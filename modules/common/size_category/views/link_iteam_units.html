@@ -1,0 +1,141 @@
+<!--Search Start -->
+<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+	<div class="modal-content">
+		<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+			<h2 class="modal-title">
+				<%=  __("size_category.linked_items"); %>
+			</h2>
+		</div>
+		<div class="modal-body padding-20">
+			<div class="row clearfix" id="main-container">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+						<div class="panel panel-col-pink">
+							<div class="panel-heading" role="tab" id="item-panel-heading-id">
+								<h4 class="panel-title">
+									<a role="button" data-toggle="collapse" data-target="#item-panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+										aria-controls="panel-collapse-id">
+										<%= __("system.search"); %>
+										<span class="pull-right collapse-toggle-icon"></span>
+									</a>
+								</h4>
+							</div>
+							<div id="item-panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="item-panel-heading-id">
+								<div class="panel-body">
+									<form id="searchForm" name="searchForm" data-rel="searchFormItem">
+										<div class="row clearfix dataTables_wrapper">
+											<!-- Search by item name in english -->
+											<div class="col-xs-12 col-sm-5">
+												<div class="form-group">
+													<div class="form-line">
+														<input class="form-control" id="item_column_filter_0"  onkeyup="searchLinkItemDatatable(0)" placeholder="<%= __('admin.menu_manager.search_by_item'); %>" name="search_by_item">
+													</div>
+												</div>
+											</div>
+											<!-- Search by branch name in english -->
+											<div class="col-xs-12 col-sm-5 col-md-5 col-lg-5">
+				                                <div class="form-group">
+				                                    <div class="form-line">
+				                                        <select name="search_by_branch_name" id="item_column_filter_2" onchange="searchLinkItemDatatable(2)" data-placeholder="<%=__('menu_manager.select_branch') %>" class="form-control" data-live-search="true">
+				                                       	 	<option value=""><%=__("admin.menu_manager.select_branch");%></option>
+				                                          	<%- branches_list%>
+				                                        </select>
+				                                    </div>
+				                                </div>
+				                            </div>
+
+											<!-- reset button -->
+											<div class="col-md-2">
+												<button type="button" id="resetdata" class="btn btn-sm waves-effect btn-danger">
+													<%= __("system.reset")%>
+												</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--Search End -->
+			<div class="row clearfix">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="card">
+
+						<div class="body dataTable-item">
+							<table id="datatable-listing-item" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+								<thead>
+									<tr>
+										<th><%= __("size_category.name_in_english");%></th>
+										<th><%= __("size_category.name_in_arabic");%></th>
+										<th><%= __("size_category.branch_name_in_english");%></th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTableItem =	"";
+	$(document).ready(function() {
+		$('#item_column_filter_2').selectpicker('refresh');
+		$('#item_column_filter_0').selectpicker('refresh');
+		dataTableItem = $('#datatable-listing-item').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ "data": 'name.en' },
+				{ "data": 'name.ar' },
+				{ "data": 'branch_name.en','field_name':'branch_id','field_type':'<%= OBJECT_ID_FIELD %>' },
+			],
+			"ajax":{
+				url 	: "<%=list_url%>/unit_item/<%=item_unit_id%>",
+				type	: "POST",
+				dataSrc	: function(res){
+					adjustPermissionsClass();
+					return res.data;
+				}
+			},
+			drawCallback:function(){
+				setTimeout(()=>{
+					dataTableItem.columns.adjust();
+				},200);
+			}
+		});
+	});
+
+	/** Javascript function to search datatable */
+	function searchLinkItemDatatable(columnNumber){
+
+		var query= $('#item_column_filter_'+columnNumber).val();
+
+		dataTableItem.column(columnNumber).search(query).draw()
+	}//end searchLinkItemDatatable()
+
+	 $('#resetdata').click(function(){
+		$('form[data-rel="searchFormItem"]').trigger("reset");
+		$('#item_column_filter_2').selectpicker('refresh');
+		$('#item_column_filter_0').selectpicker('refresh');
+		dataTableItem.state.clear();
+		dataTableItem.columns().search('').draw();
+ 	});
+
+</script>
+<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>

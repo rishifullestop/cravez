@@ -1,0 +1,1109 @@
+<%
+   let grossOrderFooterColumn = (!settlement) ? 11 : 10;
+   let deliveryFeeFooterColumn = (!settlement) ? 12 : 11;
+   let resDiscountValueFooterColumn = (!settlement) ? 13 : 12;
+   let netAmountFooterColumn = (!settlement) ? 14 : 13;
+   let crvDiscountValueFooterColumn = (!settlement) ? 15 : 14;
+   let walletPaymentFooterColumn = (!settlement) ? 16 : 15;
+   let invoiceOrderFooterColumn = (!settlement) ? 17 : 16;
+   let cravezCashFooterColumn = (!settlement) ? 19 : 18;
+   let cravezKnetFooterColumn = (!settlement) ? 20 : 19;
+   let cravezWalletFooterColumn = (!settlement) ? 21 : 20;
+   let discountRefundFooterColumn = (!settlement) ? 22 : 21;
+   let cravezCommissionFooterColumn = (!settlement) ? 23 : 22;
+   let knetChargesFooterColumn = (!settlement) ? 24 : 23;
+   let epayFooterColumn = (!settlement) ? 25 : 24;
+   let dueAmountFooterColumn = (!settlement) ? 26 : 25;
+   var fromDate = (!settlement && from_date) ? newDate(from_date,DATABASE_DATE_TIME_FORMAT) : "";
+   var toDate   = (!settlement && to_date)   ? newDate(to_date,DATABASE_DATE_TIME_FORMAT)   : "";
+   var url 		= (settlement) ? admin_list_url+'/settled_payment/order_details/'+restaurant_id : admin_list_url+'/unsettled_payment/order_details/'+restaurant_id;
+   var restaurantDetails    	   = (typeof restaurant_details !== typeof undefined && restaurant_details)       ? restaurant_details	    :{};
+   var restaurantCommission 	   = (typeof restaurant_commission !== typeof undefined && restaurant_commission) ? restaurant_commission	:{};
+   var commissionValue 			   = (typeof restaurantCommission.commission_value !== typeof undefined && restaurantCommission.commission_value) ? restaurantCommission.commission_value	:{};
+   var cravezCommissionDetails 	   = (typeof commissionValue.cravez !== typeof undefined && commissionValue.cravez) 		? commissionValue.cravez	 :{};
+   var restaurantCommissionDetails = (typeof commissionValue.restaurant !== typeof undefined && commissionValue.restaurant) ? commissionValue.restaurant :{};
+   var pickupCommissionDetails 	   = (typeof commissionValue["pick-up"] !== typeof undefined && commissionValue["pick-up"]) ? commissionValue["pick-up"] :{};
+
+%>
+
+<div class="container-fluid" id="main-container">
+	<!-- Restaurant Details Section -->
+	<div class="row m-b-20">
+		<div class="marchant_file">
+		<% if(cravezCommissionDetails.commission_type && cravezCommissionDetails.commission_criteria && cravezCommissionDetails.values) {%>
+			<div class="col-sm-4">
+				<div class="all_restaurant order-detail-class">
+					<h4 class="text-center col-black"><%= __('admin.unsettled_payments.cravez'); %></h4>
+					<ul>
+						<li>
+							<label><%= __('admin.unsettled_payments.commission_criteria'); %></label>
+							<span><%= COMMISSION_CRITERIA_OBJECT[cravezCommissionDetails.commission_criteria] %></span>
+						</li>
+						<li>
+							<label><%= __('admin.unsettled_payments.commission_type'); %></label>
+							<span><%= COMMISSION_TYPE_OBJECT[cravezCommissionDetails.commission_type] %></span>
+						</li>
+						<% if(cravezCommissionDetails.commission_type == COMMISSION_FIXED){ %>
+							<li>
+								<label><%= __('admin.unsettled_payments.commission'); %></label>
+								<span>
+									<% if(cravezCommissionDetails.values && cravezCommissionDetails.values.length > 0){
+										cravezCommissionDetails.values.map(records=>{ %>
+											<%=records.commission%>
+										<% });
+									} %>
+								</span>
+							</li>
+						<% } else if(cravezCommissionDetails.commission_type == COMMISSION_VARIABLE) { %>
+							<li>
+								<label><%= __('admin.unsettled_payments.commission_details'); %></label>
+								<table class="row-border hover table table-bordered dataTable" cellspacing="0" width="100%">
+									<thead>
+										<tr>
+											<th><%= __('admin.unsettled_payments.commission'); %></th>
+											<th><%= __('admin.unsettled_payments.amount_from'); %></th>
+											<th><%= __('admin.unsettled_payments.amount_to'); %></th>
+										</tr>
+									</thead>
+									<tbody>
+										<% if(cravezCommissionDetails.values && cravezCommissionDetails.values.length > 0){
+											cravezCommissionDetails.values.map(records=>{ %>
+												<tr>
+													<td><%=records.commission%></td>
+													<td><%=currencyFormat(records.from)%></td>
+													<td><%=currencyFormat(records.to)%></td>
+												</tr>
+											<% });
+										} %>
+									</tbody>
+								</table>
+							</li>
+						<% } %>
+					</ul>
+				</div>
+			</div>
+		<% } %>
+		<% if(restaurantCommissionDetails.commission_type && restaurantCommissionDetails.commission_criteria && restaurantCommissionDetails.values) {%>
+			<div class="col-sm-4">
+				<div class="all_restaurant order-detail-class">
+					<h4 class="text-center col-black"><%= __('admin.unsettled_payments.restaurant'); %></h4>
+					<ul>
+						<li>
+							<label><%= __('admin.unsettled_payments.commission_criteria'); %></label>
+							<span><%= COMMISSION_CRITERIA_OBJECT[restaurantCommissionDetails.commission_criteria] %></span>
+						</li>
+						<li>
+							<label><%= __('admin.unsettled_payments.commission_type'); %></label>
+							<span><%= COMMISSION_TYPE_OBJECT[restaurantCommissionDetails.commission_type] %></span>
+						</li>
+						<% if(restaurantCommissionDetails.commission_type == COMMISSION_FIXED){ %>
+							<li>
+								<label><%= __('admin.unsettled_payments.commission'); %></label>
+								<span>
+									<% if(restaurantCommissionDetails.values && restaurantCommissionDetails.values.length > 0){
+										restaurantCommissionDetails.values.map(records=>{ %>
+											<%=records.commission%>
+										<% });
+									} %>
+								</span>
+							</li>
+						<% } else if(restaurantCommissionDetails.commission_type == COMMISSION_VARIABLE) { %>
+							<li>
+								<label><%= __('admin.unsettled_payments.commission_details'); %></label>
+								<table class="row-border hover table table-bordered dataTable" cellspacing="0" width="100%">
+									<thead>
+										<tr>
+											<th><%= __('admin.unsettled_payments.commission'); %></th>
+											<th><%= __('admin.unsettled_payments.amount_from'); %></th>
+											<th><%= __('admin.unsettled_payments.amount_to'); %></th>
+										</tr>
+									</thead>
+									<tbody>
+										<% if(restaurantCommissionDetails.values && restaurantCommissionDetails.values.length > 0){
+											restaurantCommissionDetails.values.map(records=>{ %>
+												<tr>
+													<td><%=records.commission%></td>
+													<td><%=currencyFormat(records.from)%></td>
+													<td><%=currencyFormat(records.to)%></td>
+												</tr>
+											<% });
+										} %>
+									</tbody>
+								</table>
+							</li>
+						<% } %>
+					</ul>
+				</div>
+			</div>
+		<% } %>
+		<% if(pickupCommissionDetails.commission_type && pickupCommissionDetails.commission_criteria && pickupCommissionDetails.values) {%>
+			<div class="col-sm-4">
+				<div class="all_restaurant order-detail-class">
+					<h4 class="text-center col-black"><%= __('admin.unsettled_payments.pickup'); %></h4>
+					<ul>
+						<li>
+							<label><%= __('admin.unsettled_payments.commission_criteria'); %></label>
+							<span><%= COMMISSION_CRITERIA_OBJECT[pickupCommissionDetails.commission_criteria] %></span>
+						</li>
+						<li>
+							<label><%= __('admin.unsettled_payments.commission_type'); %></label>
+							<span><%= COMMISSION_TYPE_OBJECT[pickupCommissionDetails.commission_type] %></span>
+						</li>
+						<% if(pickupCommissionDetails.commission_type == COMMISSION_FIXED){ %>
+							<li>
+								<label><%= __('admin.unsettled_payments.commission'); %></label>
+								<span>
+									<% if(pickupCommissionDetails.values && pickupCommissionDetails.values.length > 0){
+										pickupCommissionDetails.values.map(records=>{ %>
+											<%=records.commission%>
+										<% });
+									} %>
+								</span>
+							</li>
+						<% } else if(pickupCommissionDetails.commission_type == COMMISSION_VARIABLE) { %>
+							<li>
+								<label><%= __('admin.unsettled_payments.commission_details'); %></label>
+								<table class="row-border hover table table-bordered dataTable" cellspacing="0" width="100%">
+									<thead>
+										<tr>
+											<th><%= __('admin.unsettled_payments.commission'); %></th>
+											<th><%= __('admin.unsettled_payments.amount_from'); %></th>
+											<th><%= __('admin.unsettled_payments.amount_to'); %></th>
+										</tr>
+									</thead>
+									<tbody>
+										<% if(pickupCommissionDetails.values && pickupCommissionDetails.values.length > 0){
+											pickupCommissionDetails.values.map(records=>{ %>
+												<tr>
+													<td><%=records.commission%></td>
+													<td><%=currencyFormat(records.from)%></td>
+													<td><%=currencyFormat(records.to)%></td>
+												</tr>
+											<% });
+										} %>
+									</tbody>
+								</table>
+							</li>
+						<% } %>
+					</ul>
+				</div>
+			</div>
+		<% } %>
+		</div>
+	</div>
+	<!-- Restaurant Details Section -->
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>&nbsp;&nbsp;(<%=restaurant_details.name[DEFAULT_LANGUAGE_CODE]%>)
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<% let branchFilter =  (!settlement) ? 4 : 3;
+									   let orderStatusFilter =  (!settlement) ? 27 : 26;
+									   let orderIdFilter =  (!settlement) ? 3 : 2;
+									   let paymentFilter =  (!settlement) ? 10 : 9;
+									%>
+									<!-- Search by branch -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="branch_id" id="column_filter_<%=branchFilter%>" data-live-search="true" onchange="searchDatatable('<%=branchFilter%>')">
+													<option value=""><%= __("admin.unsettled_payments.search_by_branch"); %></option>
+													<%-branch_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by order status -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="order_status" id="order_status">
+													<option value=""><%= __("admin.unsettled_payments.search_by_order_status"); %></option>
+													<% Object.keys(FILTER_ORDER_STATUS).map(key=>{
+														var selected = (!settlement && key == ORDER_DELIVERED) ? "selected" : "";
+														%>
+														<option value="<%=key%>" <%=selected%>>
+															<%= FILTER_ORDER_STATUS[key].status_name%>
+														</option> <%
+													}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by order id -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="unique_order_id" id="column_filter_<%=orderIdFilter%>"  onkeyup="searchDatatable('<%=orderIdFilter%>')" placeholder="<%= __('admin.unsettled_payments.search_by_order_id'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by order Date -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" value="<%=(from_date && to_date) ? newDate(from_date,DATABASE_DATE_FORMAT)+' - '+newDate(to_date,DATABASE_DATE_FORMAT) : ''%>" placeholder="<%= __('admin.unsettled_payments.search_by_order_date'); %>" name="date-range-picker">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=fromDate%>">
+											<input class="form-control hide" id="to_date"  type="text" name="to_date" value="<%=toDate%>">
+										</div>
+									</div>
+									<!-- Search by payment method -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick search_by_payment_method" id="payment_method" name="payment_method" multiple title="<%=__('admin.unsettled_payments.search_by_payment_method');%>">
+													<%-payment_methods%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" data-href="<%=url%>">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.unsettled_payments.order_details"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm <%= getPermissionClass(module_type,[(!settlement) ? 'unsettled_payments' : 'settled_payments','export_order_logs']); %>">
+						<li>
+							<a href="javascript:void(0);" id="dataExportBtn">
+								<button type="button" class="btn btn-sm bg-green waves-effect">
+									<%= __("admin.report.export")%>
+								</button>
+							</a>
+						</li>
+						<% if(!settlement) { %>
+							<li>
+								<a  data-open-modal="true" class="action-btn perform_action <%= getPermissionClass(module_type,['unsettled_payments','pay']); %>">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("admin.unsettled_payments.proceed"); %>
+									</button>
+								</a>
+							</li>
+						<% } %>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<% if(!settlement) { %>
+									<th width="3%" class="p-r-10 text-center" >
+										<div class="materialize_checkbox">
+											<input type="checkbox" class="filled-in chk-col-indigo" id="select_all">
+											<label for="select_all" class="select_all p-l-20 v-align-bottom m-b-0"></label>
+										</div>
+									</th>
+								<% } %>
+								<th><%= __("admin.report.serial_no"); %></th>
+								<th><%= __("admin.unsettled_payments.order_date"); %></th>
+								<th><%= __("admin.unsettled_payments.order_id"); %></th>
+								<th><%= __("admin.unsettled_payments.branch_name"); %></th>
+								<th><%= __("admin.unsettled_payments.client_mobile_number"); %></th>
+								<th><%= __("admin.unsettled_payments.client_name"); %></th>
+								<th><%= __("admin.unsettled_payments.area"); %></th>
+								<th><%= __("admin.unsettled_payments.delivery_by"); %></th>
+								<th><%= __("admin.unsettled_payments.customer_category"); %></th>
+								<th><%= __("admin.unsettled_payments.payment_method"); %></th>
+								<th><%= __("admin.unsettled_payments.gross_order_amount"); %></th>
+								<th><%= __("admin.unsettled_payments.delivery_fees"); %></th>
+								<th><%= __("admin.unsettled_payments.res_discount"); %></th>
+								<th><%= __("admin.unsettled_payments.net_order_amount"); %></th>
+								<th><%= __("admin.unsettled_payments.crv_discount"); %></th>
+								<th><%= __("admin.unsettled_payments.wallet_payment"); %></th>
+								<th><%= __("admin.unsettled_payments.invoice_order_amount"); %></th>
+								<th><%= __("admin.unsettled_payments.offer"); %></th>
+								<th><%= __("admin.unsettled_payments.collected_by_cravez_cash"); %></th>
+								<th><%= __("admin.unsettled_payments.collected_by_cravez_knet"); %></th>
+								<th><%= __("admin.unsettled_payments.collected_by_cravez_wallet"); %></th>
+								<th><%= __("admin.unsettled_payments.discount_refund_to_restaurant"); %></th>
+								<th><%= __("admin.unsettled_payments.cravez_commission"); %></th>
+								<th><%= __("admin.unsettled_payments.knet_charges"); %>&nbsp;&nbsp;(<%= (knet_commission) ? round(knet_commission) : 0 ;%>)</th>
+								<th><%= __("admin.unsettled_payments.epay_charges"); %>&nbsp;&nbsp;(<%= (credit_commission) ? round(credit_commission) : 0 ;%>)</th>
+								<th><%= __("admin.unsettled_payments.due_amount_to_restaurant"); %></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<% if(!settlement) { %>
+									<th class="sales_th"></th>
+								<% } %>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.js"></script>
+
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable	     =	"";
+		var checkboxArray	 =	{};
+		var orderNumber 	 =  <%=(!settlement)%> ? 2 : 1;
+		var PAYMENT_METHODS	 = 	<%- JSON.stringify(PAYMENT_METHODS)%>;
+		var CASH_PAYMENT     = "<%=CASH_PAYMENT%>";
+		var WALLET_PAYMENT     = "<%=WALLET_PAYMENT%>";
+		var KNET 			 = "<%=KNET%>";
+		var CREDIT_PAYMENT 	= "<%=CREDIT_PAYMENT%>";
+		var USER_CLIENT_TYPE = 	<%- JSON.stringify(USER_CLIENT_TYPE)%>;
+		var settlement       =  "<%=settlement%>";
+
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[orderNumber, "desc"]],
+				"dom"		: 	'lrtip',
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+
+					<% if(!settlement) { %>
+						{ 	"data"		: {},
+							"orderable" : false,
+							"render" 	: function(result){
+								let orderId = (result._id) ? result._id :"";
+
+								let checkHtml = '<div class=" materialize_checkbox  p-r-25">'+
+									'<div class="checkbox_wrapper">'+
+										'<input type="checkbox" class="filled-in chk-col-indigo" id="'+orderId+'" >'+
+										'<label for="'+orderId+'" class="checkbox data"></label>'+
+									'</div>'+
+								'</div>';
+								return (result.order_status=='<%= ORDER_DELIVERED %>') ? checkHtml : '';
+							}
+						},
+					<% } %>
+					{
+						"data" 		: "created",
+						"orderable" : false,
+						"render"	: function ( data, type, full, meta ) {
+							return  '<span class="m-l-20">'+(meta.row+ 1)+'</span>';
+						}
+					},
+					{
+						"data"	 : 'order_date',
+						"render" : 	function(order_date){
+							return moment(order_date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"		 :  {} ,
+						"field_name" : "unique_order_id",
+						"orderable"  : false,
+						"render" 	 : 	function(result){
+							return '<a href="<%= WEBSITE_ADMIN_URL+'orders/view/'%>'+result._id+'" target="_blank">'+result.unique_order_id+'</a>';
+						}
+					},
+					{   "data"		 : "branch_name",
+						"orderable"  : false,
+						"field_name" : "branch_id",
+						"field_type" : "<%=OBJECT_ID_FIELD%>",
+
+					},
+					{   "data"		 : "mobile_number",
+						"searchable" : false,
+						"orderable"  : false
+					},
+					{   "data"		 : "client_full_name",
+						"searchable" : false,
+						"orderable"  : false,
+					},
+					{   "data"		 : "area_name.en",
+						"searchable" : false,
+						"orderable"  : false
+					},
+					{
+						"data"		: "delivery_by" ,
+						"orderable" : false,
+						"searchable": false,
+					},
+					{   "data"		 : "customer_category",
+						"searchable" : false,
+						"orderable"  : false,
+						"render" 	 : 	function(customerCategory){
+							return (customerCategory) ?  USER_CLIENT_TYPE[customerCategory] : "";
+						}
+					},
+					{
+						"data"		 :  "payment_method" ,
+						"orderable"  : 	false,
+						"field_name" : "payment_method",
+						"field_type" : "<%=EXACT_FIELD%>",
+					},
+					{
+						"data"		 : 'net_amount',
+						"searchable" : 	false,
+						"render" 	 : 	function(net_amount){
+							return  (typeof net_amount !== typeof undefined) ? currencyFormat(net_amount, true) :  customRound(0);
+						}
+					},
+					{
+						"data"		 : 'delivery_fee',
+						"searchable" : 	false,
+						"render" 	 : 	function(delivery_fee){
+							return  (typeof delivery_fee !== typeof undefined) ? currencyFormat(delivery_fee, true) : customRound(0);
+						}
+					},
+					{
+						"data"		: {},
+						"searchable": false,
+						"orderable": false,
+						"render"	: function(result){
+							let total = result.order_price;
+							let resDiscountPercent = (result.restaurant_discount_percentage)? result.restaurant_discount_percentage:0;
+							let resDiscountValue = (total/100)* resDiscountPercent;
+
+							return  currencyFormat(resDiscountValue, true);
+						}
+					},
+					{
+						"data"		 : {},
+						"searchable" : 	false,
+						"orderable": false,
+						"render" 	 : 	function(result){
+							let grossAmount = (typeof result.net_amount !== typeof undefined) ? customRound(result.net_amount,CURRENCY_ROUND_PRECISION) : 0;
+							let deliveryFees = (typeof result.delivery_fee !== typeof undefined) ? customRound(result.delivery_fee,CURRENCY_ROUND_PRECISION) : 0;
+							let total = result.order_price;
+							let resDiscountPercent = (result.restaurant_discount_percentage) ? result.restaurant_discount_percentage : 0;
+							let resDiscountValue = (total / 100) * resDiscountPercent;
+							return currencyFormat((grossAmount+deliveryFees-resDiscountValue), true);
+						}
+					},
+					{
+						"data"		: {},
+						"searchable": false,
+						"orderable": false,
+						"render"	: function(result){
+							let total = result.order_price;
+							let totalDiscount = result.discount_price;
+							let resDiscountPercent = (result.restaurant_discount_percentage)? result.restaurant_discount_percentage:0;
+							let resDiscountValue = (total/100)* resDiscountPercent;
+							let crvDiscount = totalDiscount- resDiscountValue;
+							return  currencyFormat(crvDiscount, true);
+						}
+					},
+					{
+						"data"		 : {},
+						"searchable" : 	false,
+						"orderable": false,
+						"render" 	 : 	function(result){
+							return (result.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? currencyFormat(result.order_price, true) :  ((result.amount_debited_by_wallet)?currencyFormat(result.amount_debited_by_wallet, true): customRound(0));
+						}
+					},
+					{
+						"data"		 : {},
+						"searchable" : 	false,
+						"orderable": false,
+						"render" 	 : 	function(result){
+							let walletPayment = (result.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(result.order_price,CURRENCY_ROUND_PRECISION) : ((result.amount_debited_by_wallet) ? customRound(result.amount_debited_by_wallet,CURRENCY_ROUND_PRECISION) : customRound(0));
+							let total = (typeof result.order_price !== typeof undefined) ? customRound(result.order_price,CURRENCY_ROUND_PRECISION) : 0;
+							let totalDiscount = (result.discount_price)? result.discount_price:0;
+							let grossAmount = (typeof result.net_amount !== typeof undefined) ? customRound(result.net_amount,CURRENCY_ROUND_PRECISION) : 0;
+							let deliveryFees = (typeof result.delivery_fee !== typeof undefined) ? customRound(result.delivery_fee,CURRENCY_ROUND_PRECISION) : 0;
+							let resDiscountPercent = (result.restaurant_discount_percentage) ? result.restaurant_discount_percentage : 0;
+							let resDiscountValue = (total / 100) * resDiscountPercent;
+							let crvDiscount = totalDiscount - resDiscountValue;
+							let netOrderAmount = (grossAmount + deliveryFees - resDiscountValue);
+							let invoiceOrderAmount = netOrderAmount- crvDiscount- walletPayment;
+							return currencyFormat(invoiceOrderAmount, true);
+						}
+					},
+					{
+						"data"		 : 'offer_code',
+						"searchable" : 	false,
+						"orderable"  :  false,
+					},
+					{
+						"data"		 : {},
+						"orderable"  : false,
+						"searchable" : false,
+						"render"     : function(result){
+							let paymentMethod = result.payment_method ? result.payment_method : "";
+							let orderPrice    = result.order_price    ? result.order_price    : "";
+							let deliveryType  = result.delivery_type  ? result.delivery_type  : "";
+							let html          = 0;
+
+							if(paymentMethod == PAYMENT_METHODS[CASH_PAYMENT] && deliveryType == '<%= DELIVERY_BY_CRAVEZ %>'){
+								let walletPayment = (result.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(result.order_price,CURRENCY_ROUND_PRECISION) : ((result.amount_debited_by_wallet) ? customRound(result.amount_debited_by_wallet,CURRENCY_ROUND_PRECISION) : customRound(0));
+								let totalDiscount = result.discount_price;
+								let grossAmount = (typeof result.net_amount !== typeof undefined) ? customRound(result.net_amount,CURRENCY_ROUND_PRECISION) : 0;
+								let deliveryFees = (typeof result.delivery_fee !== typeof undefined) ? customRound(result.delivery_fee,CURRENCY_ROUND_PRECISION) : 0;
+								let resDiscountPercent = (result.restaurant_discount_percentage) ? result.restaurant_discount_percentage : 0;
+								let resDiscountValue = (orderPrice / 100) * resDiscountPercent;
+								let crvDiscount = totalDiscount - resDiscountValue;
+								let netOrderAmount = (grossAmount + deliveryFees - resDiscountValue);
+								let invoiceOrderAmount = netOrderAmount - crvDiscount - walletPayment;
+								html = currencyFormat(invoiceOrderAmount, true);
+							}
+							return html;
+						}
+					},
+					{
+						"data"		 : {},
+						"searchable" : false,
+						"orderable"		:   false,
+						"render" 	 : function(result){
+							let paymentMethod = result.payment_method ? result.payment_method : "";
+							let orderPrice = result.order_price ? result.order_price : "";
+							let deliveryType = result.delivery_type ? result.delivery_type : "";
+							let html = 0;
+
+							if (paymentMethod == PAYMENT_METHODS[KNET]) {
+								let walletPayment = (result.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(result.order_price,CURRENCY_ROUND_PRECISION) : ((result.amount_debited_by_wallet) ? customRound(result.amount_debited_by_wallet,CURRENCY_ROUND_PRECISION) : customRound(0));
+								let totalDiscount = result.discount_price;
+								let grossAmount = (typeof result.net_amount !== typeof undefined) ? customRound(result.net_amount,CURRENCY_ROUND_PRECISION) : 0;
+								let deliveryFees = (typeof result.delivery_fee !== typeof undefined) ? customRound(result.delivery_fee,CURRENCY_ROUND_PRECISION) : 0;
+								let resDiscountPercent = (result.restaurant_discount_percentage) ? result.restaurant_discount_percentage : 0;
+								let resDiscountValue = (orderPrice / 100) * resDiscountPercent;
+								let crvDiscount = totalDiscount - resDiscountValue;
+								let netOrderAmount = (grossAmount + deliveryFees - resDiscountValue);
+								let invoiceOrderAmount = netOrderAmount - crvDiscount - walletPayment;
+								html = currencyFormat(invoiceOrderAmount, true);
+							}
+							return html;
+						}
+					},
+					{
+						"data"		 : {},
+						"searchable" : 	false,
+						"orderable": false,
+						"render" 	 : 	function(result){
+							return (result.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? currencyFormat(result.order_price, true) : (result.amount_debited_by_wallet) ? currencyFormat(result.amount_debited_by_wallet, true) : customRound(0);
+						}
+					},
+					{
+						"data"		: {},
+						"searchable": false,
+						"orderable": false,
+						"render"	: function(result){
+							let total = result.order_price;
+							let totalDiscount = result.discount_price;
+							let resDiscountPercent = (result.restaurant_discount_percentage)? result.restaurant_discount_percentage:0;
+							let resDiscountValue = (total/100)* resDiscountPercent;
+							let crvDiscount = totalDiscount- resDiscountValue;
+							return  currencyFormat(crvDiscount, true);
+						}
+					},
+					{
+						"data"		 : {},
+						"searchable" : 	false,
+						"render" 	 : 	function(result){
+							let cravezPayout = (typeof result.cravez_payout !== typeof undefined) ? customRound(result.cravez_payout,CURRENCY_ROUND_PRECISION) : customRound(0);
+							let cashCharges = (typeof result.payment_charges !== typeof undefined && result.payment_charges["<%= CASH_PAYMENT%>"]) ? customRound(result.payment_charges["<%= CASH_PAYMENT%>"].gateway_charge,CURRENCY_ROUND_PRECISION) : customRound(0);
+							return currencyFormat((cravezPayout+cashCharges), true)
+						}
+					},
+					{
+						"data"		 : 'payment_charges',
+						"searchable" : 	false,
+						"orderable"  :  false,
+						"render" 	 : 	function(payment_charges){
+							return (typeof payment_charges !== typeof undefined && payment_charges["<%= KNET%>"]) ? currencyFormat(payment_charges["<%= KNET%>"].gateway_charge, true) : customRound(0);
+						}
+					},
+					{
+						"data"		 : 'payment_charges',
+						"searchable" : 	false,
+						"orderable"  :  false,
+						"render" 	 : 	function(payment_charges){
+							return (typeof payment_charges !== typeof undefined && payment_charges["<%= CREDIT_PAYMENT%>"]) ? currencyFormat(payment_charges["<%= CREDIT_PAYMENT%>"].gateway_charge, true) : customRound(0);
+						}
+					},
+					{
+						"data"		 : {},
+						"searchable" : 	false,
+						"orderable": false,
+						"render" 	 : 	function(result){
+							let dueAmount = 0;
+							let walletPayment = (result.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(result.order_price,CURRENCY_ROUND_PRECISION) : ((result.amount_debited_by_wallet) ? customRound(result.amount_debited_by_wallet,CURRENCY_ROUND_PRECISION) : customRound(0));
+							let knetAmount = (typeof result.total_knet_amount !== typeof undefined) ? customRound(result.total_knet_amount,CURRENCY_ROUND_PRECISION) : 0;
+
+							let cravezCommission = (typeof result.cravez_payout !== typeof undefined) ? customRound(result.cravez_payout,CURRENCY_ROUND_PRECISION) : 0;
+							let knetCharges = (result.payment_charges && result.payment_charges[KNET]) ? customRound(result.payment_charges[KNET].gateway_charge,CURRENCY_ROUND_PRECISION) : 0;
+							let epayCharges = (result.payment_charges && result.payment_charges[CREDIT_PAYMENT]) ? customRound(result.payment_charges[CREDIT_PAYMENT].gateway_charge,CURRENCY_ROUND_PRECISION) : 0;
+							let orderPrice = result.order_price ? result.order_price : 0;
+							let gatewayCharge = result.gateway_charge ? result.gateway_charge : 0;
+							let deliveryFees = (typeof result.delivery_fee !== typeof undefined) ? customRound(result.delivery_fee,CURRENCY_ROUND_PRECISION) : 0;
+							let totalDiscount = result.discount_price || 0;
+							let grossAmount = (typeof result.net_amount !== typeof undefined) ? customRound(result.net_amount,CURRENCY_ROUND_PRECISION) : 0;
+							let resDiscountPercent = (typeof result.restaurant_discount_percentage !== typeof undefined) ? result.restaurant_discount_percentage : 0;
+							let resDiscountValue = (orderPrice / 100) * resDiscountPercent;
+							let crvDiscount = totalDiscount - resDiscountValue;
+							let discountRefund = (typeof crvDiscount !== typeof undefined) ? parseFloat(crvDiscount) : 0;
+
+							if(result.delivery_type == '<%= DELIVERY_BY_CRAVEZ %>'){
+								if (result.payment_method == PAYMENT_METHODS[CASH_PAYMENT]){
+
+									let netOrderAmount = (grossAmount + deliveryFees - resDiscountValue);
+									let invoiceOrderAmount = netOrderAmount - crvDiscount - walletPayment;
+									let cashAmount = customRound(invoiceOrderAmount,CURRENCY_ROUND_PRECISION);
+									dueAmount = (cashAmount+ knetAmount+walletPayment+discountRefund)-(cravezCommission+gatewayCharge+deliveryFees);
+								}else{
+									dueAmount = (knetAmount + walletPayment + discountRefund) - (cravezCommission + gatewayCharge + deliveryFees);
+								}
+							} else{
+								dueAmount = (knetAmount + walletPayment + discountRefund) - (cravezCommission + gatewayCharge);
+							}
+							return currencyFormat(dueAmount,true);
+						}
+					},
+					{   "data"		 : "order_status",
+					    "field_name" : "order_status",
+						"visible"    : false,
+						"field_type" : "<%=EXACT_FIELD%>",
+					}
+				],
+				"ajax":{
+					url 	:	"<%=url%>",
+					type	: 	"POST",
+					data	: 	function (d) {
+						d.fromDate 	=   $('#from_date').val();
+						d.toDate 	=   $('#to_date').val();
+						d.order_status = $('#order_status').val();
+						d.payment_method = $('#payment_method').val();
+				    },
+					dataSrc	: 	function(res){
+						setTimeout(()=>{
+							dataTable.columns.adjust();
+						},100);
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"footerCallback": function ( row, data, start, end, display ) {
+					var api = this.api(), data;
+
+					// Remove the formatting to get integer data for summation
+					var intVal = function ( i ) {
+						return typeof i === 'string' ?  i*1 : typeof i === 'number' ? i : 0;
+					};
+
+					// Total over this page
+					grossAmount = api
+						.column( "<%=grossOrderFooterColumn%>", { page: 'current'} )
+						.data()
+						.reduce( function (a, b) {
+							return intVal(a) + intVal(b);
+						}, 0 );
+					deliveryFees = api
+						.column( "<%=deliveryFeeFooterColumn%>", { page: 'current'} )
+						.data()
+						.reduce( function (a, b) {
+							return intVal(a) + intVal(b);
+						}, 0 );
+					resDiscountValue = api
+						.column( "<%=resDiscountValueFooterColumn%>", { page: 'current'} )
+						.data()
+						.reduce( function (a, b) {
+							let total = b.order_price;
+							let resDiscountPercent = (b.restaurant_discount_percentage) ? b.restaurant_discount_percentage : 0;
+							let resDiscountValue = customRound(((total / 100) * resDiscountPercent),CURRENCY_ROUND_PRECISION);
+							return intVal(a) + intVal(resDiscountValue);
+						}, 0 );
+					netOrderAmount = api
+						.column( "<%=netAmountFooterColumn%>", { page: 'current'} )
+						.data()
+						.reduce( function (a, b) {
+							let grossAmount = (typeof b.net_amount !== typeof undefined) ? customRound(b.net_amount,CURRENCY_ROUND_PRECISION) : 0;
+							let deliveryFees = (typeof b.delivery_fee !== typeof undefined) ? customRound(b.delivery_fee,CURRENCY_ROUND_PRECISION) : 0;
+							let total = b.order_price;
+							let resDiscountPercent = (b.restaurant_discount_percentage) ? b.restaurant_discount_percentage : 0;
+							let resDiscountValue = (total / 100) * resDiscountPercent;
+							return intVal(a) + intVal(customRound((grossAmount + deliveryFees - resDiscountValue),CURRENCY_ROUND_PRECISION));
+						}, 0 );
+					crvDiscountValue = api
+						.column("<%=crvDiscountValueFooterColumn%>", { page: 'current' })
+						.data()
+						.reduce(function (a, b) {
+							let total = b.order_price;
+							let totalDiscount = b.discount_price;
+							let resDiscountPercent = (b.restaurant_discount_percentage) ? b.restaurant_discount_percentage : 0;
+							let resDiscountValue = (total / 100) * resDiscountPercent;
+							let crvDiscount = totalDiscount - resDiscountValue;
+							return intVal(a) + intVal(customRound(crvDiscount,CURRENCY_ROUND_PRECISION));
+						}, 0);
+					walletPaymentValue = api
+						.column("<%=walletPaymentFooterColumn%>", { page: 'current' })
+						.data()
+						.reduce(function (a, b) {
+							return intVal(a) + intVal((b.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(b.order_price,CURRENCY_ROUND_PRECISION) : ((b.amount_debited_by_wallet) ? customRound(b.amount_debited_by_wallet,CURRENCY_ROUND_PRECISION) : customRound(0)));
+						}, 0);
+					invoiceOrderValue = api
+						.column("<%=invoiceOrderFooterColumn%>", { page: 'current' })
+						.data()
+						.reduce(function (a, b) {
+							let walletPayment = (b.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(b.order_price,CURRENCY_ROUND_PRECISION) : ((b.amount_debited_by_wallet) ? customRound(b.amount_debited_by_wallet,CURRENCY_ROUND_PRECISION) : customRound(0));
+							let total = (typeof b.order_price !== typeof undefined) ? customRound(b.order_price,CURRENCY_ROUND_PRECISION) : 0;
+							let totalDiscount = (b.discount_price)? b.discount_price:0;
+							let grossAmount = (typeof b.net_amount !== typeof undefined) ? customRound(b.net_amount,CURRENCY_ROUND_PRECISION) : 0;
+							let deliveryFees = (typeof b.delivery_fee !== typeof undefined) ? customRound(b.delivery_fee,CURRENCY_ROUND_PRECISION) : 0;
+							let resDiscountPercent = (b.restaurant_discount_percentage) ? b.restaurant_discount_percentage : 0;
+							let resDiscountValue = (total / 100) * resDiscountPercent;
+							let crvDiscount = totalDiscount - resDiscountValue;
+							let netOrderAmount = customRound((grossAmount + deliveryFees - resDiscountValue),CURRENCY_ROUND_PRECISION);
+							let invoiceOrderAmount = netOrderAmount - crvDiscount - walletPayment;
+							return intVal(a) + intVal(customRound(invoiceOrderAmount,CURRENCY_ROUND_PRECISION));
+						}, 0);
+					cashAmount = api
+						.column( "<%=cravezCashFooterColumn%>", { page: 'current'} )
+						.data()
+						.reduce( function (a, b) {
+							if(b.payment_method == PAYMENT_METHODS[CASH_PAYMENT] && b.delivery_type == '<%= DELIVERY_BY_CRAVEZ %>'){
+								let walletPayment = (b.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(b.order_price,CURRENCY_ROUND_PRECISION) : ((b.amount_debited_by_wallet) ? customRound(b.amount_debited_by_wallet,CURRENCY_ROUND_PRECISION) : customRound(0));
+								let total = (typeof b.order_price !== typeof undefined) ? customRound(b.order_price,CURRENCY_ROUND_PRECISION) : 0;
+								let totalDiscount = b.discount_price;
+								let grossAmount = (typeof b.net_amount !== typeof undefined) ? customRound(b.net_amount,CURRENCY_ROUND_PRECISION) : 0;
+								let deliveryFees = (typeof b.delivery_fee !== typeof undefined) ? customRound(b.delivery_fee,CURRENCY_ROUND_PRECISION) : 0;
+								let resDiscountPercent = (b.restaurant_discount_percentage) ? b.restaurant_discount_percentage : 0;
+								let resDiscountValue = (total / 100) * resDiscountPercent;
+								let crvDiscount = totalDiscount - resDiscountValue;
+								let netOrderAmount = customRound(grossAmount + deliveryFees - resDiscountValue,CURRENCY_ROUND_PRECISION);
+								let invoiceOrderAmount = netOrderAmount - crvDiscount - walletPayment;
+								return intVal(a) + intVal(customRound(invoiceOrderAmount,CURRENCY_ROUND_PRECISION));
+							}else{
+								return intVal(a) + intVal(0);
+							}
+						}, 0 );
+					knetAmount = api
+						.column( "<%=cravezKnetFooterColumn%>", { page: 'current'} )
+						.data()
+						.reduce( function (a, b) {
+							if (b.payment_method == PAYMENT_METHODS[KNET] ) {
+								let walletPayment = (b.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(b.order_price,CURRENCY_ROUND_PRECISION) : ((b.amount_debited_by_wallet) ? customRound(b.amount_debited_by_wallet,CURRENCY_ROUND_PRECISION) : customRound(0));
+								let total = (typeof b.order_price !== typeof undefined) ? customRound(b.order_price,CURRENCY_ROUND_PRECISION) : 0;
+								let totalDiscount = b.discount_price;
+								let grossAmount = (typeof b.net_amount !== typeof undefined) ? customRound(b.net_amount,CURRENCY_ROUND_PRECISION) : 0;
+								let deliveryFees = (typeof b.delivery_fee !== typeof undefined) ? customRound(b.delivery_fee,CURRENCY_ROUND_PRECISION) : 0;
+								let resDiscountPercent = (b.restaurant_discount_percentage) ? b.restaurant_discount_percentage : 0;
+								let resDiscountValue = (total / 100) * resDiscountPercent;
+								let crvDiscount = totalDiscount - resDiscountValue;
+								let netOrderAmount = customRound((grossAmount + deliveryFees - resDiscountValue),CURRENCY_ROUND_PRECISION);
+								let invoiceOrderAmount = netOrderAmount - crvDiscount - walletPayment;
+								return intVal(a) + intVal(customRound(invoiceOrderAmount,CURRENCY_ROUND_PRECISION));
+							} else {
+								return intVal(a) + intVal(0);
+							}
+						}, 0 );
+					walletAmount = api
+						.column("<%=cravezWalletFooterColumn%>", { page: 'current' })
+						.data()
+						.reduce(function (a, b) {
+							return intVal(a) + intVal((b.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(b.order_price,CURRENCY_ROUND_PRECISION) : ((b.amount_debited_by_wallet) ? customRound(b.amount_debited_by_wallet,CURRENCY_ROUND_PRECISION) : customRound(0)));
+						}, 0);
+					discountRefund = api
+						.column( "<%=discountRefundFooterColumn%>", { page: 'current'} )
+						.data()
+						.reduce(function (a, b) {
+							let total = b.order_price;
+							let totalDiscount = b.discount_price;
+							let resDiscountPercent = (b.restaurant_discount_percentage) ? b.restaurant_discount_percentage : 0;
+							let resDiscountValue = (total / 100) * resDiscountPercent;
+							let crvDiscount = totalDiscount - resDiscountValue;
+							return intVal(a) + intVal(customRound(crvDiscount,CURRENCY_ROUND_PRECISION));
+						}, 0);
+					cravezCommission = api
+						.column( "<%=cravezCommissionFooterColumn%>", { page: 'current'} )
+						.data()
+						.reduce( function (a, b) {
+							let cravezPayout = (typeof b.cravez_payout !== typeof undefined) ? customRound(b.cravez_payout,CURRENCY_ROUND_PRECISION) : customRound(0);
+							let cashCharges = (typeof b.payment_charges !== typeof undefined && b.payment_charges["<%= CASH_PAYMENT%>"]) ? customRound(b.payment_charges["<%= CASH_PAYMENT%>"].gateway_charge,CURRENCY_ROUND_PRECISION) : customRound(0);
+							return intVal(a) + intVal(customRound(cravezPayout+cashCharges,CURRENCY_ROUND_PRECISION));
+						}, 0 );
+					knetCharges = api
+						.column( "<%=knetChargesFooterColumn%>", { page: 'current'} )
+						.data()
+						.reduce(function (a, b) {
+							let paymentCharge =  (b && typeof b["<%= KNET%>"] !== typeof undefined) ? b["<%= KNET%>"].gateway_charge : customRound(0);
+							return intVal(a) + intVal(paymentCharge);
+
+						}, 0 );
+					epayCharges = api
+						.column("<%=epayFooterColumn%>", { page: 'current' })
+						.data()
+						.reduce(function (a, b) {
+							let paymentCharge =  (b && b["<%= CREDIT_PAYMENT%>"]) ? b["<%= CREDIT_PAYMENT%>"].gateway_charge : customRound(0);
+							return intVal(a) + intVal(paymentCharge);
+						}, 0);
+					dueAmount = api
+						.column( "<%=dueAmountFooterColumn%>", { page: 'current'} )
+						.data()
+						.reduce( function (a, b) {
+							let dueAmount = 0;
+							let walletPayment = (b.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(b.order_price,CURRENCY_ROUND_PRECISION) : ((b.amount_debited_by_wallet) ? customRound(b.amount_debited_by_wallet,CURRENCY_ROUND_PRECISION) : customRound(0));
+							let knetAmount = (typeof b.total_knet_amount !== typeof undefined) ? customRound(b.total_knet_amount,CURRENCY_ROUND_PRECISION) : 0;
+							let discountRefund = 0;
+							let cravezCommission = (typeof b.cravez_payout !== typeof undefined) ? customRound(b.cravez_payout,CURRENCY_ROUND_PRECISION) : 0;
+							let knetCharges = (b.payment_charges && b.payment_charges[KNET]) ? customRound(b.payment_charges[KNET].gateway_charge,CURRENCY_ROUND_PRECISION) : 0;
+							let epayCharges = (b.payment_charges && b.payment_charges[CREDIT_PAYMENT]) ? customRound(b.payment_charges[CREDIT_PAYMENT].gateway_charge,CURRENCY_ROUND_PRECISION) : 0;
+							let orderPrice = b.order_price ? b.order_price : "";
+							let deliveryFees = (typeof b.delivery_fee !== typeof undefined) ? customRound(b.delivery_fee,CURRENCY_ROUND_PRECISION) : 0;
+							let gatewayCharge = (typeof b.gateway_charge !== typeof undefined) ? customRound(b.gateway_charge,CURRENCY_ROUND_PRECISION) : 0;
+							let totalDiscount = b.discount_price;
+							let grossAmount = (typeof b.net_amount !== typeof undefined) ? customRound(b.net_amount,CURRENCY_ROUND_PRECISION) : 0;
+							let resDiscountPercent = (b.restaurant_discount_percentage) ? b.restaurant_discount_percentage : 0;
+							let resDiscountValue = (orderPrice / 100) * resDiscountPercent;
+							let crvDiscount = totalDiscount - resDiscountValue;
+							if(crvDiscount > 0 ) discountRefund = crvDiscount;
+
+							if (b.delivery_type == '<%= DELIVERY_BY_CRAVEZ %>') {
+								if (b.payment_method == PAYMENT_METHODS[CASH_PAYMENT]) {
+
+									let netOrderAmount = (grossAmount + deliveryFees - resDiscountValue);
+									let invoiceOrderAmount = netOrderAmount - crvDiscount - walletPayment;
+									let cashAmount = customRound(invoiceOrderAmount,CURRENCY_ROUND_PRECISION);
+									dueAmount = (cashAmount + knetAmount + walletPayment + discountRefund) - (cravezCommission + gatewayCharge + deliveryFees);
+								} else {
+									dueAmount = (knetAmount + walletPayment + discountRefund) - (cravezCommission + gatewayCharge + deliveryFees);
+								}
+							} else {
+								dueAmount = (knetAmount + walletPayment + discountRefund) - (cravezCommission + gatewayCharge);
+							}
+							return intVal(a) + intVal(customRound(dueAmount,CURRENCY_ROUND_PRECISION));
+						}, 0 );
+					// Update footer
+					$( api.column( "<%=grossOrderFooterColumn%>" ).footer() ).html(
+						currencyFormat(grossAmount,true)
+					);
+					$( api.column( "<%=deliveryFeeFooterColumn%>" ).footer() ).html(
+						currencyFormat(deliveryFees,true)
+					);
+					$( api.column( "<%=resDiscountValueFooterColumn%>" ).footer() ).html(
+						currencyFormat(resDiscountValue,true)
+					);
+					$( api.column( "<%=netAmountFooterColumn%>" ).footer() ).html(
+						currencyFormat(netOrderAmount,true)
+					);
+					$(api.column("<%=crvDiscountValueFooterColumn%>").footer()).html(
+						currencyFormat(crvDiscountValue,true)
+					);
+					$(api.column("<%=walletPaymentFooterColumn%>").footer()).html(
+						currencyFormat(walletPaymentValue,true)
+					);
+					$(api.column("<%=invoiceOrderFooterColumn%>").footer()).html(
+						currencyFormat(invoiceOrderValue,true)
+					);
+					$( api.column( "<%=cravezCashFooterColumn%>" ).footer() ).html(
+						currencyFormat(cashAmount,true)
+					);
+					$( api.column( "<%=cravezKnetFooterColumn%>" ).footer() ).html(
+						currencyFormat(knetAmount,true)
+					);
+					$(api.column("<%=cravezWalletFooterColumn%>").footer()).html(
+						currencyFormat(walletAmount,true)
+					);
+					$( api.column( "<%=discountRefundFooterColumn%>" ).footer() ).html(
+						currencyFormat(discountRefund,true)
+					);
+					$( api.column( "<%=cravezCommissionFooterColumn%>" ).footer() ).html(
+						currencyFormat(cravezCommission,true)
+					);
+					$( api.column( "<%=knetChargesFooterColumn%>" ).footer() ).html(
+						currencyFormat(knetCharges,true)
+					);
+					$(api.column("<%=epayFooterColumn%>").footer()).html(
+						currencyFormat(epayCharges,true)
+					);
+					$( api.column( "<%=dueAmountFooterColumn%>" ).footer() ).html(
+						currencyFormat(dueAmount,true)
+					);
+				},
+			});
+
+			/*** Call Function to equal height for div */
+			setTimeout(function(){
+				setHeight('.marchant_file');
+			});
+
+			/**
+			 * Function to equal height for div
+			 */
+			function setHeight(divId){
+				var highestBox = 0;
+				$(divId+' .order-detail-class').each(function(){
+					var height = $(this).height();
+					/** Select and loop the elements you want to equalise */
+					if(height > highestBox) {
+						highestBox = height;
+					}
+				});
+				/** Set the height of all those children to whichever was highest */
+				$(divId+' .order-detail-class').height(highestBox);
+			}// End setHeight();
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		$("#order_status,#payment_method").change(function(){
+			dataTable.draw();
+		});
+
+		/**
+		 *  check/uncheck checkbox select all check/uncheck
+		 */
+		 $(document).on('change','#select_all',function(){
+			var isChecked	= $(this).is(':checked');
+			$('.checkbox_wrapper input[type="checkbox"]').not(":disabled").prop("checked",isChecked).trigger("change");
+		});
+
+		/**
+		 *  Check/Uncheck checkbox
+		 */
+		$(document).on('change','.checkbox_wrapper input[type="checkbox"]',function(){
+			var id          = $(this).attr('id');
+			var isChecked	= $(this).is(':checked');
+			if(isChecked){
+				checkboxArray[id] = true;
+			}else{
+				delete checkboxArray[id];
+			}
+			var totalCheckBox = $('.checkbox_wrapper input[type="checkbox"]').not(":disabled").length;
+			var checkedBox = $('.checkbox_wrapper input[type="checkbox"]:checked').length;
+			let selectAll = (totalCheckBox == checkedBox) ? true : false;
+			$("#select_all").prop("checked",selectAll);
+		});
+
+		/** To pay for selected orders */
+		$(document).on('click','.perform_action',function(){
+			var orderIds = Object.keys(checkboxArray);
+			if(orderIds.length < 1){
+				notice("<%= STATUS_ERROR %>","<%= __('admin.unsettled_payments.please_select_atleast_one_order')%>");
+				return false;
+			}
+			else{
+				var url = "<%=admin_list_url%>/unsettled_payment/pay/<%=restaurant_id%>?order_ids="+orderIds.join(",");
+				var options = {
+					url 	: url,
+					method	: "GET"
+				};
+				ajaxRequest(options,function(response){
+					if(response.status == 400){
+						var message = (response && response.responseJSON && response.responseJSON.message) ? response && response.responseJSON && response.responseJSON.message : "";
+						notice("error",message);
+					}else{
+						$("#form_modal").html(response).modal("show");
+						$("#select_all").prop("checked",false);
+					}
+				});
+			}
+		});
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("click","#dataExportBtn",function(){
+			var fromDate 		= $("#from_date").val();
+			var toDate   		= $("#to_date").val();
+			var orderStatus 	= $('#order_status').val();
+			var paymentMethod 	= $('#payment_method').val();
+			var branchId 		= $('#column_filter_<%=branchFilter%>').val();
+			var restaurantId	= '<%=restaurant_id%>';
+			var settlement 		= '<%=settlement%>';
+			var startDate		= (fromDate) ? fromDate : "";
+			var endDate			= (toDate) ? toDate : "";
+			var sortedCol 		= dataTable.order()[0][0];
+			var sortedDir 		= dataTable.order()[0][1];
+			var columns 		= dataTable.settings().init().columns;
+			var sortedColName 	= columns[sortedCol].data;
+
+			if(startDate && endDate){
+				var exportURL = "<%=admin_list_url%>/export_data?from_date="+startDate+"&to_date="+endDate+ "&sort_field=" + sortedColName + "&sort_dir=" + sortedDir;
+			} else{
+				var exportURL = "<%=admin_list_url%>/export_data?sort_field=" + sortedColName + "&sort_dir=" + sortedDir;
+			}
+			if (orderStatus) exportURL += "&order_status=" + orderStatus;
+			if (paymentMethod) exportURL += "&payment_method=" + paymentMethod;
+			if (settlement) exportURL += "&settlement=" + settlement;
+			if (restaurantId) exportURL += "&restaurant_id=" + restaurantId;
+			if (branchId) exportURL += "&branch_id=" + branchId;
+			window.location.href = exportURL;
+		});
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+

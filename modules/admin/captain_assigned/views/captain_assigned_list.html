@@ -1,0 +1,19 @@
+<%
+    var captainAssigned  = captain_assigned;
+%>
+<table id="datatable-listing" class="row-border fixed-width-table hover table full-length-header table-bordered" cellspacing="0" width="100%" >
+    <thead>
+        <tr>
+            <th><%= __('admin.captain_assigned.area_name'); %></th>
+            <th><%=  __('admin.captain_assigned.total_captains'); %></th>
+        </tr>
+    </thead>
+    <tbody> <%
+        captainAssigned.map(captainRecords=>{ %>
+            <tr>
+                <td><%=(captainRecords.area_name) ?  captainRecords.area_name : ""%></td>
+                <td><%=(captainRecords.total_captains) ?  captainRecords.total_captains : ""%></td>
+            </tr> <%
+        }); %>
+    </tbody>
+</table>

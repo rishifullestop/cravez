@@ -1,0 +1,110 @@
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+                    <h2><%= __('admin.survey_management.response_details'); %></h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<li>
+							<a href="<%=WEBSITE_ADMIN_URL%>survey_management/view_history/<%=survey_id%>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __('admin.system.back'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								<i class="material-icons">more_vert</i>
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li>
+									<a href="<%=WEBSITE_ADMIN_URL%>survey_management" >
+										<%= __("admin.system.back"); %>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body table-responsive" id="aniimated-thumbnials">
+					<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+						<tr>
+							<th class="text-right" width="20%"><%= __('admin.survey_management.user_name'); %></th>
+							<td><%=user_details.full_name%></td>
+                        </tr>
+                        <tr>
+                            <th class="text-right" width="20%"><%= __('admin.survey_management.survey_name'); %></th>
+                            <td><%=survey_details.name%></td>
+                        </tr>
+                        <tr>
+							<th class="text-right"><%= __('admin.survey_management.attempt_on'); %></th>
+							<td><span class="setDateTimeFormat" data-date-time="<%=attempt_details.created%>"></span></td>
+						</tr>
+					</table>
+				</div>
+            </div>
+            <div class="card">
+                <div class="body table-responsive" id="aniimated-thumbnials">
+						<div class="selected-answer">
+							<p><%= __("admin.survey_management.selected_options_are_displaying_in")%> <span class=" font-bold col-teal"> <%=__("admin.survey_management.green")%></span> <%=__("admin.survey_management.color")%></p>
+						</div>
+                    <table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th width="50%"><%= __("admin.survey_management.question"); %></th>
+                                <th width="50%"><%= __("admin.survey_management.options"); %></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%
+                                response_result.map((records)=>{
+                                    %>
+                                    <tr>
+                                        <td>
+                                            <%= records.question %>
+                                        </td>
+                                        <td>
+											<%  if(records.options && records.options.length > 0){ %>
+												<ol>
+													<% records.options.map((optionRecords)=>{
+														var option         = optionRecords.option
+														var chooseOption   = records.selected_option.find(element=>  element == option);
+														%>
+														<li>
+															<span class="<%= (chooseOption) ? 'font-bold col-teal' : ""; %>"><%=option%></span>
+														</li>
+														<%
+													}); %>
+												</ol>
+											<% }else{ %>
+												<span class="font-bold m-l-20"><%=records.answer%></span>
+											<% } %>
+                                        </td>
+                                    </tr>
+                                <%
+                                });
+                            %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('script') %>
+<script type="text/javascript">
+	/** Set client side datatable*/
+	$("#datatable-listing").DataTable({
+		order 		: [],
+		sDom 		: "ftipr",
+        lengthMenu	: PAGING_LENGTH_MENU,
+        bFilter		:   true,
+		columnDefs: [
+			{ orderable: false, targets: '_all' }
+		]
+    });
+</script>

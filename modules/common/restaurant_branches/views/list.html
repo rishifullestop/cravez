@@ -1,0 +1,378 @@
+<%
+	var restaurantSlug = 	(typeof slug !== typeof undefined && slug) ? slug :"";
+	var cuisine = 	(typeof cuisine !== typeof undefined && cuisine) ? cuisine :"";
+%>
+<!--Search Start -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-col-pink">
+				<div class="panel-heading" role="tab" id="panel-heading-id">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							aria-controls="panel-collapse-id">
+							<%= __("system.search"); %>
+							<span class="pull-right collapse-toggle-icon"></span>
+						</a>
+					</h4>
+				</div>
+				<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+					<div class="panel-body">
+						<form id="searchForm" name="searchForm" >
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by name in english -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_2"  onkeyup="searchDatatable(2)" placeholder="<%= __('branch.search_by_name_in_arabic'); %>">
+										</div>
+									</div>
+								</div>
+								<!-- Search by name in arabic-->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_3"  onkeyup="searchDatatable(3)" placeholder="<%= __('branch.search_by_name_in_english'); %>">
+										</div>
+									</div>
+								</div>
+								<!-- reset button -->
+								<div class="col-xs-12 col-sm-2">
+									<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" data-href="<%=base_url%>branches">
+										<%= __("system.reset")%>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Search End -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%=  __("branch.restaurant_branches"); %>
+				</h2>
+				<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm">
+					<% if(restaurantSlug != BURGER_KING && restaurantSlug != PIZZA_HUT){ %>
+						<li class=" m-r-10 <%= getPermissionClass(module_type,['branches','add']); %>">
+							<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/add" data-open-modal="true" class="action-btn">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect" >
+									<%= __("branch.add_branch"); %>
+								</button>
+							</a>
+						</li><%
+					} %>
+					<li class="<%= getPermissionClass(module_type,['branches','active_deactive_open_close']); %>">
+						<select class="form-control show-tick m-t--8" id="branch_status">
+							<option value=""><%= __("admin.restaurant_enquiry.select_action"); %></option>
+							<option value="<%=BRANCH_BUSY%>"> <%= __("branch.mark_as_busy"); %></option>
+							<option value="<%=BRANCH_OPEN%>"> <%= __("branch.mark_as_open"); %></option>
+							<option value="<%=BRANCH_ACTIVE%>"> <%= __("branch.mark_as_active"); %></option>
+							<option value="<%=BRANCH_DEACTIVE%>"> <%= __("branch.mark_as_deactive"); %></option>
+						</select>
+					</li>
+				</ul>
+				<!-- Only For Mobile View-->
+				<ul class="header-dropdown m-r--5 visible-xs">
+					<li class="dropdown">
+						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							<i class="material-icons">more_vert</i>
+						</a>
+						<ul class="dropdown-menu pull-right m-w-200">
+							<% if(restaurantSlug != BURGER_KING && restaurantSlug != PIZZA_HUT){ %>
+								<li class="<%= getPermissionClass(module_type,['branches','add']); %>">
+									<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/add" data-open-modal="true" class="action-btn">
+										<%= __("branch.add_branch"); %>
+									</a>
+								</li><%
+							} %>
+							<li class="<%= getPermissionClass(module_type,['branches','active_deactive_open_close']); %>">
+								<a href="Javascript:void(0)" onclick="updateBranchStatus('<%=BRANCH_BUSY%>')" >
+									<%= __("branch.mark_as_busy"); %>
+								</a>
+							</li>
+							<li class="<%= getPermissionClass(module_type,['branches','active_deactive_open_close']); %>">
+								<a href="Javascript:void(0)" onclick="updateBranchStatus('<%=BRANCH_OPEN%>')" >
+									<%= __("branch.mark_as_open"); %>
+								</a>
+							</li>
+							<li class="<%= getPermissionClass(module_type,['branches','active_deactive_open_close']); %>">
+								<a href="Javascript:void(0)" onclick="updateBranchStatus('<%=BRANCH_ACTIVE%>')" >
+									<%= __("branch.mark_as_active"); %>
+								</a>
+							</li>
+							<li class="<%= getPermissionClass(module_type,['branches','active_deactive_open_close']); %>">
+								<a href="Javascript:void(0)" onclick="updateBranchStatus('<%=BRANCH_DEACTIVE%>')" >
+									<%= __("branch.mark_as_deactive"); %>
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div class="body hideScroll">
+				<table id="datatable-listing" class="row-border  hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="2%" class="p-r-10 text-center" >
+								<div class="materialize_checkbox">
+									<input type="checkbox" class="filled-in chk-col-indigo" id="branch_select_all">
+									<label for="branch_select_all" class="p-l-20 v-align-bottom m-b-0"></label>
+								</div>
+							</th>
+							<th width="10%"><%= __("branch.branch_number");%></th>
+							<th width="13%"><%= __("branch.name_in_ar");%></th>
+							<th width="13%"><%= __("branch.name_in_en");%></th>
+							<th width="20%"><%= __("branch.address");%></th>
+							<th width="10%"><%= __("system.status");%></th>
+							<th><%= __("system.action"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable	=	"";
+	var branchCheckboxArray = {};
+	$(document).ready(function() {
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+
+		dataTable = $('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ 	"data"		: {},
+					"orderable" : false,
+					"render" 	: 	function(result){
+						let branchId = (result._id) ? 	result._id :"";
+
+						return '<div class=" materialize_checkbox p-l-15">'+
+							'<div class="branchCheckbox_wrapper">'+
+								'<input type="checkbox" class="filled-in chk-col-indigo" id="'+branchId+'">'+
+								'<label for="'+branchId+'" class="checkbox data"></label>'+
+							'</div>'+
+						'</div>';
+					}
+				},
+				<%if(isRestaurant(module_type)){%>
+					{
+					"data"		: 	'branch_number',
+					"orderable"	:	false,
+					},
+				<%}else{%>
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"field_name"	:   "branch_number",
+						"render"		: 	function(result){
+
+							return result.branch_number+"<br / > DB ID:- ("+result._id+")";
+						}
+					},
+				<%}%>
+				{
+					"data": 'name.ar',
+				},
+				{ 	"data": 'name.en' },
+				{
+					"data": 'address',
+					"orderable"	 : false,
+					"searchable" : false
+				},
+				{
+					"data"		: 	{},
+					"orderable"	:	false,
+					"searchable": 	false,
+					"render" 	: 	function(result){
+						var status	= 	(result.is_active)		? 	result.is_active 		:'';
+						var isOpen 	=	(result.branch_status)	? 	result.branch_status	:'';
+						var isFeatured 	=	(result.is_featured)	? 	result.is_featured	:'';
+
+						var statusLabel =  (status == "<%=ACTIVE%>")	? '<span class="label label-success m-r-5"><%=__("system.active")%></span>' :'<span class="label label-danger m-r-5"><%=__("system.inactive")%></span>';
+						statusLabel +=  (isOpen == "<%=OPEN%>")	? '<span class="label label-success m-r-5"><%=__("branch.open")%></span>' :'<span class="label label-danger m-r-5"><%=__("branch.busy")%></span>';
+						statusLabel +=  (isFeatured == "<%=FEATURED%>")	? '<span class="label label-success"><%=__("branch.featured")%></span>' :'<span class="label label-danger"><%=__("branch.unfeatured")%></span>';
+
+						return statusLabel;
+
+					}
+				},
+				{
+					"data"			: 	{},
+					"orderable"		:   false,
+					"searchable"	: 	false,
+					"render" 		: 	function(result){
+						var id 				= 	(result._id)			?	result._id 				:'';
+						var status			= 	(result.is_active)		? 	result.is_active		:'';
+						var isOpen 			=	(result.branch_status)	? 	result.branch_status	:'';
+						var restaurantId 	= 	(result.restaurant_id)	?	result.restaurant_id 	:'';
+						var isFeatured		= 	(result.is_featured)	? 	result.is_featured		:'';
+
+						var openStatus 		= 	(isOpen != "<%=OPEN%>") 	? 	"<%=BRANCH_OPEN%>" 	 						:"<%=BRANCH_BUSY%>";
+						var branchStatus	=	(status != "<%=ACTIVE%>")	?	"<%=BRANCH_ACTIVE%>" 						:"<%=BRANCH_DEACTIVE%>";
+						var branchFeatured	=	(isFeatured != "<%=FEATURED%>")	?	"<%=BRANCH_FEATURED%>" 					:"<%=BRANCH_UNFEATURED%>";
+						var statusLinkText  = 	(status != "<%=ACTIVE%>") 	?	"<%= __('system.activate'); %>"				:"<%= __('system.deactive'); %>" ;
+						var statusLinkTitle = 	(status != "<%=ACTIVE%>")	? 	"<%= __('system.click_to_activate'); %>"	:"<%= __('system.click_to_deactivate'); %>";
+						var openLinkText  	= 	(isOpen != "<%=OPEN%>") 	?	"<%= __('branch.mark_as_open'); %>"			:"<%= __('branch.mark_as_busy'); %>" ;
+						var openLinkTitle 	= 	(isOpen != "<%=OPEN%>")		? 	"<%= __('branch.click_to_open'); %>"		:"<%= __('branch.click_to_busy'); %>";
+						var featuredLinkText  	= 	(isFeatured != "<%=FEATURED%>") 	?	"<%= __('branch.mark_as_featured'); %>"			:"<%= __('branch.mark_as_unfeatured'); %>" ;
+						var featuredLinkTitle 	= 	(isFeatured != "<%=FEATURED%>")		? 	"<%= __('branch.click_to_mark_featured'); %>"		:"<%= __('branch.click_to_mark_unfeatured'); %>";
+
+						var url = "";
+						<%if(isRestaurant(module_type)){%>
+							url = "<%=WEBSITE_URL%>";
+						<%}else{%>
+							url = "<%=WEBSITE_ADMIN_URL%>";
+						<%}%>
+						var dropDownButton 		=	''+
+							'<ul class="action-btn-container">'+
+								'<li>'+
+									'<a href="<%= originalUrl %>" data-restaurant-url="<%=base_url%>branches/'+id+'" data-action-url="<%=list_url%>/view/'+id+'" class="waves-effect waves-block display-inline action-btn <%= getPermissionClass(module_type,["branches","branch_details"]); %>" >'+
+										'<button type="button" class="btn btn-sm bg-indigo waves-effect" >'+
+											'<%= __("branch.branch_details"); %>'+
+										'</button>'+
+									'</a>'+
+								'</li>'+
+								/** Item details Link **/
+								'<li>'+
+									'<a href="<%=base_url%>item?branch='+id+'" class="waves-effect waves-block display-inline <%= getPermissionClass(module_type,["item","list"]); %>">'+
+										'<button type="button" class="btn btn-sm bg-indigo waves-effect" >'+
+											'<%= __("branch.item_details"); %>'+
+										'</button>'+
+									'</a>'+
+								'</li>'+
+								'<li>'+
+									'<div class="btn-group">'+
+										'<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+											'<%= __("system.action"); %> '+
+											'<span class="caret"></span>'+
+										'</button>'+
+										'<ul class="dropdown-menu">'+
+											/** Cuisine priorities Link **/
+											'<li>'+
+												'<a href="'+url+'cuisine_priorities/'+restaurantId+'/'+id+'"  class="waves-effect waves-block <%= getPermissionClass(module_type,["branches","cuisine_priorities"]); %>" target="_blank">'+
+													' <%= __("branch.cuisine_priorities"); %>'+
+												'</a>'+
+											'</li>'+
+											/** Open status Link  **/
+											'<li>'+
+												'<a href="javascript:void(0)" onclick="updateBranchStatus('+openStatus+',\''+id+'\')"  class=" waves-effect waves-block <%= getPermissionClass(module_type,["branches","active_deactive_open_close"]); %>" title="'+openLinkTitle+'">'+
+													''+openLinkText+
+												'</a>'+
+											'</li>'+
+											/** Status Link  **/
+											'<li>'+
+												'<a href="javascript:void(0)" onclick="updateBranchStatus('+branchStatus+',\''+id+'\')"  class=" waves-effect waves-block <%= getPermissionClass(module_type,["branches","active_deactive_open_close"]); %>" title="'+statusLinkTitle+'">'+
+													''+statusLinkText+
+												'</a>'+
+											'</li>'+
+											/** featured Link  **/
+											'<li>'+
+												'<a href="javascript:void(0)" onclick="updateBranchStatus('+branchFeatured+',\''+id+'\')"  class=" waves-effect waves-block <%= getPermissionClass(module_type,["branches","active_deactive_open_close"]); %>" title="'+featuredLinkTitle+'">'+
+													''+featuredLinkText+
+												'</a>'+
+											'</li>'+
+										'</ul>'+
+									'</div>'+
+								'</li>'+
+							'<ul>';
+						return dropDownButton;
+					}
+				}
+			],
+			"ajax":{
+				url 	:	"<%=list_url%>?cuisine=<%=cuisine%>",
+				type	: 	"POST",
+				dataSrc	: 	function(result){
+					adjustPermissionsClass();
+					return result.data;
+				}
+			}
+		});
+
+		/**check/uncheck checkbox select all check/uncheck*/
+		$(document).on('change','#branch_select_all',function(){
+			var isChecked	= $(this).is(':checked');
+			$('.branchCheckbox_wrapper input[type="checkbox"]').not(":disabled").prop("checked",isChecked).trigger("change");
+		});
+
+		/**Check/Uncheck checkbox*/
+		$(document).on('change','.branchCheckbox_wrapper input[type="checkbox"]',function(){
+			var id          = $(this).attr('id');
+			var isChecked	= $(this).is(':checked');
+			if(isChecked){
+				branchCheckboxArray[id] = true;
+			}else{
+				delete branchCheckboxArray[id];
+			}
+			var totalCheckBox = $('.branchCheckbox_wrapper input[type="checkbox"]').not(":disabled").length;
+			var checkedBox = $('.branchCheckbox_wrapper input[type="checkbox"]:checked').length;
+			let selectAll = (totalCheckBox == checkedBox) ? true : false;
+			$("#branch_select_all").prop("checked",selectAll);
+		});
+
+		/**Check/Uncheck checkbox*/
+		$(document).on('change','#branch_status',function(){
+			var status = $(this).val();
+			if(status){
+				updateBranchStatus(status);
+			}
+		});
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+
+	/** Javascript function to update branch status */
+	function updateBranchStatus(status,branchId){
+		var branchIdArray = (branchId) ? [branchId] : Object.keys(branchCheckboxArray);
+
+		if(branchIdArray.length < 1){
+			notice("<%= STATUS_ERROR %>","<%= __('branch.please_select_atleast_one_branch')%>");
+			return false;
+		}
+
+		/** Confirm  box **/
+		confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("branch.do_you_want_to_update_status"); %>',function(result){
+			if(result){
+				var options = {
+					url 	: 	"<%=list_url%>/update-branch-status",
+					data	: 	{branch_ids: branchIdArray.join(","), status: status},
+					method	:	"post"
+				};
+				ajaxRequest(options,function(response){
+					if(response.status && response.message) notice(response.status,response.message);
+					dataTable.ajax.reload(null, false);
+					branchCheckboxArray = {};
+					$("#branch_select_all").prop("checked",false);
+				});
+			}
+			swal.close();
+		});
+
+	}//end updateBranchStatus()
+</script>

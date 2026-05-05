@@ -1,0 +1,241 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix" >
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								 <%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by shift name -->
+									<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.shift_setup.search_by_shift_name'); %>" name="search_by_shift_name">
+											</div>
+										</div>
+									</div> <%
+									if(auth.user_role_id == CRAVEZ){ %>
+										<!-- Search by user list -->
+										<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+											<div class="form-group">
+												<div class="form-line">
+													<select name="search_by_user_name" class="form-control show-tick" id="column_filter_3" onchange="searchDatatable(3)">
+														<option value=""> <%= __('admin.shift_setup.search_by_team_members'); %> </option>
+														<%- user_list %>
+													</select>
+												</div>
+											</div>
+										</div> <%
+									} %>
+									<div class="col-md-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.shift_setup.shift_setup"); %>
+					</h2><%
+					if(auth.user_role_id != CRAVEZ){ %>
+						<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+							<!-- <li>
+								<a href="<%=WEBSITE_ADMIN_URL+'leave_management/vacation_request'%>" target="_blank" class="<%= getPermissionClass(module_type,['vacation_request','list']); %>">
+									<button type="button" class="btn bg-cyan waves-effect btn-sm">
+										<%= __("admin.shift_setup.vacation_request"); %>
+									</button>
+								</a>
+							</li>
+							<li>
+								<a href="<%=WEBSITE_ADMIN_URL+'team_schedule'%>"   target="_blank" class="<%= getPermissionClass(module_type,['shift_setup','team_schedule']); %>">
+									<button type="button" class="btn bg-indigo waves-effect btn-sm">
+										<%= __("admin.shift_setup.team_schedule"); %>
+									</button>
+								</a>
+							</li> -->
+							<li>
+								<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['shift_setup','add']); %>">
+									<button type="button" class="btn bg-deep-orange waves-effect btn-sm">
+										<%= __("admin.shift_setup.add_shift_setup"); %>
+									</button>
+								</a>
+							</li>
+						</ul>
+						<!-- Only For Mobile View-->
+						<ul class="header-dropdown m-r--5 visible-xs">
+							<li class="dropdown">
+								<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								</a>
+								<ul class="dropdown-menu pull-right m-w-200">
+									<li class="<%= getPermissionClass(module_type,['vacation_request','list']); %>">
+										<a href="<%=WEBSITE_ADMIN_URL+'leave_management/vacation_request'%>">
+											<%= __("admin.shift_setup.vacation_request"); %>
+										</a>
+									</li>
+									<li class="<%= getPermissionClass(module_type,['shift_setup','team_schedule']); %>">
+										<a href="<%=WEBSITE_ADMIN_URL+'team_schedule'%>" target="_blank">
+											<%= __("admin.shift_setup.team_schedule"); %>
+										</a>
+									</li>
+									<li class="<%= getPermissionClass(module_type,['shift_setup','add']); %>">
+										<a href="<%=admin_list_url+'/add'%>">
+											<%= __("admin.shift_setup.add_shift_setup"); %>
+										</a>
+									</li>
+								</ul>
+							</li>
+						</ul><%
+					} %>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="25%"><%= __("admin.shift_setup.shift_name");%></th>
+								<th width="25%"><%= __("admin.shift_setup.shift_start_time");%></th>
+								<th width="25%"><%= __("admin.shift_setup.shift_end_time");%></th>
+								<% if(auth.user_role_id != CRAVEZ){ %>
+									<th><%= __("admin.system.action"); %></th>
+								<% }else{ %>
+									<th></th>
+								<% } %>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>chosen/chosen.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>chosen/chosen.jquery.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable		=	"";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ "data" : 'shift_name' },
+					{
+						"data" : 'start_time',
+						"render": function(startTime){
+							return set24HourFormat(startTime);
+						}
+					},
+					{
+						"data" : 'end_time',
+						"render": function(endTime){
+							return set24HourFormat(endTime);
+						}
+					},
+					<% if(auth.user_role_id != CRAVEZ){ %>
+						{
+							"data"		 : {},
+							"orderable"	 : false,
+							"searchable" : false,
+							"render" 	 : function(result){
+								var id = (result && result._id  ) ? result._id : "";
+								var dropDownButton 		=	''+
+								'<div class="btn-group">'+
+									'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+										'<%= __("admin.system.action"); %> '+
+										'<span class="caret"></span>'+
+									'</button>'+
+									'<ul class="dropdown-menu  width-180">'+
+										/** Edit Link **/
+										'<li>'+
+											'<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/'+id+'" class="waves-effect action-btn waves-block <%= getPermissionClass(module_type,["shift_setup","edit"]); %>" data-open-modal="true">'+
+												' <%= __("admin.system.edit"); %>'+
+											'</a>'+
+										'</li>'+
+										/** Assign Users **/
+										'<li>'+
+											'<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/assign_shift/'+id+'" data-open-modal="true" class="waves-effect waves-block action-btn <%= getPermissionClass(module_type,["shift_setup","assign_shift"]); %>">'+
+												' <%= __("admin.shift_setup.assign_shift"); %>'+
+											'</a>'+
+										'</li>'+
+										/** Delete Link **/
+										'<li>'+
+											'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["shift_setup","delete"]); %>" data-confirm-message="<%= __("admin.shift_setup.you_want_to_delete_this_shift"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+												' <%= __("admin.system.delete"); %>'+
+											'</a>'+
+										'</li>'+
+									'</ul>'+
+								'</div>';
+								return dropDownButton;
+							}
+						},
+					<% }else{ %>
+						{data : 'parent_id', visible :false, field_type : "<%=OBJECT_ID_FIELD%>" },
+					<% } %>
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>",
+					type	: "POST",
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/* Date range picker configuration */
+		var minDate    	= new Date();
+		var dateRanges 	= null;
+		var dateFrom 	= new Date();
+		var dateTo 	 	= new Date();
+
+
+	</script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

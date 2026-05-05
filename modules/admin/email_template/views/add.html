@@ -1,0 +1,269 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix" >
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.email_template.add_email_template'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" >
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+								 <%= __('admin.system.back'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="add-email-template" data-submit-btn-id="email-template-add-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="channel" class="control-label">
+											<%= __("admin.email_template.channel"); %>
+										</label>
+										<select class="form-control show-tick" id="channel" name="channel" data-live-search="true" data-title="<%=__('admin.email_template.select_channel');%>" multiple>
+											<% Object.keys(SYSTEM_CHANNEL).map(key=>{ %>
+												<option value="<%=key%>"><%=SYSTEM_CHANNEL[key]%></option>
+											<% 	}); %>
+										</select>
+									</div>
+									<span id="message" class="message demo-image-copyright"><%=__("admin.email_template.leave_blank_to_select_all")%></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="action" class="control-label">
+											<%=  __('admin.email_template.action'); %><span class="required"> *</span>
+										</label>
+										<select id="action" class="form-control" name="action"  data-live-search="true">
+											<option value=""><%- __('admin.email_template.select_action')%></option>
+											<%- (typeof email_action_list !== typeof undefined && email_action_list) ? email_action_list :"";%>
+										</select>
+									</div>
+									<span id="action_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="constants" class="control-label">
+											<%=  __('admin.email_template.constants'); %>
+										</label>
+										<select id="constants" class="form-control" name="constants">
+											<option value=""><%- __('admin.email_template.select_constant')%></option>
+										</select>
+									</div>
+									<span id="constants_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect m-t-25" onclick="insertHTML()">
+									<%= __('admin.email_template.insert_variable'); %>
+								</button>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group materialize_checkbox">
+									<div class="form-lie checkbox_wrapper">
+										<input name="is_default" id="is_default" class="filled-in chk-col-pink" type="checkbox" />
+										<label for="is_default" class="materialize-chekbox-label"><%=  __('admin.email_template.default'); %></label>
+									</div>
+									<span id="is_default_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix hide-date-picker">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="from_to" class="control-label">
+											<%=  __('admin.email_template.from_to_date'); %>
+											<span class="required"> *</span>
+										</label>
+										<input class="form-control" id="date-range-picker">
+									</div>
+									<input class="form-control hide" id="from_date" type="text" name="from_date">
+									<input class="form-control hide" id="to_date" type="text" name="to_date">
+									<span id="from_to_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="subject_in_en" class="control-label">
+											<%=  __('admin.email_template.subject_in_en'); %>
+											<span class="required"> *</span>
+										</label>
+										<input type="text" id="subject_in_en" class="form-control" name="subject_in_en"/>
+									</div>
+									<span id="subject_in_en_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="subject_in_ar" class="control-label">
+											<%=  __('admin.email_template.subject_in_ar'); %>
+											<span class="required"> *</span>
+										</label>
+										<input type="text" id="subject_in_ar" class="form-control" name="subject_in_ar"/>
+									</div>
+									<span id="subject_in_ar_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="body_in_en" class="control-label">
+											<%=  __('admin.email_template.body_in_en'); %>
+											<span class="required"> *</span>
+										</label>
+										<textarea rows="4"  id="body_in_en" class="form-control no-resize ckeditor"  name="body_in_en"></textarea>
+									</div>
+									<span id="body_in_en_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="body_in_ar" class="control-label">
+											<%=  __('admin.email_template.body_in_ar'); %>
+											<span class="required"> *</span>
+										</label>
+										<textarea rows="4"  id="body_in_ar" class="form-control no-resize ckeditor"  name="body_in_ar"></textarea>
+									</div>
+									<span id="body_in_ar_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<button type="button" id="email-template-add-btn-id" class="btn bg-brown btn-sm waves-effect btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __('admin.system.submit'); %>
+						</button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<%- contentFor('script') %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>ckeditor/ckeditor.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/**
+		 * Function to submit form
+		 */
+		$('.btn-submit').click(function(){
+			updateCkeditorValue();
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('add-email-template',function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		$(document).ready(function(){
+			/** Function to hide data time picker if default is checked **/
+			$('.checkbox_wrapper [type=checkbox]').on('click',function(){
+				if($('.checkbox_wrapper [type=checkbox]:checked').length > 0){
+					$('.hide-date-picker').addClass('hide');
+				}
+				else{
+					$('.hide-date-picker').removeClass('hide');
+				}
+			});
+		});
+		/**
+		 * Function to get email action options on change
+		 */
+		$("#action").change(function(e){
+			appendConstants();
+		});
+
+		/**
+		 * Function to get email action options on page load
+		 */
+		$(function(){
+			appendConstants();
+		});
+
+		/**
+		 * Function to append email constants
+		 */
+		function appendConstants(){
+			var value 	= 	$("#action").val();
+			var options =	'<option value=""><%- __("admin.email_template.select_constant")%></option>';
+			$("#constants").html(options);
+			$('#constants').selectpicker('refresh');
+			if(value){
+				var ajaxOptions = {
+					url		: 	"<%=admin_list_url%>/get_action_options",
+					data	: 	{action : value},
+					method	:	"POST",
+				}
+				ajaxRequest(ajaxOptions,function(response){
+					if(response && response.status == "<%= STATUS_SUCCESS%>"){
+						var result = (response.result)	 ? response.result :[];
+						result.map(function(records){
+							if(records){
+								options  += "<option value='"+records+"'>"+records+"</option>";
+							}
+						});
+
+						$("#constants").html(options);
+						$('#constants').selectpicker('refresh');
+					}else if(response && response.message){
+						notice(response.status,response.message);
+					}
+				});
+			}
+		}// end appendConstants()
+
+		/**
+		* Insert constant in ckeditor
+		*/
+		function insertHTML(){
+			var constant = $("#constants").val();
+			if(constant){
+				$(".ckeditor").each(function(index){
+					var id = $(this).attr("id");
+					if(id){
+						var newStr = '{'+constant+'}';
+						var oEditor = CKEDITOR.instances[id] ;
+						oEditor.insertHtml(newStr) ;
+					}
+				});
+			}
+		}// end insertHTML()
+
+		var minDate	   				= new Date();
+		var displayDateTimeFormat 	= "<%=DATE_PICKER_DATE_TIME_FORMAT%>";
+		var startDateTimeFormat 	= "<%=DATE_PICKER_DATE_TIME_FORMAT%>";
+		var endDateTimeFormat		= "<%=DATE_PICKER_DATE_TIME_FORMAT%>";
+		var timePicker				= true;
+		var dateRanges				= null;
+	</script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

@@ -1,0 +1,198 @@
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by user_name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick"  id="column_filter_0" onchange="searchDatatable(0)" name="user_id" data-live-search="true">
+													<option value=""><%=__("admin.system_logs.search_by_user_name");%></option>
+													<%-usersList%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by module_type -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick"  id="column_filter_1" onchange="searchDatatable(1)" name="activity_module" data-live-search="true">
+													<option value=""><%=__("admin.system_logs.search_by_module_type");%></option>
+													<% Object.keys(SYSTEM_LOG_MODULE).map(key=>{ %>
+														<option value="<%=key%>"><%=SYSTEM_LOG_MODULE[key]%></option>
+													<% 	}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by activity_type -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick"  id="column_filter_2" onchange="searchDatatable(2)" name="activity_type" data-live-search="true">
+													<option value=""><%=__("admin.system_logs.search_by_activity_type");%></option>
+													<% Object.keys(ACTIVITY_TYPE).map(key=>{ %>
+														<option value="<%=key%>"><%=ACTIVITY_TYPE[key]%></option>
+													<% 	}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by Date Range -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.system_logs.search_by_created'); %>">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-xs-12 col-sm-4">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End-->
+	<!--Start Listing-->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.system_logs.system_logs"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="15%"><%= __("admin.system_logs.user_name"); %></th>
+								<th><%= __("admin.system_logs.module_type");%></th>
+								<th><%= __("admin.system_logs.activity_type"); %></th>
+								<th><%= __("admin.system.created"); %></th>
+								<th><%= __("admin.system_logs.additional_details"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css" rel="stylesheet">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable 		  =  "";
+		var DATE_FORMAT_HTML  =  <%- JSON.stringify(DATE_FORMAT_HTML)%>;
+		var SYSTEM_LOG_MODULE =  <%- JSON.stringify(SYSTEM_LOG_MODULE)%>;
+		var ACTIVITY_TYPE 	  =  <%- JSON.stringify(ACTIVITY_TYPE)%>;
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[3, "desc"]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{	"data"		: 'user_name',
+						"field_name": "user_id",
+						"field_type": "<%=OBJECT_ID_FIELD%>",
+						"orderable"	: false
+					},
+					{	"data"  : 'activity_module',
+						"render": function(activity_module){
+							return SYSTEM_LOG_MODULE[activity_module];
+						}
+					},
+					{	"data"  : 'activity_type',
+						"render": function(activity_type){
+							return ACTIVITY_TYPE[activity_type];
+						}
+					},
+					{	
+						"data"	 : 'created',
+						"render" : function(created){
+							return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+						}
+					},
+					{	
+						"data"	 	 : {},
+						"searchable" : false,
+						"orderable"  : false,
+						"render"	 : function(result){
+							var moduleParentId = result.parent_id;
+							var html = "";
+							html += "<table class='borderless-table full-length-header-td'>";
+							html += '<tr><td><%= __("admin.system_logs.module_parent_id"); %></td><td>: '+ moduleParentId+"</td></tr>";
+							html += '</table';
+							if(Object.keys(result.additional_details).length <= 0) return html;
+							
+							var additionalDetails = result.additional_details;
+
+							Object.keys(additionalDetails).map(key=>{
+								html += '<tr><td>'+key+'</td><td>: '+additionalDetails[key]+"</td></tr>";
+							});
+							return  html;	
+						}
+					}
+				],
+				"ajax":{
+					url	 : "<%=admin_list_url%>",
+					type : "POST",
+					data : function (d) {
+						d.fromDate	= $('#from_date').val();
+						d.toDate	= $('#to_date').val();
+					},
+					dataSrc	: function(res){
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

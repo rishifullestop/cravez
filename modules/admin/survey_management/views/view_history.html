@@ -1,0 +1,190 @@
+<div class="container-fluid">
+	<!-- search start-->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<i class="material-icons">search</i> <%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by user name-->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0" onkeyup="searchDatatable(0)" name="search_by_user_name" placeholder="<%= __('admin.survey_management.search_by_user_name'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by created -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="survey-date-picker"  autocomplete="off" placeholder="<%= __('admin.survey_management.search_by_time'); %>" name="search_by_time">
+											</div>
+											<input class="form-control hide" id="survey_from_date" type="text" name="survey_from_date">
+											<input class="form-control hide" id="survey_to_date" type="text" name="survey_to_date">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick status_search"  id="column_filter_2"   onchange="searchDatatable(2)" name="search_by_status">
+													<option value=""><%=__("admin.survey_management.search_by_status");%></option>
+													<%
+														Object.keys(SURVEY_STATUS).map(searchStatus=>{
+															%>
+																<option value="<%=searchStatus%>"><%=(SURVEY_STATUS[searchStatus])%></option>
+															<%
+															
+														});
+													%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-6 col-md-2 col-lg-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.survey_management.view_history"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=WEBSITE_ADMIN_URL%>survey_management">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __('admin.system.back'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover  full-length-header table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="25%"><%= __("admin.survey_management.user_name"); %></th>
+								<th width="25%"><%= __("admin.survey_management.time"); %></th>
+								<th width="25%"><%= __("admin.system.status"); %></th>
+								<th width="25%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End listing-->
+</div>
+<%- contentFor('css') %>
+<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%-contentFor("script") %>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+<script type="text/javascript">
+
+	/** Function to initialize datatable and get server side data*/
+    var datePickerInput   = '#survey-date-picker';
+	var fromDateInput     = '#survey_from_date';
+	var toDateInput	      = '#survey_to_date';
+	var dataTable = "";
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: [[1, "desc"]],
+			"sDom"		: "ltipr",
+			"serverSide": true,
+			"scrollX"	: true,
+			"lengthMenu": PAGING_LENGTH_MENU,
+			"columns"	: [
+				{"data"	: 'user_name'},
+				{
+					"data"		: 'created',
+					"searchable": false,
+					"render" 	: function(created){
+						return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+					}
+                },
+				{
+                    "data"			: "is_attempt",
+                    "orderable"		: false,
+                    "searchable"	: false,
+                    "render": function(isAttempt){
+                        var statusTab	= (isAttempt)	? '<span class="label label-success m-l-5 m-t-5"><%=__("admin.system.attempted")%></span>': '<span class="label label-danger m-l-5 m-t-5"><%=__("admin.system.skipped")%></span>';
+                        statusTab;
+                        return statusTab;
+                    }
+				},
+				{
+                    "data"			: 	{},
+                    "orderable"		:   false,
+                    "searchable"	: 	false,
+                    "render" 		: 	function(result){
+						var surveyId    = result.survey_id;
+						var userId 		= result.user_id;
+						var hideCondition = (!result.is_attempt) ? "hide": "" ;
+						var dropDownButton = "";
+						
+                        /** View Link */
+                        dropDownButton	+= '<a href="<%=admin_list_url%>/view/'+surveyId+'/'+userId+'" class="btn '+hideCondition+' bg-cyan <%= getPermissionClass(module_type,["survey_management","view"]); %>"><%= __("admin.system.view"); %></a>';
+                        return dropDownButton;
+                    }
+                }
+			],
+			"ajax":{
+				url  : "<%=admin_list_url%>/view_history/<%=survey_id%>",
+				type : "POST",
+				data :function(d){
+					d.fromDate 	    = $('#survey_from_date').val();
+					d.toDate 	    = $('#survey_to_date').val();
+					d.status	    = $('#column_filter_2').val();
+				},
+				dataSrc	: function(res){
+					adjustPermissionsClass();
+					return res.data;
+				}
+			}
+		});
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+</script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

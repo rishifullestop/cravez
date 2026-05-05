@@ -1,0 +1,198 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by cuisine id -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.cuisines.search_by_cuisine_id'); %>" name="cuisine_id">
+											</div>
+										</div>
+									</div>
+									<!-- Search by name in english -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('admin.cuisines.search_by_name_in_english'); %>" name="name_in_english">
+											</div>
+										</div>
+									</div>
+									<!-- Search by name in arabic -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_2"  onkeyup="searchDatatable(2)" placeholder="<%= __('admin.cuisines.search_by_name_in_arabic'); %>" name="name_in_arabic">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Status -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="status" id="column_filter_3" onchange="searchDatatable(3)" name="status">
+													<option value=""><%=__("admin.cuisines.search_by_status");%></option>
+													<% Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).map(searchStatus=>{ %>
+														<option value="<%=searchStatus%>"><%=GLOBAL_STATUS_SEARCH_DROPDOWN[searchStatus]["status_name"]%></option>
+													<% 	}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-4">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.cuisines.cuisines"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['cuisines','add']); %>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.cuisines.add_cuisine"); %>
+								</button>
+							</a>
+						</li>
+						<li>
+							<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/select_cuisine_priority'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['cuisines','select_cuisine_priority']); %>">
+								<button type="button" class="btn btn-sm bg-blue waves-effect">
+									<%= __("admin.cuisines.select_cuisine_priority"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="10%"><%= __("admin.cuisines.cuisine_id");%></th>
+								<th><%= __("admin.cuisines.name_in_english");%></th>
+								<th><%= __("admin.cuisines.name_in_arabic");%></th>
+								<th><%= __("admin.system.status");%></th>
+								<th><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery.mCustomScrollbar.min.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>jquery.mCustomScrollbar.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable 	  =	"";
+		var statusObject  =  <%- JSON.stringify(GLOBAL_STATUS_SEARCH_DROPDOWN)%>;
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ 	"data"	   : 'cuisine_id',
+						"orderable": false
+					},
+					{ "data": 'name.en' },
+					{ "data": 'name.ar' },
+					{
+						"data"			: 	"is_active",
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"field_type"	:   "<%= NUMERIC_FIELD %>",
+						"render"		: 	function(active){
+							var statusClass	=	(statusObject[active] && statusObject[active]["label_class"]) ? statusObject[active]["label_class"] :"";
+							var statusLabel	=	(statusObject[active] && statusObject[active]["status_name"]) ? statusObject[active]["status_name"] :"";
+							return '<span class="label '+statusClass+'">'+statusLabel+'</span>';
+						}
+					},
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+							var id 		=	(result._id)		? 	result._id 		 :'';
+							var status	=	(result.is_active)	? 	result.is_active :'<%= DEACTIVE %>';
+
+							/** Status link text, title and  link icon **/
+							var statusLinkText  =	(status == '<%= DEACTIVE %>') ? "<%= __('admin.system.active'); %>"			   :"<%= __('admin.system.deactive'); %>";
+							var statusLinkTitle	=  	(status == '<%= DEACTIVE %>') ? "<%= __('admin.system.click_to_activate'); %>" :"<%= __('admin.system.click_to_deactivate'); %>" ;
+							var statusLinkIcon  =	(status == '<%= DEACTIVE %>') ?	"done"	 : "block";
+							var buttonColor		=   (status == '<%= DEACTIVE %>') ?	"bg-blue": "bg-red";
+
+							/**  edit Link  */
+							var dropDownButton	= '<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/'+id+'" data-open-modal="true" class="action-btn btn bg-indigo waves-effect ml-5 m-t-5 <%= getPermissionClass(module_type,["cuisines","edit"]); %>"><%= __("admin.system.edit"); %></a>';
+
+							/** Change status  Link  */
+							dropDownButton += '<a href="javascript:void(0)" data-href="<%=admin_list_url%>/update-status/'+id+'/'+status+'" class="btn '+buttonColor+' waves-effect m-l-5 m-t-5 confirm_box <%= getPermissionClass(module_type,["cuisines","active_deactive"]); %>" data-confirm-message="<%= __("admin.cuisines.do_you_want_to_change_status_of_this_cuisine"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+statusLinkTitle+'">'+''+statusLinkText+'</a>';
+
+							return dropDownButton;
+						}
+					}
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>",
+					type	: 	"POST",
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

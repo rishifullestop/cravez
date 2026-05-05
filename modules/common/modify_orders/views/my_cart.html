@@ -1,0 +1,263 @@
+<%
+var cartList 			= 	(typeof cart_list !== typeof undefined && cart_list)	?	cart_list :{};
+var orderId				= 	(order_id)		?	order_id	:"";
+var modifiedBy          =   '';
+%>
+<!-- CART SECTION CODE START -->
+<%
+if(cartList.result.length > 0){ 
+%>
+    <form id="place-order" action="<%= list_url %>/place_order" data-submit-btn-id="place-order-btn-id" method="post" class="on_click_submit" role="form">
+        <h4><%= __('admin.order.my_cart'); %></h4>
+        <% 
+        let	grandTotal			=	(cartList.grand_total)	 	? cartList.grand_total 		:0;
+        let	itemImageUrl		=	(cartList.item_image_url)	? cartList.item_image_url 	:"";
+        cartList.result.map(cartRecords=>{
+            let customerId 		=	(cartRecords.customer_id) 	    ? cartRecords.customer_id	:"";
+            let deviceId 		=	(cartRecords.device_id) 	    ? cartRecords.device_id		:"";
+            let restaurantId	=	(cartRecords.restaurant_id) 	? cartRecords.restaurant_id	:"";
+            let branchId 		=	(cartRecords.branch_id) 	    ? cartRecords.branch_id		:"";
+            let itemList 		=	(cartRecords.item_list) 	    ? cartRecords.item_list		:"";
+            let discount 	=	(cartRecords.discount) 	        ? cartRecords.discount		:"";
+            let OfferList 	=	(cartRecords.eligible_offer_list) ? cartRecords.eligible_offer_list	:"";
+            %>
+            <input type="hidden" value="<%= customerId %>" class="user_id" name="customer_id" />
+            <input type="hidden" value="<%= deviceId %>" class="device_id" name="device_id" />
+            <input type="hidden" value="<%= restaurantId %>" class="restaurant_id" name="restaurant_id" />
+            <input type="hidden" value="<%= branchId %>" class="branch_id" name="branch_id" />
+            <input type="hidden" value="<%= orderId %>" class="order_id" name="order_id" />
+            <input type="hidden" value="<%= modifiedBy %>" class="modified_by" name="modified_by" />
+            <%
+            if(OfferList.length > 0){
+                %>
+                <h5><%= __('admin.order.offer_code') %></h5>
+                <ul class="list-group">
+                <%    
+                OfferList.map(offerRecords=>{
+                    let offerId 		=	(offerRecords._id)		     ? offerRecords._id:"";
+                    let offerCode 		=	(offerRecords.offer_code) 	 ? offerRecords.offer_code:"";
+                    let title 			=	(offerRecords.title) 	     ? offerRecords.title.en:"";
+                    let description 	=	(offerRecords.description) 	 ? offerRecords.description.en:"";
+                    %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <%= title %>
+                        <span class="badge badge-primary badge-pill"><%= offerCode %></span>
+                      </li>
+                <%
+                }); 
+                %>
+            </ul>
+                <%
+            }
+            if(itemList.length > 0){
+            %>
+            <div class="row">
+                <div class="col-sm-12 table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><%= __('admin.order.items'); %></th>
+                                <th class="text-center"><%= __('admin.order.quantity'); %></th>
+                                <th class="text-center"><%= __('admin.order.price'); %></th>
+                                <th class="text-center"><%= __('admin.order.total'); %></th>
+                                <th> </th>
+                            </tr>
+                        </thead>
+                        <tbody >
+                            <% 
+                            let notAvailable    =   false;
+                            itemList.map(itemRecords=>{
+                                let cartId 			=	(itemRecords._id)		 ? itemRecords._id:"";
+                                let itemId 			=	(itemRecords.item_id) 	 ? itemRecords.item_id:"";
+                                let itemName 		=	(itemRecords.item_name)  ? itemRecords.item_name.en:"";
+                                let itemNameArabic 	=	(itemRecords.item_name)  ? itemRecords.item_name.ar:"";
+                                let itemImage 		=	(itemRecords.item_image) ? itemRecords.item_image:"";
+                                let itemPrice 		=	(itemRecords.item_price) ? itemRecords.item_price:"";
+                                let discount 		=	(itemRecords.discount)	 ? itemRecords.discount:"";
+								let itemAvailable 	=	(itemRecords.item_available) ? itemRecords.item_available		:"";
+                                let subPrice 		=	(itemRecords.sub_price)  ? itemRecords.sub_price:"";
+                                let qty 			=	(itemRecords.qty)		 ? itemRecords.qty:"";
+                                let image			=	(itemRecords.item_image) ? itemRecords.item_image:"";
+                                let extraItemList	=	(typeof itemRecords.extra_item_list !== typeof undefined && itemRecords.extra_item_list) ?	itemRecords.extra_item_list.en :"";
+                               
+                                %>
+                                <tr class="add_new_items disable cartId_<%= cartId %>">
+                                    <td class="col-sm-8 col-md-6">
+                                        <div class="media">
+                                            <%
+                                            if(image){
+                                            %>
+                                            <a class="thumbnail pull-left" href="javascript:void(0)">
+                                                <img class="media-object set_image_med_dim" src="<%= itemImageUrl+image %>"> 
+                                            </a>	
+                                            <%
+                                            }
+                                            %>
+                                            <div class="media-body pl5">
+                                                <h4 class="media-heading">
+                                                    <a href="<%= originalUrl %>" data-action-url="<%=list_url%>/change_quantity/<%= orderId %>/<%= itemId %>" data-open-modal="true" class="action-btn add_items"><%= itemName %></a>
+                                                </h4>
+                                                <%
+                                                if(extraItemList.length > 0){
+                                                %>
+													<span><%= __('admin.order.extra_items') %> </span><span class="text-success"><strong>
+														<%= extraItemList; %></strong>
+													</span>
+                                                <%
+                                                }
+                                                if(!itemAvailable){
+                                                    notAvailable    =   true;
+                                                %>
+                                                <h5><%= __('admin.order.status') %> </span><span class="text-danger"><strong>
+                                                    <%= __('admin.order.item_not_available'); %></strong>
+                                                </h5>
+                                                <%
+                                                }
+                                                %>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="col-sm-1 col-md-1" style="text-align: center">
+                                        <strong><%= qty %></strong>
+                                    </td>
+                                    <td class="col-sm-1 col-md-1 text-center"><strong><%= currencyFormat(itemPrice) %></strong></td>
+                                    <td class="col-sm-1 col-md-1 text-center"><strong><%= currencyFormat(subPrice) %></strong></td>
+                                    <td class="col-sm-1 col-md-1 text-right" >
+                                        <a href="javascript:void(0)" data-confirm-message="<%= __("admin.order.you_want_to_delete_this_cart"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" class="btn btn-danger cart_delete" id="<%= cartId %>"><span class="glyphicon glyphicon-remove"></span><%= __("admin.order.delete_item") %></a>
+                                    </td>
+                                </tr>
+                            <%
+                            });
+                            %>
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control" name="coupon_code" id="coupon_code" placeholder="<%= __('admin.order.enter_coupon_code_here') %>">
+                                    <span class="error coupon_code_error"></span>
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0);" class="btn btn-warning submit_redeem">
+                                        <span class="glyphicon glyphicon-tag"></span>
+                                        <%= __('admin.order.apply_coupon') %>	
+                                    </a>
+                                </td>
+                                <td></td>
+                                <td><h5><%= __('admin.order.sub_total'); %></h5></td>
+                                <td class="text-right"><h5><strong><%= currencyFormat(grandTotal+discount) %></strong></h5></td>
+                            </tr>
+                            <%
+                            if(discount){
+                            %>
+                            <tr>
+                                <td colspan=3></td>
+                                <td><h5><%= __('admin.order.discount'); %></h5></td>
+                                <td class="text-right"><h5><strong><%= currencyFormat(discount) %></strong></h5></td>
+                            </tr>
+                            <%
+                            }
+                            %>  
+                            <tr>
+                                <td colspan=3></td>
+                                <td><h3><%= __('admin.order.total'); %></h3></td>
+                                <td class="text-right"><h3><strong><%= currencyFormat(grandTotal) %></strong></h3></td>
+                            </tr>
+                            <tr>
+                                <td colspan=3></td>
+                                <td></td>
+                                <td>
+                                    <button type="button" class="btn btn-success place_order" id="place-order-btn-id" <%- ADMIN_LOADING_TEXT %>  <%- (notAvailable) ? "disabled":'';%>>
+                                        <%= __("admin.oreder.update_order"); %>
+                                        <span class="glyphicon glyphicon-play"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <%
+            }
+        });
+        %>
+    </form>		
+<%
+}
+%>
+<!-- CART SECTION CODE STOP -->
+<script type="text/javascript">
+    var orderId = "<%= orderId %>";
+    $(document).ready(function(){
+        /**
+         * Function to push item into cart
+         */
+        $(".place_order").click(function(){
+            var btnId = $(this).attr("id");
+            startTextLoading(btnId);
+            ajax_submit("place-order",function(status,response){
+                if(response.status	=='success'){
+                    <% if(isRestaurant(module_type)){ %>
+                        window.location.href = "/orders/view/"+orderId;
+					<% }else{ %>
+						window.location.href = "<%= WEBSITE_ADMIN_URL %>orders/view/"+orderId;
+					<% } %>        
+                }else{
+                    notice('error',response.message);
+                }
+            });
+            stopTextLoading(btnId);
+        });
+
+        /**
+         * Function to delete item into cart  
+         */
+        $(".cart_delete").click(function(){
+            var cartId 				=	$(this).attr('id');
+            var confirmMessage  	=	$(this).attr('data-confirm-message');
+            var confirmHeading  	= 	$(this).attr('data-confirm-heading');
+            confirmBox("warning",confirmHeading,confirmMessage,function(result){
+                if(result){
+                    $.ajax({
+                        url 	:	"<%=list_url%>/delete_item_cart",
+                        type	: 	"POST",
+                        data	:	{'order_id':orderId,'cart_id':cartId},
+                        success	: 	function(res){
+                            if(res.status == 'success'){
+                                notice('success',res.message);
+                                myCart();
+                                swal.close();
+                            }
+                        }
+                    });	
+                }		
+            });	
+        });
+
+        /**
+         * Function to submit coupon code 
+         */
+        $(".submit_redeem").click(function(){
+            var couponCode      =   $('#coupon_code').val();
+            var userId          =   $('.user_id').val();
+            var branchId        =   $('.branch_id').val();
+            var restaurantId    =   $('.restaurant_id').val();
+            var deviceId        =   $('.device_id').val();
+            if(couponCode){
+                $.ajax({
+                    url 	:	"<%=list_url%>/apply_coupon",
+                    type	: 	"POST",
+                    data    :   {'offer_code':couponCode,'branch_id':branchId,'restaurant_id':restaurantId,'device_id':deviceId,'order_id':orderId},
+                    success	: 	function(res){
+                        console.log(res);
+                        if(res.status == 'success'){
+                            notice('success','<%= __("admin.order.offer_apply_successfully") %>');
+                            myCart();
+                        }else{
+                            $('.coupon_code_error').html(res.message);
+                        }
+                    }
+                });
+            }else{
+                $('.coupon_code_error').html('<%= __("admin.order.please_enter_coupon_code")%>');
+            }
+        });
+    });
+</script>

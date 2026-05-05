@@ -1,0 +1,140 @@
+<%
+var currentStatus 	= order_result.admin_status ? order_result.admin_status : "";
+var orderId 		= order_result._id ? order_result._id : "";
+
+%>
+<div class="modal-dialog"  role="document">
+	<div class="modal-content">
+		<div class="modal-header modal-header-seperator">
+			<h4 class="modal-title"><%=__("admin.orders.change_order_status_heading") %></h4>
+		</div>
+		<form id="update-form" data-submit-btn-id="update-order_btn" method="post" class="on_click_submit" role="form" action='<%=admin_list_url%>/change_status/<%= orderId %>'>
+			<div class="modal-body">
+				<div class="row clearfix">
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="order_status_tick" class="control-label">
+									<%= __('admin.orders.order_status'); %><span class="required"> *</span>
+								</label>
+								<select class="form-control show-tick" id="order_status_tick" name="order_status" <% if(currentStatus == ORDER_REJECTED){ %> disabled="disabled" <% } %> >
+									<option value=""><%=__("admin.orders.select_status");%></option>
+										<%
+										Object.keys(UPDATE_ORDER_STATUS).map(key=>{
+											if(!UPDATE_ORDER_STATUS[currentStatus] || (UPDATE_ORDER_STATUS[currentStatus].level < UPDATE_ORDER_STATUS[key].level)){ %>
+												<option value="<%=key%>" <% if(currentStatus == ORDER_REJECTED && key == ORDER_CANCELLED){ %> selected <% } %> >
+													<%= UPDATE_ORDER_STATUS[key].status_name%>
+												</option> <%
+											}
+										}); %>
+								</select>
+							</div>
+							<span id="order_status_error" class="error"></span>
+						</div>
+					</div>
+				</div>
+				<div class="row clearfix">
+					<div class="col-sm-12 rejection_input <% if(currentStatus != ORDER_REJECTED){ %> hide <% } %>">
+						<div class="form-grop">
+							<div class="form-lin no-bottom-border">
+								<label for="rejection_reason" class="control-label"><%= __('admin.orders.rejection_field'); %><span class="required"> *</span>  </label>
+								<div class="form-grop margin-0">
+									<div class="form-line">
+										<textarea id="rejection_reason" rows="6" class="resize-none form-control rejection-input" name="rejection_reason"></textarea>
+									</div>
+									<span id="rejection_reason_error" class="error rejection-reason"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row clearfix">
+					<div class="col-sm-12 cancel_input <% if(currentStatus != ORDER_CANCELLED){ %> hide <% } %>">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="cancel_reason" class="control-label"><%= __('admin.orders.cancel_reason'); %><span class="required"> *</span>  </label>
+								<select class="form-control show-tick" id="cancel_reason" name="cancel_reason" data-live-search="true">
+									<option value=""><%=__("admin.orders.select_cancel_reason");%></option>
+									<%-cancel_reason_list%>
+								</select>
+								<span id="cancel_reason_error" class="error"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer border-top">
+				<button type="button"  id="update-order_btn" class="btn bg-brown btn-sm waves-effect btn-submit-update noHover margin-0" <%- ADMIN_LOADING_TEXT %> ><%= __("admin.system.submit"); %>
+				</button>
+				<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	$(".show-tick").selectpicker('refresh');
+
+	var UPDATE_ORDER_STATUS	= <%- JSON.stringify(UPDATE_ORDER_STATUS);%>;
+
+	$(document).ready(function(){
+		var status  = $('#order_status_tick').val();
+		if(status){
+			if(status == "<%=ORDER_CANCELLED%>"){
+				$('.cancel_input').removeClass('hide');
+				$('.rejection_input').addClass('hide');
+				return false;
+			}else if((status == "<%=ORDER_REJECTED%>" || status == "<%=ORDER_REJECTED_BY_ADMIN%>") && UPDATE_ORDER_STATUS[status].reason){
+				$('.rejection_input').removeClass('hide');
+				$('.cancel_input').addClass('hide');
+				return false;
+			}else{
+				$('.rejection_input').addClass('hide');
+				$('.cancel_input').addClass('hide');
+			}
+		}
+	});
+
+	/**
+	 * Function to get reason on changing of status
+	 */
+	$('#order_status_tick').on('change',function(e){
+		var status  = $('#order_status_tick').val();
+		if(status){
+			if(status == "<%=ORDER_CANCELLED%>"){
+				$('.cancel_input').removeClass('hide');
+				$('.rejection_input').addClass('hide');
+				return false;
+			}else if((status == "<%=ORDER_REJECTED%>" || status == "<%=ORDER_REJECTED_BY_ADMIN%>") && UPDATE_ORDER_STATUS[status].reason){
+				$('.rejection_input').removeClass('hide');
+				$('.cancel_input').addClass('hide');
+				return false;
+			}else{
+				$('.rejection_input').addClass('hide');
+				$('.cancel_input').addClass('hide');
+			}
+		}
+		$('.rejection_input').addClass('hide');
+		$('.cancel_input').addClass('hide');
+	});
+
+	/**
+	 * Function to submit  modal form
+	 */
+	$(".btn-submit-update").click(function(){
+
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+		var disabled = $("#order_status_tick").attr("disabled");
+		if(disabled) $("#order_status_tick").attr("disabled",false);
+
+		ajax_submit("update-form",function(status,response){
+			if(status){
+				window.location.reload();
+			}else{
+				stopTextLoading(btnId);
+			}
+			if(disabled) $("#order_status_tick").attr("disabled",true);
+		});
+	});
+
+</script>

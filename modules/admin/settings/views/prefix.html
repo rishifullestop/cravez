@@ -1,0 +1,196 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2><%= displayType+' '+__('admin.setting.settings'); %></h2>
+				</div>
+				<div class="body">
+					<form id="edit-setting" data-submit-btn-id="setting-edit-btn-id" method="post" class="on_click_submit" role="form">
+						<%
+						if(typeof result != typeof undefined && Array.isArray(result) && result.length > 0){
+							result.forEach(function(records,index){
+								keyValue 		= 	(records.key_value) 	?  	records.key_value		:'';
+								settingId 		= 	(records._id) 			?  	records._id				:'';
+								inputType 		= 	(records.input_type) 	?  	records.input_type		:'';
+								inputValue		= 	(records.value) 		?  	records.value 			:'';
+								selectList		= 	(records.select_list) 	?  	records.select_list.split(",") 	:[];
+								completeImage	=	(records.input_type == INPUT_FILE && typeof records.value !== typeof undefined && records[IMAGE_FIELD_NAME])	? 	records[IMAGE_FIELD_NAME]:"";
+								title			= 	(records.title) 		?	records.title 			:'';
+								required		= 	(records.required) 		?	records.required		:'';
+								validateType	= 	(records.validate_type) ?	records.validate_type	:'';
+								allowedExtensions= 	(records.allowed_extensions) ?	records.allowed_extensions	:'';
+								allowedMimes	= 	(records.allowed_mimes) ?	records.allowed_mimes	:'';
+
+								if((inputType && inputType!="" && inputType != INPUT_FILE) && (title && title!="") && (settingId && settingId!="")){ %>
+									<div class="row clearfix">
+										<div class="col-sm-12">
+											<div class="form-group">
+												<div class="form-line">
+													<label for="settingValue_<%=index%>" class="text-capitalize float-left"> <%= title; %>
+														<% if(required && required == REQUIRED){ %>
+															<span class="required"> *</span>
+														<%}%>
+													</label><%
+													if(inputType == "ck_editor"){ %>
+														<br/> <br/><%
+													} %>
+													<input type="hidden" name="settings[<%=index%>][id]" 		value="<%=settingId%>">
+													<input type="hidden" name="settings[<%=index%>][title]" 	value="<%=title%>">
+													<input type="hidden" name="settings[<%=index%>][required]" 	value="<%=required%>">
+													<input type="hidden" name="settings[<%=index%>][input_type]" value="<%=inputType%>">
+													<input type="hidden" name="settings[<%=index%>][validate_type]" value="<%=validateType%>">
+													<%	if(inputType == "checkbox"){ %>
+															<div class="switch">
+																<label>
+																	<input id="settingValue_<%=index%>" name="settings[<%=index%>][value]" value="<%=ACTIVE%>" type="checkbox" <%= (inputValue == ACTIVE) ? "checked" :""; %>>
+																	<span class="lever switch-col-green"></span>
+																</label>
+															</div>
+													<%	}else if(inputType == "time"){ %>
+															<input type="text" id="settingValue_<%=index%>" class="form-control time" name="settings[<%=index%>][value]" value="<%= inputValue; %>" placeholder="<%=title %>" readonly='true'/>
+													<%	}else if(inputType == "date"){ %>
+															<input type="text" id="settingValue_<%=index%>" class="form-control date" name="settings[<%=index%>][value]" value="<%= inputValue; %>" placeholder="<%= title %>" readonly='true'/>
+													<%	}else if(inputType == "textarea"){ %>
+															<textarea  id="settingValue_<%=index%>"  name="settings[<%=index%>][value]"  class="form-control no-resize" placeholder="<%= title %>"><%= inputValue; %></textarea>
+													<%	}else if(inputType == "ck_editor"){ %>
+															<textarea  id="settingValue_<%=index%>"  name="settings[<%=index%>][value]"  class="form-control ck_editor"><%- inputValue; %></textarea>
+													<%	}else if(inputType == "select"){
+														%>
+															<select id="settingValue_<%=index%>"  name="settings[<%=index%>][value]"  class="form-control show-tick"> <%
+																selectList.map(key=>{
+																	var selected = (key == inputValue)  ? "selected" :""; %>
+																	<option value="<%=key%>" <%=selected%> ><%=key%></option> <%
+																}); %>
+															</select>
+													<%	}else{ %>
+															<input type="<%= inputType; %>"  id="settingValue_<%=index%>"  class="form-control" name="settings[<%=index%>][value]" value="<%= inputValue; %>" placeholder="<%=title %>" />
+													<%	} %>
+												</div>
+												 <span id="setting_<%=index%>_value_error" class="error"></span>
+											</div>
+										</div>
+									</div>
+						<%		}
+								if((inputType && inputType!="" && inputType == INPUT_FILE) && (title && title!="") && (settingId && settingId!="")){ %>
+									<div class="row clearfix">
+										<div class="col-sm-6 col-xs-6">
+											<div class="form-group">
+												<div class="form-line">
+													<label for="settingValue_<%=index%>" class="control-label"> <%= title; %>
+														<% if(required && required == REQUIRED){ %>
+															<span class="required"> *</span>
+														<%}%>
+													</label>
+													<input type="hidden" name="settings[<%=index%>][id]" 		value="<%=settingId%>">
+													<input type="hidden" name="settings[<%=index%>][title]" 	value="<%=title%>">
+													<input type="hidden" name="settings[<%=index%>][required]" 	value="<%=required%>">
+													<input type="hidden" name="settings[<%=index%>][input_type]" value="<%=inputType%>">
+													<input type="hidden" name="settings[<%=index%>][key_value]" value="<%=keyValue%>">
+													<input type="hidden" name="settings[<%=index%>][validate_type]" value="<%=validateType%>">
+													<input type="hidden" name="settings[<%=index%>][old_image]" value="<%=inputValue%>"/>
+													<input type="hidden" name="settings[<%=index%>][allowed_extensions]" value="<%=allowedExtensions%>"/>
+													<input type="hidden" name="settings[<%=index%>][allowed_mimes]" value="<%=allowedMimes%>"/>
+													<input type="<%= inputType; %>"  id="settingValue_<%=index%>"  class="form-control cfilestyle" name="<%= keyValue%>" />
+												</div>
+												<span id="setting_<%=index%>_value_error" class="error"></span>
+											</div>
+										</div>
+										<div class="col-sm-6 col-xs-6"><%
+											var extension 	= inputValue.split('.').pop().toLowerCase();
+											if(ALLOWED_IMAGE_EXTENSIONS.indexOf(extension) != -1){ %>
+												<a href='<%=completeImage%>'  class='item-image' data-lightbox='roadtrip'>
+													<img src="<%=completeImage%>" alt="Master image" class="img-thumbnail set_image_dim" />
+												</a><%
+											}
+											if(DOCUMENT_ATTACHMENT_ICONS[extension]){ %>
+												<a href='<%=completeImage%>' class='item-image' download>
+													<img class="img-thumbnail set_image_dim" src="<%= DOCUMENT_ATTACHMENT_ICONS[extension] %>"/>
+												</a><%
+											} %>
+										</div>
+									</div><%
+								}
+							});
+						}
+						%>
+						<button type="button" id="setting-edit-btn-id" class="btn bg-brown btn-sm waves-effect btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("css") %>
+	<link href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>bootstrap-datetimepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>ckeditor/ckeditor.js" ></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			customFileStyle();
+
+			/**
+			 * Function to submit form
+			 */
+			$(".btn-submit").click(function(){
+				var btnId = $(this).attr("id");
+
+				if($('form').find('.ck_editor').length > 0) updateCkeditorValue();
+
+				startTextLoading(btnId);
+				submit_multipart_form("edit-setting",function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			});
+
+			/**
+			 * Initialize  for time picker.
+			 */
+			if($('form').find('.time').length > 0){
+				$('.time').datetimepicker({
+					format			: '<%=DATEPICKER_TIME_FORMAT%>',
+					ignoreReadonly	: true,
+				});
+			}
+
+			/**
+			 * Initialize  for date picker.
+			 */
+			if($('form').find('.date').length > 0){
+				$('.date').datetimepicker({
+					format			: '<%=DATE_RANGE_DATE_FORMAT%>',
+					ignoreReadonly	: true,
+					minDate			: moment().hours(0).minutes(0).seconds(0).milliseconds(0),
+					keepInvalid		: true,
+				});
+			}
+			/**
+			 * Initialize  for ck editor.
+			 */
+			if($('form').find('.ck_editor').length > 0){
+				$("form .ck_editor").each(function(html,i){
+					if($(this).attr("id")){
+						CKEDITOR.replace($(this).attr("id"), {
+							height: 150
+						});
+					}
+				});
+			}
+		});
+	</script>

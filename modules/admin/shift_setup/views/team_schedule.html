@@ -1,0 +1,147 @@
+<%
+let isCravez   	= (auth.user_role_id == CRAVEZ) ? true : false;
+%>
+<div class="container-fluid"  id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.shift_setup.team_schedule"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm">
+						<li>
+							<a href="<%=WEBSITE_ADMIN_URL+'leave_management/vacation_request'%>" target="_blank" class="<%= getPermissionClass(module_type,['vacation_request','list']); %>">
+								<button type="button" class="btn bg-cyan waves-effect btn-sm">
+									<%= __("admin.shift_setup.vacation_request"); %>
+								</button>
+							</a>
+						</li><%
+						if(auth.user_role_id != CRAVEZ){ %>
+							<li>
+								<a id="weekly_off" href="<%= WEBSITE_ADMIN_URL+'leave_management/vacation_request'%>" data-action-url="<%=WEBSITE_ADMIN_URL+'leave_management/vacation_request/add_weekly_off'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['vacation_request','add_weekly_off'])%>">
+									<button type="button" class="btn btn-sm bg-blue waves-effect">
+										<%= __("admin.leave_management.add_weekly_off"); %>
+									</button>
+								</a>
+							</li>
+							<li>
+								<a id="assign_shift" href="<%= WEBSITE_ADMIN_URL+'team_schedule'%>" data-action-url="<%=WEBSITE_ADMIN_URL+'team_schedule/assign_shift'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['shift_setup','assign_shift']); %>">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("admin.shift_setup.assign_shifts"); %>
+									</button>
+								</a>
+							</li><%
+						} %>
+					</ul>
+				</div>
+				<div class="body">
+					<div class="row clearfix">
+						<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+							<div class="form-group">
+								<div class="form-line">
+									<label for="date-range-picker" class="control-label"><%= __('admin.shift_setup.shift_date_time'); %><span class="required"> * </span> </label>
+									<input class="form-control" id="date-range-picker"  autocomplete="off">
+								</div>
+								<span id="date_time_error" class="error model_select_error"></span>
+								<input class="form-control hide" id="from_date" type="text" name="from_date">
+								<input class="form-control hide" id="to_date" type="text" name="to_date">
+							</div>
+						</div>
+					</div>
+					<div id="team_schedule_table">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>chosen/chosen.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>chosen/chosen.jquery.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.js"></script>
+
+<script type="text/javascript">
+	<% if(!isCravez) { %>
+		// if(window.location.href.indexOf("weekly_off")){
+		// 	$("#weekly_off").trigger("click");
+		// }
+		// if(window.location.href.indexOf("assign_shift")){
+		// 	$("#assign_shift").trigger("click");
+		// }
+
+		openBtnPopup();
+		window.onhashchange = openBtnPopup;
+	<% } %>
+	var dataTable 		= "";
+	var configDemo 		= $('#date-range-picker');
+	var stopTableDraw   = true;
+
+	/**  function for daterange picker*/
+	configDemo.on('apply.daterangepicker', function(e,picker){
+		var startDate	= picker.startDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+		var endDate		= picker.endDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+
+		$("#from_date").val(startDate);
+		$("#to_date").val(endDate);
+		getListing();
+	});
+	var dateRanges = null;
+
+	/*
+	 *	Function to get team schedule list
+	*/
+	function getListing(){
+		var startDate = $("#from_date").val();
+		var endDate = $("#to_date").val();
+
+		if(endDate && startDate){
+			var options		= {
+				url 	: "<%=admin_list_url%>",
+				data    : {from_date : startDate,to_date : endDate},
+				method	: "POST"
+			};
+			ajaxRequest(options,function(response){
+				if(response){
+					if(dataTable != ''){
+						$("#datatable-listing").DataTable().destroy();
+					}
+					$("#team_schedule_table").html(response);
+					dataTable = $('#datatable-listing').DataTable({
+						"order"		: 	[],
+						"sDom"		:	"ftr",
+						"bFilter"	:   true,
+						"serverSide": 	false,
+						"scrollX"	: 	true,
+						"autoWidth" :   false,
+						fixedHeader: true,
+						"columnDefs": [
+							{ "width": "120px", "orderable" : false, "targets": "_all" }
+						]
+					});
+				}
+			});
+		}
+	}// end getListing()
+
+	/*
+	 *	Function open modal
+	*/
+	function openBtnPopup(){
+		if(window.location.href.indexOf("weekly_off") != -1){
+			$("#weekly_off").trigger("click");
+		}
+		if(window.location.href.indexOf("assign_shift") != -1){
+			$("#assign_shift").trigger("click");
+		}
+	}// end openBtnPopup()
+</script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

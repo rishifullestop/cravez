@@ -1,0 +1,118 @@
+<%
+	var currentStatus 	= 	result.restaurant_status;
+	var orderId 		= 	result._id;
+	var deliveryType	= 	result.delivery_type;
+	var isRestDelivery	=	(deliveryType == DELIVERY_BY_RESTAURANT)? true :false;
+	isRestDelivery		=	(deliveryType == DELIVERY_BY_PICK_UP)	? true :isRestDelivery;
+	var vaildStatus		=	[];
+	if(currentStatus == ORDER_PENDING){
+		vaildStatus = [ORDER_PREPARING, ORDER_READY_TO_PICK_UP];
+	}
+
+	if(currentStatus == ORDER_PREPARING){
+		vaildStatus = [ORDER_READY_TO_PICK_UP];
+	}
+
+	if(isRestDelivery && currentStatus!= ORDER_ON_THE_WAY) vaildStatus.push(ORDER_ON_THE_WAY);
+	if(isRestDelivery) vaildStatus.push(ORDER_DELIVERED);
+
+	if(currentStatus == ORDER_PENDING || currentStatus == ORDER_PREPARING){
+		vaildStatus.push(ORDER_REJECTED);
+	}
+%>
+<div class="modal-dialog"  role="document">
+	<div class="modal-content">
+		<div class="modal-header modal-header-seperator">
+			<h4 class="modal-title"><%=__("orders.change_order_status_heading") %></h4>
+		</div>
+		<form id="update-form" data-submit-btn-id="update-order_btn" method="post" class="on_click_submit" role="form" action='<%=list_url%>/change_order_status/<%= orderId %>'>
+			<div class="modal-body">
+				<div class="row clearfix">
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="order_status" class="control-label">
+									<%= __('orders.order_status'); %><span class="required"> *</span>
+								</label>
+								<select class="form-control show-tick" id="order_status" name="order_status" <% if(currentStatus == ORDER_REJECTED){ %> disabled="disabled" <% } %> >
+									<option value=""><%=__("orders.select_status");%></option>
+										<%
+										vaildStatus.map(key=>{ %>
+											<option value="<%=key%>" >
+												<%= (RESTAURANT_ORDER_STATUS_TYPES[key]) ? RESTAURANT_ORDER_STATUS_TYPES[key] :"" %>
+											</option> <%
+										}); %>
+								</select>
+							</div>
+							<span id="order_status_error" class="error"></span>
+						</div>
+					</div>
+				</div>
+				<div class="row clearfix">
+					<div class="col-sm-12 rejection_input <% if(currentStatus != ORDER_REJECTED){ %> hide <% } %>">
+						<div class="form-grop">
+							<div class="form-lin no-bottom-border">
+								<label for="rejection_reason" class="control-label"><%= __('orders.rejection_field'); %><span class="required"> *</span>  </label>
+								<div class="form-grop margin-0">
+									<div class="form-line">
+										<textarea id="rejection_reason" rows="6" class="resize-none form-control rejection-input" name="rejection_reason"></textarea>
+									</div>
+									<span id="rejection_reason_error" class="error rejection-reason"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer border-top">
+				<button type="button"  id="update-order_btn" class="btn bg-brown btn-sm waves-effect btn-submit-update noHover margin-0" <%- FRONT_LOADING_TEXT %> ><%= __("admin.system.submit"); %>
+				</button>
+				<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("system.cancel"); %></button>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	$(".show-tick").selectpicker('refresh');
+
+	var UPDATE_ORDER_STATUS	= <%- JSON.stringify(UPDATE_ORDER_STATUS);%>;
+	$(document).ready(function(){
+		$('.rejection_input').addClass('hide');
+		var status  = $('#order_status').val();
+		if(status && status == "<%=ORDER_REJECTED%>"){
+			$('.rejection_input').removeClass('hide');
+			return false;
+		}
+	});
+
+	/**
+	 * Function to get reason on changing of status
+	 */
+	$('#order_status').on('change',function(e){
+		var status  = $('#order_status').val();
+		$('.rejection_input').addClass('hide');
+		if(status && status == "<%=ORDER_REJECTED%>"){
+			$('.rejection_input').removeClass('hide');
+			return false;
+		}
+	});
+
+	/**
+	 * Function to submit  modal form
+	 */
+	$(".btn-submit-update").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+		var disabled = $("#order_status").attr("disabled");
+		if(disabled) $("#order_status").attr("disabled",false);
+
+		ajax_submit("update-form",function(status,response){
+			if(status){
+				window.location.href = response.redirect_url;
+			}else{
+				stopTextLoading(btnId);
+			}
+			if(disabled) $("#order_status").attr("disabled",true);
+		});
+	});
+</script>

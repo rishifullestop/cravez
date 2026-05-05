@@ -1,0 +1,19 @@
+﻿<div class="row clearfix" >
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="header">
+                <h2>
+                    <%=  __("admin.menu_manager.retaturant_detail"); %>
+                </h2>
+            </div>
+            <div class="body table-responsive">
+                <table  class="row-border hover table table-bordered" cellspacing="0" width="100%" >
+                    <tr>
+                        <th class="text-right" width="20%"><%= __('admin.menu_manager.restaurant_name'); %></th>
+                        <td><%=(typeof restaurantData.name !== typeof undefined)	? restaurantData.name	: 'N/A';%></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

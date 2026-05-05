@@ -1,0 +1,555 @@
+<%
+	var type			=	(typeof type !== typeof undefined && type) ? type :false;
+	var restaurantList 	= 	(typeof restaurant_list !== typeof undefined && restaurant_list) ? restaurant_list :"";
+	var nameSearchNumber 	= COLUMN_ONE;
+	var arNameSearchNumber	= COLUMN_TWO;
+	var statusFilter		= COLUMN_FOUR;
+
+	if(!isRestaurant(module_type)){
+		nameSearchNumber 	= (type) ? COLUMN_THREE :COLUMN_TWO;
+		arNameSearchNumber 	= (type) ? COLUMN_FOUR  :COLUMN_THREE;
+		statusFilter 		= (type) ? COLUMN_SIX   :COLUMN_FIVE;
+	}
+	let searchStaus = (typeof search_status !== typeof undefined && search_status) ? search_status : "";
+%>
+
+<!--Search Start -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-col-pink">
+				<div class="panel-heading" role="tab" id="panel-heading-id">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							aria-controls="panel-collapse-id">
+							<%= __("system.search"); %>
+							<span class="pull-right collapse-toggle-icon"></span>
+						</a>
+					</h4>
+				</div>
+				<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+					<div class="panel-body">
+						<form id="searchForm" name="searchForm" >
+							<div class="row clearfix dataTables_wrapper">
+								<% if(type && !isRestaurant(module_type)){ %>
+									<!-- Search by restaurant -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="restaurant_slug" id="column_filter_2" data-live-search="true" onchange="searchDatatable(2)">
+													<option value=""><%= __("menu_manager.search_by_restaurant"); %></option>
+													<%-restaurantList%>
+												</select>
+											</div>
+										</div>
+									</div> <%
+								} %>
+								<!-- Search by name in english -->
+								<div class="col-xs-12 <%= ((isRestaurant(module_type) || type) ? 'col-md-3 col-lg-3' :'col-md-3 col-lg-3'); %>">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_<%=nameSearchNumber%>"  onkeyup="searchDatatable(<%=nameSearchNumber%>)" placeholder="<%= __('menu_manager.search_by_name_in_english'); %>"  name="name_in_english">
+										</div>
+									</div>
+								</div>
+								<!-- Search by name in arabic-->
+								<div class="col-xs-12 <%= ((isRestaurant(module_type) || type) ? 'col-md-3 col-lg-3' :'col-md-3 col-lg-3'); %>">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_<%=arNameSearchNumber%>"  onkeyup="searchDatatable(<%=arNameSearchNumber%>)" placeholder="<%= __('menu_manager.search_by_name_in_arabic'); %>"  name="name_in_arabic">
+										</div>
+									</div>
+								</div>
+								<!-- Search by status -->
+
+								<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 %>">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" id="column_filter_<%=statusFilter%>"  onChange="searchDatatable(<%=statusFilter%>)" name="category_status_search">
+												<option value=""><%=__("menu_manager.search_by_status");%></option>
+													<%
+													Object.keys(COMMAN_STATUS_SEARCH_DROPDOWN).map(key=>{
+														if(key != APPROVED && key != REJECTED || (isRestaurant(module_type) && key == REJECTED)){
+														let isSelected = (searchStaus == key) ?"selected" : "";
+													%>
+														<option value="<%=key%>" <%=isSelected%>>
+															<%=(COMMAN_STATUS_SEARCH_DROPDOWN[key].status_name) ? COMMAN_STATUS_SEARCH_DROPDOWN[key].status_name :"";%>
+														</option>
+													<%
+														}
+													}); %>
+											</select>
+										</div>
+									</div>
+								</div>
+
+								<!-- reset button -->
+								<div class="col-md-2">
+									<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" <%= (!isRestaurant(module_type)) ? 'data-href='+WEBSITE_ADMIN_URL+'restaurant_menu' : ''; %>>
+										<%= __("system.reset")%>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Search End -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%=  __("menu_manager.pending_menu_management"); %>
+				</h2>
+
+				<% if(!isRestaurant(module_type)) { %>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<li>
+							<a href="<%=WEBSITE_ADMIN_URL%>restaurant_pending_branches" class="show_branch_btn <%= getPermissionClass(module_type,['branches','list']); %>" target="_blank">
+								<button type="button" class="btn btn-sm bg-deep-orange waves-effect">
+									<%= __("menu_manager.pending_branches"); %>
+								</button>
+							</a>
+						</li>
+						<li>
+							<a href="<%=WEBSITE_ADMIN_URL%>restaurant_category" class="show_category_btn <%= getPermissionClass(module_type,['category','list']); %>" target="_blank">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("menu_manager.category"); %>
+								</button>
+							</a>
+						</li>
+						<li>
+							<select class="perform_action show-tick form-control border-bottom <%= getPermissionClass(module_type,['menu','admin_action']); %> m-t--10">
+								<option value=""><%= __("system.select_action"); %></option>
+								<option value="<%=IN_REVIEW%>"><%= __("menu_manager.mark_as_in_review"); %></option>
+								<option value="<%=APPROVED%>"><%= __("menu_manager.mark_as_approved"); %></option>
+								<option value="<%=REJECTED%>"><%= __("menu_manager.mark_as_disapproved"); %></option>
+							</select>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs ">
+						<li class="dropdown <%= getPermissionClass(module_type,['menu','admin_action']); %>">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li>
+									<a href="javascript:void(0)" onClick="updateMultipleStatus(<%=IN_REVIEW%>)">
+										<%= __("menu_manager.mark_as_in_review"); %>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:void(0)" onClick="updateMultipleStatus(<%=APPROVED%>)">
+										<%= __("menu_manager.mark_as_approved"); %>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:void(0)" onClick="updateMultipleStatus(<%=REJECTED%>)">
+										<%= __("menu_manager.mark_as_disapproved"); %>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul><%
+				} %>
+			</div>
+			<div class="body">
+				<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<% if(!isRestaurant(module_type)) { %>
+								<th width="3%" class="p-r-10 text-center" >
+									<div class="materialize_checkbox">
+										<input type="checkbox" class="filled-in chk-col-indigo" id="select_all">
+										<label for="select_all" class="select_all p-l-20 v-align-bottom m-b-0"></label>
+									</div>
+								</th>
+							<% } %>
+							<th width="15%"><%= __("menu_manager.image");%></th>
+							<% if(type){ %>
+								<th><%= __("menu_manager.restaurant_name");%></th>
+							<% } %>
+							<th width="25%"><%= __("menu_manager.name_in_english");%></th>
+							<th width="25%"><%= __("menu_manager.name_in_arabic");%></th>
+							<th width="15%"><%= __("menu_manager.from_to_date_time");%></th>
+							<th width="15%"><%= __("system.status");%></th>
+							<th width="15%"><%= __("system.action"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal for reject restaurant menu request-->
+<div class="modal fade" id="reject_menu" tabindex="-1" role="dialog" aria-labelledby="reject_menu" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("menu_manager.reject_menu_message") %></h4>
+			</div>
+			<form id="reject-form" data-submit-btn-id="reject-menu_btn" method="post" class="on_click_submit" role="form" action=''>
+				<input type="hidden" name="menu_id" id="menu_id">
+				<input type="hidden" name="slug" id="menu_slug">
+				<input type="hidden" name="status" id="menu_status" value="<%= REJECTED%>">
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-grop">
+								<div class="form-lin no-bottom-border">
+									<label for="rejection_reason" class="control-label"><%= __('menu_manager.rejection_reason'); %><span class="required"> *</span>  </label>
+									<div class="form-grop margin-0">
+										<div class="form-line">
+											<textarea id="rejection_reason" rows="6" class="resize-none form-control" name="rejection_reason"></textarea>
+										</div>
+										<span id="rejection_reason_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="reject-menu_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-reject noHover margin-0"><%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div><!--modal close-->
+<script type="text/javascript">
+
+	/** Function to initialize datatable and get server side data */
+	var STATUS_LABELS	= 	<%- JSON.stringify(STATUS_LABELS)%>;
+	var dataTable		=	"";
+	var checkboxArray	=	{};
+
+	$(document).ready(function() {
+		setCategoryURL();
+
+		$(".show-tick").selectpicker('refresh');
+		dataTable = $('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				<% if(!isRestaurant(module_type)) { %>
+					{ 	"data"		: {},
+						"orderable" : false,
+						"render" 	: 	function(result){
+							let categoryId 	=	(result._id) ? 	result._id 	:"";
+
+							return '<div class=" materialize_checkbox  p-r-25">'+
+								'<div class="checkbox_wrapper">'+
+									'<input type="checkbox" class="filled-in chk-col-indigo" id="'+categoryId+'" >'+
+									'<label for="'+categoryId+'" class="checkbox data"></label>'+
+								'</div>'+
+							'</div>';
+						}
+					},
+				<% }%>
+				{ 	"data"		 : 'full_image_path',
+					"orderable"	 : false,
+					"searchable" : false,
+					"render"    : function(full_image_path){
+						var imageSrc = ( typeof full_image_path != typeof undefined) ? full_image_path : '' ;
+						return  ('<a href="'+imageSrc+'" class="items-image waves-effect" data-lightbox="roadtrip'+imageSrc+'"><img src="'+imageSrc+'" alt="Menu Image" class="thumbnail set_image_med_dim" /></a>');
+					}
+				},
+				<% if(type && !isRestaurant(module_type)){ %>
+					{
+						"data"		 : {},
+						"field_name" : "restaurant_slug",
+						"orderable"	 : false,
+						"searchable" : false,
+						"render"	 : function(result){
+							return (result.restaurant_name)	? result.restaurant_name :"";
+						}
+					},
+				<% } %>
+				{"data": 'name.en'},
+				{"data": 'name.ar'},
+				{
+					"data"		 : {},
+					"orderable"	 : false,
+					"searchable" : false,
+					"render"    : function(result){
+						if(result.is_default) return "<%= __('menu_manager.deafult_option'); %>";
+						var startDate	= (result.start_date)	? result.start_date : "";
+						var endDate		= (result.end_date)		? result.end_date : "";
+						var startTime	= (result.start_time)	? parseFloat(result.start_time).toFixed(2) : "";
+						var endTime		= (result.end_time)		? parseFloat(result.end_time).toFixed(2) : "";
+						var dateHtml 	= "<table class='borderless-table full-length-header-td'>";
+						dateHtml += '<tr><td><%= __("menu_manager.start_date")%></td><td>: '+ startDate +"</td></tr>";
+						dateHtml += '<tr><td><%= __("menu_manager.end_date")%></td> <td>: '+ endDate +"</td></tr>";
+						dateHtml += '<tr><td><%= __("menu_manager.start_time")%></td><td>: '+startTime +"</td></tr>";
+						dateHtml += '<tr><td><%= __("menu_manager.end_time")%> </td><td>: '+ endTime +"</td></tr></table>";
+						return  dateHtml;
+					}
+				},
+				{
+					"data"		: 	{},
+					"orderable"	:   false,
+					"field_type": 	"<%=NUMERIC_FIELD%>",
+					"field_name":	"status",
+					"render" 	:	function(result){
+						var status 			= (result.status) ? result.status : '<%= PENDING %>';
+						var rejectionReason	= (result && result.rejection_reason)	?	result.rejection_reason	:"";
+						var statusTitle		= (STATUS_LABELS[status] && STATUS_LABELS[status].status_name) ? STATUS_LABELS[status].status_name:"";
+						var statusClass		= (STATUS_LABELS[status] && STATUS_LABELS[status].class)	?	STATUS_LABELS[status].class :"";
+						var statusTab = '<span class="label '+statusClass+'">'+statusTitle+'</span>';
+
+						if(rejectionReason && status == "<%= REJECTED %>"){
+							statusTab +=  '<i class="material-icons font-20 rejection-info-icon" title="'+rejectionReason+'" data-toggle="tooltip" data-placement="left" >info</i>';
+						}
+						return statusTab;
+					}
+				},
+				{
+					"data"			: 	{},
+					"orderable"		:   false,
+					"searchable"	: 	false,
+					"render" 		: 	function(result){
+						var menuId 			= (result._id)				? result._id 				:'';
+						var status 			= (result.status) 			? result.status : '<%= PENDING %>';
+						var restaurantSlug 	= (result.restaurant_slug)	? result.restaurant_slug 	:'';
+						var isReviewVisible	= (result.status == '<%= PENDING %>') ? true : false;
+						var isApproveVisible= (result.status == '<%= PENDING %>' || result.status == '<%= IN_REVIEW %>') ? true : false;
+						var dropDownButton 	= (status != "<%= IN_REVIEW%>" || <%= !isRestaurant(module_type) %>) ? ''+
+						'<div class="btn-group">'+
+							'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+								'<%= __("admin.system.action"); %>'+
+								' <span class="caret"></span>'+
+							'</button>'+
+							'<ul class="dropdown-menu">'+
+								/** Edit Link **/
+								'<li>'+
+									'<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_RESTAURANT_URL%>'+restaurantSlug+'/pending_menu/edit/'+menuId+'" data-open-modal="true" class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,["menu","edit"]); %> "><%= __("system.edit"); %></a>'+
+								'</li>' : '';
+
+								'<% if(!isRestaurant(module_type)){ %>'
+									/** In-Review Link */
+									dropDownButton += (isReviewVisible) ? '<li>'+
+										'<a href="javascript:void(0)" data-href="<%=WEBSITE_RESTAURANT_URL%>'+restaurantSlug+'/pending_menu/review_reject" class="waves-effect waves-block menu_action_btn <%= getPermissionClass(module_type,["menu","admin_action"]); %>"  data-id="'+menuId+'" data-slug="'+restaurantSlug+'" data-action="<%= IN_REVIEW%>" data-confirm-message="<%= __("menu_manager.do_you_want_to_review"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+										'<%= __("menu_manager.in_review"); %>'+
+									'</li>' : '';
+
+									/** Approve Link **/
+									dropDownButton += (isApproveVisible) ? '<li>'+
+										'<a href="javascript:void(0);" data-href="<%=WEBSITE_RESTAURANT_URL%>'+restaurantSlug+'/pending_menu/approve" data-id="'+menuId+'" data-slug="'+restaurantSlug+'" data-action="<%= APPROVED%>" class="waves-effect waves-block menu_action_btn <%= getPermissionClass(module_type,["menu","admin_action"]); %>" data-confirm-message="<%= __("menu_manager.you_want_to_approve_this_menu"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+											'<%= __("menu_manager.approve_menu"); %>'+
+										'</a>'+
+									'</li>'+
+
+									/** Reject Link **/
+									'<li>'+
+										'<a href="javascript:void(0)" class="waves-effect waves-block open-modal <%= getPermissionClass(module_type,["menu","admin_action"]); %>" data-id="'+menuId+'" data-slug="'+restaurantSlug+'" >'+
+										' <%= __("menu_manager.reject_menu"); %>'+
+									'</li>' : '';
+								'<% } %>'
+							dropDownButton 	+= (status != "<%= IN_REVIEW%>" || <%= !isRestaurant(module_type) %>) ? '</ul>'+
+						'</div>' : '';
+						return dropDownButton;
+					}
+				}
+			],
+			"ajax":{
+				url 	:	"<%=list_url%>",
+				type	: 	"POST",
+				dataSrc	: 	function(result){
+					setTimeout(()=>{
+						dataTable.columns.adjust();
+					},100);
+					adjustPermissionsClass();
+					return result.data;
+				}
+			},
+			"drawCallback": function(){
+				$('[data-toggle="tooltip"]').tooltip();
+			}
+		});
+
+		/**
+		 *  check/uncheck checkbox select all check/uncheck
+		 */
+		$(document).on('change','#select_all',function(){
+			var isChecked	= $(this).is(':checked');
+			$('.checkbox_wrapper input[type="checkbox"]').not(":disabled").prop("checked",isChecked).trigger("change");
+		});
+
+		/**
+		 *  Check/Uncheck checkbox
+		 */
+		$(document).on('change','.checkbox_wrapper input[type="checkbox"]',function(){
+			var id          = $(this).attr('id');
+			var isChecked	= $(this).is(':checked');
+			if(isChecked){
+				checkboxArray[id] = true;
+			}else{
+				delete checkboxArray[id];
+			}
+			var totalCheckBox = $('.checkbox_wrapper input[type="checkbox"]').not(":disabled").length;
+			var checkedBox = $('.checkbox_wrapper input[type="checkbox"]:checked').length;
+			let selectAll = (totalCheckBox == checkedBox) ? true : false;
+			$("#select_all").prop("checked",selectAll);
+		});
+	});
+
+	/** To update status for all selected menus */
+	$(".perform_action").change(function(){
+		var currentStatus = $(this).val();
+		updateMultipleStatus(currentStatus);
+	});
+
+	/**
+	* Function to udpate status of multiple menus
+	*/
+	function updateMultipleStatus(currentStatus){
+		currentStatus = (currentStatus) ? parseInt(currentStatus) :currentStatus;
+		if(currentStatus && (currentStatus == "<%=IN_REVIEW%>" || currentStatus=="<%=REJECTED%>" || currentStatus == "<%=APPROVED%>")){
+			var menuIds = Object.keys(checkboxArray);
+
+			if(menuIds.length < 1){
+				notice("<%= STATUS_ERROR %>","<%= __('menu_manager.please_select_atleast_one_restaurant_menu')%>");
+				return false;
+			}
+
+			if(currentStatus == "<%=REJECTED%>"){
+				$('#reject-form').attr("action","<%=WEBSITE_RESTAURANT_URL%>pending_menu/update_multiple_status");
+				$('#menu_id').val(menuIds.join(","));
+
+				$("#rejection_reason_error").text('');
+				$('#rejection_reason').val("");
+				$('#menu_status').val(currentStatus);
+				$("#reject_menu .modal-title").html('<%=__("menu_manager.reject_menu_message") %>');
+				$('#reject_menu').modal('show');
+			}else{
+				confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("menu_manager.do_you_want_to_update_multiple_status"); %>',function(result){
+					if(result){
+						var options = {
+							url 	: 	"<%=WEBSITE_RESTAURANT_URL%>pending_menu/update_multiple_status",
+							data	: 	{menu_id: menuIds.join(","), status: currentStatus},
+							method	:	"post"
+						}
+						ajaxRequest(options,function(response){
+							if(response.status && response.message) notice(response.status,response.message);
+							dataTable.draw();
+							$("#select_all").prop("checked",false);
+						});
+					}
+					swal.close();
+				});
+			}
+		}
+	}// end updateMultipleStatus()
+
+	/*
+	 * Javascript function to search datatable
+	 */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+	<% if(searchStaus){%>
+		searchDatatable(<%=statusFilter%>);
+	<%}%>
+
+	/**
+	 *	Function is triggered when user select menu(by clicking on check box in front of menu) and click on any action
+	 */
+	$(document).on("click",".menu_action_btn",function(){
+		var confirmHeading	= $(this).data("confirm-heading");
+		var confirmMessage	= $(this).data("confirm-message");
+		var dataHref		= $(this).data("href");
+		var dataId			= $(this).data("id");
+		var dataSlug		= $(this).data("slug");
+		var dataAction		= $(this).data("action");
+
+		confirmBox("warning",confirmHeading,confirmMessage,function(result){
+			if(result){
+				var options = {
+					url 	: 	dataHref,
+					data	: 	{slug: dataSlug, menu_id : dataId, status: dataAction},
+					method	:	"post"
+				}
+				ajaxRequest(options,function(response){
+					if(response.status && response.message) notice(response.status,response.message);
+					dataTable.draw();
+				});
+			}
+			swal.close();
+		});
+	});
+
+	/**
+	* Function to show modal
+	*/
+	$(document).on('click','.open-modal',function(){
+		var menuId = $(this).attr('data-id');
+		var slug = $(this).attr('data-slug');
+
+		$('#menu_id').val(menuId);
+		$('#menu_slug').val(slug);
+		$("#rejection_reason_error").text('');
+		$('#rejection_reason').val("");
+		$('#reject-form').attr("action","<%=WEBSITE_RESTAURANT_URL%>"+slug+"/pending_menu/review_reject");
+		$('#reject_menu').modal('show');
+	});
+
+	/**
+	* Function to submit  modal form
+	*/
+	$(".btn-submit-reject").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+
+		ajax_submit("reject-form",function(status,response){
+			stopTextLoading(btnId);
+			if(status){
+				if(response.status && response.message) notice(response.status,response.message);
+				dataTable.draw();
+				$('#reject_menu').modal('hide');
+			}
+		});
+	});
+
+	/** call setCategoryUrl on restaurant change */
+	$("#column_filter_2").change(function(){
+		setCategoryURL();
+	});
+
+	/*
+	 * Function to set category and branch urls
+	 */
+	function setCategoryURL(){
+		setTimeout(function(){
+			var selectedRestaurant = $("#column_filter_2").val();
+			var categoryURL = "<%=WEBSITE_ADMIN_URL%>restaurant_category";
+			var branchURL = "<%=WEBSITE_ADMIN_URL%>restaurant_pending_branches";
+			if(selectedRestaurant){
+				categoryURL = "<%=WEBSITE_ADMIN_URL%>restaurant_category?restaurant="+selectedRestaurant;
+				branchURL = "<%=WEBSITE_ADMIN_URL%>restaurant_pending_branches?restaurant="+selectedRestaurant;
+			}
+			$(".show_category_btn").attr("href",categoryURL);
+			$(".show_branch_btn").attr("href",branchURL);
+		},100);
+	};
+
+</script>
+<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>

@@ -1,0 +1,138 @@
+<%
+    var dates            = choose_date;
+    var parentId         = parent_id;
+    var shiftAvailablity = shift_availablity;
+    var fromDate	     = newDate(from_date,DATABASE_DATE_FORMAT);
+    var toDate		     = newDate(to_date,DATABASE_DATE_FORMAT);
+    var leaveTypeList    = leave_type_list;
+	var currentDate		 = newDate(newDate("",CURRENTDATE_END_DATE_FORMAT));
+	var currentTime		 = newDate("",SHIFT_TIME_FORMAT);
+%>
+<table id="datatable-listing" class="row-border fixed-width-table hover table full-length-header table-bordered" cellspacing="0" width="100%" >
+    <thead>
+        <tr>
+            <th><%= __('admin.driver_shifts.user_name'); %></th>
+            <%
+                dates.map((dateRecords)=>{%>
+                    <th><%=dateRecords%></th>
+                <%
+                });
+            %>
+        </tr>
+    </thead>
+    <tbody>
+        <%
+			Object.keys(shiftAvailablity).map((userRecords)=>{
+                let userName = (shiftAvailablity[userRecords] && shiftAvailablity[userRecords].name)   ?  shiftAvailablity[userRecords].name : "";
+                let userId   = (userRecords) ?  userRecords : "";
+                %>
+                <tr>
+                    <td><%=userName%></td>
+
+                    <%
+                        dates.map((dateRecords)=>{
+                            var shiftList = (shiftAvailablity[userId] && shiftAvailablity[userId][dateRecords]) ? shiftAvailablity[userId][dateRecords] : [];
+					%>
+					<td class="p-l-0 p-r-0">
+                        <table class="borderless-table full-length-header-td shift-table" width="100%">
+							<%
+							if(shiftList.length > 0){
+								let isLevePrinted = false;
+								shiftList.map((shiftData,index)=>{
+									var cityName  = (shiftData.city) ? shiftData.city   :"";
+									var date  	  = (shiftData.date) ? shiftData.date   :"";
+									var areaName  = (shiftData.area) ? shiftData.area   :"";
+									var shiftId   = (shiftData.shift_id)   ?    shiftData.shift_id         :"";
+									var id        = (shiftData.id)         ?    shiftData.id               :"";
+									var leaveData = (shiftData.leave_type) ?    shiftData.leave_type       :"";
+									var leaveType = "";
+									if(leaveData){
+										leaveType  = '<span class="label label-success">'+(leaveTypeList[String(leaveData)] ? leaveTypeList[String(leaveData)] :"")+'</span>';
+										time = "";
+									}
+									var shifts = [];
+
+									if(shiftData.shift){
+										var startTime = (shiftData.shift.start_time) ? set24HourFormat(shiftData.shift.start_time) :"";
+										var endTime = (shiftData.shift.end_time) ? set24HourFormat(shiftData.shift.end_time) :"";
+										var time = (startTime && endTime) ? "("+startTime+" - "+endTime+")" :"";
+										var shiftName = (shiftData.shift.shift_name) ? shiftData.shift.shift_name :"";
+										shifts.push(shiftName+" "+time);
+									}
+									%>
+									<%
+									if(shifts.length>0 && !leaveType){ %>
+										<tr <%- (index > 0) ? 'style="border-top : 1px solid #aeaeae;"': '';%>>
+											<td width="10%"><%=  __('admin.driver_shifts.city'); %></td>
+											<td>:</td>
+											<td><%= cityName%></td>
+											<td width="15%">
+												<% if(auth.user_role_id != CRAVEZ){
+													if(date > currentDate || (date >= currentDate && startTime > parseFloat(currentTime))){ %>
+														<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete/<%=id%>" class="float-right waves-effect waves-block confirm_box <%= getPermissionClass(module_type,['driver_shifts','delete']); %>" data-confirm-message="<%= __('admin.driver_shifts.you_want_to_delete_this_brand');%>" data-confirm-heading="<%= __('admin.system.are_you_sure') %>">
+															<i class="material-icons font-14">delete</i>
+														</a> <%
+													}
+													if(index == 0){ %>
+														<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/<%=id%>" data-open-modal="true" class="float-right waves-effect waves-block action-btn <%= getPermissionClass(module_type,['driver_shifts','edit']); %>">
+															<i class="material-icons font-14">mode_edit</i>
+														</a> <%
+													}
+												} %>
+											</td>
+										</tr>
+										<tr>
+											<td><%=  __('admin.driver_shifts.areas'); %></td>
+											<td>:</td>
+											<td colspan=2><%= areaName%></td>
+										</tr>
+										<tr>
+											<td><%=  __('admin.driver_shifts.shift_name'); %></td>
+											<td>:</td>
+											<td colspan=2><%= shifts%></td>
+										</tr><%
+									}
+									if(!isLevePrinted && leaveType){
+										isLevePrinted = true;
+									%>
+										<td><%- leaveType%></td>
+										<td colspan=2>
+											<%
+											if(leaveType && shiftData.status == PENDING && auth.user_role_id != CRAVEZ ){
+												if(leaveData == WEEKLY_OFF ){ %>
+													<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>driver_leave_management/driver_vacation_request/edit_weekly_off/<%=id%>?is_driver_shift=1" data-open-modal="true" class="float-right waves-effect waves-block action-btn <%= getPermissionClass(module_type,['driver_vacation_request','edit_weekly_off']); %>">
+														<i class="material-icons font-14">mode_edit</i>
+													</a> <%
+												}else{ %>
+													<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>driver_leave_management/driver_vacation_request/edit/<%=id%>?is_driver_shift=1" data-open-modal="true" class="float-right waves-effect waves-block action-btn <%= getPermissionClass(module_type,['driver_vacation_request','edit']); %>">
+														<i class="material-icons font-14">mode_edit</i>
+													</a> <%
+												}
+											} %>
+										</td>
+								<%  }
+								});
+                            }
+						%>
+						</table>
+                    </td>
+						<%
+						});
+                    %>
+                </tr>
+                <%
+            });
+        %>
+    </tbody>
+</table>
+<%
+if(Object.keys(shiftAvailablity).length > 0 ){ %>
+    <div class="export">
+        <a href="<%=admin_list_url%>/export_schedule/<%=fromDate%>/<%=toDate+'/'+parentId%>" class="btn btn-sm waves-effect btn-success <%=getPermissionClass(module_type,['driver_shifts','export_schedule']); %>">
+            <%= __("admin.driver_shifts.export")%>
+        </a>
+        <a href="<%=admin_list_url%>/user_schedule/<%=parentId%>" class="btn bg-deep-orange btn-sm waves-effect <%=getPermissionClass(module_type,['driver_shifts','user_schedule']); %>">
+            <%= __("admin.driver_shifts.send_team_schedule")%>
+        </a>
+    </div><%
+} %>

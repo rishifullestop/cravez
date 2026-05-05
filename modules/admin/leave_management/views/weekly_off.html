@@ -1,0 +1,87 @@
+<%
+var date			= (result && result.date) ? newDate(result.date,DATABASE_DATE_FORMAT) : newDate("",DATABASE_DATE_FORMAT);
+var weeklyRequestId	= (result && result._id) ?  result._id : "";
+var action			= (is_editable) ? admin_list_url+'/vacation_request/edit_weekly_off/'+weeklyRequestId : admin_list_url+'/vacation_request/add_weekly_off';
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-weekly-off" action="<%= action %>" data-submit-btn-id="vacation-request-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (is_editable) ?  __("admin.leave_management.edit_weekly_off")  : __("admin.leave_management.add_weekly_off"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix selected">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="team_member" class="control-label">
+											<%=  __('admin.leave_management.team_member'); %><span class="required"> *</span>
+										</label>
+										<select id="team_member" class="form-control show-tick" name="team_member"  data-live-search="true">
+											<option value=""><%- __('admin.leave_management.select_team_member')%></option>
+											<%-users_list%>
+										</select>
+									</div>
+									<span id="team_member_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="dates" class="control-label">
+											<%=  __('admin.leave_management.date'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control" id="date-picker" name="dates" readonly value="<%= date%>" placeholder="<%= __('admin.leave_management.select_date');%>">
+										<span id="info-message" class="message demo-image-copyright"><%= __("admin.leave_management.select_date_note") %></span>
+									</div>
+									<span id="dates_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="vacation-request-add-btn-id" class="btn  bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-weekly-off',function(status,response){
+			if(status){
+				window.location.href = response.redirect_url;
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/**
+	 * Function for datepicker
+	 */
+	$('#date-picker').datepicker({
+		multidate: true,
+		format: 'yyyy-mm-dd',
+		startDate: "dateToday"
+	});
+
+	$(".show-tick").selectpicker('refresh');
+</script>

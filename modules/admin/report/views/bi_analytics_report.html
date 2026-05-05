@@ -1,0 +1,521 @@
+<%
+	var fromDate = newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),DATABASE_DATE_FORMAT);
+	var toDate	 = newDate("",DATABASE_DATE_FORMAT);
+	var tempFromDate = newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),CURRENTDATE_START_DATE_FORMAT);
+	var tempToDate	 = newDate("",CURRENTDATE_END_DATE_FORMAT);
+%>
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<div class="col-sm-3 p-r-0">
+										<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+
+											<a class="nav-link active" id="v-pills-date-tab" data-toggle="pill" href="#v-pills-date" role="tab" aria-controls="v-pills-date" aria-selected="true">Date Range <span class="badge hide">1</span></a>
+
+											<a class="nav-link" id="v-pills-areas-tab" data-toggle="pill" href="#v-pills-areas" role="tab" aria-controls="v-pills-areas" aria-selected="false">Areas <span class="badge hide">1</span></a>
+
+											<a class="nav-link" id="v-pills-restaurant-tab" data-toggle="pill" href="#v-pills-restaurant" role="tab" aria-controls="v-pills-restaurant" aria-selected="false">Restaurant <span class="badge hide">1</span></a>
+
+											<a class="nav-link" id="v-pills-cuisine-tab" data-toggle="pill" href="#v-pills-cuisine" role="tab" aria-controls="v-pills-cuisine" aria-selected="false">Cuisine <span class="badge hide">1</span></a>
+
+											<a class="nav-link" id="v-pills-promotion-tab" data-toggle="pill" href="#v-pills-promotion" role="tab" aria-controls="v-pills-promotion" aria-selected="false">Promotion <span class="badge hide">1</span></a>
+
+											<a class="nav-link" id="v-pills-item-tab" data-toggle="pill" href="#v-pills-item" role="tab" aria-controls="v-pills-item" aria-selected="false">Menu Items <span class="badge hide">1</span></a>
+
+											<a class="nav-link" id="v-pills-week-tab" data-toggle="pill" href="#v-pills-week" role="tab" aria-controls="v-pills-week" aria-selected="false">Week Day <span class="badge hide">1</span></a>
+
+											<a class="nav-link" id="v-pills-aov-tab" data-toggle="pill" href="#v-pills-aov" role="tab" aria-controls="v-pills-aov" aria-selected="false">Average Order Value <span class="badge hide">1</span></a>
+
+											<a class="nav-link" id="v-pills-age-tab" data-toggle="pill" href="#v-pills-age" role="tab" aria-controls="v-pills-age" aria-selected="false">Age Category <span class="badge hide">1</span></a>
+
+											<a class="nav-link" id="v-pills-gender-tab" data-toggle="pill" href="#v-pills-gender" role="tab" aria-controls="v-pills-gender" aria-selected="false">Gender <span class="badge hide">1</span></a>
+									  	</div>
+									</div>
+									<div class="col-sm-9 p-l-5">
+										<div class="tab-content wizard-content" id="v-pills-tabContent">
+											<div class="tab-pane fade active in" id="v-pills-date" role="tabpanel" aria-labelledby="v-pills-date-tab">
+												<!-- Search by date -->
+												<div class="col-xs-12 col-sm-6">
+													<div class="form-group">
+														<div class="form-line">
+															<input class="form-control" id="date-range-picker" autocomplete="off" value="<%=fromDate+' - '+toDate%>">
+														</div>
+														<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=tempFromDate%>">
+														<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=tempToDate%>">
+													</div>
+												</div>
+											</div>
+											<div class="tab-pane fade" id="v-pills-areas" role="tabpanel" aria-labelledby="v-pills-areas-tab">
+												 <!-- Search by area name -->
+												<div class="col-xs-12 col-sm-6">
+													<div class="form-group">
+														<div class="form-line">
+															<select class="form-control show-tick area_id" id="search_area_id" name="search_area_id" multiple data-live-search="true" data-title="<%= __('admin.report.search_by_area'); %>">
+																<%-area_list%>
+															</select>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="tab-pane fade" id="v-pills-restaurant" role="tabpanel" aria-labelledby="v-pills-restaurant-tab">
+												<!-- Search by restaurant name -->
+												<div class="col-xs-12 col-sm-6">
+													<div class="form-group">
+														<div class="form-line">
+															<select class="form-control show-tick restaurant_id" name="search_restaurant_id" id="restaurant_ids" data-live-search="true"multiple data-title="<%= __('admin.report.search_by_restaurant_name'); %>">
+																<%-restaurant_list%>
+															</select>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="tab-pane fade" id="v-pills-cuisine" role="tabpanel" aria-labelledby="v-pills-cuisine-tab">
+												<!-- Search by cuisine -->
+												<div class="col-xs-12 col-sm-6">
+													<div class="form-group">
+														<div class="form-line">
+															<select class="form-control show-tick" id="cuisine_ids" name="search_cuisine_id" data-live-search="true" data-title="<%=__('admin.report.search_by_cuisines')%>" multiple>
+																<%- cuisine_list %>
+															</select>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="v-pills-promotion" role="tabpanel" aria-labelledby="v-pills-promotion-tab">
+												<div class="col-xs-12 col-sm-6">
+													<div class="form-group">
+
+														<div class="form-line">
+															<input type="text" name="offer_code" id="offer_code" class="form-control" placeholder="Search By Offer Code">
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="v-pills-item" role="tabpanel" aria-labelledby="v-pills-item-tab">
+												<!-- Search by items -->
+												<div class="col-xs-12 col-sm-6">
+													<div class="form-group">
+														<div class="form-line">
+															<select class="form-control item-select" style="height:46px;" id="item_ids" name="search_item_id">
+
+															</select>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="v-pills-week" role="tabpanel" aria-labelledby="v-pills-week-tab">
+												<!-- search By week days -->
+												<div class="col-xs-12 col-sm-12">
+													<div class="form-group materialize_checkbox">
+														<div class="form-lin checkbox_wrapper">
+															<% Object.keys(DAY_LIST).map(type=>{ %>
+																<div class="col-sm-3">
+																	<input name="week_days" id="<%= type%>" class="filled-in chk-col-purple" type="checkbox" value="<%= parseInt(type)%>"/>
+																	<label for="<%= type%>" class="materialize-chekbox-label font-14">
+																		<%= DAY_LIST[type]%>
+																	</label>
+																</div>
+															<%  });%>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="v-pills-aov" role="tabpanel" aria-labelledby="v-pills-aov-tab">
+												<div class="col-xs-12 col-sm-6">
+													<div class="form-group">
+														<div class="form-line">
+															<input type="text" name="min_aov" id="min_aov" class="form-control" placeholder="Min Average Order Value">
+														</div>
+													</div>
+												</div>
+												<div class="col-xs-12 col-sm-6">
+													<div class="form-group">
+														<div class="form-line">
+															<input type="text" name="max_aov" id="max_aov" class="form-control" placeholder="Max Average Order Value">
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="v-pills-age" role="tabpanel" aria-labelledby="v-pills-age-tab">
+												<!-- search By age days -->
+												<div class="col-xs-12 col-sm-12">
+													<div class="form-group materialize_checkbox">
+														<div class="form-lin checkbox_wrapper">
+															<% Object.keys(AGE_GROUP_FILTER).map(type=>{ %>
+																<div class="col-sm-3">
+																	<input name="age_group" id="<%= type%>" class="filled-in chk-col-indigo" type="checkbox" value="<%= type%>"/>
+																	<label for="<%= type%>" class="materialize-chekbox-label font-14">
+																		<%= AGE_GROUP_FILTER[type]%>
+																	</label>
+																</div>
+															<%  });%>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="v-pills-gender" role="tabpanel" aria-labelledby="v-pills-gender-tab">
+												<!-- Search by gender -->
+												<div class="col-xs-12 col-sm-6">
+													<div class="form-group">
+														<div class="form-line">
+															<% Object.keys(GENDER_DROPDOWN).map(type=>{ %>
+																<input type="radio" name="gender" id="<%= type%>" value="<%= type%>" class="with-gap">
+																<label for="<%= type%>"><%= GENDER_DROPDOWN[type]%></label>
+															<%  });%>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row clearfix text-right p-t-10">
+									<!-- reset button -->
+									<div class="col-sm-12">
+										<button type="button" id="search_btn" class="btn btn-sm waves-effect btn-success">
+											<%= __("admin.system.search")%>
+										</button>
+
+
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.report.bi_analytics_report"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="5%"><%= __("admin.report.serial_no"); %></th>
+								<th width="15%"><%= __("admin.report.customer_name"); %></th>
+								<th width="15%"><%= __("admin.report.mobile_number"); %></th>
+								<th width="15%"><%= __("admin.report.email"); %></th>
+								<th width="15%"><%= __("admin.report.date_of_birth"); %></th>
+								<th width="15%"><%= __("admin.report.gender"); %></th>
+								<th width="15%"><%= __("admin.report.aov"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+
+.select2-container .select2-selection--multiple {
+    min-height: 46px !important;
+}
+.select2-container .select2-search__field {
+    min-height: 36px !important;
+}
+
+</style>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>select2/dist/css/select2.min.css" rel="stylesheet" />
+
+<%- contentFor('script') %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>select2/dist/js/select2.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/dataTables.buttons.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/jszip.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/pdfmake.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/vfs_fonts.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/buttons.html5.min.js "></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var GENDER_DROPDOWN = <%- JSON.stringify(GENDER_DROPDOWN) %>;
+		var dataTable = "";
+		var stopTableDraw = true;
+		$(document).ready(function() {
+			$("#v-pills-item .item-select").selectpicker("destroy");
+			dataTable = $("#datatable-listing").DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"paging"	:	false,
+				"order"		: 	[[6,"desc"]],
+				"dom"		: 	'Brti',
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"columns"	: 	[
+					{	"data" : "created",
+						"orderable" : false,
+						"render": function ( data, type, full, meta ) {
+							return  '<span class="m-l-20">'+(meta.row+ 1)+'</span>';
+						}
+					},
+                    {
+                        "data"      : "full_name",
+                        "searchable": false,
+
+                    },
+                    {
+                        "data"      : "mobile_number",
+                        "searchable": false,
+                        "orderable": false,
+                    },
+                    {
+                        "data"      : "email",
+                        "searchable": false,
+                        "orderable": false,
+                    },
+					{
+						"data"		: 'date_of_birth',
+						"orderable" : false,
+                        "render"	: function (date_of_birth) {
+							return calculateAge(date_of_birth);
+                        }
+					},
+					{
+						"data"      : "gender",
+						"searchable": false,
+						"orderable": false,
+						render : function(gender){
+							return GENDER_DROPDOWN[gender];
+						}
+					},
+					{
+						"data"      : "aov",
+						"searchable": false,
+						render : function(aov){
+							return currencyFormat(aov);
+						}
+					},
+
+				],
+				buttons: [
+					{
+						text		: 'Export PDF',
+						extend		: 'pdfHtml5',
+						title 		: 'BI & Analyticals Report',
+						className	: 'btn btn-sm bg-indigo waves-effect',
+						orientation	: 'landscape',
+						pageSize	: 'letter',
+						charset		: "utf-8",
+						bom			: "true",
+						exportOptions	: {
+							orthogonal	: 'export',
+							columns		: ':visible',
+						},
+						customize: function (doc) {
+							doc.defaultStyle.fontSize = 12;
+							doc.defaultStyle.alignment = 'left';
+							doc.styles.tableHeader.fontSize = 14;
+						}
+					}
+				],
+				"deferLoading": 0, // here
+				"ajax":{
+					url 	:	"<%=admin_list_url%>/bi_analytics_report",
+					type	: 	"POST",
+					data    :   function(d){
+						d.from_date			= $('#from_date').val();
+						d.to_date			= $('#to_date').val();
+                        d.area_ids			= $('#search_area_id').val();
+                        d.restaurant_ids	= $('#restaurant_ids').val();
+                        d.cuisine_ids		= $('#cuisine_ids').val();
+                        d.offer_code		= $('#offer_code').val();
+                        d.item_ids			= $('#item_ids').val();
+                        d.week_days			=  $.map($('input[name="week_days"]:checked'),function(c){return c.value; });
+                        d.min_aov			= $('#min_aov').val();
+                        d.max_aov			= $('#max_aov').val();
+                        d.age_group			= $.map($('input[name="age_group"]:checked'),function(c){return c.value; });
+                        d.gender			= $('input[name="gender"]:checked').val();
+					},
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+			});
+
+
+			$('#item_ids').select2({
+				placeholder		: "<%= __('admin.report.select_item'); %>",
+				multiple		: true,
+				closeOnSelect	: false,
+				width			: "417px",
+				minimumInputLength : 3,
+				ajax: {
+					url		: "<%=admin_list_url%>/bi_analytics_report/get_item_list",
+					dataType: "json",
+					type	: "GET",
+					delay	: 500,
+					data	: function (params) {
+						return {
+							q: params.term,
+							page: params.page || 1,
+							limit: 10,
+							restaurant_ids	: $('#restaurant_ids').val(),
+                       		cuisine_ids		: $('#cuisine_ids').val(),
+						};
+					},
+					processResults: function (data, params) {
+						params.page = params.page || 1;
+						return {
+							results: data.result,
+							pagination: {
+								more: (params.page * 10) < data.total_count
+							}
+						};
+					},
+					cache: true
+				},
+			});
+		});
+
+        $("#search_btn").click(function(){
+			dataTable.draw()
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("click","#dataExportBtn",function(){
+			var fromDate 		= $("#from_date").val();
+			var toDate   		= $("#to_date").val();
+            var name	        = $("#driver_name").val();
+            var sortedCol 		= dataTable.order()[0][0];
+			var sortedDir 		= dataTable.order()[0][1];
+			var columns 		= dataTable.settings().init().columns;
+			var sortedColName 	= columns[sortedCol].data;
+			var startDate		= (fromDate) ? fromDate : "<%=tempFromDate%>";
+			var endDate			= (toDate) ? toDate : "<%=tempToDate%>";
+
+			if(startDate && endDate){
+				var exportURL = "<%=admin_list_url%>/bi_analytics_report/export_data?sort_field=" + sortedColName + "&sort_dir=" + sortedDir +"&from_date="+startDate+"&to_date="+endDate;
+                if (name) exportURL += "&name=" + name;
+				window.location.href=exportURL;
+			}
+		});
+
+		/**
+		* Get dropdown value by local storage
+		*/
+
+        let tempName = "";
+		if(localStorage["search_" +window.location.pathname]){
+
+			let searchFormData = JSON.parse(localStorage["search_" +window.location.pathname]);
+			for(index in searchFormData){
+                if (searchFormData[index].name && searchFormData[index].name == "driver_name" && searchFormData[index].value) {
+                    tempName = searchFormData[index].value;
+                }
+			}
+		}
+
+		var maxDate		= 	new Date("<%= toDate %>");
+		var removeClearBtn = true;
+		var dateRanges = {
+			'Today'			: [moment(), moment()],
+			'Yesterday'		: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+			'Last 7 Days'	: [moment().subtract(7, 'days'), moment()],
+			'Last 30 Days'	: [moment().subtract(30, 'days'), moment()],
+			'This Month'	: [moment().startOf('month'), moment().endOf('month')],
+			'Last Month'	: [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+		};
+
+		/**
+		* Function to show variation active
+		*/
+		$(document).on('click','#v-pills-tab a.nav-link', function (e) {
+			e.preventDefault();
+			$('#v-pills-tab a.nav-link').removeClass("active");
+			$(this).addClass("active");
+			$(this).tab('show');
+		});
+
+		function recalculateBadges(){
+			$(".nav-link").each(function(){
+				var linkedTab	= $(this).attr("href");
+				var linkId		= $(this).attr("id");
+				var checkBoxCount = $(linkedTab+" input:checked").length;
+				var selectCount = $(linkedTab+" :selected").length;
+				var inputVal	= $(linkedTab+" input[type='text']").val();
+				if(selectCount) checkBoxCount = checkBoxCount+selectCount;
+				if(inputVal) 	checkBoxCount = checkBoxCount+1;
+
+				$("#"+linkId+" span.badge").html(checkBoxCount);
+				if(checkBoxCount > 0){
+					$("#"+linkId+" span.badge").removeClass("hide");
+				}else{
+					$("#"+linkId+" span.badge").addClass("hide");
+				}
+				$("#v-pills-date-tab span.badge").html(1);
+				$("#v-pills-date-tab span.badge").removeClass("hide");
+			});
+		};
+		recalculateBadges();
+
+		$(document).on("change","select,input",function(){
+			recalculateBadges();
+		});
+
+		function calculateAge(birthday) { // birthday is a date
+			if(!birthday) return 0;
+			var ageDifMs = Date.now() - new Date(birthday).getTime();
+			var ageDate = new Date(ageDifMs); // miliseconds from epoch
+			return Math.abs(ageDate.getUTCFullYear() - 1970);
+		}
+
+</script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+

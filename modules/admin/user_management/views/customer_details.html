@@ -1,0 +1,117 @@
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="body table-responsive" id="aniimated-thumbnials">
+                <%
+                    var fullName 	= 	(typeof result !== typeof undefined &&	result.full_name)	? 	result.full_name	:'';
+                    var email 		= 	(typeof result !== typeof undefined &&	result.email)		? 	result.email		:'';
+                %>
+                <table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+                    <tr>
+                        <th class="text-right" width="25%"><%= __('admin.user_management.full_name'); %></th>
+                        <td><span><%=fullName%></span></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right"><%= __('admin.user_management.email'); %></th>
+                        <td><%- (email) ? '<a href="mailto:'+email+'">'+email+'</a>' :"";%></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right"><%= __('admin.user_management.phone_number'); %></th>
+                        <td><%= (typeof result.mobile_number !== typeof undefined) ? result.mobile_number :"N/A";%></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right"><%= __('admin.user_management.gender'); %></th>
+                        <td><%= (typeof result.gender !== typeof undefined) ? GENDER_DROPDOWN[result.gender] :"N/A";%></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right"><%= __('admin.user_management.date_of_birth'); %></th>
+                        <td>
+                            <span class="setDateTimeFormat"><%= (result && result.date_of_birth) ? newDate(result.date_of_birth,DATE_OF_BIRTH_FORMAT) :'';%></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-right"><%= __('admin.user_management.referral_code'); %></th>
+                        <td><%= (result.referral_details && result.referral_details.referral_code) ? result.referral_details.referral_code :"N/A";%></td>
+                    </tr><%
+                    if(result.referral_details && result.referral_details.referred_by){ %>
+                        <tr>
+                            <th class="text-right"><%= __('admin.user_management.referral_name'); %></th>
+                            <td><%- (result.referral_name) ? '<a target="_blank" href='+WEBSITE_ADMIN_URL+'user_management/view_customer/'+result.referral_details.referred_by+'>'+result.referral_name+'</a>' :"N/A";%></td>
+                        </tr>
+                        <tr>
+                            <th class="text-right"><%= __('admin.user_management.referral_user_code'); %></th>
+                            <td><%= (result.referral_details && result.referral_details.referrer_user_code) ? result.referral_details.referrer_user_code :"N/A";%></td>
+                        </tr><%
+                    } %>
+                    <%
+                        var status 		= 	(typeof result !== typeof undefined && result.active) 		? 	result.active 		:DEACTIVE;
+                        var statusClass	=	(status	==	ACTIVE)	?	"label-success"				:"label-danger";
+                        var statusText	=	(status	==	ACTIVE)	?	__('admin.system.active')	:__('admin.system.inactive');
+                        var isGuest		=	(result.is_guest == true) ? '<span class="label label-warning m-l-5 m-t-5">' + __("admin.user_management.guest_user") + '</span>' : ''
+                    %>
+                    <tr>
+                        <th class="text-right"><%= __('admin.system.status'); %></th>
+                        <td>
+                            <span class="label <%= statusClass %>"><%= statusText %></span>
+                            <%- isGuest; %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-right"><%= __('admin.system.modified'); %></th>
+                        <td><span class="setDateTimeFormat"><%= (typeof result !== typeof undefined &&  result.modified) ? newDate(result.modified,AM_PM_FORMAT_WITH_DATE) : '';%></span></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right"><%= __('admin.user_management.category'); %></th>
+                        <td><%= (result.client_type) ? USER_CLIENT_TYPE[result.client_type] :"";%></td>
+                    </tr>
+                    <%
+                        var googleId 	= (result.google_id)   ?  __('admin.user_management.google')   :"";
+                        var facebookId 	= (result.facebook_id) ?  __('admin.user_management.facebook') :"";
+                        var twitterId 	= (result.twitter_id)  ?  __('admin.user_management.twitter')  :"";
+                    %>
+                    <tr>
+                        <th class="text-right"><%= __('admin.user_management.opt_in'); %></th>
+                        <td><%=(googleId || facebookId || twitterId) ? googleId+" "+facebookId+" "+twitterId : __("admin.user_management.normal")%></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right"><%= __("admin.user_management.verification_code"); %></th>
+                        <td><%=(result.otp)  ?  result.otp  :"N/A"%></td>
+                    </tr> <%
+                    if(result.revert_orders && result.revert_orders.length >0){ %>
+                        <tr>
+                            <th class="text-right"><%= __("admin.user_management.oder_outstanding"); %></th>
+                            <td>
+                                <table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+                                    <tr>
+                                        <th class="text-left" width="45%"><%= __('admin.user_management.order_id'); %></th>
+                                        <th class="text-left" width="45%"><%= __('admin.user_management.amount'); %></th>
+                                    </tr><%
+                                    let totalOutstanding = 0;
+                                    result.revert_orders.map(records=>{
+                                        let outstandingAmount   =   records.outstanding_amount;
+                                        totalOutstanding        +=  outstandingAmount;
+                                        %>
+                                        <tr>
+                                            <td>
+                                                <a href="<%=WEBSITE_ADMIN_URL+'orders/view/'+records.order_id %>" target="_blank">
+                                                    <%=records.unique_order_id%>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <%= currencyFormat(outstandingAmount) %>
+                                            </td>
+                                        </tr><%
+                                    }); %>
+                                    <tr>
+                                        <th> <%= __('admin.user_management.total_amount'); %></th>
+                                        <td> <%= currencyFormat(totalOutstanding) %> </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr> <%
+                    } %>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

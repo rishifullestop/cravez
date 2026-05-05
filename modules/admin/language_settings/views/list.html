@@ -1,0 +1,115 @@
+<div class="container-fluid">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<div class="row clearfix dataTables_wrapper">
+								<div class="col-xs-12 col-sm-6">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_0" onkeyup="searchDatatable(0);"  placeholder="<%=__('admin.text_setting.search_by_key');%>">
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-6">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_1" onkeyup="searchDatatable(1);" placeholder="<%=__('admin.text_setting.search_by_value');%>">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= dynamic_variable %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url+'/'+type%>/add" ><button type="button" class="btn bg-indigo waves-effect"> <%=__("admin.text_setting.add_text_setting");%></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body table-responsive">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="20%"><%=__("admin.text_setting.key");%></th>
+								<th width="40%"><%=__("admin.text_setting.value");%></th>
+								<th width="30%"><%=__("admin.system.modified");%></th>
+								<th width="10%"><%= __('admin.system.action'); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor("script") %>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable ="";
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-listing').DataTable({
+			"order"		:	[[ 2, "desc" ]],
+			"serverSide": 	true,
+			"lengthMenu": 	PAGING_LENGTH_MENU,
+			"sDom"		:	"ltipr",
+            "columns"	: 	[
+	            { "data": 'key' },
+	            { "data": 'value' },
+	            {
+	            	"data": 'modified',
+	            	"render" 		: 	function(modified){
+	                	return moment(modified).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+	                }
+	        	},
+	            {
+	                "data"			: 	'_id',
+	                "orderable"		:   false,
+	                "searchable"	: 	false,
+	                "render" 		: 	function(id){
+	                	return '<a href="<%=admin_list_url+'/'+type%>/edit/'+id+'" class="btn bg-teal btn-sm waves-effect"><%= __('admin.system.edit'); %></a>'
+	                }
+	            }
+	        ],
+			"ajax":{
+				url 	:	"<%=admin_list_url+'/'+type%>",
+				type	: 	"POST",
+                dataSrc	: 	function(res){                    
+                    return res.data;                   
+                }
+            }
+		});
+	})
+	
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+</script>
+

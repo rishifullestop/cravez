@@ -1,0 +1,393 @@
+<%
+	var branchId	=	(typeof branch_id !== typeof undefined && branch_id)	?	branch_id 	:"";
+	var areaList	=	(typeof area_list !== typeof undefined && area_list)	?	area_list 	:[];
+	var result		=	(typeof result !== typeof undefined && result)			?	result 		:[];
+	var restaurantId=	(typeof restaurant_id !== typeof undefined && restaurant_id) ?	restaurant_id :'';
+%>
+<div class="body">
+	<div class="row">
+		<div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
+			<div class="row">
+				<div class="col-md-4 col-lg-4 col-sm-4 col-xs-12 pull-right m-b-8">
+					<div class="form-group m-b-0">
+						<select class="form-control show-tick update-areaStatus">
+							<option value=""> <%= __("pending_branches_area.select_action")%> </option>
+							<option value="<%=OPEN%>"> <%=__("pending_branches_area.mark_as_open")%> </option>
+							<option value="<%=CLOSE%>"> <%= __("pending_branches_area.mark_as_close")%> </option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-12 col-md-12">
+					<table id="datatable_area_listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="2%" class="p-r-5 text-center" >
+									<div class="materialize_checkbox">
+										<input type="checkbox" class="filled-in chk-col-indigo" id="select_all_pending_area">
+										<label for="select_all_pending_area" class="select_all p-l-30 v-align-bottom m-b-0"></label>
+									</div>
+								</th>
+								<th> <%= __("pending_branches_area.area_name");%> </th>
+								<th> <%= __("system.status");%> </th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
+				<div class="row">
+					<div class="col-md-8 col-lg-8 pull-right">
+						<div class="text-right">
+							<button type="button" class="btn btn-sm bg-indigo waves-effect bulk_setting_btn">
+								<%= __("branch_area.bulk_fill"); %>
+							</button>
+							<% if(slug != BURGER_KING && slug != PIZZA_HUT) { %>
+								<a href="<%= originalUrl %>" data-action-url="<%=list_url+'/add_branch_areas/'+branchId%>" data-open-modal="true" class="action-btn add_branch_areas freezed_event hideMe">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("pending_branches_area.add_branch_area"); %>
+									</button>
+								</a>
+							<% } %>
+						</div>
+					</div>
+				</div>
+			<div class="row">
+				<div class="col-lg-12 col-md-12 m-t-25">
+					<form action="<%=list_url+'/save_branch_area_settings/'+branchId%>" id="attribute" data-submit-btn-id="form-attribute" method="post" class="freezed_event" role="form">
+						<div class="table-responsive">
+							<input type="hidden" name="restaurant_id" value="<%=restaurantId%>">
+							<table id="datatable_area_attr_listing" class="table row-border full-length-header hover table table-bordered dataTable" cellspacing="0" width="100%">
+								<thead>
+									<tr>
+										<th width="25%"><%= __("pending_branches_area.area_name_in_english");%></th>
+										<th width="10%" class="custom_sorting"><%= __("pending_branches_area.attribute_id");%></th>
+										<th width="25%"><%= __("pending_branches_area.attribute_desc");%></th>
+										<th width="40%"> <%= __("pending_branches_area.value");%> </th>
+									</tr>
+								</thead>
+								<tbody class="max-height-400">
+									<tr class="no-records">
+										<td colspan="4" class="text-center"> <%=__("pending_branches_area.no_area_attribute_found")%></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<% if(slug != BURGER_KING && slug != PIZZA_HUT) { %>
+							<button type="button" class="pull-right area-btn-submit btn m-t-10 freezed_event hideMe  bg-brown btn-sm waves-effect" id="form-area" disabled> <%= __("system.submit"); %></button>
+						<% } %>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="hide default-attributes">
+			<table>
+				<tr class="no-records">
+					<td colspan="4" class="text-center"> <%=__("pending_branches_area.no_area_attribute_found")%></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- Modal to bulk fill -->
+<div class="modal fade" id="bulk_fill" tabindex="-1" role="dialog" aria-labelledby="bulk_fill" aria-hidden="true" data-backdrop="static" tabindex="-1" data-keyboard="false">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("branch_area.bulk_fill_data") %></h4><br />
+				<span class="message demo-image-copyright"><%= __("branch_area.only_changed_inputes_will_be_submitted")%></span>
+			</div>
+			<form id="bulk_fill_form" data-submit-btn-id="bulk_fill_submit_btn" method="post" class="on_click_submit" role="form" action="">				
+				<div class="modal-body">
+					<% if(typeof attribute_list !== typeof undefined && attribute_list && attribute_list.length>0){
+						attribute_list.map(records=>{
+							var inputType 		= 	(records._id) 				?  	records._id				:'';
+							var inputType 		= 	(records.input_type) 		?  	records.input_type		:'';
+							var defaultValue	= 	'';
+							var inputValue		= 	(records.value) 			?  	records.value 			:(inputType != "checkbox" ? defaultValue : "");
+							var validateType	= 	(records.validation_type) 	?	records.validation_type	:'';
+							var attributeId		= 	(records.attribute_id) 		?	records.attribute_id	:'';
+							var required		= 	(records.required) 			?	records.required		:'';
+							var title			= 	(records.title) 			?	records.title			:'';
+							
+							var disabled 		=    (!restaurant_details.pickup_enable && attributeId == ACCEPT_PICKUP_ORDER) ? "disabled" : "";
+					%>
+						<div class="row clearfix">
+							<div class="col-sm-5">
+								<label for="bulk_input_<%=attributeId%>" class="control-label"><%= title %></label>
+								<strong class="pull-right"> : </strong>
+							</div>
+							<div class="col-sm-7">
+								<div class="form-grop margin-0">									
+									<% if(inputType == "checkbox"){ %>
+										
+										<div class="form-lin no-bottom-border">
+											<div class="switch">
+												<label>
+													<input id="bulk_input_<%=attributeId%>" value="<%=ACTIVE%>" type="checkbox" class="bulk-fill-boxes" <%= (inputValue == ACTIVE) ? "checked" :""; %> <%=disabled%>/>
+													<span class="lever switch-col-green"></span>
+												</label>
+											</div>
+										</div>
+									<%	}else if(inputType == "textarea"){ %>
+										<div class="form-lin no-bottom-border">
+											<textarea  id="bulk_input_<%=attributeId%>"  name="bulk_input[<%= attributeId %>][value]" class="form-control no-resize bulk-fill-boxes"><%= inputValue; %></textarea>
+										</div>
+									<%	}else if(inputType == "select"){
+											let selectOption = (records.data) ? records.data :[];
+										%>
+										<div class="form-lin no-bottom-border">
+											<select id="bulk_input_<%=attributeId%>" class="form-control bulk-fill-boxes" name="bulk_input[<%= attributeId %>][value]">
+												<option value=""><%=__("branch_area.select")+" "+title%></option>
+												<% if(selectOption.length >0){
+													selectOption.map(data=>{
+														var selectValue = (data.value) ? data.value :'';
+														%>
+														<option value="<%=selectValue;%>"  <%= (inputValue == selectValue) ? 'selected' :''; %> >
+															<%=(data.title) ? data.title :'';%>
+														</option>
+												<%	});
+												} %>
+											</select>
+										</div>
+									<%	}else{ %>
+										<div class="form-lin no-bottom-border">
+											<input type="<%= inputType; %>"  id="bulk_input_<%=attributeId%>"  class="form-control bulk-fill-boxes" name="bulk_input[<%= attributeId %>][value]" value="<%= inputValue; %>" />
+										</div>
+									<%	} %>								
+								</div>
+							</div>
+						</div>
+					<% });
+					} %>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="bulk_fill_submit_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-bulk-fill noHover margin-0"><%= __("branch_area.bulk_fill"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div><!--modal close-->
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		/**
+		 * call updateFreezedEvent
+		 * Freezed event is when restaurant submit any branch details and admin mark branch as in review, then all add/edit activity is freezed
+		 */
+		updateFreezedEvent();
+
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+
+		/** Hide when branch come to reapproval  **/
+		if($("#for_reapproval").attr("data-for-reapproval")){
+			$(".update-areaStatus").hide();
+			$(".add_branch_areas").hide();
+		}
+
+		var checkboxArray 			=	{};
+		var areaAttributeDataTable 	= 	"";
+
+		/** For branch area dataTable **/
+		let areaList = <%-JSON.stringify(areaList); %>;
+		var areaDataTable = $('#datatable_area_listing').DataTable({
+			"order"		: 	[[1,'asc']],
+			"sDom"		:	"ftr",
+			"serverSide": 	false,
+			"scrollX"	: 	true,
+			"data"		:	areaList,
+			"columns"	: 	[
+				{ 	"data"		: {},
+					"orderable" : false,
+					"render" 	: 	function(result){
+						let areaId		=	(result.area_id) 		? 	result.area_id :"";
+						var checkedFlag	= 	(result.is_selected) 	?	"checked" 		:"";
+
+						return '<div class=" materialize_checkbox m-t--5 m-l--5 p-r-25">'+
+							'<div class="pending_area_checkbox_wrapper">'+
+								'<input type="checkbox" class="filled-in chk-col-indigo " id="'+areaId+'"  '+checkedFlag+'>'+
+								'<label for="'+areaId+'" class="checkbox data"></label>'+
+							'</div>'+
+						'</div>';
+					}
+				},
+				{"data" 	: "area_name"},
+				{
+					"data" 	: "open",
+					"orderable" : false,
+					"render": function(open){
+						let openHtml = (open == "<%=OPEN%>")	? '<span class="label label-success m-l-5"><%=__("pending_branches_area.open")%></span>' :'<span class="label label-danger m-l-5"><%=__("pending_branches_area.close")%></span>'
+						return openHtml;
+					}
+				},
+			],
+			"columnDefs": [
+				{ className: "area_name_td", "targets": [ 2 ] }
+			]
+		});
+
+		/** To get aleardy areas */
+		$('.area-btn-submit').click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("attribute",function(status,response){
+				stopTextLoading(btnId);
+				if(status){
+					$("#attribute .error").html("");
+					notice("success",response.message);
+				}
+			});
+		});
+
+		/**Check/Uncheck checkbox*/
+		$(document).off("change",".pending_area_checkbox_wrapper input[type='checkbox']");
+		$(document).on("change",".pending_area_checkbox_wrapper input[type='checkbox']",function(){
+			var id          = $(this).attr('id');
+			var isChecked	= $(this).is(':checked');
+
+			if(isChecked){
+				checkboxArray[id] = true;
+				getAreaSettings(id);
+			}else{
+				$(".area_attributes_tr_"+id).remove();
+				delete checkboxArray[id];
+			}
+			let disabledAttr = (Object.keys(checkboxArray).length > 0) ? false :true;
+			$("#form-area").attr("disabled",disabledAttr);
+			if(disabledAttr){
+				$('#datatable_area_attr_listing').find('tbody').html($('.default-attributes').html());
+			}
+			
+			var totalAreaBox = $('.pending_area_checkbox_wrapper input[type="checkbox"]').not(":disabled").length;
+			var checkedAreaBox = $('.pending_area_checkbox_wrapper input[type="checkbox"]:checked').length;
+			let selectAllArea = (totalAreaBox == checkedAreaBox) ? true : false;
+			$("#select_all_pending_area").prop("checked",selectAllArea);
+		});
+		
+		/**
+		 *  check/uncheck checkbox select all check/uncheck
+		 */
+		$(document).on('click','#select_all_pending_area',function(){
+			var isChecked	= $(this).is(':checked');
+			
+			$('.pending_area_checkbox_wrapper input[type="checkbox"]').not(":disabled").prop("checked",isChecked).trigger("change");
+		});
+		
+		/**update area status (open / close)*/
+		$(".update-areaStatus").change(function(){
+			var areaIdsList = Object.keys(checkboxArray);
+
+			if(areaIdsList.length < 1){
+				notice("<%= STATUS_ERROR %>", "<%= __('pending_branches_area.please_select_atleast_one_area')%>");
+				$(this).val('');
+				return false;
+			}
+
+			var status = $(this).val();
+			if(status){
+				swal({
+					title : "<%= __('system.are_you_sure') %>",
+					text  : "<%= __('pending_branches_area.you_want_yo_update_status_of_selected_areas')%>",
+					type  : "warning",
+					showCancelButton   : true,
+					confirmButtonColor : "#DD6B55",
+					confirmButtonText  : "Ok",
+					closeOnConfirm     : false,
+					showLoaderOnConfirm: true,
+				}, function (isConfirm) {
+					if(isConfirm){
+						/** Ajax options */
+						var options = {
+							url 	: 	"<%=list_url+'/update_branch_area_status/'+branchId%>",
+							data	: 	{area_id: areaIdsList,status :status},
+							method	:	"post"
+						};
+						ajaxRequest(options,function(response){
+							if(response.status && response.message) notice(response.status,response.message);
+
+							if(response.status == "<%=STATUS_SUCCESS%>"){
+								$(areaList).each(function(index,data){
+									$(areaIdsList).each(function(childIndex,records){
+
+										if(data.area_id && data.area_id == records){
+											/** Update Data in area list datatable**/
+											var temp = areaDataTable.row(index).data();
+											temp["open"] 		=	status;
+											temp["is_selected"] =	true;
+											areaDataTable.row(index).data(temp).invalidate();
+										}
+									});
+								});
+							}
+						});
+						swal.close();
+					}
+				});
+			}
+		});
+
+		/** Get area attribures */
+		function getAreaSettings(areaIdsList){
+			if(!areaIdsList){
+				$('#datatable_area_attr_listing').find('tbody').html($('.default-attributes').html());
+				return false;
+			}
+
+			/** Ajax options */
+			var options = {
+				url 	: 	"<%=list_url+'/get_branch_area_settings/'+branchId%>",
+				data	: 	{area_id: [areaIdsList]},
+				method	:	"post"
+			}
+			ajaxRequest(options,function(response){
+				if($(".area_attributes_tr_"+areaIdsList).length) $(".area_attributes_tr_"+areaIdsList).remove();
+				if(response.status == "<%=STATUS_ERROR%>" && response.message){
+					notice(response.status, response.message);
+				}else{
+					$('#datatable_area_attr_listing').find('tbody').find(".no-records").remove();
+					$('#datatable_area_attr_listing').find('tbody').append(response);
+				}
+			});
+		}// end getAreaSettings()
+		
+		$(document).on("click",".bulk_setting_btn",function(){
+			if($("#datatable_area_attr_listing .dynamic_inputs .branch_area_attr_input").length == 0){
+				notice("error","<%= __('branch_area.please_select_atleast_one_area_area'); %>");
+			}else{
+				$("#bulk_fill_form")[0].reset()
+				$("#bulk_fill").modal("show");
+			}
+		});
+		
+		$(document).on("change",".bulk-fill-boxes",function(){
+			$(this).addClass("touched-input");
+		});
+		
+		$(document).on("click","#bulk_fill_submit_btn",function(){
+			$("#bulk_fill_submit_btn").prop("disabled",true);
+			$("#datatable_area_attr_listing .dynamic_inputs .branch_area_attr_input").each(function(){
+				var currentAttr		= $(this).attr("data-attr-id");
+				var bulkInputKey	= "#bulk_input_"+currentAttr;
+				var bulkinputType	= $(bulkInputKey).attr("type");
+				var bulkValue		= $(bulkInputKey).val();
+				if(bulkinputType == "checkbox" && $(bulkInputKey).hasClass("touched-input")){
+					if($(bulkInputKey).is(":checked")){
+						$(this).prop("checked",true);
+					}else{
+						$(this).prop("checked",false);
+					}
+				}else if($(bulkInputKey).hasClass("touched-input")){
+					$(this).val(bulkValue);
+				}				
+			});
+			$("#bulk_fill_submit_btn").prop("disabled",false);
+			$("#bulk_fill").modal("hide");
+		});	
+	});
+</script>

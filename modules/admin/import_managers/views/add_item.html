@@ -1,0 +1,443 @@
+<div class="row clearfix">
+    <form id="add_item" action="<%=WEBSITE_ADMIN_URL%>merchant_upload/add_item" data-submit-btn-id="item-btn-id" method="post" class="on_click_submit" role="form">
+        <input type="hidden" name="restaurant_slug"  id="restaurant_slug"/>
+        <div id="item_form_html" class="col-sm-12">
+            <div class="table-responsive">
+                <table class="row-border full-length-header hover table table-bordered dataTable fixed_header_table">
+                    <thead>
+                        <tr>
+                            <th width="4%"> </th>
+                            <th> <%=__("admin.merchant_upload.item_old_id")%> *</th>
+                            <th> <%=__("admin.merchant_upload.menu")%> </th>
+                            <th> <%=__("admin.merchant_upload.category")%> </th>
+                            <th> <%=__("admin.merchant_upload.name_in_english")%> *</th>
+                            <th> <%=__("admin.merchant_upload.name_in_arabic")%> *</th>
+                            <th> <%=__("admin.merchant_upload.image")%> *</th>
+                            <th> <%=__("admin.merchant_upload.description_in_english")%> *</th>
+                            <th> <%=__("admin.merchant_upload.description_in_arabic")%> *</th>
+                            <th> <%=__("admin.merchant_upload.non_sellable_items")%> </th>
+                            <th> <%=__("admin.merchant_upload.price_on_selection")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_by_value")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_percentage")%> </th>
+                            <th> <%=__("admin.merchant_upload.price")%> *</th>
+                            <!-- Availability-->
+                            <th> <%=__("admin.merchant_upload.from_time1")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_time1")%> </th>
+                            <th> <%=__("admin.merchant_upload.comment1")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_time2")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_time2")%> </th>
+                            <th> <%=__("admin.merchant_upload.comment2")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_time3")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_time3")%> </th>
+                            <th> <%=__("admin.merchant_upload.comment3")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_time4")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_time4")%> </th>
+                            <th> <%=__("admin.merchant_upload.comment4")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_time5")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_time5")%> </th>
+                            <th> <%=__("admin.merchant_upload.comment5")%> </th>
+                            <!-- Pricing -->
+                            <th> <%=__("admin.merchant_upload.active1")%> </th>
+							<th> <%=__("admin.merchant_upload.sorting1")%> </th>
+                            <th> <%=__("admin.merchant_upload.item_unit_id1")%> </th>
+                            <th> <%=__("admin.merchant_upload.price1")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_type1")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_value1")%> </th>
+                            <th> <%=__("admin.merchant_upload.active2")%> </th>
+                            <th> <%=__("admin.merchant_upload.sorting2")%> </th>
+                            <th> <%=__("admin.merchant_upload.item_unit_id2")%> </th>
+                            <th> <%=__("admin.merchant_upload.price2")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_type2")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_value2")%> </th>
+                            <th> <%=__("admin.merchant_upload.active3")%> </th>
+                            <th> <%=__("admin.merchant_upload.sorting3")%> </th>
+                            <th> <%=__("admin.merchant_upload.item_unit_id3")%> </th>
+                            <th> <%=__("admin.merchant_upload.price3")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_type3")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_value3")%> </th>
+                            <th> <%=__("admin.merchant_upload.active4")%> </th>
+                            <th> <%=__("admin.merchant_upload.sorting4")%> </th>
+                            <th> <%=__("admin.merchant_upload.item_unit_id4")%> </th>
+                            <th> <%=__("admin.merchant_upload.price4")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_type4")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_value4")%> </th>
+                            <th> <%=__("admin.merchant_upload.active5")%> </th>
+                            <th> <%=__("admin.merchant_upload.sorting5")%> </th>
+                            <th> <%=__("admin.merchant_upload.item_unit_id5")%> </th>
+                            <th> <%=__("admin.merchant_upload.price5")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_type5")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_value5")%> </th>
+						 </tr>
+                    </thead>
+                    <tbody class="append_item_tr"> </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-sm bg-green item_addmore" onclick="AppendHTML()"><%=__("admin.merchant_upload.add_more")%></button>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" id="item-btn-id" class="btn bg-brown btn-sm waves-effect item-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+            <a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+        </div>
+    </form>
+
+    <div class="appendable_input hide">
+        <table >
+            <tbody class="input_tr">
+                <tr id="item_row_{index}" class="table_row">
+                    <td>
+                        <button type="button" class="btn bg-red remove_item hide">x</button>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][item_old_id]" class="form-control input-column" id="item_old_id_{index}" >
+                        <span id="item_old_id_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][menu]" class="form-control input-column" id="menu_{index}" >
+                        <span id="menu_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][category]" class="form-control input-column" id="category_{index}" >
+                        <span id="category_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="item[{index}][index]"  value="{index}" >
+                        <input type="text" name="item[{index}][name_in_english]" class="form-control input-column" id="name_in_english_{index}" >
+                        <span id="name_in_english_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][name_in_arabic]" class="form-control input-column" id="name_in_arabic_{index}" >
+                        <span id="name_in_arabic_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][image]" class="form-control input-column" id="image_{index}" >
+                        <span id="image_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][description_in_english]" class="form-control input-column" id="description_in_english_{index}" >
+                        <span id="description_in_english_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][description_in_arabic]" class="form-control input-column" id="description_in_arabic_{index}" >
+                        <span id="description_in_arabic_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][non_sellable]" class="form-control input-column" id="non_sellable_{index}" >
+                        <span id="non_sellable_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][price_on_selection]" class="form-control input-column" id="price_on_selection_{index}" >
+                        <span id="price_on_selection_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][discount_by_value]" class="form-control input-column" id="discount_by_value_{index}" >
+                        <span id="discount_by_value_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][discount_percentage]" class="form-control input-column" id="discount_percentage_{index}" >
+                        <span id="discount_percentage_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][item_price]" class="form-control input-column" id="item_price_{index}" >
+                        <span id="item_price_{index}_error" class="error"></span>
+                    </td>
+                    <!-- Availability-->
+                    <td>
+                        <input type="text" name="item[{index}][from_time_one]" class="form-control input-column" id="from_time_one_{index}" >
+                        <span id="from_time_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][to_time_one]" class="form-control input-column" id="to_time_one_{index}" >
+                        <span id="to_time_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][comment_one]" class="form-control input-column" id="comment_one_{index}" >
+                        <span id="comment_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][from_time_two]" class="form-control input-column" id="from_time_two_{index}" >
+                        <span id="from_time_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][to_time_two]" class="form-control input-column" id="to_time_two_{index}" >
+                        <span id="to_time_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][comment_two]" class="form-control input-column" id="comment_two_{index}" >
+                        <span id="comment_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][from_time_three]" class="form-control input-column" id="from_time_three_{index}" >
+                        <span id="from_time_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][to_time_three]" class="form-control input-column" id="to_time_three_{index}" >
+                        <span id="to_time_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][comment_three]" class="form-control input-column" id="comment_three_{index}" >
+                        <span id="comment_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][from_time_four]" class="form-control input-column" id="from_time_four_{index}" >
+                        <span id="from_time_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][to_time_four]" class="form-control input-column" id="to_time_four_{index}" >
+                        <span id="to_time_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][comment_four]" class="form-control input-column" id="comment_four_{index}" >
+                        <span id="comment_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][from_time_five]" class="form-control input-column" id="from_time_five_{index}" >
+                        <span id="from_time_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][to_time_five]" class="form-control input-column" id="to_time_five_{index}" >
+                        <span id="to_time_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][comment_five]" class="form-control input-column" id="comment_five_{index}" >
+                        <span id="comment_five_{index}_error" class="error"></span>
+                    </td>
+                    <!-- Pricing-->
+                    <td>
+                        <input type="text" name="item[{index}][status_one]" class="form-control input-column" id="status_one_{index}" >
+                        <span id="status_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][sorting_one]" class="form-control input-column" id="sorting_one_{index}" >
+                        <span id="sorting_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][item_unit_id_one]" class="form-control input-column" id="item_unit_id_one_{index}" >
+                        <span id="item_unit_id_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][price_one]" class="form-control input-column" id="price_one_{index}" >
+                        <span id="price_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+						<select name="item[{index}][discount_type_one]" id="discount_type_one" class="form-control show-tick">
+							<option value=""><%= __("admin.merchant_upload.select_discount_type"); %></option>
+							<% Object.keys(ITEM_DISCOUNT_TYPE).map(key=>{ %>
+								<option value="<%=key%>"><%= ITEM_DISCOUNT_TYPE[key] %></option>
+							<% });%>
+						</select>
+                        <span id="discount_type_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][discount_value_one]" class="form-control input-column" id="discount_value_one_{index}" >
+                        <span id="discount_value_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][status_two]" class="form-control input-column" id="status_two_{index}" >
+                        <span id="status_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][sorting_two]" class="form-control input-column" id="sorting_two_{index}" >
+                        <span id="sorting_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][item_unit_id_two]" class="form-control input-column" id="item_unit_id_two_{index}" >
+                        <span id="item_unit_id_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][price_two]" class="form-control input-column" id="price_two_{index}" >
+                        <span id="price_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+						<select name="item[{index}][discount_type_two]" id="discount_type_two" class="form-control show-tick">
+							<option value=""><%= __("admin.merchant_upload.select_discount_type"); %></option>
+							<% Object.keys(ITEM_DISCOUNT_TYPE).map(key=>{ %>
+								<option value="<%=key%>"><%= ITEM_DISCOUNT_TYPE[key] %></option>
+							<% });%>
+						</select>
+                        <span id="discount_type_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][discount_value_two]" class="form-control input-column" id="discount_value_two_{index}" >
+                        <span id="discount_value_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][status_three]" class="form-control input-column" id="status_three_{index}" >
+                        <span id="status_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][sorting_three]" class="form-control input-column" id="sorting_three_{index}" >
+                        <span id="sorting_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][item_unit_id_three]" class="form-control input-column" id="item_unit_id_three_{index}" >
+                        <span id="item_unit_id_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][price_three]" class="form-control input-column" id="price_three_{index}" >
+                        <span id="price_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+						<select name="item[{index}][discount_type_three]" id="discount_type_three" class="form-control show-tick">
+							<option value=""><%= __("admin.merchant_upload.select_discount_type"); %></option>
+							<% Object.keys(ITEM_DISCOUNT_TYPE).map(key=>{ %>
+								<option value="<%=key%>"><%= ITEM_DISCOUNT_TYPE[key] %></option>
+							<% });%>
+						</select>
+                        <span id="discount_type_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][discount_value_three]" class="form-control input-column" id="discount_value_three_{index}" >
+                        <span id="discount_value_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][status_four]" class="form-control input-column" id="status_four_{index}" >
+                        <span id="status_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][sorting_four]" class="form-control input-column" id="sorting_four_{index}" >
+                        <span id="sorting_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][item_unit_id_four]" class="form-control input-column" id="item_unit_id_four_{index}" >
+                        <span id="item_unit_id_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][price_four]" class="form-control input-column" id="price_four_{index}" >
+                        <span id="price_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+						<select name="item[{index}][discount_type_four]" id="discount_type_four" class="form-control show-tick">
+							<option value=""><%= __("admin.merchant_upload.select_discount_type"); %></option>
+							<% Object.keys(ITEM_DISCOUNT_TYPE).map(key=>{ %>
+								<option value="<%=key%>"><%= ITEM_DISCOUNT_TYPE[key] %></option>
+							<% });%>
+						</select>
+                        <span id="discount_type_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][discount_value_four]" class="form-control input-column" id="discount_value_four_{index}" >
+                        <span id="discount_value_four_{index}_error" class="error"></span>
+                    </td>
+                     <td>
+                        <input type="text" name="item[{index}][status_five]" class="form-control input-column" id="status_five_{index}" >
+                        <span id="status_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][sorting_five]" class="form-control input-column" id="sorting_five_{index}" >
+                        <span id="sorting_five_{index}_error" class="error"></span>
+                    </td>
+                     <td>
+                        <input type="text" name="item[{index}][item_unit_id_five]" class="form-control input-column" id="item_unit_id_five_{index}" >
+                        <span id="item_unit_id_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][price_five]" class="form-control input-column" id="price_five_{index}" >
+                        <span id="price_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+						<select name="item[{index}][discount_type_five]" id="discount_type_five" class="form-control show-tick">
+							<option value=""><%= __("admin.merchant_upload.select_discount_type"); %></option>
+							<% Object.keys(ITEM_DISCOUNT_TYPE).map(key=>{ %>
+								<option value="<%=key%>"><%= ITEM_DISCOUNT_TYPE[key] %></option>
+							<% });%>
+						</select>
+                        <span id="discount_type_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="item[{index}][discount_value_five]" class="form-control input-column" id="discount_value_five_{index}" >
+                        <span id="discount_value_five_{index}_error" class="error"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    /**
+     *  Append item input
+    */
+    var rowCount = 0;
+    function AppendHTML(){
+
+        var defaultHTML     = $(".appendable_input table .input_tr").html();
+        var htmlToAppend    = defaultHTML.replace(RegExp('{index}','g'),rowCount);
+        $(".append_item_tr").append(htmlToAppend);
+        rowCount++;
+
+        if($("#add_item .remove_item").length > 1){
+            $("#add_item .remove_item").removeClass("hide");
+        }
+
+        $("#add_item .item_addmore").addClass("hide").last().removeClass("hide");
+    }// end AppendHTML()
+
+    $(document).ready(function(){
+        AppendHTML();
+		$("#add_item .show-tick").selectpicker("refresh");
+
+        /**
+        * Function to submit form
+        */
+        $(".item-btn-submit").click(function(){
+            var btnId = $(this).attr("id");
+            $("#add_item_choice_group span.error").text("");
+			$("#restaurant_error").text("");
+			var restaurantSlug = $("#restaurant_slug").val();
+			if(!restaurantSlug || restaurantSlug == ""){
+				display_errors([{param:"restaurant",msg:"<%= __('admin.merchant_upload.please_select_restaurant_first')%>"}],"merchant_file");
+				return false;
+			}
+            startTextLoading(btnId);
+            ajax_submit("add_item",function(status,response){
+                if(status){
+                    if(response.redirect_url){
+                        notice(response.status,response.message);
+                        $("#upload_action").val('').trigger("change");
+                        resetMerchantForm();
+                        window.location.href = response.redirect_url;
+                    }else{
+                        window.location.reload(true);
+                    }
+                }
+                stopTextLoading(btnId);
+            });
+        });
+    });
+
+    /**
+     *  Remove item input
+    */
+    $(document).on("click",".remove_item",function(){
+        var haveValue   =   false;
+        var that        =   this;
+        $(that).parents(".table_row").find("input.input-column").each(function(){
+            if($(this).val() != ""){
+                haveValue = true;
+            }
+        });
+
+        if(!haveValue){
+            $(this).parents(".table_row").remove();
+            if($("#add_item .remove_item").length <= 1){
+                $("#add_item .remove_item").addClass("hide");
+            }
+
+            $("#add_item .item_addmore").addClass("hide").last().removeClass("hide");
+        }else{
+            confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.merchant_upload.item_remove_comfirm_message"); %>',function(result){
+                if(result){
+                    $(that).parents(".table_row").remove();
+                    if($("#add_item .remove_item").length <= 1){
+                        $("#add_item .remove_item").addClass("hide");
+                    }
+
+                    $("#add_item .item_addmore").addClass("hide").last().removeClass("hide");
+                }
+                swal.close();
+            });
+        }
+    });
+</script>

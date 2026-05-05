@@ -1,0 +1,107 @@
+<% 	var restaurantList = restaurant_list; 
+	var selectedSlug   = restaurant_slug;
+%>
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="restaurant-panel-id" role="tablist" aria-multiselectable="true">
+				<form id="searchDataForm" name="searchDataForm" >
+					<div class="panel panel-col-pink">
+						<div class="panel-heading" role="tab" id="restaurant-heading-id">
+							<h4 class="panel-title">
+								<a role="button" data-toggle="collapse" data-target="#restaurant-collapse-id" data-parent="#restaurant-panel-id" href="javascript:void(0)" aria-expanded="false" aria-controls="restaurant-collapse-id">
+									<%= __("admin.system.select_restaurant"); %>
+									<span class="pull-right collapse-toggle-icon"></span>
+								</a>
+							</h4>
+						</div>
+						<div id="restaurant-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="restaurant-heading-id">
+							<div class="panel-body">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by Restaurant -->
+									<div class="col-xs-12 col-sm-6">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="restaurant_slug" id="restaurant_slug" data-live-search="true" data-selected-type="<%= selectedSlug %>">
+													<option value=""><%= __("admin.system.select_restaurant"); %></option>
+													<%- restaurantList%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset-search-data" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="alert bg-grey alert-dismissible m-l-15 m-r-15" role="alert">
+	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+	<%= __("admin.restaurant_cuisines.once_you_select_restaurant"); %>
+</div>
+
+<div id="main-container"></div>
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery.mCustomScrollbar.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>jquery.mCustomScrollbar.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			<% if(selectedSlug){ %>
+				appendData('<%=selectedSlug%>');
+			<% } %>
+			
+			/** Function to get cuisine list according to the restaurant */
+			$(document).on('change','#restaurant_slug',function(e){
+				var restaurantSlug = $(this).val();
+				if(restaurantSlug != ""){
+					window.history.replaceState(null, null, WEBSITE_ADMIN_URL+"restaurant_cuisine/"+restaurantSlug);
+					appendData(restaurantSlug);
+				}
+				else{
+					window.history.replaceState(null, null, WEBSITE_ADMIN_URL+"restaurant_cuisine");
+					$("#main-container").html("");
+				}
+			});
+		});
+		
+		$(document).on('click','#reset-search-data', function(e){
+			/** Reset form **/
+			$("#searchDataForm").find("select").each(function(index,html){
+				$(this).val('');
+			});
+			if($(".bootstrap-select").length > 0){
+				setTimeout(function(){
+					$(".bootstrap-select select").selectpicker('refresh');
+				},1);
+			}
+			$("#main-container").html("");
+			window.history.replaceState(null, null, WEBSITE_ADMIN_URL+"restaurant_cuisine");
+		});
+		
+		/** Append cuisine list using ajax */
+		function appendData(slug){
+			var restaurantSlug = slug;
+			var options = {
+				url 	: "<%=admin_list_url%>/"+restaurantSlug+"/get-cuisine-list",
+				method	: "get"
+			};
+			ajaxRequest(options,function(response){
+				$("#main-container").html(response);
+				$(".alert").hide();
+			});
+		}
+	</script>
+	

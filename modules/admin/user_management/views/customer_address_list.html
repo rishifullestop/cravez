@@ -1,0 +1,103 @@
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%= __("admin.user_management.address_list"); %>
+				</h2>
+			</div>
+			<div class="body">
+				<table id="datatable-customer-address-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="20%"><%= __("admin.user_management.full_name"); %></th>
+							<th width="20%"><%= __("admin.user_management.mobile"); %></th>
+							<th width="20%"><%= __("admin.user_management.city"); %></th>
+							<th width="20%"><%= __("admin.system.action"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal for view customer details -->
+<div class="modal fade" id="view_customer" tabindex="-1" role="dialog" aria-labelledby="view_customer" aria-hidden="true">
+</div><!--modal close-->
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable ="";
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-customer-address-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem('DataTables', JSON.stringify(oData));
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse(localStorage.getItem('DataTables'));
+			},
+			"order"		: 	[[0, "desc"]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":   PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{
+					"data": {},
+					"render" 	 : 	function(result){
+						let firstName	=	 (result.first_name) ? result.first_name : '';
+						let lastName	=	 (result.last_name) ? result.last_name : '';
+						return firstName+' '+lastName;
+					}
+				},
+				{ "data" : "mobile_number" },
+				{
+					"data": 'city_name' ,
+					"searchable" : 	false,
+					"render" 	 : 	function(city_name){
+						return (city_name) ? (city_name['<%= DEFAULT_LANGUAGE_CODE %>']) : '';
+					}
+				},
+				{
+					"data"			: {},
+					"orderable"		: false,
+					"searchable"	: false,
+					"render" 		: function(result){
+						var id = (result._id) ? result._id 	:"";
+
+						var dropDownButton 		=	'<a href="javascript:void();" data-href="<%=admin_list_url%>/view_address/'+id+'" class="btn bg-indigo waves-effect ml-5 m-t-5 open-modal <%= getPermissionClass(module_type,["user_detail","view_address"]); %>"><%= __("admin.system.view"); %></a>';
+						return dropDownButton;
+					}
+				}
+			],
+			"ajax":{
+				url 	: "<%=admin_list_url%>/customer_address_list/"+'<%= user_id %>',
+				type	: "POST",
+				dataSrc	: function(res){
+					adjustPermissionsClass();
+					return res.data;
+				}
+			}
+		});
+
+		/**
+		* Function to show customer adddress modal
+		*/
+		$(document).on('click','.open-modal',function(){
+			var url	=	$(this).attr('data-href');
+			$.ajax({
+				url :url,
+				type: "GET",
+				success:function(response){
+					$('#change_address').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					$('#view_customer').html(response);
+					$('#view_customer').modal('show');
+				}
+			});
+		});
+	});
+</script>
+

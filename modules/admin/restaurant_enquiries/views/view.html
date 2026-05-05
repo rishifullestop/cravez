@@ -1,0 +1,245 @@
+<%
+	var userRoleId 		= auth.user_role_id;
+	var isContentTeam	= (userRoleId == CONTENT_TEAM ||  userRoleId == CRAVEZ) ? true :false;
+%>
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2><%= __('admin.restaurant_enquiry.view_restaurant'); %></h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<li>
+							<a href="<%=admin_list_url%>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __('admin.system.back'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li>
+									<a href="<%=WEBSITE_URL%>" >
+										<%= __("admin.system.back"); %>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body table-responsive" >
+					<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+						<tr>
+							<th class="text-right" width="20%"><%= __('admin.restaurant_enquiry.logo'); %></th>
+							<td>
+								<% if(result.restaurant_logo){ %>
+									<a href="<%=result.restaurant_logo_full_path%>" class="items-image" data-lightbox="roadtrip<%=result._id%>">
+										<img class="thumbnail display-inline set_image_dim" src="<%=result.restaurant_logo_full_path%>" alt="restaurant listing image">
+									</a>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.restaurant_enquiry.landing_image'); %></th>
+							<td>
+								<% if(result.landing_image){ %>
+									<a href="<%=result.landing_image_full_path%>" class="items-image" data-lightbox="roadtrip<%=result._id%>">
+										<img class="thumbnail display-inline set_image_dim" src="<%=result.landing_image_full_path%>" alt="restaurant grid image">
+									</a>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.restaurant_enquiry.detail_image'); %></th>
+							<td>
+								<% if(result.detail_image){ %>
+									<a href="<%=result.detail_image_full_path%>" class="items-image" data-lightbox="roadtrip<%=result._id%>">
+										<img class="thumbnail display-inline set_image_dim" src="<%=result.detail_image_full_path%>" alt="restaurant detail image">
+									</a>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.restaurant_enquiry.restaurant_english_name'); %></th>
+							<td><%=(result.name.en) ? result.name.en	: 'N/A';%></td>
+						</tr>
+						<tr>
+							<th class="text-right" ><%= __('admin.restaurant_enquiry.restaurant_arabic_name'); %></th>
+							<td><%=(result.name.ar) ? result.name.ar	: 'N/A';%></td>
+						</tr>
+						<tr>
+							<th class="text-right" ><%= __('admin.restaurant_enquiry.restaurant_address'); %></th>
+							<td><%=(result.restaurant_address) ? result.restaurant_address : 'N/A';%></td>
+						</tr>
+						<tr>
+							<th class="text-right" ><%= __('admin.restaurant_enquiry.email_address'); %></th>
+							<td><%=(result.email) ? result.email	: 'N/A';%></td>
+						</tr>
+						<tr>
+							<th class="text-right" ><%= __('admin.restaurant_enquiry.contact_number'); %></th>
+							<td><%=(result.mobile_number)	? result.mobile_number	: 'N/A';%></td>
+						</tr>
+						<tr>
+							<th class="text-right" ><%= __('admin.restaurant_enquiry.contact_person_name'); %></th>
+							<td><%=(result.contact_person_name)	? result.contact_person_name : 'N/A';%></td>
+						</tr>
+						<tr>
+							<th class="text-right" ><%= __('admin.restaurant_enquiry.account_manager_name'); %></th>
+							<td><%=(result.account_manager_name) ? result.account_manager_name	: 'N/A';%></td>
+						</tr>
+						<tr>
+							<th class="text-right" ><%= __('admin.restaurant_enquiry.restaurant_description'); %></th>
+							<td class="nl2br"><%-(result.restaurant_description)	? nl2br(result.restaurant_description)	: 'N/A';%></td>
+						</tr>
+						<tr>
+							<th class="text-right" ><%= __('admin.system.status'); %></th>
+							<%
+								var approvalStatus 		=	(result.approval_status)	?	result.approval_status	:PENDING;
+								var teamApprovalStatus 	= (result.team_approval_status) ? 	result.team_approval_status :PENDING;
+
+								if(!isContentTeam){
+									if(teamApprovalStatus == APPROVED && approvalStatus != REJECTED){
+										approvalStatus  = teamApprovalStatus;
+									}
+								}
+								var statusTitle = 	(COMMAN_STATUS_SEARCH_DROPDOWN[approvalStatus] && COMMAN_STATUS_SEARCH_DROPDOWN[approvalStatus].status_name)	?	COMMAN_STATUS_SEARCH_DROPDOWN[approvalStatus].status_name:"";
+								var statusClass = 	(COMMAN_STATUS_SEARCH_DROPDOWN[approvalStatus] && COMMAN_STATUS_SEARCH_DROPDOWN[approvalStatus].class)	?	COMMAN_STATUS_SEARCH_DROPDOWN[approvalStatus].class :"";
+							%>
+							<td>
+								<span class="label label-primary <%=statusClass%>"> <%=statusTitle%> </span>
+							</td>
+						</tr> <%
+						if(result.rejection_msg){%>
+							<tr>
+								<th class="text-right" ><%= __('admin.restaurant_enquiry.rejection_field')%></th>
+								<td><span><%=result.rejection_msg%></span>
+								</td>
+							</tr> <%
+						}
+						if(result.approval_status == PENDING || result.approval_status == IN_REVIEW) {
+							if((isContentTeam || result.team_approval_status != APPROVED) || (isContentTeam || result.team_approval_status == APPROVED)){ %>
+								<tr>
+									<th class="text-right"><%= __('admin.system.action'); %></th>
+									<td>
+										<ul class="dropdown_list"><%
+											if(result.approval_status == PENDING){ %>
+												<li href="javascript:void(0)"  class="inline_list float-left list-style-none">
+													<a data-href="<%=admin_list_url%>/update-status/<%= result._id%>?page_type=<%=IN_REVIEW%>" class="confirm_box <%= getPermissionClass(module_type,['restaurant_enquiries','approve_reject']); %>" data-confirm-message="<%= __('admin.restaurant_enquiry.do_you_want_to_update_status'); %>" data-confirm-heading="<%= __('admin.system.are_you_sure') %>">
+														<button type="button" class="btn bg-blue btn-sm waves-effect">
+														<%= __('admin.restaurant_enquiry.in_review'); %>
+														</button>
+													</a>
+												</li><%
+											}%>
+											<li class="inline_list float-left list-style-none">
+												<a href="<%=admin_list_url%>/approve/<%= result._id%>/<%= result.restaurant_id%>" class="m-l-10 <%= getPermissionClass(module_type,['restaurant_enquiries','approve_reject']); %>" data-confirm-message="<%= __('admin.restaurant_enquiry.do_you_want_to_approve_it'); %>" data-confirm-heading="<%= __('admin.system.are_you_sure') %>">
+													<button type="button" class="btn bg-brown btn-sm waves-effect">
+														<%= __('admin.restaurant_enquiry.approve_enquiry'); %>
+													</button>
+												</a>
+											</li>
+											<li class="inline_list float-left list-style-none">
+												<a href="javascript:void(1)" class="m-l-10 open-modal <%= getPermissionClass(module_type,['restaurant_enquiries','approve_reject']); %>">
+													<button type="button" class="btn bg-red btn-sm waves-effect">
+													<%= __('admin.restaurant_enquiry.reject_enquiry'); %>
+													</button>
+												</a>
+											</li>
+										</ul>
+									</td>
+								</tr>
+						<%	}
+						}%>
+						<tr class="<%= getPermissionClass(module_type,['restaurant_enquiries','download']); %>">
+							<th class="text-right" ><%= __('admin.restaurant_enquiry.file'); %></th>
+							<td>
+								<a href="<%=admin_list_url%>/download-file/<%=result._id%>" class="waves-effect waves-block <%= getPermissionClass(module_type,['restaurant_enquiries','download']); %> ">
+									<button type="button" class="btn bg-cyan btn-sm waves-effect">
+										<%= __("admin.restaurant_enquiry.download"); %>
+									</button>
+								</a>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal for reject restaurant enquiry request-->
+<div class="modal fade" id="reject_enquiry" tabindex="-1" role="dialog" aria-labelledby="reject_enquiry" aria-hidden="true">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("admin.restaurant_enquiry.reject_enquiry_title") %></h4>
+			</div>
+			<form id="reject-enquiry" data-submit-btn-id="date-set-btn-id" method="post" class="on_click_submit" role="form" action='<%=admin_list_url%>/reject_enquiry'>
+				<input type="hidden" name="enquiry_id" id="enquiry_id" value="<%=(result._id) ? result._id : '' ;%>">
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-grop">
+								<div class="form-lin no-bottom-border">
+									<label for="rejection_message" class="control-label"><%= __('admin.restaurant_enquiry.rejection_field'); %><span class="required"> *</span>  </label>
+									<div class="form-grop margin-0">
+										<div class="form-line">
+											<textarea id="rejection_message" rows="6" class="resize-none form-control" name="reject_msg"></textarea>
+										</div>
+										<span id="reject_msg_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="reject-enquiry_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-pink btn-sm waves-effect btn-submit noHover margin-0"> <%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-brown btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div><!--modal close-->
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css">
+<%- contentFor('script') %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>
+	<script type="text/javascript">
+
+		/**
+		* Function to show modal
+		*/
+		$(document).on('click','.open-modal',function(){
+			var enquiryId = $(this).attr('data-id');
+			$("#reject_msg_error").text('');
+
+			$('#reject_enquiry').modal({
+				backdrop: 'static',
+				keyboard: false
+			});
+			$('#reject_enquiry').modal('show');
+		});
+
+		/**
+		* Function to submit  modal form
+		*/
+		$(".btn-submit").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("reject-enquiry",function(status,response){
+				if(status){
+					// window.location.href = response.redirect_url;
+					window.location.reload(true);
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	</script>

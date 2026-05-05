@@ -1,0 +1,201 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by cuisine name in english -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0" name="cuisine_en_name" onkeyup="searchDatatable(0)" placeholder="<%= __("cuisines.search_by_cuisine_name_in_english"); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by cuisine name in arabic -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_1" name="cuisine_ar_name" onkeyup="searchDatatable(1)" placeholder="<%= __("cuisines.search_by_cuisine_name_in_arabic"); %>">
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-xs-12 col-sm-1">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("cuisines.cuisines"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm">
+						<li>
+							<a href="<%= originalUrl %>" data-action-url="<%=list_url+'/select_cuisines'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['cuisines','select_cuisines']); %>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("cuisines.select_cuisines"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								<i class="material-icons">more_vert</i>
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li>
+									<a href="<%= originalUrl %>" data-action-url="<%=list_url+'/select_cuisines'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['cuisines','select_cuisines']); %>">
+										<%= __("cuisines.select_cuisines"); %>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="17%"><%= __("cuisines.cuisine_en_name");%></th>
+								<th width="17%"><%= __("cuisines.cuisine_ar_name");%></th>
+								<th width="17%"><%= __("cuisines.linked_items");%></th>
+								<th width="17%"><%= __("cuisines.linked_categories");%></th>
+								<th width="17%"><%= __("cuisines.linked_branches");%></th>
+								<th width="15%"><%= __("cuisines.linked_tags");%></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_CSS_PATH%>jquery.mCustomScrollbar.min.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>jquery.mCustomScrollbar.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data */
+		var dataTable =	"";
+		let ARABIC_LANGUAGE_CODE = '<%=ARABIC_LANGUAGE_CODE%>';
+
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: [],
+				"sDom"		: "ltipr",
+				"serverSide": true,
+				"scrollX"	: true,
+				"lengthMenu": PAGING_LENGTH_MENU,
+				"columns"	: [
+					{
+						"data"	: {},
+						"field_name": "cuisine_name." + DEFAULT_LANGUAGE_CODE,
+						"render" : function(cuisineName){
+							return (cuisineName.cuisine_name && cuisineName.cuisine_name[DEFAULT_LANGUAGE_CODE]) ? cuisineName.cuisine_name[DEFAULT_LANGUAGE_CODE] : "";
+						}
+					},
+					{
+						"data"	: {},
+						"field_name": "cuisine_name." + ARABIC_LANGUAGE_CODE,
+						"render" : function(cuisineName){
+							return (cuisineName.cuisine_name && cuisineName.cuisine_name[ARABIC_LANGUAGE_CODE]) ? cuisineName.cuisine_name[ARABIC_LANGUAGE_CODE] : "";
+						}
+					},
+					{
+						"data"		: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render"	: function(result){
+							return '<a target="_blank" href="restaurants/<%= auth.restaurant_slug%>/item?cuisine='+result.cuisine_id+'">'+
+										'<button type="button" class="btn bg-blue waves-effect"><%= __("system.view");%></button>'+
+									'</a>';
+						}
+					},
+					{
+						"data"		: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render"	: function(result){
+							return '<a href="restaurants/<%= auth.restaurant_slug%>/category?cuisine='+result.cuisine_id+'" class="<%= getPermissionClass(module_type,["category","list"]); %>" target="_blank">'+
+										'<button type="button" class="btn bg-blue waves-effect"><%= __("system.view");%></button>'+
+									'</a>';
+						}
+					},
+					{
+						"data"		: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render"	: function(result){
+							return '<a href="restaurants/<%= auth.restaurant_slug%>/branches?cuisine='+result.cuisine_id+'" target="_blank">'+
+										'<button type="button" class="btn bg-blue waves-effect"><%= __("system.view");%></button>'+
+									'</a>';
+						}
+					},
+					{
+						"data"		: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render"	: function(result){
+							return '<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/linked_tags/'+result.cuisine_id+'" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,["cuisines","list"]); %>">'+
+										'<button type="button" class="btn bg-blue waves-effect"><%= __("system.view");%></button>'+
+									'</a>';
+						}
+					},
+				],
+				"ajax":{
+					url 	: "<%= list_url %>",
+					type	: "POST",
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+		
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>

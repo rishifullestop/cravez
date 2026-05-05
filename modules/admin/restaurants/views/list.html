@@ -1,0 +1,200 @@
+<%
+	let selectedButton = type ? type : "branches";
+%>
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="restaurant-panel-id" role="tablist" aria-multiselectable="true">
+				<form id="searchDataForm" name="searchDataForm" >
+					<div class="panel panel-col-pink">
+						<div class="panel-heading" role="tab" id="restaurant-heading-id">
+							<h4 class="panel-title">
+								<a role="button" data-toggle="collapse" data-target="#restaurant-collapse-id" data-parent="#restaurant-panel-id" href="javascript:void(0)" aria-expanded="false" aria-controls="restaurant-collapse-id">
+									<%= __("admin.system.select_restaurant"); %>
+									<span class="pull-right collapse-toggle-icon"></span>
+								</a>
+							</h4>
+						</div>
+						<div id="restaurant-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="restaurant-heading-id">
+							<div class="panel-body">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by Restaurant -->
+									<div class="col-xs-12 col-sm-6">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="restaurant_slug" id="restaurant_slug" data-live-search="true" data-selected-type="<%= selectedButton %>">
+													<option value=""><%= __("admin.system.select_restaurant"); %></option>
+													<%-restaurantList%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset-search-data" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-xs-12 col-sm-12 text-right m-b-20">
+			<a href="<%= originalUrl %>" data-href="{slug}/branches" class="action-btn restaurant-action-buttons <%= getPermissionClass(module_type,['branches','list']); %> <%= (!slug) ? 'hide' : ''; %>" data-type="branches">
+				<button type="button" class="btn btn-sm waves-effect btn-success">
+					<%= __("admin.restaurant.branch")%>
+				</button>
+			</a>
+			<a href="<%= originalUrl %>" data-href="{slug}/pending_branches" class="action-btn restaurant-action-buttons <%= getPermissionClass(module_type,['branches','list']); %> <%= (!slug) ? 'hide' : ''; %>" data-type="pending_branches">
+				<button type="button" class="btn btn-sm waves-effect btn-success">
+					<%= __("admin.restaurant.pending_branches")%>
+				</button>
+			</a>
+			<a href="<%= originalUrl %>" data-href="{slug}/menu" class="action-btn restaurant-action-buttons  <%= getPermissionClass(module_type,['menu','list']); %> <%= (!slug) ? 'hide' : ''; %>" data-type="menu">
+				<button type="button" class="btn btn-sm waves-effect btn-success">
+					<%= __("admin.restaurant.menu")%>
+				</button>
+			</a>
+			<a href="<%= originalUrl %>" data-href="{slug}/pending_menu" class="action-btn restaurant-action-buttons  <%= getPermissionClass(module_type,['menu','list']); %> <%= (!slug) ? 'hide' : ''; %>" data-type="pending_menu">
+				<button type="button" class="btn btn-sm waves-effect btn-success">
+					<%= __("admin.restaurant.pending_menu")%>
+				</button>
+			</a>
+			<a href="<%= originalUrl %>" data-href="{slug}/category" class="action-btn restaurant-action-buttons  <%= getPermissionClass(module_type,['category','list']); %> <%= (!slug) ? 'hide' : ''; %>" data-type="category">
+				<button type="button" class="btn btn-sm waves-effect btn-success">
+					<%= __("admin.restaurant.category")%>
+				</button>
+			</a>
+			<a href="<%= originalUrl %>" data-href="{slug}/pending_category" class="action-btn restaurant-action-buttons  <%= getPermissionClass(module_type,['category','list']); %> <%= (!slug) ? 'hide' : ''; %>" data-type="pending_category">
+				<button type="button" class="btn btn-sm waves-effect btn-success">
+					<%= __("admin.restaurant.pending_category")%>
+				</button>
+			</a>
+			<a href="<%= originalUrl %>" data-href="{slug}/item" class="action-btn restaurant-action-buttons  <%= getPermissionClass(module_type,['item','list']); %> <%= (!slug) ? 'hide' : ''; %>" data-type="item">
+				<button type="button" class="btn btn-sm waves-effect btn-success">
+					<%= __("admin.restaurant.item")%>
+				</button>
+			</a>
+			<a href="<%= originalUrl %>" data-href="{slug}/pending_item" class="action-btn restaurant-action-buttons  <%= getPermissionClass(module_type,['item','list']); %> <%= (!slug) ? 'hide' : ''; %>" data-type="pending_item">
+				<button type="button" class="btn btn-sm waves-effect btn-success">
+					<%= __("admin.restaurant.pending_item")%>
+				</button>
+			</a>
+		</div>
+	</div>
+
+	<div id="main-container"></div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_CSS_PATH%>jquery.mCustomScrollbar.min.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>jquery-filestyle.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>jquery.mCustomScrollbar.js"></script>
+
+	<script type="text/javascript">
+
+		let selectorId = "main-container";
+
+		/* Handle on load event */
+		$(document).ready(function(){
+			<% if(slug && type){ %>
+				let slug = "<%= slug %>";
+				var self = $("#"+selectorId);
+
+				<%
+					let urlIdExtraString 			= (id && (type == "branches" || type == "pending_branches" || type == "item" || type == "pending_item") ) ? "/view/"+id : ""
+					let restaurantUrlIdExtraString 	= (id && (type == "branches" || type == "pending_branches" || type == "item" || type == "pending_item") ) ? "/"+id : "";
+
+					if(/*type == "item" || type == "pending_item" ||*/ type == "choice_group" || type == "pending_choice_group" || type == "extra_items" || type == "pending_extra_items"){
+						urlIdExtraString 			= (id)  ? "/"+id : ""
+						restaurantUrlIdExtraString 	= (id)  ? "/"+id : "";
+						// urlIdExtraString 		   += (branch_id)  ? "?branch="+branch_id : "";
+					}
+				%>
+
+				/* change selector url and admin url */
+				self.data("url","<%= WEBSITE_RESTAURANT_URL+slug+'/'+type+urlIdExtraString %><%- finalQuery %>");
+				self.data("restaurant-url","<%= WEBSITE_ADMIN_URL+'restaurants/'+slug+'/'+type+restaurantUrlIdExtraString %><%- finalQuery %>");
+
+				/* If slug and type is already selected, then add href and restaurant-url attributye in anchor buttons */
+				$(".restaurant-action-buttons").each(function(){
+					let href = $(this).data("href").replace("{slug}",slug);
+					$(this).attr("data-action-url","<%= WEBSITE_RESTAURANT_URL %>"+href);
+					$(this).data("restaurant-url","<%= WEBSITE_ADMIN_URL+'restaurants' %>/"+href);
+				});
+				fetchData();
+			<% } %>
+		});
+
+
+		/* Event triggered when restaurant change */
+		$(document).on('change','#restaurant_slug',function(e){
+			let slug = $(this).val();
+			let type = $(this).data("selected-type");
+
+			/* For menu/branch/category etc buttons */
+			$(".restaurant-action-buttons").each(function(){
+				let href = $(this).data("href").replace("{slug}",slug);
+
+				$(this).attr("data-action-url","<%= WEBSITE_RESTAURANT_URL %>"+href);
+				$(this).data("restaurant-url","<%= WEBSITE_ADMIN_URL+'restaurants' %>/"+href);
+
+				if(slug) $(".restaurant-action-buttons").removeClass("hide");
+				else $(".restaurant-action-buttons").addClass("hide");
+			});
+
+			if(type){
+				let self	= $('[data-type="'+type+'"]');
+				let url		= self.attr("data-action-url");
+				let adminUrl= self.data("restaurant-url");
+
+				$("#"+selectorId).data("url",url);
+				$("#"+selectorId).data("restaurant-url",adminUrl);
+				$("#"+selectorId).data("open-modal",false);
+				if(type == "branches") $('[data-type="'+type+'"]').trigger("click");
+			}
+			if(!slug){
+				window.history.replaceState(null, null, "<%= WEBSITE_ADMIN_URL+'restaurants' %>");
+				$("#main-container").html("");
+			}else{
+				fetchData();
+			}
+		});
+
+		/** change selected data type of restaurant*/
+		$(".restaurant-action-buttons").click(function(){
+			var btnDataType = $(this).data("type");
+			$("#restaurant_slug").data("selected-type",btnDataType);
+			$("#restaurant_slug").selectpicker("refresh");
+		});
+
+		$(document).on('click','#reset-search-data', function(e){
+			/** Reset form **/
+			$("#searchDataForm").find("input,textarea,select").each(function(index,html){
+				$(this).val('');
+			});
+			if($(".bootstrap-select").length >0){
+				setTimeout(function(){
+					$(".bootstrap-select select").selectpicker('refresh');
+				},1);
+			}
+			$("#"+selectorId).data("url","");
+			$("#"+selectorId).html("");
+			$(".restaurant-action-buttons").addClass("hide");
+			window.history.replaceState(null, null, WEBSITE_ADMIN_URL+"restaurants");
+		});
+	</script>

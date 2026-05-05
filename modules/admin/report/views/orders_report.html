@@ -1,0 +1,600 @@
+<%
+	var fromDate = newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),DATABASE_DATE_FORMAT);
+	var toDate	 = newDate("",DATABASE_DATE_FORMAT);
+	var tempFromDate = newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),CURRENTDATE_START_DATE_FORMAT);
+	var tempToDate	 = newDate("",CURRENTDATE_END_DATE_FORMAT);
+%>
+
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+                                    <!-- Search by restaurant name -->
+                                    <div class="col-xs-12 col-sm-4">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <select class="form-control show-tick restaurant_id" name="search_restaurant_id" id="restaurant_ids"
+                                                    data-live-search="true" multiple data-title="<%= __('admin.report.search_by_restaurant_name'); %>">
+
+                                                    <%-restaurant_list%>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Search by branch -->
+                                    <div class="col-xs-12 col-sm-4">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <select class="form-control show-tick branch_id disabled" id="branch_ids" name="search_branch_id"
+                                                    data-live-search="true" data-title="<%=__('admin.report.search_by_branch')%>" disabled multiple>
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Search by date -->
+                                    <div class="col-xs-12 col-sm-4">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <input class="form-control" id="date-range-picker" autocomplete="off" value="<%=fromDate+' - '+toDate%>">
+                                            </div>
+                                            <input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=tempFromDate%>">
+                                            <input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=tempToDate%>">
+                                        </div>
+                                    </div>
+									<!-- Search by order status -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="order_status" id="order_status">
+													<option value=""><%= __("admin.report.search_by_order_status"); %></option>
+													<% Object.keys(FILTER_ORDER_STATUS).map(key=>{
+														var selected = (key == ORDER_DELIVERED) ? "selected" : "";
+														%>
+														<option value="<%=key%>" <%=selected%>>
+															<%= FILTER_ORDER_STATUS[key].status_name%>
+														</option> <%
+													}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by delivery by -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="delivery_type" name="search_delivery_by" data-live-search="true"
+													data-title="<%=__('admin.report.search_by_delivery_type')%>" multiple>
+													<% Object.keys(DELIVERY_BY).map(type=>{%>
+														<option value="<%= type%>">
+															<%= DELIVERY_BY[type]%>
+														</option>
+													<% });%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" data-href="<%=admin_list_url%>/orders_report">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.report.orders_report"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['orders_report','export']); %>">
+						<li>
+							<a href="javascript:void(0);" id="dataExportBtn">
+								<button type="button" class="btn btn-sm bg-green waves-effect">
+									<%= __("admin.report.export")%>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.report.order_date"); %></th>
+								<th><%= __("admin.report.order_id"); %></th>
+                                <th><%= __("admin.report.restaurant_name"); %></th>
+								<th><%= __("admin.report.branch_name"); %></th>
+                                <th><%= __("admin.report.branch_address"); %></th>
+								<th><%= __("admin.report.branch_area_name"); %></th>
+                                <th><%= __("admin.report.delivery_address"); %></th>
+                                <th><%= __("admin.report.order_time"); %></th>
+                                <th><%= __("admin.report.client_no"); %></th>
+								<th><%= __("admin.report.mobile_number"); %></th>
+								<th><%= __("admin.report.email"); %></th>
+                                <th><%= __("admin.report.first_name"); %></th>
+								 <th><%= __("admin.report.last_name"); %></th>
+                                <th><%= __("admin.report.client_type"); %></th>
+                                <th><%= __("admin.report.order_status"); %></th>
+                                <th><%= __("admin.report.order_status_desc"); %></th>
+                                <th><%= __("admin.report.payment_method"); %></th>
+								<th><%= __("admin.report.gross_order_amount"); %></th>
+                                <th><%= __("admin.report.delivery_fees"); %></th>
+                                <th><%= __("admin.report.wallet_share"); %></th>
+                                <th><%= __("admin.report.discount_by_offer"); %></th>
+                                <th><%= __("admin.report.discount_by_infinity"); %></th>
+                                <th><%= __("admin.report.net_order_amount"); %></th>
+                                <th><%= __("admin.report.cashback"); %></th>
+                                <th><%= __("admin.report.offer_code"); %></th>
+                                <th><%= __("admin.report.delivery_duration"); %></th>
+								<th><%= __("admin.report.delivery_by"); %></th>
+								<th><%= __("admin.report.invoice_no"); %></th>
+                                <th><%= __("admin.report.addr_client_city"); %></th>
+								<th><%= __("admin.report.customer_area"); %></th>
+                                <th><%= __("admin.report.business_class"); %></th>
+                                <th><%= __("admin.report.ticket_no"); %></th>
+                                <th><%= __("admin.report.auth_code"); %></th>
+								<th><%= __("admin.report.knet_payment_id"); %></th>
+								<th><%= __("admin.report.knet_track_id"); %></th>
+								<th><%= __("admin.report.gateway_res_code"); %></th>
+								<th><%= __("admin.report.captain_id"); %></th>
+								<th><%= __("admin.report.captain_name"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.js"></script>
+
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable	     =	"";
+		var PAYMENT_METHODS	 = 	<%- JSON.stringify(PAYMENT_METHODS)%>;
+		var CASH_PAYMENT     = "<%=CASH_PAYMENT%>";
+		var WALLET_PAYMENT     = "<%=WALLET_PAYMENT%>";
+		var KNET 			 = "<%=KNET%>";
+		var USER_CLIENT_TYPE = 	<%- JSON.stringify(USER_CLIENT_TYPE)%>;
+        var CLIENT_TYPE = 	<%- JSON.stringify(CLIENT_TYPE) %>;
+		var DELIVERY_BY = 	<%- JSON.stringify(DELIVERY_BY) %>;
+		var RESTAURANT_ORDER_STATUS_TYPES =<%-JSON.stringify(RESTAURANT_ORDER_STATUS_TYPES) %>;
+
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[0, "desc"]],
+				"dom"		: 	'lrtip',
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{
+						"data"	 : 'order_date',
+						"render" : 	function(order_date){
+							return moment(order_date).tz(DEFAULT_TIME_ZONE).format("<%=REPORT_DATATABLE_DATE_FORMAT%>") ;
+						}
+					},
+					{
+						"data"		 :  "unique_order_id" ,
+						"field_name" : "unique_order_id",
+						"orderable"  : false,
+					},
+                    {
+						"data"		 : "restaurant_name",
+						"field_type" : "<%=OBJECT_ID_FIELD %>",
+						"field_name" : "restaurant_id",
+						"orderable": false,
+						"render"	 :	function(restaurant_name){
+							return restaurant_name[DEFAULT_LANGUAGE_CODE];
+						}
+					},
+					{
+						"data"		 : "branch_name",
+						"field_type" : "<%=OBJECT_ID_FIELD %>",
+						"field_name" : "branch_id",
+						"orderable"  :  false,
+					},
+					{   "data"		 : "branch_address",
+						"searchable" : false,
+						"orderable"  : false
+					},
+                    {
+						"data"		 : "area_name",
+						"field_type" : "<%=OBJECT_ID_FIELD %>",
+						"field_name" : "area_id",
+						"orderable"	 : false,
+						"render"	 :	function(area_name){
+							return area_name[DEFAULT_LANGUAGE_CODE];
+						}
+					},
+                    {
+						"data"		 : "customer_address_detail",
+						"orderable": false,
+						"render"	 :	function(customer_address_detail){
+							return (customer_address_detail && Object.keys(customer_address_detail).length >0)? 'Address Type:'+ customer_address_detail.address_type +', Street:'+ customer_address_detail.street + ', Venue:' + customer_address_detail.venue + ', Block:' + customer_address_detail.block_name.en + ', Area:' + customer_address_detail.area_name.en + ', City:' + customer_address_detail.city_name.en + ', Additional Direction:' + customer_address_detail.additional_directions:"";
+						}
+					},
+                    {
+						"data"	 : 'order_date',
+						"render" : 	function(order_date){
+							return moment(order_date).tz(DEFAULT_TIME_ZONE).format('hh:mm:ss A') ;
+						}
+					},
+                    {
+						"data"	     : 'client_no',
+                        "searchable" : false,
+                         "visible": false,
+						"orderable"  : false,
+
+					},
+                    {   "data"		 : "mobile_number",
+						"searchable" : false,
+						"orderable"  : false,
+					},
+                    {   "data"		 : "email",
+						"searchable" : false,
+						"orderable"  : false,
+					},
+					{   "data"		 : "client_first_name",
+						"searchable" : false,
+						"orderable"  : false,
+					},
+					{   "data"		 : "client_last_name",
+						"searchable" : false,
+						"orderable"  : false,
+					},
+                    {   "data"		 : "is_guest",
+						"searchable" : false,
+						"orderable"  : false,
+						"render" 	 : 	function(is_guest){
+							return (is_guest) ?  CLIENT_TYPE["<%=CLIENT_TYPE_GUEST%>"] : CLIENT_TYPE["<%=CLIENT_TYPE_REGISTERED%>"];
+						}
+					},
+                    {   "data"		 : "order_status",
+						"searchable" : false,
+						"orderable"  : false,
+						"render": function (order_status) {
+							return (order_status) ? RESTAURANT_ORDER_STATUS_TYPES[order_status] : "";
+						}
+					},
+                    {   "data"		 : "order_status_desc",
+						"searchable" : false,
+						"orderable"  : false,
+						"visible"	 :  false,
+					},
+                    {
+						"data"		 :  "payment_method" ,
+						"orderable"  : 	false,
+						"field_name" : "payment_method",
+						"field_type" : "<%=EXACT_FIELD%>",
+						"render": function (payment_method) {
+							return (payment_method) ? PAYMENT_METHODS[payment_method] : "";
+						}
+					},
+                    {
+						"data"		 : 'net_amount',
+						"searchable" : 	false,
+						"render" 	 : 	function(net_amount){
+							return  (typeof net_amount !== typeof undefined) ? currencyFormat(net_amount, true) :  currencyFormat(0, true);
+						}
+					},
+                    {
+						"data"		 : 'delivery_fee',
+						"searchable" : 	false,
+						"render" 	 : 	function(delivery_fee){
+							return  (typeof delivery_fee !== typeof undefined) ? currencyFormat(delivery_fee, true) : (0);
+						}
+					},
+                    {
+						"data"		 : {},
+						"searchable" : 	false,
+						"orderable": false,
+						"render" 	 : 	function(result){
+							return (result.payment_method == WALLET_PAYMENT) ? currencyFormat(result.order_price, true) :  ((result.amount_debited_by_wallet)? currencyFormat(result.amount_debited_by_wallet, true): currencyFormat(0, true));
+						}
+					},
+                    {
+						"data"		 : 'discount_price',
+						"searchable" : 	false,
+						"render" 	 : 	function(discount_price){
+							return  (typeof discount_price !== typeof undefined) ? currencyFormat(discount_price, true) :  currencyFormat(0, true);
+						}
+					},
+                    {
+						"data"		 : 'package_delivery_fees',
+						"searchable" : 	false,
+						"render" 	 : 	function(package_delivery_fees){
+							return  (typeof package_delivery_fees !== typeof undefined) ? currencyFormat(package_delivery_fees, true) :  currencyFormat(0, true);
+						}
+					},
+                    {
+						"data"		 : {},
+						"searchable" : 	false,
+						"orderable": false,
+						"render" 	 : 	function(result){
+							let grossAmount = (typeof result.net_amount !== typeof undefined) ? customRound(result.net_amount) : 0;
+							let deliveryFees = (typeof result.delivery_fee !== typeof undefined) ? customRound(result.delivery_fee) : 0;
+							let walletShare = (result.payment_method == PAYMENT_METHODS[WALLET_PAYMENT]) ? customRound(result.order_price) : ((result.amount_debited_by_wallet) ? customRound(result.amount_debited_by_wallet) : customRound(0));
+							let infinityDiscount = (typeof result.package_delivery_fees !== typeof undefined) ? customRound(result.package_delivery_fees) : 0;
+							let offerDiscountValue = (typeof result.discount_price !== typeof undefined) ? customRound(result.discount_price) : 0;
+							let netOrderAmount  = ((grossAmount + deliveryFees) - (walletShare + infinityDiscount + offerDiscountValue));
+							return currencyFormat(netOrderAmount, true);
+						}
+					},
+                    {
+						"data"		: "cashback" ,
+						"orderable" : false,
+						"searchable": false,
+						"render": function (cashback) {
+							return (typeof cashback !== typeof undefined) ? currencyFormat(cashback, true) : currencyFormat(0, true);
+						}
+
+					},
+                    {
+						"data"		 : 'offer_code',
+						"searchable" : 	false,
+						"orderable"  :  false,
+					},
+					{
+						"data"		: "delivery_duration" ,
+						"orderable" : false,
+						"searchable": false,
+					},
+					{
+						"data"		: "delivery_type" ,
+						"orderable" : false,
+						"searchable": false,
+						"render": function (delivery_type) {
+							return (delivery_type) ? DELIVERY_BY[delivery_type] : "";
+						}
+					},
+                    {   "data"		 : "invoice_number",
+						"searchable" : false,
+						"orderable"  : false,
+					},
+                    {   "data"		 : "customer_address_detail.city_name.en",
+						"searchable" : false,
+						"orderable"  : false,
+					},
+                    {   "data"		 : "customer_address_detail.area_name.en",
+						"searchable" : false,
+						"orderable"  : false,
+					},
+					{   "data"		 : "client_type",
+						"searchable" : false,
+						"orderable"  : false,
+						"render" 	 : 	function(client_type){
+							return (client_type) ?  USER_CLIENT_TYPE[client_type] : "";
+						}
+					},
+                    {   "data"		 : "ticket_no",
+						"searchable" : false,
+						"orderable"  : false,
+					},
+                    {
+                        "data": "authorization_id",
+                        "searchable": false,
+                        "orderable": false,
+                    },
+                    {
+                        "data": {},
+                        "searchable": false,
+                        "orderable": false,
+                        "render": function (result) {
+                            return (result.payment_method == KNET) ? result.payment_id : "";
+                        }
+                    },
+                    {
+                        "data": {},
+                        "searchable": false,
+                        "orderable": false,
+                        "render": function (result) {
+                            return (result.payment_method == KNET) ? result.track_id : "";
+                        }
+                    },
+                    {
+                        "data": "gateway_response_code",
+                        "searchable": false,
+                        "orderable": false,
+                    },
+                    {
+                        "data": "driver_id",
+                        "searchable": false,
+                        "orderable": false,
+                    },
+                    {
+                        "data": "captain_name",
+                        "searchable": false,
+                        "orderable": false,
+                    },
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>/orders_report",
+					type	: 	"POST",
+					data	: 	function (d) {
+						d.fromDate 	        = $('#from_date').val();
+						d.toDate 	        = $('#to_date').val();
+						d.order_status      = $('#order_status').val();
+                        d.restaurant_ids	= $('#restaurant_ids').val();
+						d.branch_ids   		= $('#branch_ids').val();
+						d.delivery_type = $('#delivery_type').val();
+				    },
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		$("#order_status,#delivery_type,#restaurant_ids,#branch_ids").change(function(){
+			dataTable.draw();
+		});
+
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("click","#dataExportBtn",function(){
+			var fromDate 		= $("#from_date").val();
+			var toDate   		= $("#to_date").val();
+			var orderStatus 	= $('#order_status').val();
+			var deliveryType 	= $('#delivery_type').val();
+			var restaurantIds	= $("#restaurant_ids").val();
+			var branchIds   	= $("#branch_ids").val();
+
+			var sortedCol 		= dataTable.order()[0][0];
+			var sortedDir 		= dataTable.order()[0][1];
+			var columns 		= dataTable.settings().init().columns;
+			var sortedColName 	= columns[sortedCol].data;
+			var startDate		= (fromDate) ? fromDate : "<%=tempFromDate%>";
+			var endDate			= (toDate) ? toDate : "<%=tempToDate%>";
+
+			if(startDate && endDate){
+				var exportURL = "<%=admin_list_url%>/orders_report/export_data?from_date="+startDate+"&to_date="+endDate+ "&sort_field=" + sortedColName + "&sort_dir=" + sortedDir;
+			}
+			if (orderStatus) exportURL += "&order_status=" + orderStatus;
+			if (deliveryType) exportURL += "&delivery_type=" + deliveryType;
+			if(restaurantIds) exportURL += "&restaurant_ids="+restaurantIds;
+			if(branchIds) exportURL += "&branch_ids="+branchIds;
+			window.location.href = exportURL;
+		});
+
+        /**
+		* Get branch list
+		*/
+		$("select[name='search_restaurant_id']").change(function(){
+			getBranchDropDownList($(this));
+		});
+
+        /**
+		* Get dropdown value by local storage
+		*/
+		let tempRestaurantId 	= 	"";
+		let tempBranchId 	 	=	"";
+        let tempdeliveryType = "";
+        let tempOrderStatus = "";
+		if(localStorage["search_" +window.location.pathname]){
+
+			let searchFormData = JSON.parse(localStorage["search_" +window.location.pathname]);
+			for(index in searchFormData){
+				if (searchFormData[index].name && searchFormData[index].name == "search_branch_id" && searchFormData[index].value) {
+                    tempBranchId = searchFormData[index].value;
+                }
+                if (searchFormData[index].name && searchFormData[index].name == "search_restaurant_id" && searchFormData[index].value) {
+                    tempRestaurantId = searchFormData[index].value;
+                }
+                if (searchFormData[index].name && searchFormData[index].name == "search_delivery_by" && searchFormData[index].value) {
+                    tempdeliveryType = searchFormData[index].value;
+                }
+                if (searchFormData[index].name && searchFormData[index].name == "order_status" && searchFormData[index].value) {
+                    tempOrderStatus = searchFormData[index].value;
+                }
+			}
+
+			if(tempRestaurantId) getBranchDropDownList($("select[name='search_restaurant_id']"),tempRestaurantId,tempBranchId);
+		}
+
+        /**
+		* Get branch search dropdown list
+		*/
+		function getBranchDropDownList(currentObj,restaurantId,branchId){
+			if(currentObj){
+				var currentValue	=	currentObj.val();
+				var childInputName	=	"search_branch_id";
+				var childObj		=	(childInputName) ?  $("select[name='"+childInputName+"']") :"";
+
+				if(!currentValue && restaurantId) currentValue = restaurantId;
+
+				childObj.attr("disabled",true).addClass("disabled").html("");
+				$(".show-tick").selectpicker('refresh');
+
+				if(currentValue){
+					/** Get dropdown list **/
+					var options = {
+						url 	: "<%=admin_list_url%>/restaurant_branch_dropdown",
+						data	: {restaurant_ids : currentValue},
+						method	: "post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_SUCCESS%>"){
+							/** Append dropdown list **/
+							childObj.attr("disabled",false).removeClass("disabled").html(response.branch_list);
+							if(branchId) childObj.val(branchId);
+							$(".show-tick").selectpicker('refresh');
+						}else if(response.status && response.message){
+							notice(response.status,response.message);
+						}
+					});
+				}else{
+					$(".show-tick").selectpicker('refresh');
+				}
+			}
+		}// end getBranchDropDownList()
+
+		var maxDate		= 	new Date("<%= toDate %>");
+		var removeClearBtn = true;
+		var dateRanges = {
+			'Today'			: [moment(), moment()],
+			'Yesterday'		: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+			'Last 7 Days'	: [moment().subtract(7, 'days'), moment()],
+			'Last 30 Days'	: [moment().subtract(30, 'days'), moment()],
+			'This Month'	: [moment().startOf('month'), moment().endOf('month')],
+			'Last Month'	: [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+		};
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+

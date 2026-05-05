@@ -1,0 +1,115 @@
+
+<%
+let itemId		    = item_id;
+let formUrl		    = list_url+"/overriding/"+itemId;
+let overrideType    = override_type;
+
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="overriding" action="<%= formUrl %>" data-modal-id="form_modal" data-submit-btn-id="overriding-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%=__("items.overriding") %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20 materialize_checkbox">
+                        <div class="row clearfix">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="branches" class="control-label">
+                                            <%= __("items.branches"); %>
+                                        </label>
+                                        <select id="branches" class="form-control show-tick" name="branches" title="<%=__('items.select_branches')%>" multiple>
+                                            <%- branch_list %>
+										</select>
+                                    </div>
+                                    <span id="branches_error" class="error"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+									<div class="form-line">
+										<label for="options" class="control-label"> <%= __("items.options"); %></label><br/>
+										<% Object.keys(OVERRIDING_OPTIONS).map((option, index)=>{ %>
+											<input class="with-gap radio-col-cyan single"type="radio" name="options" id="options_<%= index %>" value="<%= option %>" <%= ((!overrideType && index == 0) || overrideType == option) ? 'checked' : '';%>>
+											<label for="options_<%= index %>"><%= OVERRIDING_OPTIONS[option] %></label>
+										<% }); %>
+
+                                    </div>
+                                    <span id="options_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="overriding-btn-id" class="btn bg-brown btn-sm waves-effect overriding-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div><%
+					if(branch_detail.length > 0){  %>
+						<div class="modal-body padding-20 materialize_checkbox">
+							<div class="row clearfix table-responsive">
+								<div class="col-sm-12">
+									<div class="table-wrapper content">
+										<table id="datatable-item" class="row-border hover table table-bordered dataTable" cellspacing="0" width="100%">
+											<thead>
+												<tr>
+													<th width="20%"><%= __("items.branch_number");%></th>
+													<th width="40%"><%= __("items.name_in_english");%></th>
+													<th width="40%"><%= __("items.name_in_arabic");%></th>
+												</tr>
+											</thead>
+										</table>
+										<div class="table-body-wrapper">
+											<table class="row-border hover table table-bordered dataTable" cellspacing="0" width="100%">
+												<tbody><%
+													branch_detail.map(detail=>{%>
+														<tr>
+															<td><a href="<%= WEBSITE_ADMIN_URL+'restaurants/'+detail.restaurant_slug+'/branches/'+detail._id%>" target="_blank"><%= (detail.branch_number) ? detail.branch_number : '';%></a></td>
+															<td><%= (detail.name && detail.name.en) ? detail.name.en : '';%></td>
+															<td><%= (detail.name && detail.name.ar) ? detail.name.ar : '';%></td>
+														</tr><%
+													}); %>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div><%
+					} %>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function() {
+		$(".show-tick").selectpicker('refresh');
+        /**
+         * Function to submit form
+         */
+        $('.overriding-btn-submit').click(function(){
+            var btnId = $(this).attr('id');
+            startTextLoading(btnId);
+            ajax_submit('overriding',function(status,response){
+                if(status){
+					if(response.status && response.message) notice(response.status,response.message);
+					if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+					$('#form_modal').modal("hide");
+                }else{
+                    stopTextLoading(btnId);
+                }
+            });
+        });
+        
+       $(".table-body-wrapper").mCustomScrollbar({
+			scrollbarPosition:"outside"
+		});
+	});
+</script>

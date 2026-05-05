@@ -1,0 +1,302 @@
+<%
+var restaurantSlug 	= 	(typeof restaurant_slug !== typeof undefined && restaurant_slug)  ?	restaurant_slug  :"";
+var result 			= 	(typeof result !== typeof undefined && result)  	?	result 		:{};
+var cityList		=	(typeof city_list !== typeof undefined && city_list)?	city_list	:"";
+var branchId		=	(result.branch_id)	?	result.branch_id	:"";
+var deliveryVehicleType	= (result.delivery_vehicle_type) ? 	result.delivery_vehicle_type 	:[];
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="body">
+			<form id="branch-edit" action="<%= list_url+'/update/'+branchId %>" data-submit-btn-id="branch-edit-btn-id" method="post" class="freezed_event" role="form">
+				<div class="row clearfix">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="name_in_english" class="control-label">
+									<%= __("pending_branches.name_in_english"); %><span class="required"> *</span>
+								</label>
+								<input type="text" id="name_in_english" class="form-control" name="name_in_english" value="<%=(result.name.en) ? result.name.en :''%>"/>
+							</div>
+							<span id="name_in_english_error" class="error"></span>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="name_in_arabic" class="control-label">
+									<%= __("pending_branches.name_in_arabic"); %><span class="required"> *</span>
+								</label>
+								<input type="text" id="name_in_arabic" class="form-control" name="name_in_arabic" value="<%=( result.name.ar) ? result.name.ar :''%>"/>
+							</div>
+							<span id="name_in_arabic_error" class="error"></span>
+						</div>
+					</div>
+				</div><%
+				if(restaurantSlug == BURGER_KING || restaurantSlug == PIZZA_HUT){ %>
+					<div class="row clearfix selected">
+						<div class="col-sm-6">
+							<div class="form-group">
+								<div class="form-line">
+									<label for="kfg_offer_id" class="control-label"><%= __('branch.kfg_offer_id'); %></label>
+									<input name="kfg_offer_id" id="kfg_offer_id" type="text" class="form-control" value="<%=( result.kfg_offer_id) ? result.kfg_offer_id :''%>" />
+								</div>
+								<span id="kfg_offer_id_error" class="error"></span>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<div class="form-line">
+									<label for="kfg_offer_name" class="control-label"><%= __('branch.kfg_offer_name'); %></label>
+									<input name="kfg_offer_name" id="kfg_offer_name" type="text" class="form-control" value="<%=( result.kfg_offer_name) ? result.kfg_offer_name :''%>" />
+								</div>
+								<span id="kfg_offer_name_error" class="error"></span>
+							</div>
+						</div>
+					</div><%
+				} %>
+				<div class="row clearfix">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="city_id" class="control-label">
+									<%= __("pending_branches.city"); %><span class="required"> *</span>
+								</label>
+								<select name="city_id" id="city_id" class="form-control show-tick" data-live-search="true" disabled>
+									<option value=""> <%=__("pending_branches.select_city")%> </option>
+									<%-cityList%>
+								</select>
+							</div>
+							<span id="city_id_error" class="error"></span>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="area_id" class="control-label">
+									<%= __("pending_branches.area"); %><span class="required"> *</span>
+								</label>
+								<select name="area_id" id="area_id" class="form-control show-tick" data-live-search="true">
+									<option value=""> <%=__("pending_branches.select_area")%> </option>
+								</select>
+							</div>
+							<span id="area_id_error" class="error"></span>
+						</div>
+					</div>
+				</div>
+				<div class="row clearfix">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="block" class="control-label">
+									<%= __("pending_branches.block"); %>
+								</label>
+								<select name="block" id="block" class="form-control show-tick" data-live-search="true">
+									<option value=""> <%=__("branch.select_block")%> </option>
+								</select>
+							</div>
+							<span id="block_error" class="error"></span>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="street" class="control-label">
+									<%= __("pending_branches.street"); %>
+								</label>
+								<input type="text" id="street" class="form-control" name="street" value="<%=( result.street) ? result.street :''%>" />
+							</div>
+							<span id="street_error" class="error"></span>
+						</div>
+					</div>
+				</div>
+				<div class="row clearfix">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="build_no" class="control-label">
+									<%= __("pending_branches.build_no"); %>
+								</label>
+								<input type="text" id="build_no" class="form-control" name="build_no" value="<%=( result.build_no) ? result.build_no :''%>" />
+							</div>
+							<span id="build_no_error" class="error"></span>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="description" class="control-label">
+									<%= __("pending_branches.description"); %>
+								</label>
+								<textarea id="description" class="form-control resize-none" name="description"><%=( result.description) ? result.description :''%></textarea>
+							</div>
+							<span id="description_error" class="error"></span>
+						</div>
+					</div>
+				</div>
+				<div class="row clearfix">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="latitude" class="control-label">
+									<%= __("pending_branches.latitude"); %><span class="required"> *</span>
+								</label>
+								<input type="text" id="latitude" class="form-control" name="latitude" value="<%=( result.latitude) ? result.latitude :''%>" />
+							</div>
+							<span id="latitude_error" class="error"></span>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="longitude" class="control-label">
+									<%= __("pending_branches.longitude"); %><span class="required"> *</span>
+								</label>
+								<input type="text" id="longitude" class="form-control" name="longitude" value="<%=(result.longitude) ? result.longitude :''%>" />
+							</div>
+							<span id="longitude_error" class="error"></span>
+						</div>
+					</div>
+				</div>
+				<div class="row clearfix">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="address" class="control-label">
+									<%= __("pending_branches.address"); %><span class="required"> *</span>
+								</label>
+								<input type="text" id="address" class="form-control" name="address" value="<%=(result.address) ? result.address :''%>"/>
+							</div>
+							<span id="address_error" class="error"></span>
+						</div>
+					</div>
+					<% if(!isRestaurant(module_type)){ %>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<div class="form-line">
+									<label for="auto_assignment_start_after" class="control-label"><%= __('pending_branches.auto_assignment_start_after'); %></label>
+									<input type="text" id="auto_assignment_start_after" class="form-control" name="auto_assignment_start_after" value="<%=(typeof result.auto_assignment_start_after != undefined) ? result.auto_assignment_start_after :''%>"/>
+								</div>
+								<span id="auto_assignment_start_after_error" class="error"></span>
+							</div>
+						</div>
+						</div>
+						<div class="row clearfix">
+					<%}%>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="delivery_vehicle_type" class="control-label"><%= __('branch.delivery_vehicle_type'); %></label>
+								<br />
+								<div class="materialize_checkbox">
+									<%
+									Object.keys(DELIVERY_VEHICLE_DROPDOWN).map((key,index)=>{
+										var checkedFlag = (deliveryVehicleType.indexOf(key) >=0) ? "checked" :""; %>
+										<input type="checkbox" id="delivery_vehicle_type<%=key%>" value="<%=key%>" name="delivery_vehicle_type[]" class="filled-in chk-col-indigo" <%=checkedFlag%>>
+										<label class="m-r-5 font-16"  for="delivery_vehicle_type<%=key%>"><%=DELIVERY_VEHICLE_DROPDOWN[key]%></label>
+									<% 	}); %>
+								</div>
+							</div>
+							<span id="delivery_vehicle_type_error" class="error"></span>
+						</div>
+					</div>
+				</div>
+				<button type="button" id="branch-edit-btn-id" class="btn bg-brown btn-sm waves-effect freezed_event hideMe branch-btn-submit" <%- ADMIN_LOADING_TEXT %> >
+					<%= __("system.submit"); %>
+				</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+	/**
+	* call updateFreezedEvent
+	* Freezed event is when restaurant submit any branch details and admin mark branch as in review, then all add/edit activity is freezed
+	*/
+	updateFreezedEvent();
+
+	/**
+	 * Function to submit form
+	 */
+	$('.branch-btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		$("#city_id").attr("disabled",false);
+		ajax_submit('branch-edit',function(status,response){
+			if(status){
+				$("#branch-edit span.error").html("");
+				notice("success",response.message);
+			}
+			$("#city_id").attr("disabled",true);
+			stopTextLoading(btnId);
+		});
+	});
+
+	/** Get area list*/
+	$("#city_id").change(function(){
+		getAreaList();
+	});
+
+	/** Get block list*/
+	$(document).on('change','#area_id',function(){
+		getBlockList($(this).val());
+	});
+
+	/** Refresh select box list **/
+	refreshDropDownList();
+	function refreshDropDownList(){
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+	}
+
+	/** get area list **/
+	var selectedAreaId =  "<%= (result.area_id) ? result.area_id :'';%>";
+	getAreaList();
+	function getAreaList(){
+		var cityId 				=	$("#city_id").val();
+		var areaFirstOtpions 	= 	'<option value=""> <%=__("pending_branches.select_area")%> </option>';
+		var blockFirstOtpions 	= 	'<option value=""> <%=__("pending_branches.select_block")%> </option>';
+
+		$("#area_id").html(areaFirstOtpions);
+		$("#block").html(blockFirstOtpions);
+		refreshDropDownList();
+		if(cityId){
+			var options = {
+				url 	: 	"<%=WEBSITE_RESTAURANT_URL+restaurantSlug+'/branches/get_area_list'%>",
+				data	: 	{city_id: cityId, area_id: selectedAreaId},
+				method	:	"post"
+			};
+			ajaxRequest(options,function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					let optionsList = (response.result)	?	response.result	:"";
+					$("#area_id").html(areaFirstOtpions+optionsList);
+					refreshDropDownList();
+				}
+			});
+		}
+	}// end getAreaList()
+
+	/** Get block list **/
+	getBlockList(selectedAreaId);
+	function getBlockList(areaId){
+		var blockFirstOtpions 	= 	'<option value=""> <%=__("pending_branches.select_block")%> </option>';
+		$("#block").html(blockFirstOtpions);
+		refreshDropDownList();
+		if(areaId){
+			var options = {
+				url 	: 	"<%=WEBSITE_RESTAURANT_URL+restaurantSlug+'/branches/get_block_list'%>",
+				data	: 	{area_id: areaId, block_id: '<%=(result.block) ? result.block :""%>'},
+				method	:	"post"
+			};
+			ajaxRequest(options,function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					let optionsList = (response.result)	?	response.result	:"";
+					$("#block").html(blockFirstOtpions+optionsList);
+					refreshDropDownList();
+				}
+			});
+		}
+	}// end getBlockList()
+</script>

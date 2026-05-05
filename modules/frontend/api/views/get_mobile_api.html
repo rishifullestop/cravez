@@ -1,0 +1,98 @@
+<style>
+	.table-bordered,.table-bordered tr,.table-bordered tr td,.table-bordered tr th{
+		border: 1px solid #ddd;
+	}
+	.no-border,.no-border tr,.no-border tr td,.no-border tr th{
+		border: none;
+	}
+	.break-world{
+		word-wrap:break-word;
+	}
+</style>
+<form name="post_mobile_api" method="post" action="<%= WEBSITE_URL %>post_mobile_api/<%= WEBSITE_HEADER_AUTH_KEY %>" enctype="multipart/form-data">
+	<textarea name="data" rows="10" cols="100" id="api-text"></textarea>
+	<input type="submit" value="submit" id="submit">
+	<input type="button" id="addInputs" value="Add Image Files">
+	<div id="files"></div>
+</form>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2><%= __('Api History'); %></h2>
+			</div>
+			<div class="body table-responsive" id="aniimated-thumbnials">
+				<table  class="row-border hover table table-bordered" cellspacing="0" cellspadding="0" width="100%">
+					<thead>
+						<tr>
+							<th width="5%"><%= __('S.N.'); %></th>
+							<th width="45%" class="break-world" style="width:100px;"><%= __('api.data'); %></th>
+							<th width="20%"><%= __('system.created'); %></th>
+							<th width="30%"><%= __('Action'); %></th>
+						</tr>
+					</thead>
+					<tbody>
+						<%
+						var count = 1;
+						result.map(records=>{ %>
+							<tr>
+								<td>&nbsp;<%= count++ %></td>
+								<td class="break-world" style="width:100px;overflow:hidden">
+									<div style="display: inline-block;width: 600px;word-wrap: break-word;overflow: scroll;max-height:600px;">
+										<pre class="no-border"><%- JSON.stringify(records.data,undefined,4); %></pre>
+									</div>
+								</td>
+								<td>&nbsp;<%=newDate(records.created,AM_PM_FORMAT_WITH_DATE)%></td>
+								<td>
+									<a href="javascript:void(0);" class="copy-data" data-copy-text='<%- JSON.stringify(records.data,undefined,4); %>'><button type="button" class="btn btn-sm bg-blue waves-effect"><%= __("api.copy"); %></button></a>
+									<a href="javascript:void(0);">
+										<button type="button" class="btn btn-sm bg-cyan waves-effect resubmit" data-copy-text='<%- JSON.stringify(records.data,undefined,4); %>'>
+											<%= __("api.resubmit"); %>
+										</button>
+									</a>
+								</td>
+							</tr>
+						<% }); %>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		var inputHtml = '<div class="input-file">'+
+			'<input type="text" class="input_name"/>'+
+			'<input type="file" class="image-input" name=""/>'+
+		'</div>';
+
+		$("#addInputs").click(function(){
+			$("#files").append(inputHtml);
+		});
+
+		$(document).on("keyup",".input_name",function(){
+			var name = $(this).val();
+			$(this).parent().find(".image-input").attr("name",name);
+		});
+
+		$(document).on("click",".copy-data",function(e){
+			e.preventDefault();
+			var copyText = $(this).attr('data-copy-text');
+			document.addEventListener('copy', function(e) {
+				e.clipboardData.setData('text/plain', copyText);
+				e.preventDefault();
+			}, true);
+			document.execCommand('copy');
+			alert("data copied.");
+		});
+
+		$(document).on("click",".resubmit",function(e){
+			e.preventDefault();
+			var copyText = $(this).attr('data-copy-text');
+			$("#api-text").val(copyText);
+			$("#submit").trigger("click");
+		});
+
+	});
+</script>

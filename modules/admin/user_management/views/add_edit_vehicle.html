@@ -1,0 +1,196 @@
+<%
+	var result 		= 	(typeof result !== typeof undefined && result)  ?	result 	:{};
+	var isEditable 	=	(typeof is_editable !== typeof undefined && is_editable) ? is_editable :false;
+	var vehicleId	=	(result._id)	?	result._id	:"";
+	var formUrl 	=	(isEditable)	?	admin_list_url+"/manage_vehicle/"+driver_id+"/edit_vehicle/"+vehicleId :admin_list_url+"/manage_vehicle/"+driver_id+"/add_vehicle";
+%>
+
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-vehicle" action="<%=formUrl%>" data-submit-btn-id="vehicle-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog  modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.user_management.edit_vehicle") : __("admin.user_management.add_vehicle"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="plate_number" class="control-label col-555">
+											<%= __("admin.user_management.plate_number"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="plate_number" class="form-control" name="plate_number" value="<%=result.plate_number ? result.plate_number :''; %>"/>
+									</div>
+									<span id="plate_number_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="image" class="control-label">
+											<%= __("admin.user_management.licence"); %>
+											<% if(!isEditable) { %>
+												<span class="required"> *</span>
+											<% } %>
+										</label>
+										<input type="file" data-input="false" name="licence" class="form-control cfilestyle" id="licence" />
+										<span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('admin.user_management.extension_and_size_suggestion_message',ALLOWED_IMAGE_EXTENSIONS.join(', '))%>">
+											<i class="material-icons">info</i>
+										</span>
+										<input type="hidden" name="old_image" value="<%=result.licence%>">
+									</div>
+									<span id="licence_error" class="error"></span>
+								</div>
+							</div>
+							<% if(isEditable) { %>
+								<div class="col-sm-3">
+									<a href="<%=result.full_image_path%>" class="item-image" data-lightbox="roadtrip">
+										<img class="img-thumbnail pull-right set_image_dim" src="<%=result.full_image_path%>" alt="Licence Image">
+									</a>
+								</div>
+							<% } %>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="vehicle_type" class="control-label">
+											<%= __("admin.user_management.vehicle_type"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" name="vehicle_type" id="vehicle_type">
+											<option value=""><%= __("admin.user_management.select_vehicle_type"); %></option>
+											<% Object.keys(VEHICLE_TYPE).map(key=>{ %>
+												<option value="<%=key%>" <%= (result.vehicle_type == key) ? "selected" : ""%>><%=VEHICLE_TYPE[key]%></option>
+											<% 	}); %>
+										</select>
+									</div>
+									<span id="vehicle_type_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="model" class="control-label col-555">
+											<%= __("admin.user_management.model"); %>
+										</label>
+										<input type="text" id="model" class="form-control" name="model" value="<%=result.model ? result.model :''; %>"/>
+									</div>
+									<span id="model_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="manufacture" class="control-label col-555">
+											<%= __("admin.user_management.manufacture"); %>
+										</label>
+										<input type="text" id="manufacture" class="form-control" name="manufacture" value="<%=result.manufacture ? result.manufacture :''; %>"/>
+									</div>
+									<span id="manufacture_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="year" class="control-label col-555">
+											<%= __("admin.user_management.year"); %>
+										</label>
+										<input type="text" id="year" class="form-control" name="year" value="<%=result.year ? result.year :''; %>"/>
+									</div>
+									<span id="year_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="color" class="control-label col-555">
+											<%= __("admin.user_management.colour"); %>
+										</label>
+										<input type="text" id="color" class="form-control" name="color" value="<%=result.color ? result.color :''; %>"/>
+									</div>
+									<span id="color_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="status" class="control-label">
+											<%= __("admin.user_management.status"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" name="status" id="status">
+											<option value=""><%= __("admin.user_management.select_status"); %></option>
+											<% Object.keys(VEHICLE_STATUS).map(key=>{ %>
+												<option value="<%=key%>" <%= (result.status == key) ? "selected" : ""%>><%=VEHICLE_STATUS[key]%></option>
+											<% 	}); %>
+										</select>
+									</div>
+									<span id="status_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="location" class="control-label col-555">
+											<%= __("admin.user_management.location"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="location" class="form-control" name="location" value="<%=result.location ? result.location :''; %>"/>
+									</div>
+									<span id="location_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="vehicle-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		/** file browser **/
+		customFileStyle();
+		/**
+		 * Function to submit form
+		 */
+		var isEditable = <%=isEditable%>;
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('add-vehicle',function(status,response){
+				if(status){
+					if(isEditable){
+						if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+						if(response.status && response.message) notice(response.status,response.message);
+						$('#form_modal').modal("hide");
+					}else{
+						$("#reset").trigger("click");
+					}
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	});
+
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+</script>

@@ -1,0 +1,71 @@
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.admin_permissions.details'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" ><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __('admin.system.back'); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body table-responsive" id="aniimated-thumbnials">
+					<%
+						var firstName 	= 	(typeof result !== typeof undefined &&	result.first_name)	? 	result.first_name	:'';
+						var lastName 	= 	(typeof result !== typeof undefined &&	result.last_name)	? 	result.last_name	:'';
+						var email 		= 	(typeof result !== typeof undefined &&	result.email)		? 	result.email		:'';
+						var code 		= 	(typeof result !== typeof undefined &&	result.code)		? 	result.code			:'';
+						var agentId 	= 	(typeof result !== typeof undefined &&	result.agent_id)	? 	result.agent_id		:'';
+						var userRole	= 	(typeof result !== typeof undefined &&	result.role_name)	? 	result.role_name	:'';
+						var userRoleId	= 	(typeof result !== typeof undefined &&	result.user_role_id)? 	result.user_role_id	:'';
+					%>
+					<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+						<tr>
+							<th class="text-right" width="25%"><%= __('admin.admin_permissions.full_name'); %></th>
+							<td><span><%=firstName%><%=" "%><%=lastName%></span></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.admin_permissions.email'); %></th>
+							<td><%- (email) ? '<a href="mailto:'+email+'">'+email+'</a>' :"";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.admin_permissions.code'); %></th>
+							<td><%- (code) ? code :"";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.admin_permissions.agent_id'); %></th>
+							<td><%- (agentId) ? agentId :"";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.admin_permissions.user_role'); %></th>
+							<td><%=userRole%></td>
+						</tr>
+						<%
+							var status 		= 	(typeof result !== typeof undefined && result.active) 		? 	result.active 		:DEACTIVE;
+							var statusClass	=	(status	==	ACTIVE)	?	"label-success"				:"label-danger";
+							var statusText	=	(status	==	ACTIVE)	?	__('admin.system.active')	:__('admin.system.inactive');
+						%>
+						<tr>
+							<th class="text-right"><%= __('admin.system.status'); %></th>
+							<td>
+								<span class="label <%= statusClass %>"><%= statusText %></span>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.system.modified'); %></th>
+							<td><span class="setDateTimeFormat" data-date-time="<%= (typeof result !== typeof undefined &&  result.modified) ? result.modified : 'N/A';%>"></span></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css">
+
+<%- contentFor('script') %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>

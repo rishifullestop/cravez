@@ -1,0 +1,403 @@
+<%
+	let orderId 		=   order_id;
+	let cityList 		=   city_list;
+	let areaList 		=   area_list;
+	let blockList 		=   block_list;
+	let firstName		=	result.first_name;
+	let lastName		=	result.last_name;
+	let mobileNumber	=	result.mobile_number;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-address" action="<%=admin_list_url+'/change_address/'+orderId%>" data-submit-btn-id="address-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.orders.change_address"); %><span class="cursor-pointer modal-close pull-right close_address" data-dismiss="modal"><i class="material-icons">close</i></span>
+						</h2>
+						<ul class="header-dropdown m-r--5 order_back_button">
+							<li>
+								<a href="javascript:void(0);" class="show-map">
+									<button type="button" class="btn bg-indigo btn-sm waves-effect noHover" id="show-map"><%= __("admin.order.show_map"); %></button>
+								</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);" class="hide-map hide">
+									<button type="button" class="btn bg-indigo btn-sm waves-effect noHover" id="hide-map"><%= __("admin.order.hide_map"); %></button>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix hide">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="first_name" class="control-label col-555">
+											<%= __("admin.orders.first_name"); %><span class="required"> *</span>
+										</label>
+										<input type="hidden" id="user_id" name="user_id" value="<%= customer_id;%>" />
+										<input type="text" id="first_name" class="form-control <%= (firstName) ? "cursor-not-allowed" : ""; %>" name="first_name" value="<%= firstName %>" <%= (firstName) ? "readonly" : ""; %>/>
+									</div>
+									<span id="first_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="last_name" class="control-label col-555">
+											<%= __("admin.orders.last_name"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="last_name" class="form-control <%= (lastName) ? "cursor-not-allowed" : ""; %>" name="last_name" value="<%= lastName %>" <%= (lastName) ? "readonly" : ""; %> />
+									</div>
+									<span id="last_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="mobile_number" class="control-label col-555">
+											<%= __("admin.orders.mobile_number"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="mobile_number" class="form-control <%= (mobileNumber) ? "cursor-not-allowed" : ""; %>" name="mobile_number" value="<%= mobileNumber %>" <%= (mobileNumber) ? "readonly" : ""; %> />
+									</div>
+									<span id="mobile_number_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="address_type" class="control-label col-555">
+											<%= __("admin.orders.address_type"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" id="address_type" name="address_type">
+											<option value=""><%=__("admin.orders.select_address_type");%></option>
+											<%
+											Object.keys(ADDRESS_TYPE).map(key=>{
+												var selected = (key == result.address_type) ? 'selected' : ''; %>
+												<option value="<%=key%>" <%= selected%>>
+													<%= ADDRESS_TYPE[key]%>
+												</option> <%
+											}); %>
+										</select>
+									</div>
+									<span id="address_type_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="address_title" class="control-label col-555">
+											<%= __("admin.orders.address_title"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="address_title" class="form-control" name="address_title" value="<%= (result.address_title) ? result.address_title :'';%>" />
+									</div>
+									<span id="address_title_error" class="error"></span>
+								</div>
+							</div>							
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="landline_number" class="control-label col-555">
+											<%= __("admin.orders.landline_number"); %>
+										</label>
+										<input type="text" id="landline_number" class="form-control" name="landline_number" value="<%= (result.landline_number) ? result.landline_number :'';%>" />
+									</div>
+									<span id="landline_number_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						
+						<div class="row clearfix">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="city_id" class="control-label">
+											<%= __("admin.orders.city"); %><span class="required"> *</span>
+										</label>
+										<select name="city_id" id="city_id" class="form-control show-tick" data-live-search="true">
+											<option value=""> <%=__("admin.orders.select_city")%> </option>
+											<%-cityList%>
+										</select>
+									</div>
+									<span id="city_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="area_id" class="control-label">
+											<%= __("admin.orders.area"); %><span class="required"> *</span>
+										</label>
+										<select name="area_id" id="area_id" class="form-control show-tick" data-live-search="true">
+											<option value=""> <%=__("admin.orders.select_area")%> </option>
+											<%-areaList%>
+										</select>
+									</div>
+									<span id="area_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="block_id" class="control-label">
+											<%= __("admin.orders.block"); %><span class="required"> *</span>
+										</label>
+										<select name="block_id" id="block_id" class="form-control show-tick" data-live-search="true">
+											<option value=""> <%=__("admin.orders.select_block")%> </option>
+											<%-blockList%>
+										</select>
+									</div>
+									<span id="block_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">							
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="street" class="control-label">
+											<%= __("admin.orders.street"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="street" class="form-control" name="street" value="<%= (result.street) ? result.street :'';%>"/>
+									</div>
+									<span id="street_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="building_number" class="control-label col-555">
+											<%= __("admin.orders.building_number"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="building_number" class="form-control" name="building_number" value="<%= (result.building_number) ? result.building_number :'';%>" />
+									</div>
+									<span id="building_number_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="floor_number" class="control-label col-555">
+											<%= __("admin.orders.floor_number"); %>
+										</label>
+										<input type="text" id="floor_number" class="form-control" name="floor_number" value="<%= (result.floor_number) ? result.floor_number :'';%>" />
+									</div>
+									<span id="floor_number_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="flat_number" class="control-label col-555">
+											<%= __("admin.orders.flat_number"); %>
+										</label>
+										<input type="text" id="flat_number" class="form-control" name="flat_number" value="<%= (result.flat_number) ? result.flat_number :'';%>" />
+									</div>
+									<span id="flat_number_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="jadda" class="control-label col-555">
+											<%= __("admin.orders.jadda"); %>
+										</label>
+										<input type="text" id="jadda" class="form-control" name="jadda" value="<%= (result.jadda) ? result.jadda :'';%>" />
+									</div>
+									<span id="jadda_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="venue" class="control-label col-555">
+											<%= __("admin.orders.venue"); %><span class="required"> </span>
+										</label>
+										<input type="text" id="venue" class="form-control on_click_submit" name="venue" value="<%= (result.venue) ? result.venue :'';%>" autocomplete="off"/>
+									</div>
+									<span id="venue_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="additional_directions" class="control-label col-555">
+											<%= __("admin.orders.additional_directions"); %>
+										</label>
+										<textarea id="additional_directions" class="form-control resize-none height-100" rows="5" name="additional_directions" ><%= (result.additional_directions) ? result.additional_directions :''; %></textarea>
+									</div>
+									<span id="additional_directions_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="latitude" class="control-label col-555">
+											<%= __("admin.orders.latitude"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="latitude" class="form-control coordinates" name="latitude" value="<%= (result.latitude) ? result.latitude :'';%>" />
+									</div>
+									<span id="latitude_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="longitude" class="control-label col-555">
+											<%= __("admin.orders.longitude"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="longitude" class="form-control coordinates" name="longitude" value="<%= (result.longitude) ? result.longitude :'';%>" />
+									</div>
+									<span id="longitude_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group materialize_checkbox">
+									<div class="form-lie checkbox_wrapper">
+										<input name="update_in_customer_address" id="update_in_customer_address" class="filled-in chk-col-pink" type="checkbox" value="true"/>
+										<label for="update_in_customer_address" class="materialize-chekbox-label font-14"><%= __('admin.orders.update_in_customer_address'); %></label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix map_div hide"></div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="address-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-blue-grey btn-sm waves-effect col-white close_address" data-dismiss="modal" aria-hidden="true">
+							 <%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<input type="hidden" name="script_loaded" id="script_loaded" value="">
+<script type="text/javascript">
+
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-address',function(status,response){
+			if(status){
+				window.location.reload();
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/** Get area list*/
+	$(document).on('change','#city_id',function(){
+		var cityId 				=	$(this).val();
+		var areaFirstOtpions 	= 	'<option value=""> <%=__("admin.orders.select_area")%> </option>';
+		var blockFirstOtpions 	= 	'<option value=""> <%=__("admin.orders.select_block")%> </option>';
+
+		$("#area_id").html(areaFirstOtpions);
+		$("#block_id").html(blockFirstOtpions);
+		refreshDropDownList();
+		if(cityId){
+			var options = {
+				url 	: 	"<%=admin_list_url+'/get_area_list'%>",
+				data	: 	{city_id: cityId},
+				method	:	"post"
+			};
+			ajaxRequest(options,function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					let optionsList = (response.result)	?	response.result	:"";
+					$("#area_id").html(areaFirstOtpions+optionsList);
+					refreshDropDownList();
+				}
+			});
+		}
+	});
+
+	/** Get block list*/
+	$(document).on('change','#area_id',function(){
+		var areaId 				=	$(this).val();
+		var blockFirstOtpions 	= 	'<option value=""> <%=__("admin.orders.select_block")%> </option>';
+
+		$("#block_id").html(blockFirstOtpions);
+		refreshDropDownList();
+		if(areaId){
+			var options = {
+				url 	: 	"<%=admin_list_url+'/get_block_list'%>",
+				data	: 	{area_id: areaId},
+				method	:	"post"
+			};
+			ajaxRequest(options,function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					let optionsList = (response.result)	?	response.result	:"";
+					$("#block_id").html(blockFirstOtpions+optionsList);
+					refreshDropDownList();
+				}
+			});
+		}
+	});
+
+	/** Refresh select box list **/
+	refreshDropDownList();
+	function refreshDropDownList(){
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+	}
+
+	function updateLatLongValues(lat,lng){
+		$("#latitude").val(customRound(lat,8));
+		$("#longitude").val(customRound(lng,8));
+	}
+
+	$('#show-map,#venue').click(function(){
+		loadMap();
+		$('.hide-map').removeClass('hide');
+		$('.show-map').addClass('hide');
+	});
+
+	$('#hide-map').click(function(){
+		$('.map_div').addClass('hide');
+		$('.hide-map').addClass('hide');
+		$('.show-map').removeClass('hide');
+	});
+
+	function loadMap(){
+		var scriptStatus	=	$('#script_loaded').val();
+		var scriptInit		=	$('#script_init').val();
+		if(!scriptStatus){
+			var options = {
+				url 	: 	"<%=WEBSITE_ADMIN_URL+'user_management/load_map'%>",
+				method	:	"get"
+			};
+			ajaxRequest(options,function(response){
+				if (scriptInit) {
+					$('.map_div').html(response).removeClass('hide');
+					$('#script_loaded').val(1);
+					$('#script_init').val(1);
+				} else {
+					loadScript("https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&key=<%= GOOGLE_AUTO_COMPLETE_API_KEY%>", function () {
+						$('.map_div').html(response).removeClass('hide');
+						$('#script_loaded').val(1);
+						$('#script_init').val(1);
+					});
+				}
+			});
+		} else{
+			$('.map_div').removeClass('hide');
+		}
+	}
+</script>

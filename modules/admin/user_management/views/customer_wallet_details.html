@@ -1,0 +1,39 @@
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+		<div class="header">
+				<h2>
+					<%= __("admin.user_management.wallet_details"); %>
+				</h2>
+				<% if(typeof customer_detail !== typeof undefined && !customer_detail.is_guest){ %>
+				<ul class="header-dropdown m-r--5 btn-right-top-margin">					
+					<li class="<%= getPermissionClass(module_type,['user_detail','add_wallet_amount'])%>">
+						<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add_wallet_amount/'+customer_id%>" data-open-modal="true" class="action-btn">
+							<button type="button" class="btn btn-sm bg-indigo waves-effect">
+								<%= __("admin.user_management.add_wallet_amount"); %>
+							</button>
+						</a>
+					</li>
+				</ul>
+				<% } %>
+			</div>
+            <div class="body table-responsive">
+                <%
+                    var wallet 	= 	(typeof result !== typeof undefined &&	result.wallet)	? 	result.wallet	:{};
+                %>
+                <table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+                    <tr>
+                        <th class="text-right" width="35%"><%= __('admin.user_management.total_amount'); %></th>
+                        <td><span><%=(result.total_amount) ? currencyFormat(result.total_amount) : currencyFormat(0) %></span></td>
+                    </tr>
+                    <% Object.keys(WALLET_TYPE).map(key=>{ %>
+                        <tr>
+                            <th class="text-right" ><%=WALLET_TYPE[key]%></th>
+                            <td><span><%=(wallet[key]) ? (key == POINTS_AMOUNT) ? wallet[key] : currencyFormat(wallet[key]) : currencyFormat(0) %></span></td>
+                        </tr>
+                    <% }); %>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

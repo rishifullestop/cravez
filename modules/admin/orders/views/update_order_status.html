@@ -1,0 +1,859 @@
+<%
+	var status		= (typeof status !== typeof undefined && status)	?	status	: "";
+	var orderType	= (typeof order_type !== typeof undefined && order_type)	?	order_type	: "";
+	var firstOrders 				   = first_orders;
+	var duplicateOrders 			   = duplicate_orders;
+	var bigOrders 				   	   = big_orders;
+	var orderRejected 			       = order_rejected;
+	var delayedAcceptance 		       = delayed_acceptance;
+	var delayedPreparation 			   = delayed_preparation;
+	var delayedPickupCaptain           = delayed_pickup_by_captain;
+	var delayedPickupCustomer          = delayed_pickup_by_customer;
+	var delayedPickupRestaurant        = delayed_pickup_by_restaurant;
+	var vipOrders 					   = vip_orders;
+	var delayedDelivery 			   = delayed_delivery;
+	var deliveryCravez 				   = delivery_cravez;
+	var deliveryRestaurant 			   = delivery_restaurant;
+%>
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.orders.rules"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a>
+								<button type="button" class="btn btn-sm bg-indigo waves-effect count-refresh-btn" id="count-btn">
+									<%= __("admin.orders.refresh"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<div class="all_restaurant">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="col-sm-4">
+									<ul>
+										<li class="<%= (orderType == "first_orders") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=first_orders'%>" class="reset_storage"><%= __("admin.orders.first_order")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=first_orders'%>" class="reset_storage"><span class="first_order"><%= (firstOrders) ? firstOrders :0%></span></a>
+										</li>
+										<li class="<%= (orderType == "duplicate_orders") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=duplicate_orders'%>" class="reset_storage"><%= __("admin.orders.duplicate_orders")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=duplicate_orders'%>" class="reset_storage"><span class="duplicate_orders"><%= (duplicateOrders) ? duplicateOrders :0%></span></a>
+										</li>
+										<li class="<%= (orderType == "big_orders") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=big_orders'%>" class="reset_storage"><%= __("admin.orders.big_orders")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=big_orders'%>" class="reset_storage"><span class="big_orders"><%= (bigOrders) ? bigOrders :0%></span></a>
+										</li>
+										<li class="<%= (orderType == "order_rejected") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=order_rejected'%>" class="reset_storage"><%= __("admin.orders.order_rejected")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=order_rejected'%>" class="reset_storage"><span class="order_rejected"><%= (orderRejected) ? orderRejected :0%></span></a>
+										</li>
+										<li class="<%= (orderType == "delayed_acceptance") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_acceptance'%>" class="reset_storage"><%= __("admin.orders.delayed_acceptance")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_acceptance'%>" class="reset_storage"><span class="delayed_acceptance"><%= (delayedAcceptance) ? delayedAcceptance :0%></span></a>
+										</li>
+									</ul>
+								</div>
+								<div class="col-sm-4 order_rules">
+									<ul>
+										<li class="<%= (orderType == "delivery_cravez") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delivery_cravez'%>" class="reset_storage"><%- __("admin.orders.delivery_cravez")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delivery_cravez'%>" class="reset_storage"><span class="delivery_cravez"><%= (deliveryCravez) ? deliveryCravez :0%></span></a>
+										</li>
+										<li class="<%= (orderType == "delivery_restaurant") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delivery_restaurant'%>" class="reset_storage"><%- __("admin.orders.delivery_restaurant")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delivery_restaurant'%>" class="reset_storage"><span class="delivery_restaurant"><%= (deliveryRestaurant) ? deliveryRestaurant :0%></span></a>
+										</li>
+										<li class="<%= (orderType == "delayed_pickup_by_customer") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_pickup_by_customer'%>" class="reset_storage"><%= __("admin.orders.delayed_pickup_by_customer")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_pickup_by_customer'%>" class="reset_storage"><span class="delayed_pickup_by_customer"><%= (delayedPickupCustomer) ? delayedPickupCustomer :0%></span></a>
+										</li>
+										<li class="<%= (orderType == "delayed_pickup_by_restaurant") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_pickup_by_restaurant'%>" class="reset_storage"><%- __("admin.orders.delayed_pickup_by_restaurant")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_pickup_by_restaurant'%>" class="reset_storage"><span class="delayed_pickup_by_restaurant"><%= (delayedPickupRestaurant) ? delayedPickupRestaurant :0%></span></a>
+										</li>
+										<li class="<%= (orderType == "delayed_pickup_by_captain") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_pickup_by_captain'%>" class="reset_storage"><%= __("admin.orders.delayed_pickup_by_captain")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_pickup_by_captain'%>" class="reset_storage"><span class="delayed_pickup_by_captain"><%= (delayedPickupCaptain) ? delayedPickupCaptain :0%></span></a>
+										</li>
+									</ul>
+								</div>
+								<div class="col-sm-4">
+									<ul>
+										<li class="<%= (orderType == "vip_orders") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=vip_orders'%>" class="reset_storage"><%- __("admin.orders.vip_orders")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=vip_orders'%>" class="reset_storage"><span class="vip_orders"><%= (vipOrders) ? vipOrders :0%></span></a>
+										</li>
+										<li class="<%= (orderType == "delayed_preparation") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_preparation'%>" class="reset_storage"><%- __("admin.orders.delayed_preparation")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_preparation'%>" class="reset_storage"><span class="delayed_preparation"><%= (delayedPreparation) ? delayedPreparation :0%></span></a>
+										</li>
+										<li class="<%= (orderType == "delayed_delivery") ? 'active' : '';%>">
+											<label><a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_delivery'%>" class="reset_storage"><%- __("admin.orders.delayed_delivery")%></a></label>
+											<a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_delivery'%>" class="reset_storage"><span class="delayed_delivery"><%= (delayedDelivery) ? delayedDelivery :0%></span></a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="first_name" id="column_filter_11"  onkeyup="searchDatatable(11)" placeholder="<%= __('admin.orders.search_by_first_name'); %>">
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="last_name" id="column_filter_12"  onkeyup="searchDatatable(12)" placeholder="<%= __('admin.orders.search_by_last_name'); %>">
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="mobile_number" id="column_filter_13"  onkeyup="searchDatatable(13)" placeholder="<%= __('admin.orders.search_by_mobile_number'); %>">
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="unique_order_id" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('admin.orders.search_by_order_id'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Status -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="filter_order_status" name="order_status" multiple>
+													<%
+														Object.keys(FILTER_ORDER_STATUS).map(key=>{
+															var selected	=	(key == status) ? 'selected' : '';%>
+															<option value="<%=key%>" <%= selected%>>
+																<%= FILTER_ORDER_STATUS[key].status_name%>
+															</option> <%
+														}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by restaurant name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick restaurant_id" id="column_filter_4"  onChange="searchDatatable(4)" name="search_restaurant_id" data-child-name="search_branch_id" data-live-search="true">
+													<option value=""><%=__("admin.orders.search_by_restaurant_name");%></option>
+													<%- restaurant_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by branch -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick branch_id disabled" id="column_filter_15"  onChange="searchDatatable(15)" name="search_branch_id" data-live-search="true" data-placeholder="<%=__('admin.orders.search_by_branch')%>" data-live-search="true" disabled>
+													<option value=""><%=__("admin.orders.search_by_branch");%></option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by invoice number -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="invoice_number" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.orders.search_by_invoice_number'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by delivery by -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="delivery_by" id="column_filter_16"  onkeyup="searchDatatable(16)" placeholder="<%= __('admin.orders.search_by_delivery_by'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Order Date -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.orders.search_by_order_date'); %>" name="date-range-picker">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date"  type="text" name="to_date">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" data-href="<%= WEBSITE_ADMIN_URL+'orders'%>">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.orders.orders"); %>
+					</h2>
+
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="10%"><%= __("admin.orders.invoice_number"); %></th>
+								<th width="10%"><%= __("admin.orders.order_id"); %></th>
+								<th width="10%"><%= __("admin.orders.order_date"); %></th>
+								<th width="10%"><%= __("admin.orders.last_status_updated_on"); %></th>
+								<th width="10%"><%= __("admin.orders.restaurant_name"); %></th>
+								<th width="10%"><%= __("admin.orders.net_order_amount"); %></th>
+								<th width="10%"><%= __("admin.orders.discount_value"); %></th>
+								<th width="10%"><%= __("admin.orders.infinity_service"); %></th>
+								<th width="10%"><%= __("admin.orders.total_order_amount"); %></th>
+								<th width="10%"><%= __("admin.orders.order_status"); %></th>
+								<th width="10%"><%= __("admin.system.action"); %> </th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal to reject order request-->
+<div class="modal fade" id="reject_order" tabindex="-1" role="dialog" aria-labelledby="reject_order" aria-hidden="true">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("admin.orders.reject_order") %></h4>
+			</div>
+			<form id="reject-form" data-submit-btn-id="reject-order_btn" method="post" class="on_click_submit" role="form" action=''>
+				<input type="hidden" name="order_id" id="order_id">
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-grop">
+								<div class="form-lin no-bottom-border">
+									<label for="rejection_reason" class="control-label"><%= __('admin.orders.rejection_field'); %><span class="required"> *</span>  </label>
+									<div class="form-grop margin-0">
+										<div class="form-line">
+											<textarea id="rejection_reason" rows="6" class="resize-none form-control" name="rejection_reason"></textarea>
+										</div>
+										<span id="rejection_reason_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="reject-order_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-reject noHover margin-0"><%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div><!--modal close-->
+<!-- Modal to update order status -->
+<div class="modal fade" id="update_order" tabindex="-1" role="dialog" aria-labelledby="update_order" aria-hidden="true">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("admin.orders.change_order_status_heading") %></h4>
+			</div>
+			<form id="update-form" data-submit-btn-id="update-order_btn" method="post" class="on_click_submit" role="form" action=''>
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-group">
+								<div class="form-line">
+									<label for="order_status" class="control-label">
+										<%= __('admin.orders.order_status'); %><span class="required"> *</span>
+									</label>
+									<select class="form-control show-tick-order" id="order_status" name="order_status">
+										<option value=""><%=__("admin.orders.select_status");%></option>
+											<%
+											Object.keys(UPDATE_ORDER_STATUS).map(key=>{ %>
+												<option value="<%=key%>">
+													<%= UPDATE_ORDER_STATUS[key].status_name%>
+												</option> <%
+											}); %>
+									</select>
+								</div>
+								<span id="order_status_error" class="error"></span>
+							</div>
+						</div>
+						<div class="col-sm-12 rejection_input hide">
+							<div class="form-grop">
+								<div class="form-lin no-bottom-border">
+									<label for="rejection_reason" class="control-label"><%= __('admin.orders.rejection_field'); %><span class="required"> *</span>  </label>
+									<div class="form-grop margin-0">
+										<div class="form-line">
+											<textarea id="rejection_reason" rows="6" class="resize-none form-control rejection-input" name="rejection_reason"></textarea>
+										</div>
+										<span id="rejection_reason_error" class="error rejection-reason"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="update-order_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-update noHover margin-0"><%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<!-- Modal to refund amount to user -->
+<div class="modal fade" id="refund_modal" tabindex="-1" role="dialog" aria-labelledby="refund_modal" aria-hidden="true">
+</div>
+
+<!-- Modal for change address of order -->
+<div class="modal fade" id="change_address" tabindex="-1" role="dialog" aria-labelledby="assign_order" aria-hidden="true">
+</div><!--modal close-->
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data */
+		var dataTable 			=	"";
+		var ORDER_STATUS_TYPES	= 	<%- JSON.stringify(ORDER_STATUS_TYPES)%>;
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ "data": 'invoice_number' },
+					{ "data": 'unique_order_id' },
+					{
+						"data"		 : 'order_date',
+						"searchable" : 	false,
+						"render" 	 : 	function(order_date){
+							return moment(order_date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"		 : 'last_status_updated_on',
+						"searchable" : 	false,
+						"render" 	 : 	function(last_status_updated_on){
+							return moment(last_status_updated_on).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"		 : 'restaurant_name',
+						"field_type" : "<%=OBJECT_ID_FIELD%>",
+						"field_name" : "restaurant_id",
+						"render" 	 : 	function(restaurant_name){
+							return  (restaurant_name) ? restaurant_name[DEFAULT_LANGUAGE_CODE] : '';
+						}
+					},
+					{
+						"data"		 : 'net_amount',
+						"searchable" : 	false,
+						"render" 	 : 	function(netAmount){
+							return  (typeof netAmount !== typeof undefined) ? currencyFormat(netAmount) :'';
+						}
+					},
+					{
+						"data": 'discount_price',
+						"orderable" : 	false,
+						"render"	: function(discount_price){
+							return  (typeof discount_price !== typeof undefined) ? currencyFormat(discount_price) : '';
+						}
+					},
+					{
+						"data"		: 	'infinity_service' ,
+						"orderable" : 	false,
+						"render"	: function(infinity_service){
+							return  infinity_service;
+						}
+					},
+					{
+						"data"		 : 'order_price',
+						"searchable" : 	false,
+						"render" 	 : 	function(orderPrice){
+							return (typeof orderPrice !== typeof undefined) ? currencyFormat(orderPrice) :'';
+						}
+					},
+					{
+						"data": {},
+						"orderable" : 	false,
+						"field_type" : "<%=EXACT_FIELD%>",
+						"field_name" : "admin_status",
+						"render" : function(result){
+							var statusLabel 	= (result.admin_status && ORDER_STATUS_TYPES[result.admin_status]) ? '<p><span class="label '+ORDER_STATUS_TYPES[result.admin_status].label_class+'">'+ORDER_STATUS_TYPES[result.admin_status].status_name+'</span></p>' : '';
+							var confirmStatus 	= (result.is_confirm == false)	? '<p><span class="label label-danger"><%=__("admin.orders.not_confirmed")%></span></p>' : '';
+							var modifiedStatus 	= (result.is_modified && result.admin_status == '<%= ORDER_PENDING %>')	? '<p><span class="label label-warning"><%=__("admin.orders.modified_order")%></span></p>' : '';
+
+							return statusLabel+confirmStatus+modifiedStatus;
+						}
+					},
+					{ 	"data"		: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render"	: function(result){
+							var id			= (result._id)	  		  ? result._id 	  		  : '';
+							var customerId	= (result.customer_id)	  ? result.customer_id 	  : "";
+							var isConfirm	= (result.is_confirm)	  ? result.is_confirm 	  : false;
+							var isCompleted	= (result.is_completed)	  ? result.is_completed   : false;
+							var noOfQueue	= (result.number_of_queue)? result.number_of_queue: '';
+							var orderStatus = (result.order_status)   ? result.order_status  : '';
+							var refundStatus= (result.refund_amount_status)   ? result.refund_amount_status  : false;
+							var dropDownButton 		= ''+
+							'<div class="btn-group m-l-5 m-t-5">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %>'+
+									' <span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									/** view Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/view/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,['order_detail','view']); %>">'+
+											'<%= __("admin.orders.view");%>'+
+										'</a>'+
+									'</li>';
+									if(orderStatus == '<%= ORDER_REJECTED %>'){
+										dropDownButton	+=	'<li>'+
+																'<a href="javascript:void(0);" class="waves-effect waves-block open-status-modal <%= getPermissionClass(module_type,['orders','cancel_order']); %>" data-id="'+id+'" data-type="<%= ORDER_CANCELLED%>">'+
+																	'<%= __("admin.orders.cancel_order");%>'+
+																'</a>'+
+															'</li>'+
+															'<li>'+
+																'<a href="javascript:void(0);" data-href="<%=admin_list_url%>/reschedule/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,['orders','reschedule_order']); %>" data-id="'+id+'" data-confirm-message="<%= __("admin.orders.you_want_to_reschedule_this_order"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+																	'<%= __("admin.orders.reschedule_order");%>'+
+																'</a>'+
+															'</li>';
+									}
+									if(isConfirm && !isCompleted){
+										dropDownButton	+=	'<li>'+
+																'<a href="javascript:void(0);" class="waves-effect waves-block open-status-modal <%= getPermissionClass(module_type,['orders','change_status']); %>" data-id="'+id+'">'+
+																	'<%= __("admin.orders.change_order_status");%>'+
+																'</a>'+
+															'</li>';
+									}
+									if(noOfQueue <= '<%= THIRD_REQUEUE_ORDER %>' && !isCompleted){
+										/** Requeue Link **/
+										dropDownButton += '<li>'+
+																'<a href="javascript:void(0);" data-href="<%=admin_list_url%>/requeue/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,['orders','change_status']); %>" data-confirm-message="<%= __("admin.orders.you_want_to_requeue_this_order"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+																	'<%= __("admin.orders.requeue");%>'+
+																'</a>'+
+															'</li>';
+									}
+
+									if(!isConfirm) {
+										/** Approve Link **/
+										dropDownButton += '<li>'+
+																'<a href="javascript:void(0);" data-href="<%= admin_list_url %>/accept_status/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,['orders','accept_reject']); %>" data-confirm-message="<%= __("admin.orders.you_want_to_accept_this_order"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+																	'<%= __("admin.orders.accept"); %>'+
+																'</a>'+
+															'</li>'+
+															/** Reject Link **/
+															'<li>'+
+																'<a href="javascript:void(0)" class="waves-effect waves-block open-modal <%= getPermissionClass(module_type,['orders','accept_reject']); %>" data-id="'+id+'">'+
+																	' <%= __("admin.orders.reject"); %>'+
+																'</a>'+
+															'</li>';
+									}
+									if(!isCompleted){
+										dropDownButton += '<li>'+
+															/** change Address **/
+																'<a href="javascript:void(0);" class="waves-effect waves-block open-change-address-modal <%= getPermissionClass(module_type,['orders','change_address']); %>" data-id="'+id+'">'+
+																	' <%= __("admin.orders.change_address"); %>'+
+																'</a>'+
+															'</li>';
+									}
+									if(orderStatus == '<%= ORDER_DELIVERED %>' && !refundStatus){
+										dropDownButton += '<li>'+
+															/** change Address **/
+																'<a href="javascript:void(0);" class="waves-effect waves-block open-refund-amount-modal <%= getPermissionClass(module_type,['orders','refund_amount']); %>" data-id='+id+'>'+
+																	' <%= __("admin.orders.refund_amount"); %>'+
+																'</a>'+
+															'</li></ul>'+
+													'</div>';
+									}
+							return dropDownButton;
+						}
+					},
+					{
+						"data"		: 'first_name',
+						"visible"	: false,
+					},
+					{
+						"data"		: 'last_name',
+						"visible"	: false,
+					},
+					{
+						"data"		: 'mobile_number',
+						"visible"	: false,
+					},
+					{
+						"data"		 : 'queue_time',
+						"visible"	 :  false,
+						"searchable" : 	false,
+						"render" 	 : 	function(queue_time){
+							return moment(queue_time).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"		 : 'branch_id',
+						"visible"	 : false,
+						"field_type" : "<%=OBJECT_ID_FIELD%>",
+						"field_name" : "branch_id",
+					},
+					{
+						"data"		: 'delivery_type',
+						"visible"	: false,
+					},
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>?status=<%= status%>&is_confirm=<%= is_confirm%>&order_type=<%= order_type%>",
+					type	: 	"POST",
+					data	: 	function (d) {
+						d.status	=	$('#filter_order_status').val();
+						d.fromDate 	=   $('#from_date').val();
+				        d.toDate 	=   $('#to_date').val();
+				    },
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+
+			/**
+			* Get branch list
+			*/
+			$("select[name='search_restaurant_id']").change(function(){
+				getBranchDropDownList($(this));
+			});
+
+			/** Refresh count of orders */
+			$(".count-refresh-btn").click(function(e) {
+				var btnId = $(this).attr("id");
+				e.stopPropagation();
+       			getorderData(btnId,true);
+			});
+
+			/** To Refresh count of orders in every 5 seconds */
+			setInterval(function(){
+				var btnId	=	$(".count-refresh-btn").attr('id');
+				getorderData(btnId,false);
+			}, 5000);
+
+			/**
+		* Function to get Location of captain using ajax submit
+		*/
+		function getorderData(btnId,load){
+			$.ajax({
+				url :"<%=admin_list_url%>/get_order_rules",
+				type: "GET",
+				beforeSend: function() {
+					if(load){
+						startTextLoading(btnId);
+					}
+				},
+				success:function(response){
+					$('.first_orders').html(response.first_orders);
+					$('.duplicate_orders').html(response.duplicate_orders);
+					$('.big_orders').html(response.big_orders);
+					$('.order_rejected').html(response.order_rejected);
+					$('.delayed_acceptance').html(response.delayed_acceptance);
+					$('.delayed_preparation').html(response.delayed_preparation);
+					$('.delayed_pickup_by_captain').html(response.delayed_pickup_by_captain);
+					$('.delayed_pickup_by_customer').html(response.delayed_pickup_by_customer);
+					$('.delayed_pickup_by_restaurant').html(response.delayed_pickup_by_restaurant);
+					$('.vip_orders').html(response.vip_orders);
+					$('.delayed_delivery').html(response.delayed_delivery);
+					$('.delivery_cravez').html(response.delivery_cravez);
+					$('.delivery_restaurant').html(response.delivery_restaurant);
+					stopTextLoading(btnId);
+				}
+			});
+		}//End getLocationData()
+
+			/**
+			* Get dropdown value by local storage
+			*/
+			let tempRestaurantId = 	"";
+			let tempBranchId 	 =	"";
+			if(localStorage["search_" +window.location.pathname]){
+
+				let searchFormData = JSON.parse(localStorage["search_" +window.location.pathname]);
+				for(index in searchFormData){
+					if(searchFormData[index].name && searchFormData[index].name == "search_branch_id" && searchFormData[index].value){
+						tempBranchId = searchFormData[index].value;
+					}
+					if(searchFormData[index].name && searchFormData[index].name == "search_restaurant_id" && searchFormData[index].value){
+						tempRestaurantId = searchFormData[index].value;
+					}
+				}
+
+				if(tempRestaurantId) getBranchDropDownList($("select[name='search_restaurant_id']"),tempRestaurantId,tempBranchId);
+			}
+		});
+
+
+
+		/**
+		* Get branch search dropdown list
+		*/
+		function getBranchDropDownList(currentObj,restaurantId,branchId){
+			if(currentObj){
+
+				var currentValue	=	currentObj.val();
+				var childInputName	=	currentObj.attr("data-child-name");
+				var childObj		=	(childInputName) ?  $("select[name='"+childInputName+"']") :"";
+				var placeholder		=	childObj.attr("data-placeholder");
+				var childFirstOption=	'<option value="">'+placeholder+'</option>';
+
+				if(!currentValue && restaurantId) currentValue = restaurantId;
+
+				childObj.attr("disabled",true).removeClass("disabled").html(childFirstOption);
+				if(!branchId) childObj.val("").trigger("change");
+				$(".show-tick").selectpicker('refresh');
+
+				if(currentValue){
+					/** Get dropdown list **/
+					var options = {
+						url 	: "<%=admin_list_url%>/branch_list",
+						data	: {restaurant_id : currentValue},
+						method	: "post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_SUCCESS%>"){
+							/** Append dropdown list **/
+							childObj.attr("disabled",false).removeClass("disabled").html(childFirstOption+response.branch_list);
+							if(branchId) childObj.val(branchId);
+							$(".show-tick").selectpicker('refresh');
+						}else if(response.status && response.message){
+							notice(response.status,response.message);
+						}
+					});
+				}
+			}
+		}// end getBranchDropDownList()
+
+		/**
+		* Function to show modal
+		*/
+		$(document).on('click','.open-modal',function(){
+			var orderId = $(this).attr('data-id');
+
+			$('#order_id').val(orderId);
+			$("#rejection_reason_error").text('');
+			$('#rejection_reason').val("");
+			$('#reject-form').attr("action","<%=admin_list_url%>/reject_order_status");
+
+			$('#reject_order').modal({
+				backdrop: 'static',
+				keyboard: false
+			});
+			$('#reject_order').modal('show');
+		});
+
+		/**
+		* Function to show change address modal
+		*/
+		$(document).on('click','.open-change-address-modal',function(){
+			var orderId 		= $(this).attr('data-id');
+
+			$.ajax({
+				url :"<%=list_url%>/change_address/"+orderId,
+				type: "GET",
+				success:function(response){
+					$('#change_address').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					$('#change_address').html(response);
+					$('#change_address').modal('show');
+				}
+			});
+		});
+
+		/**
+		* Function to show modal for status change
+		*/
+		$(document).on('click','.open-status-modal',function(){
+			$('.rejection_input').addClass('hide');
+			var orderId = $(this).attr('data-id');
+			var type 	= $(this).attr('data-type');
+
+			$("#order_status_error").text('');
+			$('#order_status').val("");
+			$(".rejection-reason").text('');
+			$('.rejection-input').val("");
+
+			if(type){
+				$('#order_status').val(type).addClass('disabled-select');
+				$(".show-tick-order").selectpicker('refresh');
+				$('#order_status').trigger('change');
+			}
+			$('#update-form').attr("action","<%=admin_list_url%>/change_status/"+orderId);
+
+			$('#update_order').modal({
+				backdrop: 'static',
+				keyboard: false
+			});
+			$('#update_order').modal('show');
+		});
+
+		/**
+		* Function to show modal for status change
+		*/
+		$(document).on('click','.open-refund-amount-modal',function(){
+			var orderId 		= $(this).attr('data-id');
+
+			$('#refund_amount').val('');
+			$.ajax({
+				url :"<%=admin_list_url%>/refund_amount/"+orderId,
+				type: "GET",
+				success:function(response){
+					$('#refund_modal').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					$('#refund_modal').html(response);
+					$('#refund_modal').modal('show');
+				}
+			});
+		});
+
+		/**
+		* Function to get reason on changing of status
+		*/
+		$('#order_status').on('change',function(e){
+			var status  = $('#order_status').val();
+			var ADMIN_ORDER_ACTIONS	=	<%- JSON.stringify(ADMIN_ORDER_ACTIONS);%>;
+			if(status){
+				var getReason	=	ADMIN_ORDER_ACTIONS[status].reason;
+				if(getReason){
+					$('.rejection_input').removeClass('hide');
+					return false;
+				}else{
+					$('.rejection_input').addClass('hide');
+				}
+			}
+			$('.rejection_input').addClass('hide');
+		});
+
+		/**
+		* Function to submit  modal form
+		*/
+		$(".btn-submit-reject").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+
+			ajax_submit("reject-form",function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/**
+		* Function to submit  modal form
+		*/
+		$(".btn-submit-update").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+
+			ajax_submit("update-form",function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/**
+		* Function to filter by order status
+		*/
+		$('#filter_order_status').change(function(){
+			dataTable.draw();
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+
+	</script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

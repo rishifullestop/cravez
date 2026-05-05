@@ -1,0 +1,79 @@
+<%
+if(auth.team_head){
+	let tmpMemberStats 		= (result.members_stats) ? result.members_stats :{};
+	let totalMembers		= (tmpMemberStats.members_stats && tmpMemberStats.members_stats.total_members) 	? tmpMemberStats.members_stats.total_members 	: 0;
+	let activeMembers		= (tmpMemberStats.members_stats && tmpMemberStats.members_stats.active_members) ? tmpMemberStats.members_stats.active_members : 0;
+	let overtimeRequests	= (tmpMemberStats.overtime_requests)  ? tmpMemberStats.overtime_requests 	: 0;
+	let memberVacations		= (tmpMemberStats.member_on_vacation) ? tmpMemberStats.member_on_vacation   : 0;
+	var totalAgentsOnLeave  = (result.total_agents_on_leaves) 	 ?	result.total_agents_on_leaves	:[];
+	var leaveTypeList  		= (result.leave_type_list)	 		 ?	result.leave_type_list			:{};
+	var agentsInfo  		= (result.agents_info) 				 ?	result.agents_info				:{};
+%>
+
+	<div class="number_box">
+		<h3><span><%= __("admin.dashboard.members")%></span></h3>
+		<div class="dashboard_number menu_box">
+			<ul>
+				<li>
+					<div class="number_bg_box darkblue_border">
+						<strong><%= totalMembers%></strong>
+						<a href="<%= WEBSITE_ADMIN_URL %>admin_permissions" target="_blank" class="text-decoration-none reset_storage"><span><%= __("admin.dashboard.total_members")%></span></a>
+					</div>
+				</li>
+				<li>
+					<div class="number_bg_box darkblue_border">
+						<strong><%= activeMembers%></strong>
+						<a href="<%= WEBSITE_ADMIN_URL %>admin_permissions?status=<%= ACTIVE %>" target="_blank" class="text-decoration-none reset_storage"><span><%= __("admin.dashboard.active_members")%></span></a>
+					</div>
+				</li>
+				<li>
+					<div class="number_bg_box darkblue_border">
+						<strong><%= (agentsInfo.total_available_agents) ? agentsInfo.total_available_agents:0%></strong>
+						<a href="javascript:void(0)" class="text-decoration-none">
+							<span><%= __("admin.dashboard.total_available_agents")%></span>
+						</a>
+					</div>
+				</li>
+				<li>
+					<div class="number_bg_box darkblue_border">
+						<strong><%= overtimeRequests%></strong>
+						<a href="<%= WEBSITE_ADMIN_URL %>overtime_request" target="_blank" class="text-decoration-none reset_storage"><span><%= __("admin.dashboard.over_time_requests")%></span></a>
+					</div>
+				</li>
+				<li>
+					<div class="number_bg_box darkblue_border">
+						<strong><%= memberVacations%></strong>
+						<a href="<%= WEBSITE_ADMIN_URL %>leave_management/vacation_request?from_date=<%=newDate('',DATABASE_DATE_FORMAT)%>&to_date=<%=newDate('',DATABASE_DATE_FORMAT)%>" target="_blank" class="text-decoration-none reset_storage"><span><%= __("admin.dashboard.members_on_leave")%></span></a>
+					</div>
+				</li>
+				<li>
+					<div class="number_bg_box darkblue_border">
+						<strong><%=( agentsInfo.total_agents_on_off_today) ?  agentsInfo.total_agents_on_off_today :0%></strong>
+						<a href="<%= WEBSITE_ADMIN_URL %>leave_management/vacation_request?leave_type=<%=WEEKLY_OFF%>&from_date=<%=newDate('',DATABASE_DATE_FORMAT)%>&to_date=<%=newDate('',DATABASE_DATE_FORMAT)%>" target="_blank" class="text-decoration-none reset_storage">
+							<span><%= __("admin.dashboard.total_agents_on_off")%></span>
+						</a>
+					</div>
+				</li>
+				<%
+				if(Object.keys(leaveTypeList).length >0){
+					Object.keys(leaveTypeList).map(key=>{
+						var leaveCount = 0;
+						if(totalAgentsOnLeave.length >0){
+							totalAgentsOnLeave.map(records=>{
+								if(records._id == key) leaveCount = records.total_count;
+							});
+						} %>
+						<li>
+							<div class="number_bg_box darkblue_border">
+								<strong><%= leaveCount;%></strong>
+								<a href="<%= WEBSITE_ADMIN_URL %>leave_management/vacation_request?from_date=<%=newDate('',DATABASE_DATE_FORMAT)%>&to_date=<%=newDate('',DATABASE_DATE_FORMAT)%>&leave_type=<%=key %>" target="_blank" class="text-decoration-none reset_storage">
+									<span><%= leaveTypeList[key]%></span>
+								</a>
+							</div>
+						</li>
+					<% });
+				} %>
+			</ul>
+		</div>
+	</div>
+<%	} %>

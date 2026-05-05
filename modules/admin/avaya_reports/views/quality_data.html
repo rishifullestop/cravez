@@ -1,0 +1,39 @@
+<%
+    var agentData        = agent_data;
+    var teamLeaderData   = team_leader_data;
+    var fromDate	     = newDate(from_date,DATABASE_DATE_FORMAT);
+    var toDate		     = newDate(to_date,DATABASE_DATE_FORMAT);
+    var teamLeaderId	 = team_leader_id;
+    var overAlPercent	=	(teamLeaderData[0] && teamLeaderData[0].over_all_percentage) ? teamLeaderData[0].over_all_percentage : 0;
+	var overAlCount		=	(teamLeaderData[0] && teamLeaderData[0].over_all_count) ? teamLeaderData[0].over_all_count : 0;
+	var finalPercent	=	(overAlPercent) ? round(overAlPercent/overAlCount) :0;
+%>      
+<table id="datatable-category-listing" class="row-border fixed-width-table hover table full-length-header table-bordered" cellspacing="0" width="100%" >
+    <thead>
+        <tr>
+            <th><%= __('admin.quality_monitor.agent_name'); %></th>
+            <th><%= __("admin.quality_monitor.over_all_percentage"); %></th>
+        </tr>
+    </thead>
+    <tbody>
+        <%
+            agentData.map((agentRecords)=>{
+                let userName 	    = (agentRecords.agent_name)   ?  agentRecords.agent_name   :"";
+                let percentage 		= (agentRecords.over_all_percentage)   ?  agentRecords.over_all_percentage   :0;
+                let count			= (agentRecords.over_all_count) ? agentRecords.over_all_count : 0;
+                %>
+                <tr>
+                    <td><%=userName%></td>
+                    <td><%= (percentage) ? round(percentage/count) : 0;%></td>
+                </tr>
+                <%
+            });
+        %>
+    </tbody>
+    <tfoot>
+		<tr>
+			<th style="text-align:right"><%= __("admin.quality_monitor.team_average_percentage"); %></th>
+			<th><%= finalPercent %></th>
+		</tr>
+	</tfoot>
+</table>

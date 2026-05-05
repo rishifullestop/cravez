@@ -1,0 +1,127 @@
+<%
+	var result 		= 	(typeof result !== typeof undefined && result)  ?	result 	:{};
+	var isEditable 	=	(typeof is_editable !== typeof undefined && is_editable) ? is_editable :"";
+	var breakId		=	(result._id)	?	result._id	:"";
+	var formUrl 	=	(isEditable)	?	admin_list_url+"/edit/"+breakId :admin_list_url+"/add";
+	var breakTypes	=   (typeof  break_types !== typeof undefined) ? break_types : [];
+	let isTeamLead  =   (auth && auth.team_head) ? true : false;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-break" action="<%=formUrl%>" data-submit-btn-id="break-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.team_breaks.edit_break") : __("admin.team_breaks.add_breaks"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix selected">
+							<% if(isTeamLead){ %>
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="form-line">
+											<label for="user_id" class="control-label col-555">
+												<%= __("admin.team_breaks.team_member"); %><span class="required"> *</span>
+											</label>
+											<select class="form-control show-tick" id="user_id" name="user_id" multiple title="<%=__('admin.team_breaks.select_team_member') %>">
+												<%-team_member_list%>
+											</select>
+										</div>
+										<span id="user_id_error" class="error"></span>
+									</div>
+								</div>
+							<% } %>
+							<div class="<%= (isTeamLead) ? 'col-sm-6' : 'col-sm-12'%>">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="break_type" class="control-label col-555">
+											<%= __("admin.team_breaks.break_type"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" id="break_type" name="break_type">
+											<option value=""><%=__("admin.team_breaks.select_break_type");%></option>
+												<%
+												let breakType = (result.break_type) ? result.break_type : ""
+												breakTypes.map(type=>{
+													let selectedText = (breakType == String(type._id)) ? "selected" : "";
+												%>
+													<option value="<%= (type._id) ? type._id : ''; %>" <%= selectedText %>>
+														<%= (type.title) ? type.title : "";%>
+													</option> <%
+												}); %>
+										</select>
+									</div>
+									<span id="break_type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="start_time" class="control-label"><%= __('admin.team_breaks.start_time'); %><span class="required"> * </span> :</label>
+										<input name="start_time"  id="start_time" class="form-control timepicker" value="<%=(result.start_time) ? result.start_time :'';%>" />
+									</div>
+									<span id="start_time_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group demo-tagsinput-area">
+									<div class="form-line">
+										<label for="end_time" class="control-label"><%= __('admin.team_breaks.end_time'); %><span class="required "> *</span> :</label>
+										<input  name="end_time" id="end_time" type="text" class=" timepicker form-control" value="<%=(result.end_time) ? result.end_time :'';%>"/>
+									</div>
+									<span id="end_time_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="break-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-blue-grey btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							 <%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	var isEditable = "<%=isEditable%>";
+
+	$(document).ready(function() {
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('add-break',function(status,response){
+				if(status){
+					if(isEditable){
+						if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+						if(response.status && response.message) notice(response.status,response.message);
+						$('#form_modal').modal("hide");
+					}else{
+						$("#reset").trigger("click");
+					}
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/* date time picker function*/
+		$('.timepicker').datetimepicker({
+			ignoreReadonly: true,
+			format: '<%= DATEPICKER_TIME_FORMAT %>'
+		});
+
+		$(".show-tick").selectpicker('refresh');
+	});
+</script>

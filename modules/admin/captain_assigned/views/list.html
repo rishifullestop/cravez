@@ -1,0 +1,106 @@
+<div class="container-fluid"  id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.captain_assigned.captain_assigned"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __('admin.captain_assigned.area_name'); %></th>
+								<th><%=  __('admin.captain_assigned.total_captains'); %></th>
+								<th width="2%"></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable		=	"";
+		let captainAssigned	=	<%-JSON.stringify(captain_assigned); %>
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"order"		: 	[],
+				"sDom"		:	"ftr",
+				"serverSide": 	false,
+				"scrollX"	: 	true,
+				"paging"	:	false,
+				"data"		:	captainAssigned,
+				"columns"	: 	[
+					{
+						"data"		:	"area_name",
+						"orderable"	:   false,
+					},
+					{
+						"data"		:	"total_captains",
+						"orderable"	:   false,
+					},
+					{
+						"class":          "details-control",
+						"orderable":      false,
+						"data":           null,
+						"defaultContent": ""
+					},
+				],
+			});
+
+			// Array to track the ids of the details displayed rows
+			var detailRows = [];
+			$('#datatable-listing tbody').on( 'click', 'tr td.details-control', function () {
+				var tr = $(this).closest('tr');
+				var row = dataTable.row( tr );
+				var idx = $.inArray( tr.attr('id'), detailRows );
+				var table = $('#datatable-listing').DataTable();
+				// DO SOMETHING HERE TO UPDATE fixedHeader.headerOffset
+				// table.fixedHeader.headerOffset($('.navbar').height());   // apply new value
+				// above fails, as there so no such method to update headerOffset (yet)
+				// table.fixedHeader.adjust();
+
+				if ( row.child.isShown() ) {
+					tr.removeClass( 'details' );
+					row.child.hide();
+					// Remove from the 'open' array
+					detailRows.splice( idx, 1 );
+				}else{
+					tr.addClass( 'details' );
+					row.child( format( row.data() ) ).show();
+					// Add to the 'open' array
+					if ( idx === -1 ) {
+						detailRows.push( tr.attr('id') );
+					}
+				}
+			} );
+			// On each draw, loop over the `detailRows` array and show any child rows
+			dataTable.on( 'draw', function () {
+				$.each( detailRows, function ( i, id ) {
+					$('#'+id+' td.details-control').trigger( 'click' );
+				} );
+			} );
+		});
+
+		function format(d){
+			var captainList = (d.captain_list) ? d.captain_list :[];
+
+			let html = '<div class="col-sm-12">';
+			if(captainList.length >0){
+				captainList.map((records,index)=>{
+					let captainId 	=	records._id;
+					let captainName =	records.full_name;
+
+					html	+='<div class="col-sm-3 mb0"><a href="<%=WEBSITE_ADMIN_URL%>user_management/view_driver/'+captainId+'" target="_blank"><p><strong>'+(index+1)+'.</strong> '+captainName+'</p></a></div>';
+				});
+			}
+			html	+='</div>';
+			return html;
+		}
+	</script>

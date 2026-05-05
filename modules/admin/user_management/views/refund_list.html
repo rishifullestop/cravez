@@ -1,0 +1,169 @@
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-col-pink">
+				<div class="panel-heading" role="tab" id="panel-heading-id">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							aria-controls="panel-collapse-id">
+							<%= __('admin.system.search'); %>
+							<span class="pull-right collapse-toggle-icon"></span>
+						</a>
+					</h4>
+				</div>
+				<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+					<div class="panel-body">
+						<form id="searchForm" name="searchForm">
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by action -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" id="wallet_type"  name="wallet_type">
+												<option value=""><%=__("admin.user_management.search_by_type");%></option>
+												<option value="<%=COMPENSATION_AMOUNT%>">
+													<%= REFUND_TYPE[COMPENSATION]%>
+												</option>
+												<option value="<%=REFUND_AMOUNT%>">
+													<%= REFUND_TYPE[REFUND]%>
+												</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- datatable reset -->
+								<div class="col-xs-12 col-sm-2">
+									<div class="form-group">
+										<button type="button" id="reset" class="btn btn-danger btn-sm waves-effect"><%= __("admin.system.reset")%></button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%= __("admin.user_management.compensation"); %>
+				</h2>
+			</div>
+			<div class="body">
+				<table id="datatable-customer-refund" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="10%"><%= __("admin.user_management.type"); %></th>
+							<th width="20%"><%= __("admin.user_management.order_id"); %></th>
+							<th width="20%"><%= __("admin.user_management.total_amount"); %></th>
+							<th width="20%"><%= __("admin.user_management.refunded_amount"); %></th>
+							<th width="10%"><%= __("admin.user_management.status"); %></th>
+							<th width="20%"><%= __("admin.user_management.initiated_on"); %></th>
+							<th width="20%"><%= __("admin.user_management.refunded_on"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable ="";
+	var PAYMENT_REFUND_STATUS = <%- JSON.stringify(PAYMENT_REFUND_STATUS);%>;
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-customer-refund').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem('DataTables', JSON.stringify(oData));
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse(localStorage.getItem('DataTables'));
+			},
+			"order"		: 	[[5, "desc"]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":   PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{
+					"data" : {},
+					"orderable"  : 	false,
+					"field_name" : 	"wallet_type",
+					"render" 	 : 	function(result){
+						let walletType = (result.wallet_type) ? result.wallet_type :"";
+						return (walletType == "<%=COMPENSATION_AMOUNT%>") ? "<%=REFUND_TYPE[COMPENSATION]%>":"<%=REFUND_TYPE[REFUND]%>";
+					}
+				},
+				{
+					"data" : {},
+					"orderable" : false,
+					"render" 	 : 	function(result){
+						return (result.unique_order_id) ? '<a href='+'<%= WEBSITE_ADMIN_URL %>'+'orders/view/'+result.order_id+' target="_blank">'+result.unique_order_id+'</a>' : '';
+					}
+				},
+				{
+					"data": 'total_amount' ,
+					"searchable" : 	false,
+					"render" 	 : 	function(total_amount){
+						return (total_amount) ? currencyFormat(total_amount) : '';
+					}
+				},
+				{
+					"data": {},
+					"searchable" : 	false,
+					"render" 	 : 	function(result){
+						return (result.payment_detail) ? currencyFormat(result.payment_detail[0].amount) : '';
+					}
+				},
+				{
+					"data": 'status' ,
+					"searchable" : 	false,
+					"orderable"  :  false,
+					"render" 	 : 	function(status){
+						return (status) ? '<span class="label '+PAYMENT_REFUND_STATUS[status].label_class+'">'+PAYMENT_REFUND_STATUS[status].status_name+'</span>' : '';
+					}
+				},
+				{
+					"data"		: 'created' ,
+					"searchable" : 	false,
+					"render" 	 : 	function(created){
+						return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+					}
+				},
+				{
+					"data": 'refunded_on' ,
+					"searchable" : 	false,
+					"render" 	 : 	function(refunded_on){
+						return (refunded_on) ? moment(refunded_on).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) : '';
+					}
+				},
+			],
+			"ajax":{
+				url 	: "<%=admin_list_url%>/refund_detail/"+'<%= user_id %>',
+				type	: "POST",
+				data: function (d) {
+					d.wallet_type = $("#wallet_type").val();
+				},
+				dataSrc	: function(res){
+					return res.data;
+				}
+			}
+		});
+
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+
+		/**
+		* Function to filter by wallet type
+		*/
+		$('#wallet_type').change(function(){
+			dataTable.draw();
+		});
+	});
+</script>
+

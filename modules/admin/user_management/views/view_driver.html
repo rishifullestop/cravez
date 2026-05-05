@@ -1,0 +1,225 @@
+<%
+  var driverId  	=  	driver_id;
+  var dateStart		=	newDate(subtractMinute(MINUTES_IN_A_HOUR),DATE_TIME_RANGE_FORMAT);
+  var dateEnd		=	newDate("",DATE_TIME_RANGE_FORMAT);
+  var dateForm		=	newDate(subtractMinute(MINUTES_IN_A_HOUR),DATABASE_DATE_TIME_FORMAT);
+  var dateTo		=	newDate("",DATABASE_DATE_TIME_FORMAT);
+%>
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.user_management.driver_details'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>/list_driver" ><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __('admin.system.back'); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body table-responsive" id="aniimated-thumbnials">
+						<%
+						var fullName 	= 	(typeof result !== typeof undefined &&	result.full_name)	? 	result.full_name	:'';
+						var email 		= 	(typeof result !== typeof undefined &&	result.email)		? 	result.email		:'';
+					%>
+					<table id="driver-table" class="row-border hover table table-bordered" cellspacing="0" width="100%">
+						<tr>
+							<th class="text-right"  width="25%"><%= __('admin.user_management.photo'); %></th>
+							<td>
+								<span>
+									<a href="<%=result.full_image_path%>" class="item-image" data-lightbox="roadtrip">
+										<img class="img-thumbnail set_image_dim" src="<%=result.full_image_path%>" alt="Driver Image">
+									</a>
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.user_management.driver_id'); %></th>
+							<td><span><%= (typeof result.driver_id !== typeof undefined) ? result.driver_id :"";%></span></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.user_management.full_name'); %></th>
+							<td><span><%=fullName%></span></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.user_management.user_name'); %></th>
+							<td><%- (email) ? '<a href="mailto:'+email+'">'+email+'</a>' :"";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.user_management.phone_number'); %></th>
+							<td><%= (typeof result.mobile_number !== typeof undefined) ? result.mobile_number :"N/A";%></td>
+						</tr>
+						<%
+							var status 		= 	(typeof result !== typeof undefined && result.active) 		? 	result.active 		:DEACTIVE;
+							var statusClass	=	(status	==	ACTIVE)	?	"label-success"				:"label-danger";
+							var statusText	=	(status	==	ACTIVE)	?	__('admin.system.active')	:__('admin.system.inactive');
+						%>
+						<tr>
+							<th class="text-right"><%= __('admin.system.status'); %></th>
+							<td>
+								<span class="label <%= statusClass %>"><%= statusText %></span>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.system.modified'); %></th>
+							<td><span class="setDateTimeFormat" data-date-time="<%= (typeof result !== typeof undefined &&  result.modified) ? result.modified : 'N/A';%>"></span></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container-fluid">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							aria-controls="panel-collapse-id">
+								<%= __("admin.user_management.driver_movement_history"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix">
+									<!-- Search by order Date -->
+									<div class="col-xs-12 col-sm-6 col-md-5 col-lg-5">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.orders.search_by_order_date'); %>" value="<%= dateStart %> - <%= dateEnd%>" readonly>
+											</div>
+											<input class="form-control hide" id="from_date" value="<%= dateForm%>" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" value="<%= dateTo%>" type="text" name="to_date">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<div class="append_driver_map"></div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>
+	<script type="text/javascript">
+		var dateFrom 	= 	$('#from_date').val();
+		var dateTo 		= 	$('#to_date').val();
+		/**
+		* Function to change current order
+		*/
+		show_location();
+		function show_location(){
+			dateFrom 	= 	$('#from_date').val();
+			dateTo 		= 	$('#to_date').val();
+			var driverId	=	"<%= driverId %>";
+			$.ajax({
+				url 	:	"<%=list_url%>/driver_locations/"+driverId,
+				type	: 	"POST",
+				data	:   {"date_from" : dateFrom,"date_to" : dateTo},
+				success	: 	function(res){
+					$(".append_driver_map").html(res);
+				}
+			});
+		}
+
+		/**
+		 * For date range picker in searching
+		 */
+		var DATE_FORMAT = "<%=DATE_PICKER_DATE_TIME_FORMAT%>";
+		var START_DATE	= (typeof dateFrom !== typeof undefined && dateFrom!="") ?	new Date(dateFrom) 	: new Date();
+		var END_DATE	= (typeof dateTo !==typeof  undefined && dateTo!="" ) ?	new Date(dateTo) : new Date();
+		var OPENS		= "right";
+		var options		= {};
+
+		/**Options for date range picker*/
+		options.locale = {
+			format		: 	DATE_FORMAT,
+			cancelLabel	:	"<%= __('admin.date_picker.cancel_label')%>"
+		};
+
+		options.timePicker		= 	true;
+		options.startDate		= 	START_DATE;
+		options.endDate			= 	END_DATE;
+		options.opens			= 	OPENS;
+		options.autoUpdateInput	= 	false;
+		options.maxDate			= 	new Date();
+
+		var configDemo = $('#date-range-picker');
+		configDemo.daterangepicker(options, function (start, end, label) {
+			var start_date	= start.format('<%=DATE_RANGE_DATE_FORMAT%>');
+			var end_date	= end.format('<%=DATE_RANGE_DATE_FORMAT%>');
+		});
+
+		/**
+		* Applying date range filter on user details
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		configDemo.on('apply.daterangepicker', function(e,picker){
+			var startDate	= picker.startDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+			var endDate		= picker.endDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_END_DATE%>');
+
+			$('#from_date').val(startDate);
+			$('#to_date').val(endDate);
+
+			var displayStartDate 	=	picker.startDate.format('<%=DATEPICKER_DATE_TIME_FORMAT%>');
+			var displayEndDate 		= 	picker.endDate.format('<%=DATEPICKER_DATE_TIME_FORMAT%>');
+			$('#date-range-picker').val(displayStartDate+" - "+displayEndDate);
+			show_location(startDate,endDate);
+		});
+
+		/**
+		* Unset date range picker value when click to "clear" button
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		configDemo.on('cancel.daterangepicker',function(e){
+			configDemo.data('daterangepicker').setStartDate(new Date());
+			configDemo.data('daterangepicker').setEndDate(new Date());
+
+			$('#from_date').attr('value','');
+			$('#to_date').attr('value','');
+			$('#date-range-picker').attr('value','');
+			show_location();
+		});
+
+		/* Calling up the reset function */
+		$(document).on("click","#reset",function(e){
+			e.stopImmediatePropagation();
+			if($(this).attr("data-href")){
+				window.location.href = $(this).attr("data-href");
+			}else{
+				window.location.reload();
+			}
+		});
+	</script>
+	<script src="<%-GOOGLE_MAP_SCRIPT%>"></script>

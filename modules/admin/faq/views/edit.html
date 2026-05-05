@@ -1,0 +1,178 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix" >
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.faq.edit_faq"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" ><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __("admin.system.back"); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="edit-faq" data-submit-btn-id="faq-edit-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix selected">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="question" class="control-label">
+											<%= __("admin.faq.category"); %><span class="required"> *</span> :
+										</label>
+										<select class="form-control show-tick" id="category_id" name="category_id">
+											<option value=""><%=__("admin.faq.select_category");%></option>
+											<%-category_list%>
+										</select>
+									</div>
+									<span id="category_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="sub_category" class="control-label">
+											<%= __("admin.faq.sub_category"); %><span class="required"> *</span> :
+										</label>
+										<select class="form-control show-tick" id="sub_category_id" name="sub_category_id">
+											<option value=""><%=__("admin.faq.select_sub_category");%></option>
+											<%-sub_category_list%>
+										</select>
+									</div>
+									<span id="sub_category_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="faq_channel" class="control-label">
+											<%= __("admin.faq.faq_channel"); %><span class="required"> *</span> :
+										</label>
+										<select class="form-control show-tick" id="faq_channel" name="faq_channel">
+											<option value=""><%=__("admin.faq.select_faq_channel");%></option>
+											<% Object.keys(SYSTEM_CHANNEL).map(key=>{ %>
+												<option value="<%=key%>" <%=(result.faq_channel == key) ? 'selected' : ''%>><%=SYSTEM_CHANNEL[key]%></option>
+											<% 	}); %>
+										</select>
+									</div>
+									<span id="faq_channel_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="question_in_english" class="control-label">
+											<%= __("admin.faq.question_in_english"); %><span class="required"> *</span> :
+										</label>
+										<input type="text" id="question_in_english" class="form-control" name="question_in_english" value="<%=result.question.en %>"/>
+									</div>
+									<span id="question_in_english_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="question_in_arabic" class="control-label">
+											<%= __("admin.faq.question_in_arabic"); %><span class="required"> *</span> :
+										</label>
+										<input type="text" id="question_in_arabic" class="form-control" name="question_in_arabic" value="<%=result.question.ar %>"/>
+									</div>
+									<span id="question_in_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="answer_in_english" class="control-label">
+											<%= __("admin.faq.answer_in_english"); %><span class="required"> *</span> :
+										</label>
+										<textarea rows="4" id="answer_in_english" class="form-control no-resize ckeditor"  name="answer_in_english"><%= result.answer.en; %></textarea>
+									</div>
+									<span id="answer_in_english_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="answer_in_arabic" class="control-label">
+											<%= __("admin.faq.answer_in_arabic"); %><span class="required"> *</span> :
+										</label>
+										<textarea rows="4" id="answer_in_arabic" class="form-control no-resize ckeditor"  name="answer_in_arabic"><%= result.answer.ar; %></textarea>
+									</div>
+									<span id="answer_in_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<button type="button" id="faq-edit-btn-id" class="btn bg-brown btn-sm waves-effect btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("admin.system.submit"); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>ckeditor/ckeditor.js"></script>
+	<script type="text/javascript">
+		/**
+		 * Function to change ckeditor height
+		 */
+		CKEDITOR.replace('answer_in_english', {
+			height: 600
+		});
+		CKEDITOR.replace('answer_in_arabic', {
+			height: 600
+		});
+		
+		/**
+		 * Function to submit form
+		 */
+		$('.btn-submit').click(function(){
+			updateCkeditorValue();
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('edit-faq',function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/**
+		 * Function to get sub category list
+		 */
+		 $('#category_id').on('change', function() {
+			var firstOptions = "<option value=''><%=__('admin.faq.select_sub_category');%></option>";
+			var parentId = $(this).val();
+			$("#sub_category_id").html(firstOptions);
+			$(".show-tick").selectpicker('refresh');
+
+			if(parentId){
+				var options = {
+					url 	: "<%=admin_list_url%>/sub_category",
+					data	: {parent_id : parentId},
+					method	: "post"
+				}
+				ajaxRequest(options,function(response){
+					if(response.status == "success"){
+						$("#sub_category_id").html(firstOptions+response.sub_category_list);
+						$(".show-tick").selectpicker('refresh');
+					}
+				});
+			}
+		});
+	</script>

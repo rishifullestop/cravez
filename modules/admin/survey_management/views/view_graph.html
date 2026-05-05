@@ -1,0 +1,120 @@
+<%
+    var result = response_result;
+    var colors = SURVEY_RESPONSE_CHART_COLOR;
+%>
+
+<div class="container-fluid">
+    <div class="row clearfix">
+        <a href="<%=WEBSITE_ADMIN_URL%>survey_management" class="pull-right survey-back-button">
+            <button type="button" class="btn btn-sm bg-indigo waves-effect">
+                <%= __('admin.system.back'); %>
+            </button>
+        </a>
+        <%
+            if(result.length>0){
+                result.map((viewRecords,index)=>{
+					let optionCount = 0;
+					viewRecords.options.map(optionRecords=>{
+						optionCount		+=	optionRecords.count;
+					});
+					%>
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                            <div class="card">
+                                <div class="header">
+                                    <div class="survey-question-type">
+                                        <span class="survey-question"><%=viewRecords._id%></span>
+                                    </div>
+                                    <div class="survey-given-options">
+                                        <%
+                                            let startIndex = 0;
+                                            viewRecords.options.map(optionRecords=>{
+                                                if(colors.length <= startIndex) startIndex = 0;
+                                                let optionPercentage	=	(optionRecords.count/optionCount)*100; 
+                                                if(isNaN(optionPercentage)) optionPercentage = 0;
+                                                %>
+                                                <div class="survey-options">
+                                                    <i class="color-code-class glyphicon glyphicon-stop" style="color: <%= colors[startIndex++] %>"></i>
+                                                    <%= optionRecords.option%> <%= '('+round(optionPercentage,ROUND_GRAPH_PRECISION)+'%)' %>
+                                                </div>
+                                            <% });
+                                        %>
+                                    </div>
+                                    <div id="piechart_<%=index%>" class="pie-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    <%
+                });
+            }else{ %>
+                <div class="col-lg-12 col-md-12">
+                    <div class="card">
+                        <div class="body text-center padding-80">
+                            <h3><%= __("admin.system.no_record_found")%></h3>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        %>
+    </div>
+</div>
+
+<%- contentFor("css") %>
+<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery.mCustomScrollbar.min.css">
+
+<%- contentFor("script") %>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>jquery.mCustomScrollbar.js"></script>
+<script type="text/javascript">
+var viewResult= <%- JSON.stringify(result)%>;
+var scrollWidth    = 4;
+var questionHeight = 50;
+var optionHeight   = 70;
+
+
+/** For goggle pieChart*/
+viewResult.map((records,index)=>{
+    var question       = records.question;
+    var questionOption = [['Options', 'Count']];
+    records.options.map((optionRecords)=>{
+        questionOption.push([optionRecords.option,optionRecords.count]);
+    });
+	google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable(questionOption);
+        var options = {
+            legend          : 'none',
+            pieSliceText    : 'percentage',
+            pieStartAngle   : 100,
+            chartArea:{
+                left  :"center",
+                top   : "center",
+                width : "75%",
+                height: "75%",
+            },
+            colors:<%- JSON.stringify(colors)%>,
+            sliceVisibilityThreshold:0
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart_'+index));
+        chart.draw(data, options);
+    }
+});
+
+// $(".survey-question-type").slimscroll({
+//     height: questionHeight + "px",
+//     size  : scrollWidth+"px"
+// });
+// $(".survey-given-options").slimscroll({
+//     height: optionHeight + "px",
+//     size  : scrollWidth + "px"
+// });
+$(".survey-question-type").mCustomScrollbar({
+    theme:"dark-3",
+});
+
+$(".survey-given-options").mCustomScrollbar({
+    theme:"dark-3",
+});
+
+</script>

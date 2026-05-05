@@ -1,0 +1,190 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by date of payment -->
+									<div class="col-xs-12 col-sm-5">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.unsettled_payments.search_by_date_of_payment'); %>" name="date-range-picker">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date"  type="text" name="to_date">
+										</div>
+									</div>
+									<!-- Search by settlement method -->
+									<div class="col-xs-12 col-sm-5">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick"  onchange="searchDatatable(1)" name="settlement_method" id="column_filter_1">
+													<option value=""><%= __("admin.unsettled_payments.search_by_settlement_method"); %></option>
+													<%-settlement_methods%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.unsettled_payments.payment_history"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.unsettled_payments.restaurant_name"); %></th>
+								<th><%= __("admin.unsettled_payments.settlement_method"); %></th>
+								<th><%= __("admin.unsettled_payments.paid_amount"); %></th>
+								<th><%= __("admin.unsettled_payments.date"); %></th>
+								<th><%= __("admin.unsettled_payments.proceed_by"); %></th>
+								<th><%= __("admin.unsettled_payments.remarks"); %></th>
+								<th><%= __("admin.unsettled_payments.beneficiary_name"); %></th>
+								<th><%= __("admin.unsettled_payments.iban"); %></th>
+								<th><%= __("admin.unsettled_payments.bank_account"); %></th>
+								<th><%= __("admin.unsettled_payments.cheque_number"); %></th>
+								<th><%= __("admin.unsettled_payments.cheque_date"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable	    =	"";
+		var dateFormatHtml	= 	'<%=DATE_FORMAT_HTML%>';
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[3, "desc"]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{   "data"		 : "restaurant_name",
+						"orderable"  : false,
+					},
+					{   "data"		 : "settlement_method_title",
+						"field_name" : "settlement_method",
+						"orderable"  : false
+					},
+					{   "data"		 : "pay_amount",
+						"render" 	 : function(payAmount){
+							payAmount = (payAmount) ? payAmount :0;
+							return currencyFormat(payAmount);
+						}
+					},
+					{
+						"data"	 : 'date_of_payment',
+						"render" : 	function(dateOfPayment){
+							return moment(dateOfPayment).tz(DEFAULT_TIME_ZONE).format(dateFormatHtml) ;
+						}
+					},
+					{   "data"		 : "proceed_by_name",
+						"orderable"  : false
+					},
+					{   "data"		 : 'remarks',
+						"orderable"	 : false,
+						"render"	 : function(remarks){
+							return (remarks) ? "<span class='readmore nl2br'>"+remarks+"</span>" :"";
+						}
+					},
+					{   "data"		 : "beneficiary_name",
+						"orderable"  : false
+					},
+					{   "data"		 : "iban",
+						"orderable"  : false
+					},
+					{   "data"		 : "bank_account_number",
+						"orderable"  : false
+					},
+					{   "data"		 : "cheque_number",
+						"orderable"  : false
+					},
+					{
+						"data"		 : 'cheque_date',
+						"orderable"  :  false,
+						"render" 	 : 	function(chequeDate){
+							return (chequeDate) ? moment(chequeDate).tz(DEFAULT_TIME_ZONE).format(dateFormatHtml) :"";
+						}
+					},
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>/unsettled_payment/payment_history/<%=restaurant_id%>",
+					type	: 	"POST",
+					data	: 	function (d) {
+						d.fromDate 	=   $('#from_date').val();
+				        d.toDate 	=   $('#to_date').val();
+				    },
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function( settings ) {
+					/** Description read more **/
+					readMore();
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+

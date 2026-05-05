@@ -1,0 +1,335 @@
+<%
+	var result	 = (typeof result !== typeof undefined && result)	    ?	result	  : "";
+	var userType = (typeof user_type !== typeof undefined && user_type)	?	user_type : "";
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by Driver ID -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_1" onkeyup="searchDatatable(1)" placeholder="<%= __('admin.user_management.search_by_driver_id'); %>" name="driver_id">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Driver Name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_2" onkeyup="searchDatatable(2)" placeholder="<%= __('admin.user_management.search_by_first_name'); %>" name="driver_name">
+											</div>
+										</div>
+									</div>
+									<!-- Search by User Name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_3" onkeyup="searchDatatable(3)" placeholder="<%= __('admin.user_management.search_by_user_name'); %>" name="email">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Phone number  -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_4" onkeyup="searchDatatable(4)" placeholder="<%= __('admin.user_management.search_by_phone_number'); %>" name="mobile_number">
+											</div>
+										</div>
+									</div>
+									<!-- Search by status -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="column_filter_5"  onChange="searchDatatable(5)" name="branch_status_search">
+													<option value=""><%=__("categories.search_by_status");%></option>
+														<%
+														Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).map(key=>{
+															let selected = (userType == key) ? 'selected' : '';
+															%>
+															<option value="<%=key%>" <%=selected%>>
+																<%= GLOBAL_STATUS_SEARCH_DROPDOWN[key].status_name%>
+															</option> <%
+														}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- datatable reset -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<button type="button" id="reset" data-href="<%=admin_list_url%>/list_driver" class="btn btn-danger btn-sm waves-effect"><%= __("admin.system.reset")%></button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.user_management.driver_management"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li class="<%= getPermissionClass(module_type,['driver_management','active_deactive_delete']); %>">
+							<select class="form-control show-tick m-t--8" id="driver_status">
+								<option value=""><%= __("admin.user_management.select_action"); %></option>
+								<option value="<%=DRIVER_ACTIVE%>"> <%= __("admin.user_management.mark_as_active"); %></option>
+								<option value="<%=DRIVER_DEACTIVE%>"> <%= __("admin.user_management.mark_as_deactive"); %></option>
+								<option value="<%=DRIVER_DELETE%>"> <%= __("admin.user_management.mark_as_delete"); %></option>
+							</select>
+						</li>
+						<li>
+							<a href="<%=admin_list_url%>/add_driver" class="<%= getPermissionClass(module_type,['driver_management','add']); %>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									 <%= __('admin.user_management.add_driver'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="2%" class="p-r-10 text-center" >
+									<div class="materialize_checkbox">
+										<input type="checkbox" class="filled-in chk-col-indigo" id="driver_select_all">
+										<label for="driver_select_all" class="p-l-20 v-align-bottom m-b-0"></label>
+									</div>
+								</th>
+								<th width="12%"><%= __("admin.user_management.driver_id"); %></th>
+								<th width="15%"><%= __("admin.user_management.full_name"); %></th>
+								<th width="15%"><%= __("admin.user_management.user_name"); %></th>
+								<th width="20%"><%= __("admin.user_management.phone_number"); %></th>
+								<th width="10%"><%= __("admin.system.status"); %></th>
+								<th width="10%"><%= __("admin.system.modified"); %></th>
+								<th width="10%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable 			="";
+		var driverCheckboxArray = {};
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem('DataTables', JSON.stringify(oData));
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse(localStorage.getItem('DataTables'));
+				},
+				"order"		: 	[[6, "desc"]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":   PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ 	"data"		: {},
+						"orderable" : false,
+						"render" 	: 	function(result){
+							let driverId = (result._id) ? 	result._id :"";
+
+							return '<div class=" materialize_checkbox p-l-15">'+
+								'<div class="driverCheckbox_wrapper">'+
+									'<input type="checkbox" class="filled-in chk-col-indigo" id="'+driverId+'">'+
+									'<label for="'+driverId+'" class="checkbox data"></label>'+
+								'</div>'+
+							'</div>';
+						}
+					},
+					{"data": 'driver_id' },
+					{
+						"data"		: 'full_name',
+						"orderable"	: false,
+					},
+					{
+						"data"		: 'email',
+						"render" 	: function(email){
+							return 	(email)	? '<a href="mailto:'+email+'">'+email+'</a>' :email;
+						}
+					},
+					{"data": 'mobile_number' },
+					{
+						"data"			: 'active',
+						"orderable"		: false,
+						"field_type"	: "<%= NUMERIC_FIELD %>",
+						"render": function(active){
+							let html = (active && active == "<%=ACTIVE%>")	? '<span class="label label-success m-l-5 m-t-5"><%=__("admin.system.active")%></span>': '<span class="label label-danger m-l-5 m-t-5"><%=__("admin.system.inactive")%></span>';
+							return html;
+						}
+					},
+					{
+						"data"			: 'modified',
+						"searchable"	: false,
+						"render" 		: function(modified){
+							return moment(modified).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+						}
+					},
+					{
+						"data"			: {},
+						"orderable"		: false,
+						"searchable"	: false,
+						"render" 		: function(result){
+							var id 					= (result._id) 		? result._id 											: "";
+							var status				= (result.active)	? result.active											: "<%=DEACTIVE%>";
+							/** Status Link  **/
+							var statusLinkText  = (status == "<%= DEACTIVE %>") ? "<%= __('admin.system.activate'); %>"				: "<%= __('admin.system.deactive'); %>" ;
+							var statusLinkTitle = (status == "<%= DEACTIVE %>") ? "<%= __('admin.system.click_to_activate'); %>"  	: "<%= __('admin.system.click_to_deactivate'); %>" ;
+							var statusLinkIcon  = (status == "<%= DEACTIVE %>") ? "done"	: "block";
+
+							var dropDownButton 		=	''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %> '+
+									'<span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/edit_driver/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["driver_management","edit"]); %>">'+
+											' <%= __("admin.system.edit"); %>'+
+										'</a>'+
+									'</li>'+
+									/** View Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/view_driver/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["driver_management","view"]); %>">'+
+											' <%= __("admin.system.view"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Status Link  **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/update-driver-status/'+id+'/'+status+'" class=" waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["driver_management","active_deactive"]); %>" data-confirm-message="<%= __("admin.user_management.you_want_to_change_driver_status"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+statusLinkTitle+'">'+
+											''+
+											statusLinkText+
+										'</a>'+
+									'</li>'+
+									/** Manage Vehicle Link  **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/manage_vehicle/'+id+'" target="_blank" class="waves-effect waves-block <%= getPermissionClass(module_type,["driver_management","manage_vehicle"]); %>">'+
+											' <%= __("admin.user_management.manage_vehicle"); %>'+
+										'</a>'+
+									'</li>';
+									/** Delete Link */
+									dropDownButton +='<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete_driver/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["driver_management","delete"]); %>" data-confirm-message="<%= __("admin.user_management.you_want_to_delete_this_driver"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+											'<%= __("admin.system.delete"); %>'+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+						}
+					}
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>/list_driver?user_type=<%=user_type%>",
+					type	: "POST",
+					data: function (d) {
+
+					},
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+			});
+
+			/**check/uncheck checkbox select all check/uncheck*/
+			$(document).on('change','#driver_select_all',function(){
+				var isChecked	= $(this).is(':checked');
+				$('.driverCheckbox_wrapper input[type="checkbox"]').not(":disabled").prop("checked",isChecked).trigger("change");
+			});
+
+			/**Check/Uncheck checkbox*/
+			$(document).on('change','.driverCheckbox_wrapper input[type="checkbox"]',function(){
+				var id          = $(this).attr('id');
+				var isChecked	= $(this).is(':checked');
+				if(isChecked){
+					driverCheckboxArray[id] = true;
+				}else{
+					delete driverCheckboxArray[id];
+				}
+				var totalCheckBox = $('.driverCheckbox_wrapper input[type="checkbox"]').not(":disabled").length;
+				var checkedBox = $('.driverCheckbox_wrapper input[type="checkbox"]:checked').length;
+				let selectAll = (totalCheckBox == checkedBox) ? true : false;
+				$("#driver_select_all").prop("checked",selectAll);
+			});
+
+			/**Check/Uncheck checkbox*/
+			$(document).on('change','#driver_status',function(){
+				var status = $(this).val();
+				if(status){
+					var driverIdArray = Object.keys(driverCheckboxArray);
+
+					if(driverIdArray.length < 1){
+						notice("<%= STATUS_ERROR %>","<%= __('admin.user_management.please_select_atleast_one_driver')%>");
+						return false;
+					}
+
+					/** Confirm  box **/
+					confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.user_management.you_want_perform_this_action"); %>',function(result){
+						if(result){
+							/** Call ajax */
+							ajaxRequest({
+								url 	: 	"<%=list_url%>/update-multiple-driver-details",
+								data	: 	{driver_ids: driverIdArray.join(","), status: status},
+								method	:	"post"
+							},function(response){
+								if(response.status && response.message) notice(response.status,response.message);
+								dataTable.ajax.reload(null, false);
+								driverIdArray = {};
+								$("#driver_select_all").prop("checked",false);
+								swal.close();
+							});
+						}else{
+							swal.close();
+						}
+					});
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

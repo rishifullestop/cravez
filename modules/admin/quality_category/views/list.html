@@ -1,0 +1,278 @@
+<div class="container-fluid" id="main-container" >
+	<%  if(breadcrumbData && breadcrumbData.length > 0 ){  %>
+		<ol class="hide" id="custome_breadcrumb" >
+			<li>
+				<a href="<%= WEBSITE_ADMIN_URL %>"><%= __("system.home") %></a></li>
+			<li>
+				<a href="<%=admin_list_url%>">
+					<%= __("admin.quality_category.categories") %>
+				</a>
+			</li>
+			<% breadcrumbData.map(val => {
+				if((String(category_id) == ((val.category_id) ? String(val.category_id) :''))) { %>
+					<li ><%= val.category_name %>  </li>
+				<% }else{ %>
+					<li> <a href="<%=admin_list_url%>/<%= (val.category_id) ? val.category_id :'' %>"> <%= val.category_name %> </a></li>
+			<% }
+			}); %>
+		</ol>
+    <%  } %>
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<i class="material-icons">search</i> <%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by question -->
+									<div class="col-xs-12 col-sm-5">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.category.search_by_category'); %>" name="question">
+											</div>
+										</div>
+									</div>
+									<div class="col-md-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.quality_category.category_management"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm">
+						<%  if(breadcrumbData && breadcrumbData.length > 0 ){  %>
+							<li>
+								<a href="<%=admin_list_url+'/'%><%= id %>">
+									<button type="button" class="btn btn-sm bg-red waves-effect">
+										<%= __("admin.system.back"); %>
+									</button>
+								</a>
+							</li>
+						<%  } 
+						if(breadcrumbData && breadcrumbData.length > 1){  
+						%>
+							<li>
+								<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add/'+(typeof category_id !== typeof undefined ? category_id : '')%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['quality_category','add']); %>">
+									<button type="button" class="btn bg-indigo waves-effect btn-sm">
+										<%= __("admin.category.add_category"); %>
+									</button>
+								</a>
+							</li>
+						<%  
+						} 
+						%>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								<i class="material-icons">more_vert</i>
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li>
+									<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['category','add']); %>">
+										<button type="button" class="btn bg-indigo waves-effect btn-sm">
+											<%= __("admin.category.add_category"); %>
+										</button>
+									</a>
+								</li>
+								<%  if(breadcrumbData && breadcrumbData.length > 0 ){  %>
+									<li>
+										<a href="<%=admin_list_url+'/'%><%= id %>">
+											<button type="button" class="btn bg-indigo waves-effect">
+												<i class="material-icons font-14">keyboard_backspace</i> <%= __("admin.system.back"); %>
+											</button>
+										</a>
+									</li>
+								<%  } %>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="25%"><%= __("admin.category.category_name");%></th>
+								<% if(CATEGORY_ADD_ORDER ==  true) { %>
+									<th width="25%"><%= __("admin.system.order");%></th>
+								<%	} %>
+								<% if(breadcrumbData && breadcrumbData.length > 1) {  %>
+									<th width="25%"><%= __("admin.quality_category.category_percentage");%></th>
+								<%	} %>
+								<th width="25%"><%= __("admin.system.modified");%></th>
+								<th width="25%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--Model Box to Add multi level categorys -->
+<div class="container">
+	<div class="modal fade" id="openCategoryModal" role="dialog">
+	   <div class="modal-dialog" >
+	      <!-- Modal content-->
+	      	<div class="modal-content add_category_form">
+	      	</div>
+	   </div>
+	</div>
+</div>
+<!--End Model Box to Add multi level categorys -->
+
+<%- contentFor('css') %>
+    <link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var statusObject 	= 	<%- JSON.stringify(GLOBAL_STATUS_SEARCH_DROPDOWN)%>;
+		var dataTable		=	"";
+		var GLOBAL_CATEGORTY_DROPDOWN 	= 	<%- JSON.stringify(GLOBAL_CATEGORTY_DROPDOWN)%>;
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+
+
+					{ "data": 'category_name' },
+
+					<% if(CATEGORY_ADD_ORDER) { %>
+							{ "data": 'order' },
+					<%	} %>
+					<% if(breadcrumbData && breadcrumbData.length > 1 )  {  %>
+
+							{  
+								"data":'category_percentage',
+							},
+
+					<%	} %>
+
+					{
+						"data"			: 	'modified',
+						"searchable"	: 	false,
+						"render" 		: 	function(modified){
+							return moment(modified).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+
+							var id 		=	(result._id)		? 	result._id 		 :'';
+							var parentaCategoryId 		=	(result.parent_category_id)	? result.parent_category_id :'';
+							var status	=	(result.is_active)	? 	result.is_active :'<%= DEACTIVE %>';
+
+							/** Status link text, title and  link icon **/
+							var statusLinkText  =	(status == '<%= DEACTIVE %>') ? "<%= __('admin.system.active'); %>"			   :"<%= __('admin.system.deactive'); %>";
+							var statusLinkTitle	=  	(status == '<%= DEACTIVE %>') ? "<%= __('admin.system.click_to_activate'); %>" :"<%= __('admin.system.click_to_deactivate'); %>" ;
+							var statusLinkIcon  =	(status == '<%= DEACTIVE %>') ?	"done"	: "block";
+
+							var dropDownButton 		=	''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %> '+
+									'<span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu width-180">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/'+id+'/'+parentaCategoryId+'" class="waves-effect action-btn waves-block <%= getPermissionClass(module_type,["quality_category","edit"]); %>" data-open-modal="true">'+
+											' <%= __("admin.category.edit"); %>'+
+										'</a>'+
+									'</li>'+
+									<%  if(breadcrumbData && breadcrumbData.length < SUB_CATEGORY_BUTTON_LEVEL_TO_HIDE-1 ){  %>
+									'<li>'+
+										'<a href="<%=admin_list_url%>/'+id+'" class="waves-effect waves-block">'+
+											' <%= __("admin.category.sub_category"); %>'+
+										'</a>'+
+									'</li>'+
+									<%  } %>
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+						}
+					}
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%><%= typeof category_id !== typeof undefined ? '/'+category_id : '';%>",
+					type	: 	"POST",
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+
+	<script type="text/javascript">
+		$(document).on('click', '.addCategory', function(event) {
+    		event.preventDefault();
+    		var links = $(this).attr('data-href');
+    		var id 	 = ($(this).attr('data-id')) ? $(this).attr('data-id'): "" ;
+			$.ajax({
+				url:  links,
+				success:function(data){
+					$('.add_category_form').html("");
+					$('.add_category_form').append(data);
+				}
+			});
+			$('#openCategoryModal').modal('show');
+	    });
+
+		$(document).ready(function(event) {
+			$( ".breadcrumb" ).html( $('#custome_breadcrumb').html() );
+			$( ".breadcrumb li" ).find( "i" ).addClass( "hide" );
+		});
+	</script>

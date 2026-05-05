@@ -1,0 +1,51 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.contact.contact_details'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>">
+								<button type="button" class="btn bg-indigo waves-effect">
+									<i class="material-icons font-14">keyboard_backspace</i> <%= __("admin.system.back"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body table-responsive">
+					<table class="row-border hover table table-bordered" cellspacing="0" width="100%">
+						<tr>
+							<th class="text-right" width="20%"><%= __('admin.contact.name'); %></th>
+							<td><%=(typeof result !== typeof undefined &&  result.name) ? result.name : 'N/A'%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.contact.email'); %></th>
+							<td><%- (typeof result !== typeof undefined &&  result.email) ? '<a href="mailto:'+result.email+'">'+result.email+'</a>' : 'N/A'%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.contact.phone'); %></th>
+							<td>
+								<%
+									var phoneNumber = 	(typeof result !== typeof undefined &&  result.phone)	?	result.phone	:"";
+								%>
+								<%=phoneNumber%>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.contact.messages'); %></th>
+							<td><span><%-(typeof result !== typeof undefined &&  result.message) ? nl2br(result.message) : 'N/A'%></span></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.system.created'); %></th>
+							<td><span class="setDateTimeFormat" data-date-time="<%= (typeof result !== typeof undefined &&  result.created) ? result.created : '';%>"></span></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

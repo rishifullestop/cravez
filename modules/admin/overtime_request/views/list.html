@@ -1,0 +1,252 @@
+<%
+let isCravez   = (auth.user_role_id == CRAVEZ) ? true : false;
+%>
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm">
+								<div class="row clearfix dataTables_wrapper">
+									<% if(isTeamHead || isCravez) {  %>
+										<% if(isCravez) { %>
+											<div class="col-xs-12 col-sm-3">
+												<div class="form-group">
+													<div class="form-line">
+														<select class="form-control" id="column_filter_6" onchange="searchDatatable(6)" name="teams">
+														<option value=""><%= __('admin.overtime_request.select_team_leader'); %></option>
+														<%- team_list %>
+														</select>
+													</div>
+												</div>
+											</div>
+										<% } %>
+										<!-- Search by Team Member -->
+										<div class="col-xs-12 <%= (isCravez) ? 'col-sm-3' : 'col-sm-5'%>">
+											<div class="form-group">
+												<div class="form-line">
+													<select id="column_filter_0"  onchange="searchDatatable(0)" class="form-control show-tick" name="user_id" data-live-search="true">
+														<option value=""><%- __('admin.overtime_request.search_by_team_member')%></option>
+														<%-users_list%>
+													</select>
+												</div>
+											</div>
+										</div>
+									<% } %>
+									<!-- Search by Request Date -->
+									<div class="col-xs-12 <%= (isCravez) ? 'col-sm-3' : 'col-sm-5'%>">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.overtime_request.search_by_request_date'); %>" >
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- Reset button -->
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.overtime_request.overtime_request"); %>
+					</h2>
+					<% if(!isCravez) { %>
+						<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+							<% if(isTeamHead) {  %>
+							<li>
+								<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['overtime_request','add'])%>">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("admin.overtime_request.add_overtime_request"); %>
+									</button>
+								</a>
+							</li>
+							<% } %>
+						</ul>
+						<!-- Only For Mobile View-->
+						<ul class="header-dropdown m-r--5 visible-xs">
+							<li class="dropdown">
+								<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+									<i class="material-icons">more_vert</i>
+								</a>
+								<ul class="dropdown-menu pull-right m-w-200">
+									<li>
+										<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['overtime_request','add'])%>">
+											<button type="button" class="btn btn-sm bg-indigo waves-effect">
+												<%= __("admin.overtime_request.add_overtime_request"); %>
+											</button>
+										</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					<% } %>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<% if(isTeamHead || isCravez) {  %>
+								<th width="20%"><%= __("admin.overtime_request.team_member");%></th>
+								<% } %>
+								<th><%= __("admin.overtime_request.request_date");%></th>
+								<th><%= __("admin.overtime_request.hours");%></th>
+								<th><%= __("admin.overtime_request.overtime_start_time");%></th>
+								<th><%= __("admin.overtime_request.overtime_end_time");%></th>
+								<th><%= __("admin.overtime_request.purpose");%></th>
+								<% if(isCravez){%>
+									<th></th>
+								<% }%>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript">
+
+		/** Function to initialize datatable and get server side data*/
+		var dateFormatHtml	= 	'<%=DATE_FORMAT_HTML%>';
+		var isCravez		= 	<%=isCravez%>;
+		var dataTable	   	=	"";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[1, "desc" ]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					<% if(isTeamHead || isCravez) {  %>
+					{ 	"data"		 : 'team_member_name',
+						"field_type" : "<%=OBJECT_ID_FIELD %>",
+						"field_name" : "user_id",
+						"orderable"	 : false
+					},
+					<% }%>
+					{
+						"data"	 : 	'request_date',
+						"render" : 	function(request_date){
+							return moment(request_date).tz(DEFAULT_TIME_ZONE).format(dateFormatHtml) ;
+						}
+					},
+					{
+						"data"	: 'hours',
+						"render": function(hours){
+							return set24HourFormat(hours);
+						}
+					},
+					{
+						"data" 		 : 'from_time',
+						"searchable" : false,
+						"render"     : function(fromTime){
+							return fromTime ? set24HourFormat(fromTime) : "";
+						}
+					},
+					{
+						"data" 		  : 'to_time',
+						"searchable"  : false,
+						"render"      : function(toTime){
+							return toTime ? set24HourFormat(toTime) : "";
+						}
+					},
+					{ 	"data"	: 'purpose',
+						"render": function(purpose){
+							return (purpose) ? "<span class='readmore'>"+purpose+"</span>" :"N/A";
+						}
+					},
+					<% if(isCravez){ %>
+						{"data"	: 'parent_id',visible :false, field_type : "<%=OBJECT_ID_FIELD%>"},
+					<% } %>
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>",
+					type	: 	"POST",
+					data	: 	function (d) {
+				        d.fromDate 	   = $('#from_date').val();
+				        d.toDate 	   = $('#to_date').val();
+				    },
+					dataSrc	: 	function(res){
+						if(isCravez) addMembers(res.team_members);
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function( settings ) {
+					/** Description read more **/
+					readMore();
+				}
+			});
+		});
+
+		/** Function to show members*/
+		function addMembers(teamMembers){
+			$("#column_filter_0").html("");
+			$("#column_filter_0").append('<option value=""><%- __("admin.overtime_request.search_by_team_member")%></option>');
+			if(teamMembers){
+				$("#column_filter_0").append(teamMembers);
+				if(localStorage["search_" +window.location.pathname]){
+					let searchFormData = JSON.parse(localStorage["search_" +window.location.pathname]);
+					for(index in searchFormData){
+						if(searchFormData[index].name && searchFormData[index].name == "user_id" && searchFormData[index].value){
+							$("#column_filter_0").val(searchFormData[index].value);
+						}
+					}
+				}
+			}
+			$("#column_filter_0").selectpicker("refresh");
+		}
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

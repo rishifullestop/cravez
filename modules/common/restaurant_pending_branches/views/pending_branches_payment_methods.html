@@ -1,0 +1,113 @@
+<%
+var result 			= 	(typeof result !== typeof undefined && result) 		?	result 		:[];
+var branchId 		=	(typeof branch_id !== typeof undefined && branch_id)?	branch_id 	:"";
+var restaurantId 	=	(typeof restaurant_id !== typeof undefined && restaurant_id)  ?	restaurant_id 	:"";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="body">
+			<table id="datatable-payment-method-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+				<thead>
+					<tr>
+						<th width="50%"><%= __("pending_branches_payment_methods.name_in_en");%></th>
+						<th><%= __("pending_branches_payment_methods.name_in_ar");%></th>
+						<th width="3%">
+							<%= __("pending_branches_payment_methods.assigned");%>
+						</th>
+					</tr>
+				</thead>
+			</table>
+			<div class="row m-t-10 text-right">
+				<div class="col-sm-12">
+					<button type="button" class="btn btn-sm bg-brown waves-effect assign_all_payment freezed_event hideMe">
+						<%= __("system.submit"); %>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var paymentCheckboxArray = {};
+	$(document).ready(function() {
+		/** Call to freezed event **/
+		updateFreezedEvent();
+
+		var dataTable = $('#datatable-payment-method-listing').DataTable({
+			"order"		: 	[[0,"asc"]],
+			//"sDom"		:	"tr",
+			"searching"	:	true,
+			"paging": false,
+			"info": false,
+			"serverSide": 	false,
+			"scrollX"	: 	true,
+			"data"		:	JSON.parse('<%-JSON.stringify(result); %>'),
+			"columns"	: 	[
+				{ 	"data"		 : 'title.en',
+					"orderable"	 : false,
+				},
+				{ 	"data"		 : 'title.ar',
+					"orderable"	 : false,
+				},
+				{ 	"data"		: {},
+					"orderable" : false,
+					"render" 	: 	function(result){
+						let paymentSlug	= (result.slug) 		? 	result.slug :"";
+						var checkedFlag	= (result.is_selected) 	?	"checked" 	:"";
+
+
+						return '<div class=" materialize_checkbox p-r-25">'+
+							'<div class="paymeny_listing">'+
+								'<input type="checkbox" class="filled-in chk-col-indigo " id="'+paymentSlug+'"  '+checkedFlag+'>'+
+								'<label for="'+paymentSlug+'" class="checkbox data"></label>'+
+							'</div>'+
+						'</div>';
+					}
+				},
+			],
+
+		});
+
+		/** To get aleardy selected method */
+		$('.paymeny_listing input[type="checkbox"]:checked').each(function(){
+			if($(this).attr("id")){
+				paymentCheckboxArray[$(this).attr("id")] = true;
+			}
+		});
+
+		/**Check/Uncheck checkbox*/
+		$(document).off("change",".paymeny_listing input[type='checkbox']");
+		$(document).on('change','.paymeny_listing input[type="checkbox"]',function(){
+			var id          = $(this).attr('id');
+			var isChecked	= $(this).is(':checked');
+			if(isChecked){
+				paymentCheckboxArray[id] = true;
+			}else{
+				delete paymentCheckboxArray[id];
+			}
+			var totalCheckBox = $('.paymeny_listing input[type="checkbox"]').not(":disabled").length;
+			var checkedBox = $('.paymeny_listing input[type="checkbox"]:checked').length;
+		});
+
+		/** To update status for all selected method */
+		$('.assign_all_payment').click(function(){
+			var methods = Object.keys(paymentCheckboxArray);
+
+			if(methods.length < 1){
+				notice("<%= STATUS_ERROR %>","<%= __('pending_branches_payment_methods.please_select_atleast_one_payment_method')%>");
+				return false;
+			}
+
+			/** Ajax options */
+			var options = {
+				url 	: 	"<%=list_url+'/save_payment_methods/'+branchId%>",
+				data	: 	{methods: methods,restaurant_id :"<%=restaurantId%>"},
+				method	:	"post"
+			};
+			ajaxRequest(options,function(response){
+				if(response.status && response.message) notice(response.status,response.message);
+			});
+		});
+	});
+</script>

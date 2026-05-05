@@ -1,0 +1,647 @@
+<%
+	var deliveryType	= 	result.delivery_type;
+	var restaurantStatus= 	result.restaurant_status;
+	var isCompleted		= 	(result.is_completed) ? result.is_completed :false;
+	var isRestDelivery	=	(deliveryType == DELIVERY_BY_RESTAURANT)? true :false;
+	var	isPickUp		=	(deliveryType == DELIVERY_BY_PICK_UP)	? true :false;
+    var openingTime 	= 	(settings["App.opening_time"]) ? settings["App.opening_time"]  :"";
+    var closingTime		= 	(settings["App.closing_time"]) ? settings["App.closing_time"]  :"";
+	var preparationTime =  (orderDetails.preparation_time) ? orderDetails.preparation_time :"";
+	var orderDate       =  (result.order_date) ? result.order_date :"";
+	var showMidifyBtn   =  (result.is_modified || result.is_completed) ? false :true;
+	if(preparationTime){
+		var preparationMin = (preparationTime/MAX_ORDER_MODIFY_DIVIDED)/MINUTES_IN_A_HOUR;
+		var finalTime      = newDate(addDaysToDate(preparationMin,orderDate));
+		var currentTime    = newDate();
+        if(finalTime > currentTime) showMidifyBtn = false;
+	}
+    if((openingTime || closingTime) && showMidifyBtn){
+		var currentDate  = newDate("",DATABASE_DATE_FORMAT);
+		var currentTime  = newDate();
+		var appOpenTime  = newDate(currentDate+" "+openingTime);
+		var appCloseTime = newDate(currentDate+" "+closingTime);
+        showMidifyBtn    = false;
+
+		if(currentTime < appOpenTime || currentTime > appCloseTime){
+			showMidifyBtn = true;
+		}
+	}
+
+	var isStatusChanged= (restaurantStatus ==  ORDER_PENDING  || restaurantStatus==  ORDER_PREPARING  ||
+	(restaurantStatus==  ORDER_READY_TO_PICK_UP && !isRestDelivery) || (isRestDelivery || isPickUp)) ? true :false;
+
+	if(restaurantStatus == ORDER_DELIVERED || restaurantStatus == ORDER_REJECTED || restaurantStatus == ORDER_CANCELLED){
+		showMidifyBtn 	= false;
+		isStatusChanged = false;
+	}
+
+	let labelClass = "";
+	let labelText = "";
+	if(restaurantStatus && ORDER_STATUS_TYPES[restaurantStatus]){
+		labelClass 	= ORDER_STATUS_TYPES[restaurantStatus].label_class;
+		labelText 	= ORDER_STATUS_TYPES[restaurantStatus].status_name;
+		if(ORDER_STATUS_TYPES[restaurantStatus].restaurant_status_name){
+			labelText = ORDER_STATUS_TYPES[restaurantStatus].restaurant_status_name;
+		}
+	}
+
+	var addressDetail 	=  (orderDetails.customer_address_detail) ? orderDetails.customer_address_detail :{};
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('orders.order_info'); %>
+					</h2>
+					<ul class="action-btn-container header-dropdown m-r--5"><%
+						if(!isCompleted){
+							if(restaurantStatus != ORDER_ON_THE_WAY && isRestDelivery){ %>
+								<li>
+									<a href="javascript:void(0);" class=" text-decoration-none open-captain-modal <%= getPermissionClass(module_type,['orders','update_order_status']);%>" data-id="<%=result._id%>" >
+										<button type="button" class="btn bg-orange waves-block btn-sm waves-effect 	noHover margin-0">
+											<%= __('orders.assign_captain') %>
+										</button>
+									</a>
+								</li><%
+							}
+
+							if(isStatusChanged){ %>
+								<li>
+									<a href="<%=list_url+'/view/'+result._id%>"  data-action-url="<%=list_url+'/change_order_status/'+result._id%>" class=" action-btn <%= getPermissionClass(module_type,['orders','update_order_status']); %>" data-open-modal="true" >
+										<button type="button" class="btn bg-brown btn-sm waves-block waves-effect 	noHover margin-0">
+											<%= __('orders.change_order_status') %>
+										</button>
+									</a>
+								</li>
+							<% }
+						}%>
+					</ul>
+				</div>
+				<div class="body table-responsive" id="aniimated-thumbnials">
+					<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.branch_id'); %></th>
+							<td><%= (result.branch_detail) ? result.branch_detail.name[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.order_id'); %></th>
+							<td><%= (result.unique_order_id) ? result.unique_order_id :"N/A";%></td>
+						</tr>
+                        <tr>
+							<th class="text-right" width="25%"><%= __('orders.order_status'); %></th>
+							<td> <span class="label <%=labelClass%>"><%=labelText%></span></td>
+						</tr> <%
+						if(ORDER_REASON_STATUS.indexOf(restaurantStatus) != -1 && result.rejection_reason){ %>
+							<tr>
+								<th class="text-right" width="25%"><%= __('orders.rejection_field'); %></th>
+								<td><%= result.rejection_reason;%></td>
+							</tr><%
+						} %>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.captain_id'); %></th>
+							<td><%= (result.delivery_detail && result.delivery_detail.title) ? result.delivery_detail.title :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.client_name'); %></th>
+							<td><%= (result.customer_detail && result.customer_detail.full_name) ? result.customer_detail.full_name :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.mobile_number'); %></th>
+							<td><%= (result.customer_detail && result.customer_detail.mobile_number) ? result.customer_detail.mobile_number :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.payment_method'); %></th>
+							<td><%= (typeof orderDetails.payment_title !== typeof undefined) ? orderDetails.payment_title[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.order_time'); %></th>
+							<td><span class="setDateTimeFormat" data-date-time="<%= (result.order_date) ? result.order_date : '';%>"></span></td>
+						</tr>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.delivery_time'); %></th>
+							<td><%
+								let minutes		=	(orderDetails.delivery_duration) ? orderDetails.delivery_duration/MINUTES_IN_A_HOUR :'';
+								let deliveryTime=	(minutes && result.order_date) ? addDaysToDate(minutes,result.order_date) : '';
+							%>
+								<span class="setDateTimeFormat" data-date-time="<%= (deliveryTime) ? deliveryTime : '';%>"></span>
+							</td>
+						</tr><%
+						if(orderDetails.branch_discount){ %>
+							<tr>
+								<th class="text-right" width="25%"><%= __('orders.branch_discount'); %></th>
+								<td><%= (typeof orderDetails.branch_discount !== typeof undefined) ? currencyFormat(orderDetails.branch_discount) :"";%></td>
+							</tr>
+							<tr>
+								<th class="text-right" width="25%"><%= __('orders.branch_discount_type'); %></th>
+								<td><%= (typeof orderDetails.branch_discount_type !== typeof undefined) ? BRANCH_DISCOUNT_TYPE[orderDetails.branch_discount_type] :"";%></td>
+							</tr><%
+						}
+						if(orderDetails.branch_extra_charge){ %>
+							<tr>
+								<th class="text-right" width="25%"><%= __('orders.branch_extra_charge'); %></th>
+								<td><%=  currencyFormat(orderDetails.branch_extra_charge);%></td>
+							</tr> <%
+						} %>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.net_amounts'); %></th>
+							<td><%= (typeof orderDetails.net_amount !== typeof undefined) ? currencyFormat(orderDetails.net_amount) :"";%></td>
+						</tr><%
+						if(orderDetails.additional_tax && typeof orderDetails.additional_tax !== typeof undefined){ %>
+							<tr>
+								<th class="text-right" width="25%"><%= __('orders.additional_tax'); %></th>
+								<td><%= (typeof orderDetails.additional_tax !== typeof undefined) ? currencyFormat(orderDetails.additional_tax) :"";%></td>
+							</tr><%
+						} %>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.delivery_fee'); %></th>
+							<td><%= (typeof orderDetails.delivery_fee !== typeof undefined) ? currencyFormat(orderDetails.delivery_fee) :"";%></td>
+						</tr>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.discount_value'); %></th>
+							<td><%= (typeof orderDetails.discount_price !== typeof undefined) ? currencyFormat(orderDetails.discount_price) :"";%></td>
+						</tr>
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.total_order_amount'); %></th>
+							<td><%= (typeof orderDetails.total_amount !== typeof undefined) ? currencyFormat(orderDetails.total_amount) :"";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.amount_debited_by_wallet'); %></th>
+							<td><%= (typeof result.amount_debited_by_wallet !== typeof undefined) ? currencyFormat(result.amount_debited_by_wallet) :currencyFormat(0);%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.order_notes'); %></th>
+							<td><%= (typeof result.request_note !== typeof undefined) ? result.request_note :"";%></td>
+						</tr>
+						<%  if(result.captain_id) { %>
+							<tr>
+								<th class="text-right" width="25%"><%= __('orders.captain_name'); %></th>
+								<td><%= (result.captain_detail && result.captain_detail.full_name) ? result.captain_detail.full_name :"N/A";%></td>
+							</tr>
+							<tr>
+								<th class="text-right" width="25%"><%= __('orders.captain_vehicle_detail'); %></th>
+								<td><%= (result.captain_detail && result.captain_detail.vehicle_type) ? VEHICLE_TYPE[result.captain_detail.vehicle_type] :"N/A";%>&nbsp;&nbsp;<%= (result.captain_detail && result.captain_detail.vehicle_number) ? result.captain_detail.vehicle_number :"N/A";%></td>
+							</tr>
+							<tr>
+								<th class="text-right" width="25%"><%= __('orders.captain_mobile_number'); %></th>
+								<td><%= (result.captain_detail && result.captain_detail.mobile_number) ? result.captain_detail.mobile_number :"N/A";%></td>
+							</tr>
+						<% } %>
+					</table>
+				</div>
+			</div>
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('orders.delivery_detail_address'); %>
+					</h2>
+				</div>
+				<div class="body table-responsive" id="aniimated-thumbnials">
+					<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+						<tr>
+							<th class="text-right" width="25%"><%= __('orders.first_name'); %></th>
+							<td><%= (addressDetail.first_name) ? addressDetail.first_name :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.last_name'); %></th>
+							<td><%= (addressDetail.last_name) ? addressDetail.last_name :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.phone_number'); %></th>
+							<td><%= (addressDetail.mobile_number) ? addressDetail.mobile_number :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.landline_number'); %></th>
+							<td><%= (addressDetail.landline_number) ? addressDetail.landline_number :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.address_title'); %></th>
+							<td><%= (addressDetail.address_title) ? addressDetail.address_title :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.city'); %></th>
+							<td><%= (addressDetail.city_name) ? addressDetail.city_name[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.area'); %></th>
+							<td><%= (addressDetail.area_name) ? addressDetail.area_name[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.block'); %></th>
+							<td><%= (addressDetail.block_name) ? addressDetail.block_name[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.street'); %></th>
+							<td><%= (addressDetail.street) ? addressDetail.street :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.address_type'); %></th>
+							<td><%= (addressDetail.address_type) ? addressDetail.address_type :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.building_number'); %></th>
+							<td><%= (addressDetail.building_number) ? addressDetail.building_number :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.floor_number'); %></th>
+							<td><%= (addressDetail.floor_number) ? addressDetail.floor_number :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.flat_number'); %></th>
+							<td><%= (addressDetail.flat_number) ? addressDetail.flat_number :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.jadda'); %></th>
+							<td><%= (addressDetail.jadda) ? addressDetail.jadda :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('orders.venue'); %></th>
+							<td><%= (addressDetail.venue) ? addressDetail.venue :"N/A";%></td>
+						</tr>
+
+						<tr>
+							<th class="text-right" ><%= __('orders.delivery_latitude'); %></th>
+							<td><%= (orderDetails.customer_latitude) ? orderDetails.customer_latitude :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right" ><%= __('orders.delivery_longitude'); %></th>
+							<td><%= (orderDetails.customer_longitude) ? orderDetails.customer_longitude :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right" ><%= __('orders.additional_directions'); %></th>
+							<td><%= (orderDetails.additional_directions) ? orderDetails.additional_directions :"N/A";%></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('orders.order_item'); %>
+					</h2>
+					<% if(showMidifyBtn){ %>
+					   <ul class="header-dropdown m-r--5 btn-right-top-margin">
+						    <li>
+							    <a href="javascript:void(0);" class="modify_order <%= getPermissionClass(module_type,['modify_orders','modify']); %>">
+								    <button type="button" class="btn btn-sm bg-indigo waves-effect">
+								      <%= __('admin.orders.modify_order'); %>
+							       </button>
+						        </a>
+							</li>
+						    <li><a href="javascript:void(0);" data-confirm-message="<%= __("admin.order.you_want_to_reset_your_order"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" class="reset_order hidden"><button type="button" class="btn btn-sm bg-orange waves-effect"><%= __('admin.orders.reset_order'); %></button></a>
+						   </li>
+						    <li class="add_items hidden"><a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_RESTAURANT_URL+'modify_orders/add_items/'+result._id %>" data-open-modal="true" class="action-btn add_new_items"><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __('admin.orders.add_items'); %></button></a>
+						  </li>
+					   </ul>
+					<% } %>
+				</div>
+				<div class="body table-responsive" id="aniimated-thumbnials">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="25%"><%= __("orders.item_name"); %></th>
+								<th width="10%"><%= __("orders.quantity"); %></th>
+								<th width="10%"><%= __("orders.price"); %></th>
+								<th width="10%"><%= __("orders.discount"); %></th>
+								<th width="10%"><%= __("orders.net_amounts"); %></th>
+								<th width="10%"><%= __("orders.total_amount"); %></th>
+								<th width="10%"><%= __("orders.notes"); %></th>
+								<% if(showMidifyBtn){ %>
+								   <th width="15%"><%= __("orders.action"); %></th>
+								<% } %>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal for reject restaurant branch request-->
+<div class="modal fade" id="reject_order" tabindex="-1" role="dialog" aria-labelledby="reject_order" aria-hidden="true">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("orders.reject_order") %></h4>
+			</div>
+			<form id="reject-form" data-submit-btn-id="reject-order_btn" method="post" class="on_click_submit" role="form" action=''>
+				<input type="hidden" name="order_id" id="order_id">
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-grop">
+								<div class="form-lin no-bottom-border">
+									<label for="rejection_reason" class="control-label"><%= __('orders.rejection_field'); %><span class="required"> *</span>  </label>
+									<div class="form-grop margin-0">
+										<div class="form-line">
+											<textarea id="rejection_reason" rows="6" class="resize-none form-control" name="rejection_reason"></textarea>
+										</div>
+										<span id="rejection_reason_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="reject-order_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-reject noHover margin-0"><%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div><!--modal close-->
+<!-- Modal for assigning captain to order -->
+<div class="modal fade" id="assign_order" tabindex="-1" role="dialog" aria-labelledby="assign_order" aria-hidden="true">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("orders.assign_captain") %></h4>
+			</div>
+			<form id="assign-form" data-submit-btn-id="assign-order_btn" method="post" class="on_click_submit" role="form" action=''>
+				<input type="hidden" name="order_captain_id" id="order_captain_id">
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-group">
+								<div class="form-line no-bottom-border">
+									<label for="captain_name" class="control-label"><%= __('orders.captain_name'); %><span class="required"> *</span>  </label>
+									<input type="text" id="captain_name" class="form-control" name="captain_name">
+								</div>
+								<span id="captain_name_error" class="error"></span>
+							</div>
+						</div>
+						<div class="col-sm-12">
+							<div class="form-group">
+								<div class="form-line no-bottom-border">
+									<label for="captain_number" class="control-label"><%= __('orders.captain_number'); %><span class="required"> *</span>  </label>
+									<input type="text" id="captain_number" class="form-control" name="captain_number">
+								</div>
+								<span id="captain_number_error" class="error"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="assign-order_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-assign noHover margin-0"><%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<!--modal close-->
+
+<%- contentFor("css") %>
+<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+	var orderId	= "<%= result._id %>";
+	$(document).ready(function(){
+		$( ".modify_order").click(function() {
+			$(".add_items").removeClass("hidden");
+			$(".modify_order").addClass("hidden");
+			$(".reset_order").removeClass("hidden");
+			$.ajax({
+				url 	:	"<%=WEBSITE_RESTAURANT_URL%>modify_orders/add_multiple_item_cart/"+orderId,
+				type	: 	"POST",
+				success	: 	function(res){
+					if(res.status== 'success'){
+						$(".add_items").removeClass("hidden");
+						$(".modify_order").addClass("hidden");
+						$(".reset_order").removeClass("hidden");
+					}else{
+						notice(res.status,res.message);
+					}
+				}
+			});
+		});
+		$( ".reset_order").click(function() {
+			var confirmMessage  	=	$(this).attr('data-confirm-message');
+			var confirmHeading  	= 	$(this).attr('data-confirm-heading');
+			confirmBox("warning",confirmHeading,confirmMessage,function(result){
+				if(result){
+					$.ajax({
+						url 	:	"<%=WEBSITE_RESTAURANT_URL%>modify_orders/delete_item_cart",
+						type	: 	"POST",
+						data	:	{'order_id':orderId},
+						success	: 	function(res){
+							if(res.status == 'success'){
+								notice('success',"<%= __('order.order_reset_successfully')%>");
+								$(".add_items").addClass("hidden");
+								$(".modify_order").removeClass("hidden");
+								$(".reset_order").addClass("hidden");
+								swal.close();
+							}
+						}
+					});
+				}
+			});
+		});
+	});
+
+		/** Function to initialize datatable and get server side data */
+		var dataTable 		=	"";
+		var orderId			= "<%= (result && result._id) 	?	result._id	:""%>";
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[ 0, "desc" ]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{
+						"data"		 : {},
+						"searchable" : 	false,
+						"field_name" : "item_name",
+						"render" 	 : 	function(result){
+							var itemName	= (result.item_name) ? (result.item_name['<%= DEFAULT_LANGUAGE_CODE %>']) : '';
+							var itemHtml	= itemName+'<br/>';
+							if(result.unit_lists && result.unit_lists.length > 0){
+								var text	=	(result.item_type == '<%= HALF_AND_HALF_ITEM%>') ? '<%= __('admin.order.half_pizza');%>' : '<%= __('admin.order.pizza');%>';
+								if(result.item_type == '<%= HALF_AND_HALF_ITEM%>' || result.item_type == '<%= DEAL_ITEM%>'){
+									result.unit_lists.map((data,key)=>{
+										let extraItemsArray = data.extra_items ? data.extra_items : [];
+										let extraItemHtml = "";
+										if(extraItemsArray && extraItemsArray.length > 0){
+											extraItemsArray.map((extraItemRecords,index)=>{
+												let extraItemIdsArray = extraItemRecords.extra_item_ids && extraItemRecords.extra_item_ids[0] ? extraItemRecords.extra_item_ids[0] : {};
+												let extraItemName = extraItemIdsArray.extra_item_name && extraItemIdsArray.extra_item_name['<%= DEFAULT_LANGUAGE_CODE %>'] ? extraItemIdsArray.extra_item_name['<%= DEFAULT_LANGUAGE_CODE %>'] : "";
+												extraItemHtml += (index != 0) ? ', ' : '';
+												extraItemHtml += extraItemName;
+											});
+										}
+										key	=	key+1;
+										var unitNames	=	(data.unit_name) ? data.unit_name+', ':"";
+										var doughNames	=	(data.dough_name) ? data.dough_name+', ':"";
+										var seclectorNames	=	(data.selector_name) ? data.selector_name:"";
+										itemHtml	+=	(!extraItemHtml) ? key+'. '+text+': ' +unitNames+doughNames+seclectorNames+'<br/>' :  key+'. '+text+': ' +unitNames+doughNames+seclectorNames+'<br/>'+'<%= __("orders.extra_item");%>'+': ' +extraItemHtml+'<br/>';
+									});
+								}
+							}else{
+								if(result.unit_name){
+									itemHtml += (result.unit_name['<%= DEFAULT_LANGUAGE_CODE %>']) ? result.unit_name['<%= DEFAULT_LANGUAGE_CODE %>'] :"";
+
+									itemHtml += (result.dough_name && result.dough_name['<%= DEFAULT_LANGUAGE_CODE %>']) ? ", "+result.dough_name['<%= DEFAULT_LANGUAGE_CODE %>'] :"";
+
+									itemHtml += "<br/>";
+								}
+							}
+							let mainExtraItemHtml = "";
+							if(result.extra_items && result.extra_items.length > 0){
+								result.extra_items.map((mainExtraItemRecords,index)=>{
+									let extraItemName = mainExtraItemRecords.extra_item_name && mainExtraItemRecords.extra_item_name['<%= DEFAULT_LANGUAGE_CODE %>'] ? mainExtraItemRecords.extra_item_name['<%= DEFAULT_LANGUAGE_CODE %>'] : "";
+									mainExtraItemHtml += (index != 0) ? ', ' : '';
+									mainExtraItemHtml += extraItemName;
+								});
+							}
+							itemHtml += (mainExtraItemHtml) ? '<%= __("orders.extra_item");%>'+': '+mainExtraItemHtml : '';
+							return itemHtml;
+						}
+					},
+					{ "data": 'qty' },
+					{
+						"data"		 : 'price',
+						"searchable" : 	false,
+						"render" 	 : 	function(price){
+							return (typeof price !== typeof undefined) ? currencyFormat(price) : '';
+						}
+					},
+					{
+						"data"		 : 'discounted_price',
+						"searchable" : 	false,
+						"render" 	 : 	function(discounted_price){
+							return (typeof discounted_price !== typeof undefined) ? currencyFormat(discounted_price) : '';
+						}
+					},
+					{
+						"data"		 : 'net_amount',
+						"searchable" : 	false,
+						"render" 	 : 	function(net_amount){
+							return (typeof net_amount !== typeof undefined) ? currencyFormat(net_amount) : '';
+						}
+					},
+					{
+						"data"		 : 'sub_total',
+						"searchable" : 	false,
+						"render" 	 : 	function(sub_total){
+							return (typeof sub_total !== typeof undefined) ? currencyFormat(sub_total) : '';
+						}
+					},
+					{
+						"data"		 : 'note',
+						"orderable"  : 	false,
+						"render" 	 : 	function(note){
+							return (note) ? "<span class='readmore nl2br'>"+note+"</span>" :"";
+						}
+					},
+					<% if(showMidifyBtn){ %>
+					{
+						"data"		 : 'item_id',
+						"orderable"	 : false,
+						"searchable" : false,
+						"render" 	 : function(item_id){
+							var id     		= (item_id) ? item_id : "";
+							var dropDownButton = '<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_RESTAURANT_URL%>modify_orders/change_quantity/'+orderId+'/'+id+'/addtocart" data-open-modal="true" class="action-btn add_items hidden">'+
+								'<button type="button" class="btn bg-green waves-effect">'+
+									' <%= __("admin.orders.change_quantity"); %>'+
+								'</button>'+
+							'</a>';
+							return dropDownButton;
+						}
+					},
+					<% } %>
+				],
+				"ajax":{
+					url 	:	"<%=list_url%>/list_items/"+orderId,
+					type	: 	"POST",
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function( settings ) {
+					/** Description read more **/
+					readMore();
+				}
+			});
+		});
+
+		/**
+		* Function to show modal
+		*/
+		$(document).on('click','.open-modal',function(){
+			var orderId = $(this).attr('data-id');
+
+			$('#order_id').val(orderId);
+			$("#rejection_reason_error").text('');
+			$('#rejection_reason').val("");
+			$('#reject-form').attr("action","<%=WEBSITE_URL%>orders/reject_order_status");
+
+			$('#reject_order').modal({
+				backdrop: 'static',
+				keyboard: false
+			});
+			$('#reject_order').modal('show');
+		});
+
+		/**
+		* Function to show assign captain modal
+		*/
+		$(document).on('click','.open-captain-modal',function(){
+			var orderId = $(this).attr('data-id');
+
+			$('#order_captain_id').val(orderId);
+			$('#assign-form').attr("action","<%=WEBSITE_URL%>orders/assign_captain");
+
+			$('#assign_order').modal({
+				backdrop: 'static',
+				keyboard: false
+			});
+			$('#assign_order').modal('show');
+		});
+
+		/**
+		* Function to submit  modal form
+		*/
+		$(".btn-submit-reject").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+
+			ajax_submit("reject-form",function(status,response){
+				stopTextLoading(btnId);
+				if(status){
+					window.location.href = response.redirect_url;
+				}
+			});
+		});
+
+		/**
+		* Function to submit assign captain modal form
+		*/
+		$(".btn-submit-assign").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+
+			ajax_submit("assign-form",function(status,response){
+				stopTextLoading(btnId);
+				if(status){
+					window.location.href = response.redirect_url;
+				}
+			});
+		});
+	</script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

@@ -1,0 +1,191 @@
+<%
+	var areaList 		=	(typeof area_list !== typeof undefined && area_list)  ?	area_list 	:[];
+	var branchId 		= 	(typeof branch_id !== typeof undefined && branch_id)  ?	branch_id 	:"";
+	var branchDetails 	= 	(typeof branch_details !== typeof undefined && branch_details)  ?	branch_details 	:{};
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-area" action="<%=list_url+'/add_branch_areas/'+branchId%>" data-submit-btn-id="area-add-btn-id" method="post" class="freezed_event" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("pending_branches_area.add_branch_area") %>
+						</h2>
+					</div>
+					<div class="modal-body">
+						<div class="restaurant_processing">
+							<div class="add_branch_area">
+								<strong><%=__("pending_branches_area.branch_id")%>: <span> <%=(branchDetails.branch_number) ? branchDetails.branch_number :"";%> </span></strong>
+								<strong><%=__("pending_branches_area.branch_name")%>: <span> <%=(branchDetails.name && branchDetails.name[DEFAULT_LANGUAGE_CODE]) ? branchDetails.name[DEFAULT_LANGUAGE_CODE] :"";%> </span></strong>
+							</div>
+							<div class="table-responsive">
+								<table id="add-area-table" class="table table-bordered" width="100%">
+									<thead>
+										<tr>
+											<th width="2%" class="p-r-5 text-left" >
+												<div class="materialize_checkbox">
+													<input type="checkbox" class="filled-in chk-col-indigo" id="select_all">
+													<label for="select_all" class="select_all p-l-30 v-align-bottom m-b-0"></label>
+												</div>
+											</th>
+											<th width="8%"><%= __("pending_branches_area.area_id");%></th>
+											<th width="20%"><%= __("pending_branches_area.area_name_in_english");%></th>
+											<th width="20%"><%= __("pending_branches_area.area_name_in_arabic");%></th>
+											<th width="10%"><%= __("pending_branches_area.city_id");%></th>
+											<th width="20%"><%= __("pending_branches_area.city_name_in_english");%></th>
+											<th width="20%"><%= __("pending_branches_area.city_name_in_arabic");%></th>
+										</tr>
+									</thead>
+								</table>
+								<span id="area_id_error" class="error"></span>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="area-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white area_btn_submit freezed_event hideMe" <%- FRONT_LOADING_TEXT %> >
+							<%= __("system.submit"); %>
+						</button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" >
+							<button type="button" class="btn bg-blue-grey btn-sm waves-effect">
+								<%= __("system.cancel"); %>
+							</button>
+						</a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * call updateFreezedEvent
+	 * Freezed event is when restaurant submit any branch details and admin mark branch as in review, then all add/edit activity is freezed
+	 */
+	updateFreezedEvent();
+
+	/** For branch area **/
+	var childCheckboxArray = {};
+	var addAreaDataTable = $('#add-area-table').DataTable({
+		"order"		: 	[[2,'asc']],
+		"sDom"		:	"ftr",
+		lengthChange:   false,
+		"serverSide":   false,
+		"scrollX"   :   false,
+		"paging"	:	false,
+		"columnDefs": [
+			{ orderable: false, "targets": [ 0 ] }
+		],
+		"data"		:	<%-JSON.stringify(areaList); %>,
+		"columns"	: 	[
+			{ 	"data"		: {},
+				"orderable" : false,
+				"render" 	: 	function(result){
+					let areaId		=	(result._id) 			? 	result._id 	:"";
+					var checkedFlag	= 	(result.is_selected) 	?	"checked" 	:"";
+
+					return '<div class=" materialize_checkbox p-r-25">'+
+						'<div class="checkbox_wrapperr">'+
+							'<input type="checkbox" class="filled-in chk-col-indigo " id="child_'+areaId+'" value="'+areaId+'" '+checkedFlag+'>'+
+							'<label for="child_'+areaId+'" class="checkbox data"></label>'+
+						'</div>'+
+					'</div>';
+				}
+			},
+			{"data" : 'area_id'},
+			{"data" : 'name.en'},
+			{"data" : 'name.ar'},
+			{"data" : 'city_id'},
+			{"data" : 'city_name.en'},
+			{"data" : 'city_name.ar'},
+		],
+	});
+
+	/** Resize width datatable columns **/
+	setTimeout(function(){
+		addAreaDataTable.columns.adjust().draw();
+	},170);
+
+	/** Get old selected checkbox **/
+	var totalCheckBoxes = $('.checkbox_wrapperr input[type="checkbox"]').not(":disabled").length;
+	$('.checkbox_wrapperr input[type="checkbox"]:checked').each(function(){
+		if($(this).attr("value")){
+			childCheckboxArray[$(this).attr("value")] = true;
+		}
+		
+		if(totalCheckBoxes == Object.keys(childCheckboxArray).length){
+			$("#select_all").prop("checked",true);
+		}
+	});
+
+	/**Check/Uncheck checkbox*/
+	$(document).on('change','.checkbox_wrapperr input[type="checkbox"]',function(){
+		var id          = $(this).attr('value');
+		var isChecked	= $(this).is(':checked');
+		if(isChecked){
+			childCheckboxArray[id] = true;
+		}else{
+			delete childCheckboxArray[id];
+		}
+		
+		var totalCheckBox = $('.checkbox_wrapperr input[type="checkbox"]').not(":disabled").length;
+		var checkedBox = $('.checkbox_wrapperr input[type="checkbox"]:checked').length;
+		let selectAll = (totalCheckBox == checkedBox) ? true : false;
+		$("#select_all").prop("checked",selectAll);
+	});
+	
+	/**
+	 *  check/uncheck checkbox select all check/uncheck
+	 */
+	$(document).on('change','#select_all',function(){
+		var isChecked	= $(this).is(':checked');
+		$('.checkbox_wrapperr input[type="checkbox"]').not(":disabled").prop("checked",isChecked).trigger("change");
+	});
+	
+	/**
+	 * Function to submit form
+	 */
+	$(document).on("click",".area_btn_submit",function(){
+		var btnId = $(this).attr('id');
+		var areaList = Object.keys(childCheckboxArray);
+		$("#area_id_error").text("");
+
+		if(areaList.length < 1){
+			$("#area_id_error").text("<%= __('pending_branches_area.please_select_atleast_one_area')%>");
+			return false;
+		}
+
+		swal({
+			title : "<%= __('system.are_you_sure') %>",
+			text  : "<%= __('pending_branches_area.you_want_to_submit_this_form')%>",
+			type  : "warning",
+			showCancelButton   : true,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText  : "Ok",
+			closeOnConfirm     : false,
+			showLoaderOnConfirm: true,
+		}, function (isConfirm) {
+			if(isConfirm){
+				/** Ajax options */
+				var options = {
+					url 	: 	"<%=list_url+'/add_branch_areas/'+branchId%>",
+					data	: 	{area_id: areaList},
+					method	:	"post"
+				};
+				startTextLoading(btnId);
+				ajaxRequest(options,function(response){
+					if(response.status == "<%= STATUS_SUCCESS%>"){
+						$('#form_modal').modal("hide");
+						$(".branch-panel-link.active").find("a").trigger("click");
+						if(response.status && response.message) notice(response.status,response.message);
+					}else{
+						stopTextLoading(btnId);
+						if(response.message) $("#area_id_error").text(response.message);
+					}
+				});
+				swal.close();
+			}
+		});
+	});
+</script>

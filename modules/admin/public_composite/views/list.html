@@ -1,0 +1,143 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.public_composite.public_composite"); %>
+					</h2><%
+					if(!haveResult){%>
+						<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+							<li>
+								<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['public_composite','edit'])%>">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("admin.public_composite.add"); %>
+									</button>
+								</a>
+							</li>
+						</ul><%
+					} %>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="33%"><%= __("admin.public_composite.free_delivery");%></th>
+								<th width="33%"><%= __("admin.public_composite.min_order_amount");%></th>
+								<th width="20%"> <%= __('admin.system.status');%>	</th>
+								<th><%= __("admin.system.action"); %></th>
+								<th></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable	   	=	"";
+		$(document).ready(function() {
+
+			dataTable = $('#datatable-listing').DataTable({
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{
+						"data"			: 'free_delivery',
+						"searchable"	: false,
+						"render" 		: function(free_delivery){
+							let freeDelivery	=	(free_delivery) ? '<%= __("admin.public_composite.yes") %>' : '<%= __("admin.public_composite.no") %>';
+							return freeDelivery;
+						}
+					},
+					{
+						"data"			: 'minimum_order_amount',
+						"searchable"	: false,
+						"render" 		: function(minimum_order_amount){
+							return  (typeof minimum_order_amount !== typeof undefined) ? currencyFormat(minimum_order_amount) : 0;
+						}
+					},
+					{
+						"data"			: 	"is_active",
+						"orderable"		:   false,
+						"field_type"	:   "<%= NUMERIC_FIELD %>",
+						"field_name"	:   "is_active",
+						"render": function(is_active){
+							return (is_active == parseInt('<%=ACTIVE%>')) ? '<span class="label label-success m-t-5"><%=__("admin.system.active")%></span>': '<span class="label label-danger m-t-5"><%=__("admin.system.inactive")%></span>';
+						}
+					},
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){ console.log(result);
+
+							var id     		   = result._id;
+							var status 		=	(result.is_active)		? result.is_active 	:parseInt('<%= DEACTIVE %>'); console.log(status);
+
+							/** Status Link Text **/
+							var statusLinkText  =	(status == parseInt('<%= DEACTIVE %>')) ? "<%= __('admin.system.active'); %>" : "<%= __('admin.system.deactive'); %>" ;
+							/** Status Link Title **/
+							var statusLinkTitle =	(status == parseInt('<%= DEACTIVE %>')) ?  	"<%= __('admin.system.click_to_activate'); %>"  : "<%= __('admin.system.click_to_deactivate'); %>" ;
+							var dropDownButton 		= ''+
+							'<div class="btn-group m-l-5 m-t-5">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %>'+
+									' <span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									'<li>'+
+										'<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/'+id+'" data-open-modal="true" class="waves-effect waves-block action-btn <%= getPermissionClass(module_type,["public_composite","edit"])%>"><%= __("admin.system.edit"); %></a>'+
+									'</li>'+
+									/** Status Link **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/change_status/'+id+'/'+status+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["public_composite","update_status"]); %>" data-confirm-message="<%=__("admin.public_composite.do_you_want_to_change_status_of_this_public_composite"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+statusLinkTitle+'">'+
+											statusLinkText+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+
+							return dropDownButton;
+						}
+					},
+					{
+						"data"		 : 'created',
+						"visible"	 :  false,
+						"searchable" : 	false,
+						"render" 	 : 	function(created){
+							return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>",
+					type	: 	"POST",
+					data	: 	function (d) {
+				    },
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+	</script>
+

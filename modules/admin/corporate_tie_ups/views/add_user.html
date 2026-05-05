@@ -1,0 +1,142 @@
+<!-- HTML to append in add more -->
+<table id="user_form_html" class="hide">
+    <tbody>
+        <tr id="user_row_{INDEX}" class="table_row">
+            <td>
+                <button type="button" class="btn bg-green add-more-btn" onclick="AppendHTML()">+</button>
+                <button type="button" class="btn bg-red remove-user hide">x</button>
+            </td>
+            <input type="hidden" name="users[{INDEX}][index]" value="{INDEX}" />
+               
+            <td>
+                <input type="text" name="users[{INDEX}][first_name]" id="first_name_{INDEX}" class="form-control input-column"/>
+                <span id="first_name_{INDEX}_error" class="error"></span>
+            </td>
+			<td>
+                <input type="text" name="users[{INDEX}][last_name]" id="last_name_{INDEX}" class="form-control input-column"/>
+                <span id="last_name_{INDEX}_error" class="error"></span>
+            </td>
+			<td>
+                <input type="text" name="users[{INDEX}][email]" id="email_{INDEX}" class="form-control input-column"/>
+                <span id="email_{INDEX}_error" class="error"></span>
+            </td>
+			<td>
+                <input type="text" name="users[{INDEX}][mobile_number]" id="mobile_number_{INDEX}" class="form-control input-column"/>
+                <span id="mobile_number_{INDEX}_error" class="error"></span>
+            </td>
+			<td>
+                <input type="text" name="users[{INDEX}][date_of_birth]" id="date_of_birth_{INDEX}" class="form-control input-column"/>
+                <span id="date_of_birth_{INDEX}_error" class="error"></span>
+            </td>
+			<td>
+                <select name="users[{INDEX}][gender]" id="gender_{INDEX}" class="form-control input-column"><%
+					Object.keys(GENDER_DROPDOWN).map((gender)=>{ %>
+						<option value="<%= gender%>"><%= GENDER_DROPDOWN[gender]%></option><%
+					}); %>
+				</select>
+                <span id="gender_{INDEX}_error" class="error"></span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Form -->
+<form id="add_user" action="<%=WEBSITE_ADMIN_URL%>corporate_tie_ups/add_user/<%= corporate_id%>" data-submit-btn-id="user-btn-id" method="post" class="on_click_submit" role="form">
+    <div class="row clearfix">
+        <input type="hidden" name="corporate_id"  id="corporate_id" value="<%= corporate_id %>"/>
+        <div class="col-sm-12">
+            <table class="row-border full-length-header hover table table-bordered dataTable">
+                <thead>
+                    <tr>
+                        <th width="4%"> </th>
+                        <th width="10%"> <%=__("admin.corporate_tie_ups.first_name")%> </th>
+                        <th width="10%"> <%=__("admin.corporate_tie_ups.last_name")%> </th>
+                        <th> <%=__("admin.corporate_tie_ups.email")%> </th>
+                        <th width="12%"> <%=__("admin.corporate_tie_ups.mobile_number")%> </th>
+                        <th width="10%"> <%=__("admin.corporate_tie_ups.date_of_birth")%> </th>
+                        <th width="20"> <%=__("admin.corporate_tie_ups.gender")%> </th>
+                    </tr>
+                </thead>
+                <tbody id="user_form"></tbody>
+            </table>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-sm bg-green add-more-btn" onclick="AppendHTML()"><%=__("admin.corporate_tie_ups.add_more")%></button>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" id="user-btn-id" class="btn bg-brown btn-sm waves-effect user-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+            <a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    /** Function to append inputs in form*/
+    var rowCount = 0;
+    function AppendHTML(){
+        var defaultHTML     = $("#user_form_html tbody").html();
+        var htmlToAppend    = defaultHTML.replace(RegExp('{INDEX}','g'),rowCount);
+        $("#user_form").append(htmlToAppend);
+        rowCount++;
+
+        if($(document).find("#add_user .remove-user").length > 1){
+            $(document).find("#add_user .remove-user").removeClass("hide");
+        }
+        $(".add-more-btn").addClass("hide");
+        $(".add-more-btn").last().removeClass("hide");
+    }
+
+    /** Add one row default*/
+    $(document).ready(function(){
+        AppendHTML();
+    });
+
+    /**
+    * Function to submit form
+    */
+    $(".user-btn-submit").click(function(){
+        var btnId = $(this).attr("id");
+        $("#add_user span.error").text("");
+        startTextLoading(btnId);
+        ajax_submit("add_user",function(status,response){
+            stopTextLoading(btnId);
+            if(status){
+                if(response.redirect_url){
+                    window.location.href = response.redirect_url;
+                }else{
+                    window.location.reload();
+                }
+            }
+        });
+    });
+
+    /** Delete user row*/
+    $(document).on("click",".remove-user",function(){
+        var openModal = false;
+        var that = this;
+        $(that).parents(".table_row").find("input.input-column").each(function(){
+            if($(this).val() != ""){
+                openModal = true;
+            }
+        });
+
+        if(!openModal){
+            $(that).parents(".table_row").remove();
+            if($(document).find("#add_user .remove-user").length <= 1){
+                $(document).find("#add_user .remove-user").addClass("hide");
+            }
+            $(".add-more-btn").last().removeClass("hide");
+        }else{
+            confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.corporate_tie_ups.user_remove_comfirm_message"); %>',function(result){
+                if(result){
+                    $(that).parents(".table_row").remove();
+                    if($(document).find("#add_user .remove-user").length <= 1){
+                        $(document).find("#add_user .remove-user").addClass("hide");
+                    }
+                    $(".add-more-btn").last().removeClass("hide");
+                }
+                swal.close();
+            });
+        }
+    });
+
+</script>

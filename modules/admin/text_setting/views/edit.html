@@ -1,0 +1,97 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix" >
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.text_setting.edit_text_setting"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url+'/'+type%>" ><button type="button" class="btn bg-indigo waves-effect"><%= __('admin.system.back'); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<!-- Multilanguage tabs -->
+					<%- include ('../../elements/multilanguage_tabs.html') %>
+					<!-- Multilanguage tabs -->
+					<form id="edit-text-setting" data-submit-btn-id="text-setting-edit-btn-id" method="post" class="on_click_submit" role="form">
+						<!-- Tab panes -->
+						<div class="tab-content mt-20">
+							<%
+							if(typeof language_list !== typeof undefined && Array.isArray(language_list) && language_list.length > 0){
+								key = (result.key) ? result.key : '';
+							%>
+								<div class="row clearfix">
+									<div class="col-sm-12">
+										<div class="form-group">
+											<div class="form-line">
+												<label for="key" class="control-label">
+													<%= __('admin.text_setting.key'); %>
+													<span class="required"> *</span>
+												</label>
+												<input type="text" id="key" class="form-control" name="key" value="<%= key; %>"  />
+											</div>
+											<span id="key_error" class="error"></span>
+
+										</div>
+									</div>
+								</div>
+								<% language_list.forEach(function(languages){
+									languageId 		= 	(languages._id) 		?  	languages._id 		:"";
+									languageCode	=	(languages.lang_code) 	?	languages.lang_code :"";
+									value 			= 	(result.text_settings_descriptions && result.text_settings_descriptions[languageId] && result.text_settings_descriptions[languageId]['value']) ? result.text_settings_descriptions[languageId]['value'] : '';
+								%>
+									<div role="tabpanel" class="tab-pane multi-lang-tab-pane fade in <%= (languageCode == DEFAULT_LANGUAGE_CODE) ? 'active' : ''; %>" id="multi_lang_<%= languageCode; %>">
+										<div class="row clearfix">
+											<div class="col-sm-12">
+												<div class="form-group">
+													<div class="form-line">
+														<label for="value_<%= languageCode; %>" class="control-label">
+															<%= __('admin.text_setting.value'); %>
+															<% if(languageCode ==  DEFAULT_LANGUAGE_CODE){ %>
+																<span class="required"> *</span>
+															<% } %>
+														</label>
+														<input type="hidden" name="text_settings_descriptions[<%= languageId %>][language_id]" value="<%= languageId; %>"/>
+														<textarea rows="4"  id="value_<%= languageCode; %>" class="form-control no-resize"  name="text_settings_descriptions[<%= languageId %>][value]"><%= value; %></textarea>
+													</div>
+													<% if(languageCode ==  DEFAULT_LANGUAGE_CODE){ %>
+														<span id="value_error" class="error"></span>
+													<% } %>
+												</div>
+											</div>
+										</div>
+									</div>
+							<% 	});
+							} %>
+						</div>
+						<button type="button" id="text-setting-edit-btn-id" class="btn bg-pink btn-sm waves-effect btn-submit" <%- ADMIN_LOADING_TEXT %> > <%= __('admin.system.submit'); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+						<a href="<%=admin_list_url+'/'+type%>"><button type="button" class="btn bg-brown btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('script') %>
+	<script type="text/javascript">
+		/**
+		 * Function to submit form
+		 */
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('edit-text-setting',function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					changeTab('<%= DEFAULT_LANGUAGE_CODE %>');
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	</script>

@@ -1,0 +1,134 @@
+<div class="equal_spacing">
+	<div class="dashboard_page team-leader">
+		<h1><%= __("system.dashboard"); %></h1>
+		<div class="number_box">
+			<h3><span><%= __("admin.dashboard.captains")%></span></h3>
+			<div class="dashboard_number menu_box">
+				<ul>
+					<li>
+						<div class="number_bg_box darkblue_border">
+							<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking';%>" target="_blank" class="reset_storage">
+								<strong><%= (result.total_captains) ? result.total_captains : 0;%></strong>
+								<span><%= __("admin.dashboard.total_captains")%></span>
+							</a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box darkblue_border">
+							<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=active_captains';%>" target="_blank" class="reset_storage">
+								<strong><%= (result.total_online_captains) ?  result.total_online_captains : 0;%></strong>
+								<span><%= __("admin.dashboard.total_online_captains")%></span>
+							</a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box darkblue_border">
+							<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=inactive_captains';%>" target="_blank" class="reset_storage">
+								<strong><%= (result.total_offline_captains) ?  result.total_offline_captains : 0;%></strong>
+								<span><%= __("admin.dashboard.total_offline_captains")%></span>
+							</a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box darkblue_border">
+							<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=free_captains';%>" target="_blank" class="reset_storage">
+								<strong><%= (result.total_free_captains) ?  result.total_free_captains : 0;%></strong>
+								<span><%= __("admin.dashboard.total_free_captains")%></span>
+							</a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box darkblue_border">
+							<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=busy_captains';%>" target="_blank" class="reset_storage">
+								<strong><%= (result.total_occupied_captains) ?  result.total_occupied_captains : 0;%></strong>
+								<span><%= __("admin.dashboard.total_occupied_captains")%></span>
+							</a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box darkblue_border">
+							<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=way_to_restaurant_captains';%>" target="_blank" class="reset_storage">
+								<strong><%= (result.total_on_the_way_to_restaurant_captains) ?  result.total_on_the_way_to_restaurant_captains : 0;%></strong>
+								<span><%= __("admin.dashboard.total_on_the_way_to_restaurant_captains")%></span>
+							</a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box darkblue_border">
+							<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=arrived_at_customer_location_captains';%>" target="_blank" class="reset_storage">
+								<strong><%= (result.total_on_the_way_to_delivery_location_captains) ?  result.total_on_the_way_to_delivery_location_captains : 0;%></strong>
+								<span><%= __("admin.dashboard.total_captains_on_the_way_to_delivery_location")%></span>
+							</a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box darkblue_border">
+							<a href="<%= WEBSITE_ADMIN_URL+'driver_breaks/'+APPROVED;%>" target="_blank" class="reset_storage">
+								<strong><%= (result.total_captains_on_break) ?  result.total_captains_on_break : 0;%></strong>
+								<span><%= __("admin.dashboard.total_captains_on_break")%></span>
+							</a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box darkblue_border">
+							<a href="<%= WEBSITE_ADMIN_URL+'overtime_captain_request?is_today=true';%>" target="_blank" class="reset_storage">
+								<strong><%= (result.overtime_requests) ?  result.overtime_requests : 0;%></strong>
+								<span><%= __("admin.dashboard.total_captains_on_overtime")%></span>
+							</a>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<a href="<%= WEBSITE_ADMIN_URL+'captain_assigned';%>" target="_blank" class="m-t-20" class="reset_storage">
+			<button type="button" class="btn btn-sm bg-indigo waves-effect captain-btn">
+				<%= __("admin.dashboard.captain_by_areas")%>
+			</button>
+		</a>
+		<!-- Order Tracking Section-->
+		<div class="number_box">
+			<h3><span><%= __('admin.dashboard.orders') %></span></h3>
+			<div class="dashboard_number menu_box">
+				<ul>
+					<li>
+						<div class="number_bg_box skyblue_border">
+							<strong><%= (result.way_to_customer_orders) ? result.way_to_customer_orders : 0;%></strong>
+							<a href="<%= WEBSITE_ADMIN_URL %>order_tracking?order_type=way_to_customer" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.way_to_customer_orders') %></span></a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box skyblue_border">
+							<strong><%= (result.way_to_restaurant_orders) ? result.way_to_restaurant_orders : 0;%></strong>
+							<a href="<%= WEBSITE_ADMIN_URL %>order_tracking?order_type=way_to_restaurant" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.way_to_restaurant_orders') %></span></a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box skyblue_border">
+							<strong><%= (result.delivered_orders) ? result.delivered_orders : 0;%></strong>
+							<a href="<%= WEBSITE_ADMIN_URL %>order_tracking?order_type=delivered" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.delivered_orders') %></span></a>
+						</div>
+					</li>
+					<li>
+						<div class="number_bg_box skyblue_border">
+							<strong><%= (result.not_assigned_orders) ? result.not_assigned_orders : 0;%></strong>
+							<a href="<%= WEBSITE_ADMIN_URL %>order_tracking?order_type=not_assigned" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.not_assigned_orders') %></span></a>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<!-- Tickets  Section -->
+			<%- include dashboard_elements/ticket_info.html %>
+
+		<!-- Members info Section -->
+			<%- include dashboard_elements/members_info.html %>
+
+		<!-- Login Logout Time & Upcoming week schedule Section -->
+			<%- include dashboard_elements/login_logout_and_week_schedule.html %>
+
+	</div>
+</div>
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		$(".breadcrumb").remove();
+	</script>

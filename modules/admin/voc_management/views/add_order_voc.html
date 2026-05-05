@@ -1,0 +1,135 @@
+<%
+  var vocType = (typeof voc_type !== typeof undefined)  ? voc_type  : "";
+  var orderId = (typeof order_id !== typeof undefined)  ? order_id  : "";
+  var actionUrl= (vocType) ? admin_list_url+'/add_order_voc/'+orderId+'/'+vocType : admin_list_url+'/add_order_voc/'+orderId;
+%>
+<div class="row clearfix" >
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-order-voc" action="<%=actionUrl%>" data-submit-btn-id="order-voc-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.voc_management.add_voc"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<% if(!vocType){ %>
+							<div class="row clearfix">
+								<div class="col-sm-12">
+									<div class="form-group">
+										<label for="voc_for" class="control-label">
+											<%= __("admin.voc_management.voc_for"); %>
+											<span class="required"> *</span>
+										</label>
+										<div class="voc-for-class">
+											<% Object.keys(VOC_FOR).map(key=>{  %>
+												<input class="with-gap radio-col-cyan voc_for_option <%=key%>" type="radio" name="voc_for" id="voc_for_<%=key%>" value="<%=key%>"/>
+												<label for="voc_for_<%=key%>"><%=VOC_FOR[key]%></label>
+											<% 	}); %>
+										</div>
+										<span id="voc_for_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						<% } %>
+						<div class="row clearfix voc_type_block <%= (!vocType) ? 'hide' : '' %>">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="type" class="control-label">
+											<%= __("admin.voc_management.type"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick"  id="type" name="type">
+											<option value=""><%=__("admin.voc_management.select_type");%></option>
+											<% if( vocType == VOC_FOR_CLIENT){ %>
+												<%  Object.keys(VOC_TYPE_FOR_CLIENT).map(key=>{ %>
+													<option value="<%=key%>"><%= VOC_TYPE_FOR_CLIENT[key]%></option>
+												<% }); %>
+											<% } else if(vocType == VOC_FOR_CAPTAIN) {%>
+												<%  Object.keys(VOC_TYPE_FOR_CAPTAIN).map(key=>{ %>
+													<option value="<%=key%>"><%= VOC_TYPE_FOR_CAPTAIN[key]%></option>
+												<% }); %>
+											<% } %>
+										</select>
+									</div>
+									<span id="type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<!-- Append question list -->
+							<div class="question-add" id="question-add"> </div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="order-voc-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-order-voc',function(status,response){
+			if(response.status == 'error') notice(response.status,response.message);
+			if(status){
+				$("#reset").trigger("click");
+				$('#form_modal').modal('hide');
+				if(response.status=="<%= STATUS_SUCCESS%>" && !'<%=vocType%>') window.location.reload();
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+
+	/**
+	 * Function to get question list
+	 */
+	$('#type').on('change', function() {
+		var type = $(this).val();
+		var vType= ('<%=vocType%>') ? '<%=vocType%>' : $("input[name='voc_for']:checked").val();
+		$("#question-add").html("");
+		if(type){
+			var options = {
+				url 	: "<%=admin_list_url%>/get_question_list",
+				data	: {type : type, user_type : vType},
+				method	: "post"
+			}
+			ajaxRequest(options,function(response){
+				$("#question-add").html(response);
+			});
+		}
+	});
+
+	/**
+	 * Function to get type list
+	 */
+	$(document).on('click','.voc_for_option',function(){
+		$('.voc_type_block').removeClass('hide');
+		let vocFor = $("input[name='voc_for']:checked").val();
+		let vocList= (vocFor=="<%= VOC_FOR_CLIENT %>") ? <%-JSON.stringify(VOC_TYPE_FOR_CLIENT)%> : <%-JSON.stringify(VOC_TYPE_FOR_CAPTAIN)%>;
+		var optionHtml ='<option value=""><%=__("admin.voc_management.select_type");%></option>';
+		Object.keys(vocList).map(key=>{
+			optionHtml+= '<option value="'+key+'">'+vocList[key]+'</option>';
+		});
+		$('#type').html(optionHtml);
+		$("#question-add").html("");
+		$("#type").selectpicker('refresh');
+	});
+</script>

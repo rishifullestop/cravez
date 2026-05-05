@@ -1,0 +1,94 @@
+<aside id="leftsidebar" class="sidebar">
+	<!-- User Info -->
+	<div class="user-info">
+		<div class="info-container">
+			<div class="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><%= (auth.name && auth.name[DEFAULT_LANGUAGE_CODE]) ? auth.name[DEFAULT_LANGUAGE_CODE] : "" %></div>
+			<div class="email"><%= (auth.email) ? auth.email : "" %></div>
+			<div class="btn-group user-helper-dropdown">
+				<i class="material-icons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">keyboard_arrow_down</i>
+				<ul class="dropdown-menu pull-right m-w-200">
+					<li><a href="<%= WEBSITE_URL%>edit_profile"><i class="material-icons">person</i><%= __("system.edit_profile"); %></a></li>
+					<li><a href="<%= WEBSITE_URL%>change_password"><i class="material-icons">lock</i><%= __("system.change_password"); %></a></li>
+					<li role="seperator" class="divider"></li>
+					<li><a href="<%= WEBSITE_URL%>logout"><i class="material-icons">input</i><%= __("system.sign_out"); %></a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="expand_arrow">
+		<a href="javascript:void(0)" id="expand_arrow"><img src="<%=WEBSITE_IMG_URL%>expand-arrow.png" alt="img"></a>
+	</div>
+	<!-- Menu -->
+
+	<div class="menu">
+		<ul class="list"><%
+			if(auth && (auth.restaurant_slug == PIZZA_HUT || auth.restaurant_slug == BURGER_KING)){ %>
+				<li class="<%= site_url.indexOf('rejected_orders') >=0 ? 'active' :'' %> ">
+					<a href="<%= WEBSITE_URL+'orders/rejected_orders'%>" >
+						<span><%= __('orders.rejected_orders')%></span>
+					</a>
+				</li> <%
+			}else{
+				if(typeof modules_list !== typeof undefined && modules_list && modules_list.length > 0){
+					modules_list.map(function(module,index){
+						if(!module.only_for_permission && module.title){
+							let moduleGroupPath = (module.group_path) ? module.group_path.replace(RegExp("{SLUG}",'g'),auth.restaurant_slug).split(',') : [];
+							let activeFlag		= (moduleGroupPath.indexOf(path) != -1 || moduleGroupPath.indexOf(active_path) != -1) ? true : false; %>
+							<li class="<%= activeFlag ? 'active' : '' %>">
+								<%
+									let extraString = "";
+									let menuLink	= WEBSITE_URL+module.path.replace("{SLUG}",auth.restaurant_slug);
+
+									if(typeof module.childs !== typeof undefined && module.childs && module.childs.length > 0){
+										let isToggled 	= activeFlag ? 'toggled' : '';
+										extraString 	= 'menu-toggle '+isToggled+'';
+										menuLink		= module.path;
+									}
+								%>
+								<a href="<%= menuLink%>" class="<%-extraString%> <%= activeFlag ? "active" : "" %>" >
+									<i class="material-icons"><%= module.icon%></i>
+									<span><%= module.title %></span>
+								</a>
+								<%if(typeof module.childs !== typeof undefined && module.childs && module.childs.length > 0){%>
+									<ul class="ml-menu">
+										<%
+										module.childs.map(function(child,index){
+											if(!child.only_for_permission && child.title){
+												let activeClass 	= "";
+												let childGroupPath = (child.group_path) ? child.group_path.replace(RegExp("{SLUG}",'g'),auth.restaurant_slug).split(',') : [];
+												childGroupPath.map(function(childPath){
+													if(site_url.indexOf(childPath) > -1){
+														activeClass = "active";
+													}
+												}); %>
+												<li class="<%= activeClass %>">
+													<a href="<%= WEBSITE_URL+child.path.replace('{SLUG}',auth.restaurant_slug) %>"><%= child.title %></a>
+												</li>
+										<%
+											}
+										}) %>
+									</ul>
+								<%}%>
+							</li> <%
+						}
+					});
+				}
+			} %>
+		</ul>
+	</div>
+	<!-- #Menu -->
+	<!-- Footer -->
+	<div class="legal">
+		<div class="copyright">
+			<%- settings["Site.copyright_text"] %>
+		</div>
+	</div>
+	<!-- #Footer -->
+</aside>
+
+<script>
+/* Class toggle */
+$("#expand_arrow").click(function(){
+	$("body").toggleClass("menuclose");
+});
+</script>

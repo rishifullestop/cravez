@@ -1,0 +1,55 @@
+﻿<%
+var sileTitle = (settings["Site.site_title"]) ? settings["Site.site_title"] : "";
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title><%= settings["Site.site_title"] %></title>
+    <!-- Favicon-->
+    <link rel="icon" href="<%=WEBSITE_IMG_URL%>fav_icon.ico" type="image/x-icon">
+	<!-- Custom Css -->
+	<link rel="stylesheet" href="<%=WEBSITE_CSS_PATH%>bootstrap.css" type="text/css">
+	<link href="<%= WEBSITE_CSS_PATH %>custom.css" rel="stylesheet" media="all">
+	<link href="<%=WEBSITE_CSS_PATH%>developer.css" rel="stylesheet"  media="all">
+</head>
+<body>
+	<div class="main-header m-t-10">
+		<div class="container">
+			<div class="text-center m-t-30">
+				<div class="logo">
+					<a href="<%=WEBSITE_URL%>">
+						<img src="<%= WEBSITE_IMG_URL %>logo.png" alt="img">
+						<!-- <h2><%- settings["Site.project_title"] %></h2> -->
+					</a>
+				</div>
+				<div class="banner-text inner-text wow fadeInUp animated">
+					<h2>404 NOT FOUND!</h2>
+				</div>
+			</div>
+		</div>
+	</div>
+    <div class="clearfix"></div>
+   <!--banner-->
+	<div class="middle home-page newspagesContent">
+		<div class="container">
+			<div class="custom-page">
+				<div class="page-detail">
+				   <div class="detail-text apply_by_user apply_by_nxt">
+					   <div class="thanku_page">
+							<p>
+								<center>
+									<h1>Oops! That page can't be found.</h1>
+									<p>It looks like nothing was found at this location.</p>
+									<a href="<%=WEBSITE_URL%>" class="btn btn-sm bg-pink go_home_btn">Go to Home</a>
+								</center>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

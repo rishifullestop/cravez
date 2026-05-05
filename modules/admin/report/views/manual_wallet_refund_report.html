@@ -1,0 +1,203 @@
+<%
+	var fromDate = newDate(subtractDate(HOURS_IN_A_DAY*(DAYS_IN_A_WEEK-1)),DATABASE_DATE_FORMAT);
+	var toDate	 = newDate("",DATABASE_DATE_FORMAT);
+	var tempFromDate = newDate(subtractDate(HOURS_IN_A_DAY*(DAYS_IN_A_WEEK-1)),CURRENTDATE_START_DATE_FORMAT);
+	var tempToDate	 = newDate("",CURRENTDATE_END_DATE_FORMAT);
+%>
+<div class="container-fluid"  id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by restaurant name -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick restaurant_id" id="search_restaurant_id" name="search_restaurant_id" data-child-name="search_branch_id" data-live-search="true">
+													<%-restaurant_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by branch -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick branch_id disabled" id="search_branch_id" name="search_branch_id" data-live-search="true" data-placeholder="<%=__('admin.report.search_by_branch')%>" data-live-search="true" disabled>
+													<option value=""><%=__("admin.report.search_by_branch");%></option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by date -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker"  autocomplete="off" value="<%=fromDate+' - '+toDate%>">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=tempFromDate%>">
+											<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=tempToDate%>">
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-3">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="manual_wallet_refund_table">
+	</div>
+</div>
+
+<!--Search End -->
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/**  Call getListing function */
+		$(document).ready(function(){
+			getListing();
+			$("select[name='search_restaurant_id']").trigger("change");
+		});
+		
+		/** Function to initialize datatable and get server side data*/
+		var configDemo 		= $('#date-range-picker');
+		var stopTableDraw   = true;
+		var removeClearBtn  = true;
+		
+		/**  function for daterange picker*/
+		configDemo.on('apply.daterangepicker', function(e,picker){
+			var startDate	= picker.startDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+			var endDate		= picker.endDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+
+			$("#from_date").val(startDate);
+			$("#to_date").val(endDate);
+			getListing();
+		});
+		
+		/*
+		*	Function to get manual wallet refund report list
+		*/
+		function getListing(){
+			var startDate    = $("#from_date").val();
+			var endDate      = $("#to_date").val();
+			var restaurantId = $('#search_restaurant_id').val();
+			var branchId 	 = $('#search_branch_id').val();
+			if(endDate && startDate && restaurantId){
+				var options		= {
+					url 	: "<%=admin_list_url%>/append_manual_wallet_refund_report/"+startDate+'/'+endDate+'/'+restaurantId+'/'+branchId,
+					method	: "GET"
+				};
+				ajaxRequest(options,function(response){
+					if(response){
+						$("#manual_wallet_refund_table").html(response);
+					}
+				});
+			}
+		}
+
+		/*
+		*	Call getListing on restaurant,branch change
+		*/
+		$("#search_restaurant_id,#search_branch_id").change(function(){
+			getListing();
+		});
+
+		/**
+		* Get branch list
+		*/
+		$("select[name='search_restaurant_id']").change(function(){
+			getBranchDropDownList($(this));
+		});
+		
+		/**
+		* Get dropdown value by local storage
+		*/
+		let tempRestaurantId = 	"";
+		let tempBranchId 	 =	"";
+		if(localStorage["search_" +window.location.pathname]){
+
+			let searchFormData = JSON.parse(localStorage["search_" +window.location.pathname]);
+			for(index in searchFormData){
+				if(searchFormData[index].name && searchFormData[index].name == "search_branch_id" && searchFormData[index].value){
+					tempBranchId = searchFormData[index].value;
+				}
+				if(searchFormData[index].name && searchFormData[index].name == "search_restaurant_id" && searchFormData[index].value){
+					tempRestaurantId = searchFormData[index].value;
+				}
+			}
+
+			if(tempRestaurantId) getBranchDropDownList($("select[name='search_restaurant_id']"),tempRestaurantId,tempBranchId);
+		}
+
+		/**
+		* Get branch search dropdown list
+		*/
+		function getBranchDropDownList(currentObj,restaurantId,branchId){
+			if(currentObj){
+
+				var currentValue	=	currentObj.val();
+				var childInputName	=	currentObj.attr("data-child-name");
+				var childObj		=	(childInputName) ?  $("select[name='"+childInputName+"']") :"";
+				var placeholder		=	childObj.attr("data-placeholder");
+				var childFirstOption=	'<option value="">'+placeholder+'</option>';
+
+				if(!currentValue && restaurantId) currentValue = restaurantId;
+
+				childObj.attr("disabled",true).removeClass("disabled").html(childFirstOption);
+				if(!branchId) childObj.val("").trigger("change");
+				$(".show-tick").selectpicker('refresh');
+
+				if(currentValue){
+					/** Get dropdown list **/
+					var options = {
+						url 	: "<%=admin_list_url%>/customer_order/branch_list",
+						data	: {restaurant_id : currentValue},
+						method	: "post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_SUCCESS%>"){
+							/** Append dropdown list **/
+							childObj.attr("disabled",false).removeClass("disabled").html(childFirstOption+response.branch_list);
+							if(branchId) childObj.val(branchId);
+							$(".show-tick").selectpicker('refresh');
+						}else if(response.status && response.message){
+							notice(response.status,response.message);
+						}
+					});
+				}
+			}
+		}// end getBranchDropDownList()
+		
+		var maxDate	= new Date("<%= toDate %>");
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+	
+

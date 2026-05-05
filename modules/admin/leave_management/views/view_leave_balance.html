@@ -1,0 +1,44 @@
+<%
+	var leaveTypeList = leave_type_list;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.leave_management.leave_balance"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<table class="row-border full-length-header hover table table-bordered dataTable" cellspacing="0" width="100%">
+							<thead>
+								<tr>
+									<th><%= __('admin.leave_management.total_leave'); %></th>
+									<% if(result) { %>
+										<%	result.leaves.map(records=>{
+												let leaveTitle = (leaveTypeList[String(records.leave_type)]) ? leaveTypeList[String(records.leave_type)] :""; %>
+												<th><%=leaveTitle%></th> <%
+											}); %>
+									<% } %>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<% if(result) { %>
+										<td><%=result.total_leave%></td>
+										<% result.leaves.map(records=>{ %>
+											<td><%= records.leaves%></td>
+										<% }); %>
+									<% } else{ %>
+										<td class="text-center"><%=__("admin.system.no_record_found")%></td>
+									<% } %>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

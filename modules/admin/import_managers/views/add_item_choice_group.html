@@ -1,0 +1,162 @@
+<!-- HTML to append in add more -->
+<table id="choice_group_form_html" class="hide">
+    <tbody>
+
+        <tr id="choice_group_row_{index}" class="table_row">
+            <td>
+                <button type="button" class="btn bg-green add-more-btn" onclick="AppendHTML()">+</button>
+                <button type="button" class="btn bg-red remove-choice-group hide">x</button>
+            </td>
+            <td>
+                <input type="text" name="choice_group[{INDEX}][choice_group_old_id]" id="choice_group_old_id_{INDEX}" class="form-control input-column"/>
+                <span id="choice_group_old_id_{INDEX}_error" class="error"></span>
+            </td>
+            <td>
+                <input type="text" name="choice_group[{INDEX}][item_id]" id="item_id_{INDEX}" class="form-control input-column"/>
+                <span id="item_id_{INDEX}_error" class="error"></span>
+            </td>
+            <td>
+                <input type="text" name="choice_group[{INDEX}][item_unit_id]" id="item_unit_id_{INDEX}" class="form-control input-column"/>
+                <input type="hidden" name="choice_group[{INDEX}][index]" value="{INDEX}" />
+                <span id="item_unit_id_{INDEX}_error" class="error"></span>
+            </td>
+            <td>
+                <input type="text" name="choice_group[{INDEX}][group_name_english]" id="group_name_english_{INDEX}" class="form-control input-column"/>
+                <span id="group_name_english_{INDEX}_error" class="error"></span>
+            </td>
+            <td>
+                <input type="text" name="choice_group[{INDEX}][group_name_arabic]" id="group_name_arabic_{INDEX}" class="form-control input-column"/>
+                <span id="group_name_arabic_{INDEX}_error" class="error"></span>
+            </td>
+            <td>
+                <input type="text" name="choice_group[{INDEX}][group_min_quantity]" id="group_min_quantity_{INDEX}" class="form-control input-column"/>
+                <span id="group_min_quantity_{INDEX}_error" class="error"></span>
+            </td>
+            <td>
+                <input type="text" name="choice_group[{INDEX}][group_max_quantity]" id="group_max_quantity_{INDEX}" class="form-control input-column"/>
+                <span id="group_max_quantity_{INDEX}_error" class="error"></span>
+            </td>
+            <td>
+                <input type="text" name="choice_group[{INDEX}][group_description_in_english]" id="group_description_in_english_{INDEX}" class="form-control input-column"/>
+                <span id="group_description_in_english_{INDEX}_error" class="error"></span>
+            </td>
+            <td>
+                <input type="text" name="choice_group[{INDEX}][group_description_in_arabic]" id="group_description_in_arabic_{INDEX}" class="form-control input-column"/>
+                <span id="group_description_in_arabic_{INDEX}_error" class="error"></span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Form -->
+<form id="add_item_choice_group" action="<%=WEBSITE_ADMIN_URL%>merchant_upload/add_item_choice_group" data-submit-btn-id="choice-group-btn-id" method="post" class="on_click_submit" role="form">
+    <div class="row clearfix">
+        <input type="hidden" name="restaurant_slug"  id="restaurant_slug"/>
+        <div class="col-sm-12 table-responsive">
+            <table class="row-border full-length-header hover table table-bordered dataTable fixed_header_table">
+                <thead>
+                    <tr>
+                        <th width="4%"> </th>
+                        <th> <%=__("admin.merchant_upload.choice_group_old_id")%> *</th>
+                        <th> <%=__("admin.merchant_upload.item_id")%> *</th>
+                        <th> <%=__("admin.merchant_upload.item_unit_id")%> </th>
+                        <th> <%=__("admin.merchant_upload.group_name_english")%> *</th>
+                        <th> <%=__("admin.merchant_upload.group_name_arabic")%> *</th>
+                        <th> <%=__("admin.merchant_upload.group_min_quantity")%> *</th>
+                        <th> <%=__("admin.merchant_upload.group_max_quantity")%> *</th>
+                        <th> <%=__("admin.merchant_upload.group_description_in_english")%> </th>
+                        <th> <%=__("admin.merchant_upload.group_description_in_arabic")%> </th>
+                    </tr>
+                </thead>
+                <tbody id="choice_group_form"></tbody>
+            </table>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-sm bg-green add-more-btn" onclick="AppendHTML()"><%=__("admin.merchant_upload.add_more")%></button>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" id="choice-group-btn-id" class="btn bg-brown btn-sm waves-effect choice-group-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+            <a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    /** Function to append inputs in form*/
+    var rowCount = 0;
+    function AppendHTML(){
+        var defaultHTML     = $("#choice_group_form_html tbody").html();
+        var htmlToAppend    = defaultHTML.replace(RegExp('{INDEX}','g'),rowCount);
+        $("#choice_group_form").append(htmlToAppend);
+        rowCount++;
+
+        if($(document).find("#add_item_choice_group .remove-choice-group").length > 1){
+            $(document).find("#add_item_choice_group .remove-choice-group").removeClass("hide");
+        }
+        $(".add-more-btn").addClass("hide");
+        $(".add-more-btn").last().removeClass("hide");
+    }
+
+    /** Add one row default*/
+    $(document).ready(function(){
+        AppendHTML();
+    });
+
+    /**
+    * Function to submit form
+    */
+    $(".choice-group-btn-submit").click(function(){
+        var btnId = $(this).attr("id");
+        $("#add_item_choice_group span.error").text("");
+        $("#restaurant_error").text("");
+        var restaurantSlug = $("#restaurant_slug").val();
+        if(!restaurantSlug || restaurantSlug == ""){
+            display_errors([{param:"restaurant",msg:"<%= __('admin.merchant_upload.please_select_restaurant_first')%>"}],"merchant_file");
+            return false;
+        }
+        startTextLoading(btnId);
+        ajax_submit("add_item_choice_group",function(status,response){
+            stopTextLoading(btnId);
+            if(status){
+                if(response.redirect_url){
+                    notice(response.status,response.message);
+                    $("#upload_action").val('').trigger("change");
+                    resetMerchantForm();
+                    window.location.href = response.redirect_url;
+                }else{
+                    window.location.reload(true);
+                }
+            }
+        });
+    });
+
+    /** Delete choice_group row*/
+    $(document).on("click",".remove-choice-group",function(){
+        var openModal = false;
+        var that = this;
+        $(that).parents(".table_row").find("input.input-column").each(function(){
+            if($(this).val() != ""){
+                openModal = true;
+            }
+        });
+
+        if(!openModal){
+            $(that).parents(".table_row").remove();
+            if($(document).find("#add_item_choice_group .remove-choice-group").length <= 1){
+                $(document).find("#add_item_choice_group .remove-choice-group").addClass("hide");
+            }
+            $(".add-more-btn").last().removeClass("hide");
+        }else{
+            confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.merchant_upload.choice_group_remove_comfirm_message"); %>',function(result){
+                if(result){
+                    $(that).parents(".table_row").remove();
+                    if($(document).find("#add_item_choice_group .remove-choice-group").length <= 1){
+                        $(document).find("#add_item_choice_group .remove-choice-group").addClass("hide");
+                    }
+                    $(".add-more-btn").last().removeClass("hide");
+                }
+                swal.close();
+            });
+        }
+    });
+
+</script>

@@ -1,0 +1,477 @@
+
+<%
+var fromDate  	= (from_date != "" ) ? from_date+" "+START_DATE_TIME_FORMAT: "";
+var toDate  	= (to_date != "") ? to_date+" "+END_DATE_TIME_FORMAT : "";
+var finalDate  	= (from_date!= "" && to_date != "") ? from_date+' - '+to_date : "";
+var orderStatus	= order_status;
+var printOrderId= print_order_id;
+%>
+<div class="container-fluid" id="main-container">
+<!--Search Start -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-col-pink">
+				<div class="panel-heading" role="tab" id="panel-heading-id">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+						   aria-controls="panel-collapse-id">
+							<%= __("system.search"); %>
+							<span class="pull-right collapse-toggle-icon"></span>
+						</a>
+					</h4>
+				</div>
+				<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+					<div class="panel-body">
+						<form id="searchForm" name="searchForm" >
+							<div class="row clearfix dataTables_wrapper">
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control" id="column_filter_8" data-live-search="true" onchange="searchDatatable(8)" name="branch_id" <%= (restaurantBranches) ? 'disabled' : ''%>>
+												<option value=""><%= __('orders.select_branch'); %></option>
+												<%- branch_list %>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" name="unique_order_id" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('orders.search_by_order_id'); %>">
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" name="customer_mobile" id="customer_mobile" placeholder="<%= __('orders.search_by_customer_mobile'); %>">
+										</div>
+									</div>
+								</div>
+								<!-- Search by order Date -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="date-range-picker" placeholder="<%= __('orders.search_by_order_date'); %>" value="<%=finalDate%>" name="date-range-picker">
+										</div>
+										<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=fromDate%>">
+										<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=toDate%>">
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-2">
+									<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+										<%= __("system.reset")%>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Search End -->
+
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%= __("orders."+order_status); %>
+				</h2>
+				<ul class="header-dropdown m-r--5 btn-right-top-margin">
+					<li>
+						<a href="javascript:void(0);" class='refresh hide status_change_<%= orderStatus %>'>
+							<button type="button" class="btn btn-sm bg-indigo waves-effect">
+								 <%= __('system.refresh'); %>
+							</button>
+						</a>
+					</li>
+
+					<li class="hide print_<%=printOrderId%>">
+						<a href="javascript:void(0);" id="anchor_<%=printOrderId%>" class='<%= getPermissionClass(module_type,["print_receipt","print"]); %>' data-id="<%=printOrderId%>"> </a>
+					</li>
+				</ul>
+			</div>
+			<div class="body">
+				<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="10%"><%= __("orders.order_id"); %></th>
+							<th width="10%"><%= __("orders.order_date"); %></th>
+							<th width="10%"><%= __("orders.order_status"); %></th>
+							<th width="10%"><%= __("orders.client_name"); %></th>
+							<th width="10%"><%= __("orders.mobile_number"); %></th>
+							<th width="10%"><%= __("orders.payment_method"); %></th>
+							<th width="10%"><%= __("orders.net_amount"); %></th>
+							<th width="10%"><%= __("orders.captain_id"); %></th>
+							<th width="10%"><%= __("orders.branch_id"); %></th>
+							<th width="10%"><%= __("system.action"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<!-- Modal for reject restaurant branch request-->
+<div class="modal fade" id="reject_order" tabindex="-1" role="dialog" aria-labelledby="reject_order" aria-hidden="true">
+<div class="modal-dialog"  role="document">
+	<div class="modal-content">
+		<div class="modal-header modal-header-seperator">
+			<h4 class="modal-title"><%=__("orders.reject_order") %></h4>
+		</div>
+		<form id="reject-form" data-submit-btn-id="reject-order_btn" method="post" class="on_click_submit" role="form" action=''>
+			<input type="hidden" name="order_id" id="order_id">
+			<div class="modal-body">
+				<div class="row clearfix">
+					<div class="col-sm-12">
+						<div class="form-grop">
+							<div class="form-lin no-bottom-border">
+								<label for="rejection_reason" class="control-label"><%= __('orders.rejection_field'); %><span class="required"> *</span>  </label>
+								<div class="form-grop margin-0">
+									<div class="form-line">
+										<textarea id="rejection_reason" rows="6" class="resize-none form-control" name="rejection_reason"></textarea>
+									</div>
+									<span id="rejection_reason_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer border-top">
+				<button type="button"  id="reject-order_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-reject noHover margin-0"><%= __("admin.system.submit"); %>
+				</button>
+				<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+			</div>
+		</form>
+	</div>
+</div>
+</div><!--modal close-->
+<!-- Modal for assigning captain to order -->
+<div class="modal fade" id="assign_order" tabindex="-1" role="dialog" aria-labelledby="assign_order" aria-hidden="true">
+<div class="modal-dialog"  role="document">
+	<div class="modal-content">
+		<div class="modal-header modal-header-seperator">
+			<h4 class="modal-title"><%=__("orders.assign_captain") %></h4>
+		</div>
+		<form id="assign-form" data-submit-btn-id="assign-order_btn" method="post" class="on_click_submit" role="form" action=''>
+			<input type="hidden" name="order_captain_id" id="order_captain_id">
+			<div class="modal-body">
+				<div class="row clearfix">
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="form-line no-bottom-border">
+								<label for="captain_name" class="control-label"><%= __('orders.captain_name'); %><span class="required"> *</span>  </label>
+								<input type="text" id="captain_name" class="form-control" name="captain_name">
+							</div>
+							<span id="captain_name_error" class="error"></span>
+						</div>
+					</div>
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="form-line no-bottom-border">
+								<label for="captain_number" class="control-label"><%= __('orders.captain_number'); %><span class="required"> *</span>  </label>
+								<input type="text" id="captain_number" class="form-control" name="captain_number">
+							</div>
+							<span id="captain_number_error" class="error"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer border-top">
+				<button type="button"  id="assign-order_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-assign noHover margin-0"><%= __("admin.system.submit"); %>
+				</button>
+				<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+			</div>
+		</form>
+	</div>
+</div>
+</div><!--modal close-->
+<!-- Modal for receipt of order -->
+<div class="modal fade" id="order_receipt" tabindex="-1" role="dialog" aria-labelledby="assign_order" aria-hidden="true">
+</div><!--modal close-->
+<%- contentFor("css") %>
+<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data */
+	var dataTable 			=	"";
+	var ORDER_STATUS_TYPES	= 	<%- JSON.stringify(ORDER_STATUS_TYPES)%>;
+
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[[ 1, "desc" ]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ 	"data": 'unique_order_id',
+					"orderable" : 	false,
+				},
+				{
+					"data"		 : 'order_date',
+					"searchable" : 	false,
+					"render" 	 : 	function(order_date){
+						return moment(order_date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+					}
+				},
+				{
+					"data": {},
+					"field_type" : "<%=EXACT_FIELD%>",
+					"field_name" : "restaurant_status",
+					"render" : function(result){
+						let labelClass 	= "";
+						let labelText	= "";
+						if(result.restaurant_status && ORDER_STATUS_TYPES[result.restaurant_status]){
+							labelClass 	= ORDER_STATUS_TYPES[result.restaurant_status].label_class;
+							labelText 	= ORDER_STATUS_TYPES[result.restaurant_status].status_name;
+							if(ORDER_STATUS_TYPES[result.restaurant_status].restaurant_status_name){
+								labelText = ORDER_STATUS_TYPES[result.restaurant_status].restaurant_status_name;
+							}
+						}
+
+						var statusLabel 	= (result.restaurant_status && ORDER_STATUS_TYPES[result.restaurant_status]) ? '<p><span class="label '+labelClass+'">'+labelText+'</span></p>' : '';
+						var modifiedStatus 	= (result.is_modified)	? '<p><span class="label label-warning"><%=__("admin.orders.modified_order")%></span></p>' : '';
+
+						return statusLabel+modifiedStatus;
+					}
+				},
+				{
+					"data"		 : 'customer_name',
+					"orderable" : 	false,
+				},
+				{
+					"data"		 : 'customer_mobile',
+					"orderable" : 	false,
+				},
+				{
+					"data"		: 'payment_type',
+					"orderable" : 	false,
+				},
+				{
+					"data"		 : 'net_amount',
+					"searchable" : 	false,
+					"render" 	 : 	function(net_amount){
+						return  (typeof net_amount !== typeof undefined) ? currencyFormat(net_amount) : '';
+					}
+				},
+				{
+					"data"		 : 'delivery_by',
+					"orderable" : 	false,
+				},
+				{
+					"data"		 : 'branch_name',
+					"field_type" : "<%=OBJECT_ID_FIELD %>",
+					"field_name" : "branch_id",
+					"orderable" : 	false,
+				},
+				{
+					"data"		: {},
+					"orderable"	: false,
+					"searchable": false,
+					"render"	: function(result){
+						var id 			 = 	(result._id) 			?	result._id 				:"";
+						var deliveryType = 	(result.delivery_type) 	?	result.delivery_type	:"";
+						var isCompleted  = 	(result.is_completed) 	?	result.is_completed		:false;
+						var isRestDelivery=	(deliveryType == '<%= DELIVERY_BY_RESTAURANT%>')? true :false;
+						var isPickUp	=	(deliveryType == '<%= DELIVERY_BY_PICK_UP%>')? true :false;
+						var isStatusChanged= ('<%= order_status %>'== '<%= ORDER_PENDING %>' || '<%= order_status %>'== '<%= ORDER_PREPARING %>' || ('<%= order_status %>'== '<%= ORDER_READY_TO_PICK_UP %>' && !isRestDelivery) || (isRestDelivery || isPickUp)) ? true :false;
+
+						var actionButtons=	'<ul class="action-btn-container">'+
+								'<li>'+
+									'<a href="<%=list_url%>/view/'+id+'" target="_blank">'+
+										'<button type="button" class="btn bg-primary waves-effect noHover <%= getPermissionClass(module_type,["order_detail","view"]); %>"><%= __("system.view");%></button>'+
+									'</a>'+
+								'</li>';
+
+								if('<%= order_status %>' == '<%= ORDER_PENDING %>' || '<%= order_status %>' == '<%= ORDER_PREPARING %>' || '<%= order_status %>' == '<%= ORDER_DELIVERED %>'){
+									actionButtons += '<li>'+
+										'<a href="javascript:void(0)">'+
+											'<button type="button" class="btn bg-orange waves-effect open-receipt <%= getPermissionClass(module_type,["print_receipt","print"]); %>" data-id="'+id+'">'+
+											' <%= __("orders.thermal") %></button>'+
+										'</a>'+
+									'</li>';
+								}
+								if(!isCompleted){
+									if('<%= order_status %>'!= '<%= ORDER_ON_THE_WAY %>' && isRestDelivery){
+										actionButtons += '<li>'+
+											'<a href="javascript:void(0)" class="btn bg-orange waves-effect waves-block open-captain-modal <%= getPermissionClass(module_type,["orders","update_order_status"]); %>" data-id="'+id+'" >'+
+												' <%= __("orders.assign_captain") %>'+
+											'</a>'+
+										'</li>';
+									}
+
+									if(isStatusChanged){
+										actionButtons += '<li class="<%= getPermissionClass(module_type,["orders","update_order_status"]); %>">'+
+											'<a data-action-url="<%=list_url%>/change_order_status/'+id+' "class="action-btn" data-open-modal="true" >'+
+												'<button type="button" class="btn bg-indigo waves-effect noHover <%= getPermissionClass(module_type,["order_detail","view"]); %>"><%= __("orders.change_order_status");%></button>'+
+											'</a>'+
+										'</li>';
+									}
+								}
+						actionButtons +=	'</ul>';
+						return actionButtons;
+					}
+				},
+			],
+			"createdRow": function( row, data, dataIndex){
+				if('<%= order_status %>' == '<%= ORDER_PENDING %>'){
+					if(data.is_modified){
+						$(row).addClass('highlight-datatable-row');
+					}
+				}
+			},
+			"ajax":{
+				url 	:	"<%=list_url%>/"+'<%= order_status %>',
+				type	: 	"POST",
+				data	: 	function (d) {
+					d.fromDate 	   = $('#from_date').val();
+					d.toDate 	   = $('#to_date').val();
+					d.mobile 	   = $('#customer_mobile').val();
+				},
+				dataSrc	: 	function(res){
+					adjustPermissionsClass();
+					return res.data;
+				}
+			}
+		});
+	});
+
+	/**
+	* Function to show modal
+	*/
+	$(document).on('click','.open-modal',function(){
+		var orderId = $(this).attr('data-id');
+
+		$('#order_id').val(orderId);
+		$("#rejection_reason_error").text('');
+		$('#rejection_reason').val("");
+		$('#reject-form').attr("action","<%=WEBSITE_URL%>orders/reject_order_status");
+
+		$('#reject_order').modal({
+			backdrop: 'static',
+			keyboard: false
+		});
+		$('#reject_order').modal('show');
+	});
+
+	/**
+	* Function to show assign captain modal
+	*/
+	$(document).on('click','.open-captain-modal',function(){
+		var orderId = $(this).attr('data-id');
+
+		$('#order_captain_id').val(orderId);
+		$('#assign-form').attr("action","<%=WEBSITE_URL%>orders/assign_captain");
+
+		$('#assign_order').modal({
+			backdrop: 'static',
+			keyboard: false
+		});
+		$('#assign_order').modal('show');
+	});
+
+	/**
+	* Function to submit  modal form
+	*/
+	$(".btn-submit-reject").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+
+		ajax_submit("reject-form",function(status,response){
+			stopTextLoading(btnId);
+			if(status){
+				window.location.reload();
+			}
+		});
+	});
+
+	/**
+	* Function to submit assign captain modal form
+	*/
+	$(".btn-submit-assign").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+
+		ajax_submit("assign-form",function(status,response){
+			stopTextLoading(btnId);
+			if(status){
+				window.location.reload();
+			}
+		});
+	});
+
+	/**
+	* Function to print receipt
+	*/
+	$(document).on('click','.open-receipt',function(){
+		var orderId	=	$(this).attr('data-id');
+		if(orderId) openReceipt(orderId);
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+	/** Javascript function to search by mobile number */
+	$("#customer_mobile").keyup(function(){
+		dataTable.draw();
+	});
+
+	/** Javascript function to refresh */
+	$('.refresh').click(function(){
+		$(this).addClass("hide");
+		dataTable.draw();
+	});
+
+	/** Open receipt popup  */
+	if($(".print_<%=printOrderId%>").length >0){
+		adjustPermissionsClass();
+		setTimeout(function(){
+			if(!$(".print_<%=printOrderId%>").find("a").hasClass("hideMe")){
+				openReceipt("<%=printOrderId%>");
+				window.history.replaceState(null, null, "<%=list_url%>/<%= order_status %>");
+			}
+		},1.5);
+	}
+
+	/** Open receipt popup  */
+	function openReceipt(orderId){
+		if(orderId){
+			$.ajax({
+				url :"<%=list_url%>/print/"+orderId+"<%=(printOrderId) ? '?print_order='+printOrderId: ''%>",
+				type: "GET",
+				success:function(response){
+					$('#order_receipt').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					$('#order_receipt').html(response);
+					$('#order_receipt').modal('show');
+					setDateTimeformat();
+				}
+			});
+		}
+	}
+</script>
+<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>
+<script type="text/javascript" src="<%= WEBSITE_JS_PAGE_PATH %>date_range_picker/config.js"></script>

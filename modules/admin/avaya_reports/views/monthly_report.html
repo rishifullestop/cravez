@@ -1,0 +1,175 @@
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							aria-controls="panel-collapse-id">
+								<%= __("admin.avaya.monthly_report"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" method="post">
+								<div class="row clearfix">
+									<!-- Search by Month -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="date-range-picker" id="date-range-picker" placeholder="<%= __('admin.team_breaks.search_by_date'); %>" autocomplete="off" value="<%=newDate('',DATABASE_DATE_FORMAT)+' - '+newDate('',DATABASE_DATE_FORMAT)%>" readonly>
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=newDate('',DATABASE_DATE_FORMAT)%>">
+											<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=newDate('',DATABASE_DATE_FORMAT)%>">
+											<span id="date_time_error" class="error"></span>
+										</div>
+									</div>
+									<!-- Search by Month -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select id="team_leader_id" class="form-control" data-live-search="true" name="team_leader_id" multiple title="<%= __('admin.quality_monitor.select_team_leader'); %>">
+													<%- team_list %>
+												</select>
+											</div>
+											<span id="date_time_error" class="error"></span>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-4">
+										<button type="button" id="apply" class="btn btn-sm waves-effect bg-indigo noHover">
+											<%= __("admin.system.apply")%>
+										</button>
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="main-container"></div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+<script type="text/javascript">
+	/**
+	 * Function to show month p[icker
+	 * 
+	*/
+	//~ $('#date_time').datepicker({
+		//~ autoclose: true,
+		//~ minViewMode: 1,
+		//~ format: '<%=MONTH_YEAR_FORMAT%>'
+	//~ }).on('changeDate', function(selected){
+		//~ download_report();
+	//~ }); 
+	
+	/**
+	 * For date range picker in searching
+	 */
+	var DATE_FORMAT = "<%=DATE_RANGE_DATE_FORMAT%>";
+	var START_DATE	= (typeof dateFrom !== typeof undefined && dateFrom!="") ?	new Date(dateFrom) 	: new Date();
+	var END_DATE	= (typeof dateTo !==typeof  undefined && dateTo!="" ) ?	new Date(dateTo) : new Date();
+	var OPENS		= "right";
+	var options		= {};
+
+	/**Options for date range picker*/
+	options.locale = {
+		format		: 	DATE_FORMAT,
+		cancelLabel	:	"<%= __('admin.date_picker.cancel_label')%>"
+	};
+
+	options.startDate		= 	START_DATE;
+	options.endDate			= 	END_DATE;
+	options.opens			= 	OPENS;
+	options.autoUpdateInput	= 	false;
+	//~ options.maxDate			= 	new Date();
+
+	var configDemo = $('#date-range-picker');
+	configDemo.daterangepicker(options, function (start, end, label) {
+		var start_date	= start.format('<%=DATE_RANGE_DATE_FORMAT%>');
+		var end_date	= end.format('<%=DATE_RANGE_DATE_FORMAT%>');
+	});
+
+	/**
+	* Applying date range filter on user details
+	*
+	* @param  null
+	*
+	* @return void
+	*/
+	configDemo.on('apply.daterangepicker', function(e,picker){
+		var startDate	= picker.startDate.format('<%=DATE_RANGE_DATE_FORMAT%>');
+		var endDate		= picker.endDate.format('<%=DATE_RANGE_DATE_FORMAT%>');
+
+		$('#from_date').val(startDate);
+		$('#to_date').val(endDate);
+
+		var displayStartDate 	=	picker.startDate.format('<%=DATEPICKER_DATE_FORMAT%>');
+		var displayEndDate 		= 	picker.endDate.format('<%=DATEPICKER_DATE_FORMAT%>');
+		$('#date-range-picker').val(displayStartDate+" - "+displayEndDate);
+	});
+
+	/**
+	* Unset date range picker value when click to "clear" button
+	*
+	* @param  null
+	*
+	* @return void
+	*/
+	configDemo.on('cancel.daterangepicker',function(e){
+		configDemo.data('daterangepicker').setStartDate(new Date());
+		configDemo.data('daterangepicker').setEndDate(new Date());
+
+		$('#from_date').val("");
+		$('#to_date').val("");
+		$('#date-range-picker').val("");
+		//~ dataTable.draw();
+	});
+
+	/**
+	 * Function to submit the month form and get the monthly report
+	 * 
+	*/
+	function download_report(){
+		$("#searchForm").submit();
+	}
+	
+	$('#apply').click(function(){ 
+		var date	=	$('#date-range-picker').val();
+		var errors	=	[];
+		if(!date) errors.push('<%= __('admin.quality_monitor.please_select_date')%>');
+		var errorString	=	'';
+		if(errors.length > 0){
+			errors.forEach(function(error) { 
+				errorString		+=	error+'<br/>';
+			});
+			notice('error',errorString);
+			return false;
+		}else{
+			download_report();
+		}
+	});
+
+	/* Calling up the reset function */
+	$(document).on("click","#reset",function(e){
+		e.stopImmediatePropagation();
+		if($(this).attr("data-href")){
+			window.location.href = $(this).attr("data-href");
+		}else{
+			window.location.reload(true);
+		}
+	});
+</script> 
+	

@@ -1,0 +1,40 @@
+<% var totalOfferCounts =  (result.total_offers_counts) ? result.total_offers_counts : {}; %>
+<div class="number_box">
+    <h3><span><%= __("admin.dashboard.offers_info")%></span></h3>
+    <div class="dashboard_number menu_box">
+        <ul>
+            <li>
+                <div class="number_bg_box darkblue_border">
+                    <a href="<%= WEBSITE_ADMIN_URL %>offer_management" target="_blank" class="text-decoration-none reset_storage">
+                        <strong><%= (totalOfferCounts.total_offers) ? totalOfferCounts.total_offers : 0;%></strong>
+                        <span><%= __("admin.dashboard.total_offers")%></span>
+                    </a>
+                </div>
+            </li>
+            <li>
+                <div class="number_bg_box darkblue_border">
+                    <a href="<%= WEBSITE_ADMIN_URL %>offer_management?offer_type=redeemed_offers" target="_blank" class="text-decoration-none reset_storage">
+                        <strong><%= (totalOfferCounts.total_redeemed_offers) ? totalOfferCounts.total_redeemed_offers : 0;%></strong>
+                        <span><%= __("admin.dashboard.total_redeemed_offers")%></span>
+                    </a>
+                </div>
+            </li>
+            <li>
+                <div class="number_bg_box darkblue_border">
+                    <a href="<%= WEBSITE_ADMIN_URL %>offer_management?offer_type=redeemed_offers" target="_blank" class="text-decoration-none reset_storage">
+                        <strong><%= (totalOfferCounts.total_used_offers) ? totalOfferCounts.total_used_offers : 0;%></strong>
+                        <span><%= __("admin.dashboard.total_used_offers")%></span>
+                    </a>
+                </div>
+            </li>
+            <li>
+                <div class="number_bg_box darkblue_border">
+                    <a href="<%= WEBSITE_ADMIN_URL %>offer_management?offer_type=unused_offers" target="_blank" class="text-decoration-none reset_storage">
+                        <strong><%= (totalOfferCounts.total_unused_offers) ? totalOfferCounts.total_unused_offers : 0;%></strong>
+                        <span><%= __("admin.dashboard.total_unused_offers")%></span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

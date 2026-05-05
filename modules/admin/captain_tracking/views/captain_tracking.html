@@ -1,0 +1,685 @@
+<%
+	var activeCaptains 	  = (active_captains) 		? parseInt(active_captains) 		: 0;
+	var notActiveCaptains = (not_active_captains) 	? parseInt(not_active_captains) 	: 0;
+	var busyCaptains 	  = (busy_captains) 		? busy_captains 		: 0;
+	var assignedCaptains  = (assigned_captains) 	? assigned_captains 	: 0;
+	var freeCaptains 	  = (free_captains) 		? free_captains 		: 0;
+	var orderCountType 	  = (order_count_type) 		? order_count_type 		:"";
+	var arrivedAtCustomerLocationCaptains = (arrived_at_customer_location_captains) ? arrived_at_customer_location_captains : 0;
+	var WTCCaptains 	= (way_to_customer_captains) ? way_to_customer_captains : 0;
+	var WTRCaptains 	= (way_to_restaurant_captains) ? way_to_restaurant_captains : 0;
+	var arrivedRestaurantCaptains 	= (arrived_at_restaurant_captains) ? arrived_at_restaurant_captains : 0;
+
+	var captainType	= (typeof captain_type !== typeof undefined && captain_type) ?	captain_type : "";
+	var captainId	= (typeof captain_id !== typeof undefined && captain_id) 	 ?	captain_id   : "";
+%>
+<div class="container-fluid" id="main-container">
+	<!--Static  -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-target="#panel-collapse-id1" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.captain_tracking.statics"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id1" class="panel-collapse collapse" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<div class="rulebutton">
+								<ul>
+									<li class="<%= (captainType == 'total_captains') ? 'active' : '';%>">
+										<label><a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=total_captains'%>" class="reset_storage"><%= __("admin.captain_tracking.total_captains");%></a></label>
+										(<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=total_captains'%>" class="reset_storage"><span class="total_captains"><%= (activeCaptains+notActiveCaptains)%></span></a>)
+									</li>
+									<li class="<%= (captainType == 'active_captains') ? 'active' : '';%>">
+										<label><a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=active_captains'%>" class="reset_storage"><%= __("admin.captain_tracking.active_captains");%></a></label>
+										(<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=active_captains'%>" class="reset_storage"><span class="active_captains"><%= activeCaptains%></span></a>)
+									</li>
+
+									<li class="<%= (captainType == 'inactive_captains') ? 'active' : '';%>">
+										<label><a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=inactive_captains'%>" class="reset_storage"><%= __("admin.captain_tracking.inactive_captains");%></a></label>
+										(<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=inactive_captains'%>" class="reset_storage"><span class="inactive_captains"><%= notActiveCaptains%></span></a>)
+									</li>
+									<li class="<%= (captainType == 'assigned_captains') ? 'active' : '';%>">
+										<label><a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=assigned_captains'%>" class="reset_storage"><%= __("admin.captain_tracking.assigned");%></a></label>
+										(<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=assigned_captains'%>" class="reset_storage"><span class="assigned_captains"><%= assignedCaptains%></span></a>)
+									</li>
+									<li class="<%= (captainType == 'free_captains') ? 'active' : '';%>">
+										<label><a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=free_captains'%>" class="reset_storage"><%= __("admin.captain_tracking.free");%></a></label>
+										(<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=free_captains'%>" class="reset_storage"><span class="free_captains"><%= freeCaptains%></span></a>)
+									</li>
+									<li class="<%= (captainType == 'way_to_restaurant_captains') ? 'active' : '';%>">
+										<label><a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=way_to_restaurant_captains'%>" class="reset_storage"><%= __("admin.captain_tracking.way_to_restaurant_captains");%></a></label>
+										(<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=way_to_restaurant_captains'%>" class="reset_storage"><span class="way_to_restaurant_captains"><%= WTRCaptains%></span></a>)
+									</li>
+									<li class="<%= (captainType == 'arrived_at_restaurant_captains') ? 'active' : '';%>">
+										<label><a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=arrived_at_restaurant_captains'%>" class="reset_storage"><%= __("admin.captain_tracking.arrived_at_restaurant_captains");%></a></label>
+										(<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=arrived_at_restaurant_captains'%>" class="reset_storage"><span class="arrived_at_restaurant_captains"><%= arrivedRestaurantCaptains%></span></a>)
+									</li>
+									<li class="<%= (captainType == 'arrived_at_customer_location_captains') ? 'active' : '';%>">
+										<label><a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=arrived_at_customer_location_captains'%>" class="reset_storage"><%= __("admin.captain_tracking.arrived_at_customer_location");%></a></label>
+										(<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=arrived_at_customer_location_captains'%>" class="reset_storage"><span class="arrived_at_customer_location_captains"><%= arrivedAtCustomerLocationCaptains%></span></a>)
+									</li>
+									<li class="<%= (captainType == 'way_to_customer_captains') ? 'active' : '';%>">
+										<label><a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=way_to_customer_captains'%>" class="reset_storage"><%= __("admin.captain_tracking.way_to_customer_captains");%></a></label>
+										(<a href="<%= WEBSITE_ADMIN_URL+'captain_tracking?captain_type=way_to_customer_captains'%>" class="reset_storage"><span class="way_to_customer_captains"><%= WTCCaptains%></span></a>)
+									</li>
+								</ul>
+								<div class="refresh_Button">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect count-refresh-btn" id="count-btn">
+										<%= __("admin.captain_tracking.refresh"); %>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Captain listing  -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.captain_tracking.captain_tracking"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a  class="refresh-btn">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.captain_tracking.refresh"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="15%"><%= __("admin.captain_tracking.name"); %></th>
+								<th width="5%"><%= __("admin.system.status"); %></th>
+								<th width="10%"><%= __("admin.captain_tracking.no_of_orders"); %></th>
+								<th width="10%"><%= __("admin.captain_tracking.not_accepted_orders"); %></th>
+								<th width="5%"><%= __("admin.captain_tracking.in_shift"); %></th>
+								<th width="10%"><%= __("admin.captain_tracking.force_active"); %></th>
+								<th width="5%"><%= __("admin.captain_tracking.suspend"); %></th>
+								<th><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Captain deliveries  -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.captain_tracking.captain_deliveries"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li class="selected">
+							<select class="form-control m-t--10" id="captain_id" data-live-search="true">
+								<option value=""><%=__("admin.captain_tracking.search_by_captain_name");%></option>
+								<%-captain_list%>
+							</select>
+						</li>
+						<li>
+							<a  class="refresh-captain-deliveries-btn">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.captain_tracking.refresh"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing-captain-deliveries" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="10%"><%= __("admin.system.action"); %></th>
+								<th width="10%"><%= __("admin.captain_tracking.order_id"); %></th>
+								<th width="10%"><%= __("admin.captain_tracking.captain"); %></th>
+								<th width="5%"><%- nl2br(__("admin.captain_tracking.delivery_status")); %></th>
+								<th width="5%"><%- nl2br(__("admin.captain_tracking.order_status")); %></th>
+								<th width="5%"><%= __("admin.captain_tracking.area"); %></th>
+								<th width="10%"><%- nl2br(__("admin.captain_tracking.delivery_area")); %></th>
+								<th width="2%"><%- nl2br(__("admin.captain_tracking.delivery_time")); %></th>
+								<th width="2%"><%- nl2br(__("admin.captain_tracking.remaining_time")); %></th>
+								<th width="2%"><%- nl2br(__("admin.captain_tracking.time_passed")); %></th>
+								<th width="20%"><%= __("admin.captain_tracking.voc"); %></th>
+								<th width="20%"><%= __("admin.captain_tracking.tickets"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Map  -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.captain_tracking.location"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a  class="refresh-location-btn">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.captain_tracking.refresh"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div id="legend" class="col-sm-12 m-t-10 text-center">
+					<% Object.keys(DRIVER_ORDER_STATUS).map(key=>{
+						let orderDriverStatus = DRIVER_ORDER_STATUS[key].title;
+						if(key == ORDER_DRIVER_ASSIGNED) orderDriverStatus = DRIVER_ORDER_STATUS[key].title+"("+__("admin.captain_tracking.not_accepted")+")";
+						 %>
+							<div class="icon-seperator">
+								<img src="<%=DRIVER_ORDER_STATUS[key].icon%>"/>
+								<p class="captain-map-legend"><%=orderDriverStatus%></p>
+							</div>
+					<% }); %>
+				</div>
+				<div class="body table-responsive p-t-0" id="live-location-report">
+					<div id="map" class="col-sm-12">
+						<h5 class="text-center">
+							<img src="<%=WEBSITE_ADMIN_IMG_URL%>/pagination_loader.gif">
+						</h5>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script src="<%-GOOGLE_MAP_SCRIPT%>"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>countdown/countdown.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>countdown/config.js"></script>
+	<script type="text/javascript">
+		var historyData;
+		var myMarker 	= [];
+		var infowindow 	= [];
+		/** Function to initialize datatable and get server side data*/
+		var captainsDataTable	 =	"";
+		var captainsDeliveriesDataTable = "";
+		var statusObject 		  =  <%- JSON.stringify(CAPTAIN_TRACKING_STATUS)%>;
+		var DRIVER_ORDER_STATUS   =  <%- JSON.stringify(DRIVER_ORDER_STATUS)%>;
+		var ORDER_STATUS_TYPES    =  <%- JSON.stringify(ORDER_STATUS_TYPES)%>;
+		var DELIVERY_ORDER_STATUS = <%-JSON.stringify(DELIVERY_ORDER_STATUS)%>;
+		var ORDER_DRIVER_FREE 	  = '<%=ORDER_DRIVER_FREE%>';
+
+		$(document).ready(function() {
+			captainsDataTable = $('#datatable-listing').DataTable({
+				"order"		: 	[[1,"desc"]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{
+						"data"			: 	'full_name',
+						"searchable"	: 	false
+					},
+					{
+						"data"			: 	'is_available',
+						"searchable"	: 	false,
+						"render" 		: 	function(isAvailable){
+							var is_available 	= 	(isAvailable) ? isAvailable :'<%=NOT_AVAILABLE%>';
+							var statusClass		=	(statusObject[is_available] && statusObject[is_available]["label_class"]) ? statusObject[is_available]["label_class"] :"";
+							var statusLabel		=	(statusObject[is_available] && statusObject[is_available]["status_name"]) ? statusObject[is_available]["status_name"] :"";
+							return '<span class="label '+statusClass+'">'+statusLabel+'</span>';
+						}
+					},
+					{
+						"data"			: 	{},
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+							let activeOrders = result.active_orders ? result.active_orders : "";
+							let captainId    = result._id           ? result._id           : "";
+
+							return (activeOrders) ? '<a href="<%=admin_list_url%>?captain_id='+captainId+'&order_count_type=all_orders" class="reset_storage">'+activeOrders+'</a>' :0;
+						}
+					},
+					{
+						"data"			: 	{},
+						"searchable"	: 	false,
+						"orderable"     :   false,
+						"render" 		: 	function(result){
+							let notAcceptedOrder=result.not_accepted_orders ? result.not_accepted_orders:"";
+							let captainId    	= result._id          ? result._id          :"";
+
+							return (notAcceptedOrder) ? '<a href="<%=admin_list_url%>?captain_id='+captainId+'&order_count_type=not_accepted_orders" class="reset_storage">'+notAcceptedOrder+'</a>' :0;
+						}
+					},
+					{
+						"data"			: 	'in_shift',
+						"searchable"	: 	false,
+						"render" 		: 	function(inShift){
+							return (inShift) ? '<%= __("admin.captain_tracking.yes"); %>' : '<%= __("admin.captain_tracking.no"); %>';
+						}
+					},
+					{
+						"data"			: 	'force_active',
+						"searchable"	: 	false,
+						"render" 		: 	function(forceActive){
+							return (forceActive == '<%=FORCE_ACTIVE%>') ? '<%= __("admin.captain_tracking.yes"); %>' : '<%= __("admin.captain_tracking.no"); %>';
+						}
+					},
+					{
+						"data"			: 	'is_suspend',
+						"orderable"		:   false,
+						"render" 		: 	function(isSuspend){
+							return (isSuspend == '<%=SUSPEND%>') ? '<%= __("admin.captain_tracking.yes"); %>' : '<%= __("admin.captain_tracking.no"); %>';
+						}
+					},
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+							var id 			=	(result._id)			? 	result._id 		 	:'';
+							var forceActive	=	(result.force_active)	? 	result.force_active : '<%=FORCE_DEACTIVE%>';
+							var suspend		=	(result.is_suspend) 	? 	result.is_suspend	:'<%=UNSUSPEND%>';
+
+							/** Status link text, title and  link icon **/
+							var statusLinkText  =	(forceActive == '<%=FORCE_DEACTIVE%>') ? "<%= __('admin.captain_tracking.mark_force_active'); %>"	      :"<%= __('admin.captain_tracking.mark_force_inactive'); %>";
+							var statusLinkTitle	=  	(forceActive == '<%=FORCE_DEACTIVE%>') ? "<%= __('admin.captain_tracking.click_to_mark_force_active'); %>" :"<%= __('admin.captain_tracking.click_to_mark_force_inactive'); %>" ;
+							var statusLinkIcon  =	(forceActive == '<%=FORCE_DEACTIVE%>') ? "done"	 : "block";
+							var buttonColor		=   (forceActive == '<%=FORCE_DEACTIVE%>') ? "bg-blue": "bg-red";
+
+							/** Change status  Link  */
+							var dropDownButton = '<a href="javascript:void(0)" data-href="<%=admin_list_url%>/update-force-active/'+id+'/'+forceActive+'" class="btn '+buttonColor+' waves-effect m-l-5 m-t-5 confirm_box <%= getPermissionClass(module_type,["captain_tracking","list"]); %>" data-confirm-message="<%= __("admin.captain_tracking.do_you_want_to_change_force_active_for_this_captain"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+statusLinkTitle+'">'+''+statusLinkText+'</a>';
+
+							/*  Get Captain Stats Link  */
+							dropDownButton 	+= '<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/get_captain_stats/'+id+'" data-open-modal="true" class="action-btn btn bg-indigo waves-effect m-l-5 m-t-5 <%= getPermissionClass(module_type,["captain_tracking","captain_stats"]); %>"><%= __("admin.captain_tracking.captain_status"); %></a>';
+
+							/** Suspend status **/
+							var suspendLinkText  	= (suspend == '<%=UNSUSPEND%>') ? "<%= __('admin.captain_tracking.suspend'); %>"	      :"<%= __('admin.captain_tracking.unsuspend'); %>";
+							var suspendConfirmText 	= (suspend == '<%=UNSUSPEND%>') ? "<%= __('admin.captain_tracking.you_want_to_mark_as_suspend'); %>" : "<%= __('admin.captain_tracking.you_want_to_mark_as_unsuspend'); %>";
+							var suspendButtonColor 	= (suspend == '<%=UNSUSPEND%>') ? "bg-green": "bg-red";
+							dropDownButton += '<a href="javascript:void(0)" data-href="<%=admin_list_url%>/suspend-status/'+id+'/'+suspend+'" class="btn '+suspendButtonColor+' waves-effect m-l-5 m-t-5 confirm_box <%= getPermissionClass(module_type,["captain_tracking","list"]); %>" data-confirm-message="'+suspendConfirmText+'" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+suspendLinkText+'">'+''+suspendLinkText+'</a>';
+
+							return dropDownButton;
+						}
+					}
+				],
+				"createdRow": function( row, data, dataIndex){
+					var isHighlight = (data.is_highlight) ? data.is_highlight :'';
+					if(isHighlight) $(row).addClass('highlight-datatable-row');
+				},
+				"ajax":{
+					url 	:	"<%=admin_list_url%>?captain_type=<%= captainType%>",
+					type	: 	"POST",
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+
+			/** captain deliveries datatable*/
+			var orderCountType	= "<%=orderCountType%>";
+			captainsDeliveriesDataTable = $('#datatable-listing-captain-deliveries').DataTable({
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{
+						"data"		: 	{},
+						"orderable"	:   false,
+						"render" 	: 	function(result){
+							var id = (result._id) ? result._id : '';
+							let dropDownButton = '<a href="javascript:void(0);" class="action-btn btn btn-primary m-l-5 btn-sm waves-effect <%= getPermissionClass(module_type,["captain_tracking","list"]); %>" data-action-url="<%=admin_list_url%>/assign_captain_list/'+id+'" data-open-modal="true"><%= __("admin.captain_tracking.reassign");%></a>';
+							return dropDownButton;
+						}
+					},
+					{
+						"data"		: 	{},
+						"orderable"	: 	false,
+						"render"	:  function(result){
+							var uniqueOrderId  	= (result.unique_order_id)  ? result.unique_order_id : "";
+							var orderId 		= (result._id) ? result._id :"";
+							return '<a href="<%=WEBSITE_ADMIN_URL%>orders/view/'+orderId+'/order_status" target="_blank">'+uniqueOrderId+'</a>';
+
+						}
+					},
+					{
+						"data"		: 	{},
+						"orderable"	: 	false,
+						"render"	:  function(result){
+							var captain   = (result.captain)    ? result.captain 	: "";
+							var captainId = (result.captain_id) ? result.captain_id : "";
+							return (captainId) ? '<a href="<%=WEBSITE_ADMIN_URL%>user_management/view_driver/'+captainId+'" target="_blank">'+captain+'</a>' :captain;
+
+						}
+					},
+					{
+						"data"		:	{},
+						"orderable" : 	false,
+						"render" 	: 	function(result){
+							var statusLabel 	= (result.delivery_status && DELIVERY_ORDER_STATUS[result.delivery_status]) ? '<span class="label '+DELIVERY_ORDER_STATUS[result.delivery_status].label_class+'">'+DELIVERY_ORDER_STATUS[result.delivery_status].status_name+'</span>' : '';
+							return statusLabel;
+						}
+					},
+					{
+						"data"		: 	"admin_status",
+						"orderable"	: 	false,
+						"render"	:  function(adminStatus){
+							var statusLabel 	= (adminStatus && ORDER_STATUS_TYPES[adminStatus]) ? '<span class="label '+ORDER_STATUS_TYPES[adminStatus].label_class+'">'+ORDER_STATUS_TYPES[adminStatus].status_name+'</span>' : '';
+							return statusLabel;
+						}
+					},
+					{
+						"data"		: 	'area_name.en',
+						"orderable"	: 	false
+					},
+					{
+						"data"		: 	'delivery_area_name.en',
+						"orderable"	:   false,
+					},
+					{
+						"data"		: 'delivery_duration',
+						"orderable"	: false,
+						"render" 	: function(deliveryDuration){
+							var durationString	= (deliveryDuration) ? deliveryDuration+" <%= __('admin.captain_tracking.min'); %>" : '';
+							return durationString;
+						}
+					},
+					{
+						"data"		: {},
+						"orderable"	: false,
+						"render" 	: function(result){
+							let orderEstimateTime = (result.order_estimate_time) ? result.order_estimate_time :"";
+							let orderDate 		  =	(result.order_date) 	? result.order_date 	:"";
+							let isSchedule 		  =	(result.is_schedule) 	? result.is_schedule 	:"";
+							let scheduledDate 	  =	(result.scheduled_date) ? result.scheduled_date :"";
+
+							if(!orderEstimateTime) return '0 <%= __("admin.orders.min"); %>';
+
+							var startTime 	= 	(isSchedule) ? scheduledDate :orderDate;
+							var endTime	  	=	moment(orderEstimateTime).tz(DEFAULT_TIME_ZONE);
+							var timestamps	= 	parseFloat(String(moment(startTime).tz(DEFAULT_TIME_ZONE).format("<%=DATEPICKER_TIME_FORMAT%>")).replace(":","."));
+							var endtimestamp=	new Date(endTime).getTime();
+
+							var countDownString = '<span data-start-time="'+timestamps+'" data-countdown="'+endtimestamp+'">0 <%= __("admin.orders.min"); %></span>';
+
+							return countDownString;
+						}
+					},
+					{
+						"data"		: {},
+						"orderable" : false,
+						"render"	: function(result){
+							var timePassed			=	(result.time_passed) ? result.time_passed :0;
+							var adminStatus 		= 	result.admin_status ? result.admin_status : 0;
+							var isCompleted         =   result.is_completed ? result.is_completed : '';
+							var timePassedLabel     = 	(!isNaN(timePassed)) ? timePassed+" <%= __('admin.orders.min'); %>" : 0+" <%= __('admin.orders.min'); %>";
+							timePassedLabel		=	(timePassed > "<%=TIME_PASSED_MINUTE_LIMIT%>") ? "<%= __('admin.orders.order_not_delivered'); %>" : timePassedLabel;
+							timePassedLabel		=	(adminStatus != "<%=ORDER_DELIVERED%>" && !isCompleted) ? timePassedLabel : "";
+							return  timePassedLabel;
+						}
+					},
+					{
+						"data"			: 	{},
+						"searchable"	: 	false,
+						"orderable"		: 	false,
+						"render"		:  function(result){
+							var vocCount = (result.voc)  ?	result.voc.length 	:0;
+							var orderId  = (result._id)  ? result._id 			:"";
+							let seenCount 	= 0;
+							if(result.voc){
+								result.voc.map(data => {
+									if(data.is_not_seen) seenCount+=1;
+								});
+							}
+
+							var vocClass  =	(seenCount >0 && "<%-auth.user_role_id%>" == "<%=FLEET%>" ) ? 'bg-green btn_view_seen' : 'bg-orange';
+							var vocAction =	'<a href="<%= originalUrl %>" class="btn '+vocClass+' m-r-5 m-t-5 action-btn <%= getPermissionClass(module_type,["captain_tracking","voc_list"]); %>" data-action-url="<%=admin_list_url%>/get_captain_voc_list/'+orderId+'" data-open-modal="true"><i class="material-icons" >visibility</i> <span class="font-18 ">'+vocCount+' </span></a>';
+
+							vocAction +=	'<a href="<%= originalUrl %>" class="btn bg-indigo font-20 m-t-5  action-btn <%= getPermissionClass(module_type,["captain_tracking","add_voc"]); %>" data-action-url="<%=WEBSITE_ADMIN_URL%>voc_management/add_order_voc/'+orderId+'" data-open-modal="true"><i class="material-icons" >add_circle_outline</i></a>';
+
+							return vocAction;
+						}
+					},
+					{
+						"data"			: 	{},
+						"searchable"	: 	false,
+						"orderable"		: 	false,
+						"render"		:  function(result){
+							var orderId  	= (result._id) 	 	? 	result._id 	  :"";
+							var ticketCount = (result.tickets) 	?	result.tickets.length : 0;
+							let seenCount 	= 0;
+							if(result.tickets){
+								result.tickets.map(ticket => {
+									if(ticket.is_not_seen) seenCount+=1;
+								});
+							}
+
+							var tcktClass 	 =	(seenCount >0 && "<%-auth.user_role_id%>" == "<%=FLEET%>" ) ? 'bg-green btn_view_seen' : 'bg-orange';
+							var ticketAction =	'<a href="<%= originalUrl %>" class="btn '+tcktClass+' m-r-5 m-t-5 action-btn <%= getPermissionClass(module_type,["captain_tracking","ticket_list"]); %>" data-action-url="<%=admin_list_url%>/get_captain_ticket_list/'+orderId+'" data-open-modal="true"><i class="material-icons" >visibility</i> <span class="font-18 ">'+ticketCount+' </span></a>';
+
+							ticketAction +=	'<a href="<%= originalUrl %>" class="btn bg-indigo font-20 m-t-5 action-btn <%= getPermissionClass(module_type,["captain_tracking","add_ticket"]); %>" data-action-url="<%=WEBSITE_ADMIN_URL%>tickets/order_ticket_list/add/'+orderId+'?type=captain_tracking" data-open-modal="true"><i class="material-icons" >add_circle_outline</i></a>';
+
+							return ticketAction;
+						}
+					},
+				],
+				"createdRow": function( row, data, dataIndex){
+					if(!data.captain_id){
+						$(row).addClass('highlight-datatable-row');
+					}
+				},
+				"ajax":{
+					url 	:	"<%=admin_list_url+'/get_captain_deliveries'%>?captain_type=<%= captainType%>",
+					type	: 	"POST",
+					data	: 	function (d) {
+						d.captain_id = $('#captain_id').val();
+						d.order_count_type 	=	orderCountType;
+					},
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function() {
+					initCountDown();
+				}
+			});
+
+			/** Reload datatable data*/
+			$("#captain_id").change(function(){
+				orderCountType = "";
+				$("#datatable-listing-captain-deliveries").DataTable().ajax.reload();
+			});
+			$("#captain_id").selectpicker('refresh');
+
+			/** Refresh captains datatable */
+			$(".refresh-btn").click(function() {
+       			$("#datatable-listing").DataTable().ajax.reload();
+			});
+
+			/** Refresh captain deliveries datatable */
+			$(".refresh-captain-deliveries-btn").click(function() {
+       			$("#datatable-listing-captain-deliveries").DataTable().ajax.reload();
+			});
+			/** To Refresh captain deliveries and captain tracking in every 30 seconds */
+			setInterval(function(){
+				$("#datatable-listing").DataTable().ajax.reload();
+			},DEFAULT_REFRESH_TIME);
+
+			/** To Refresh location in every 30 seconds */
+
+			/** Refresh map */
+			$(".refresh-location-btn").click(function(e) {
+				var locationBtnId = $(this).attr("id");
+				e.stopPropagation();
+				getLocationData(locationBtnId,true);
+			});
+
+			/** To Get location map */
+			var locationBtnId =	$(".refresh-location-btn").attr('id');
+			getLocationData(locationBtnId,true);
+
+			/** Refresh captain statistics */
+			$(".count-refresh-btn").click(function(e) {
+				var btnId = $(this).attr("id");
+				e.stopPropagation();
+       			getCaptainRules(btnId,true);
+			});
+
+			/** To Refresh count of captain statistics in every 30 seconds */
+			setInterval(function(){
+				var btnId	=	$(".count-refresh-btn").attr('id');
+				getCaptainRules(btnId,true);
+			}, ORDER_RULE_REFRESH_TIME);
+
+			/** Add scroll bar for captain deliveries when click on number of orders */
+			var captainId = "<%=captainId%>";
+			if(captainId){
+				$('html,body').animate({scrollTop: $("#datatable-listing-captain-deliveries").offset().top - 120});
+			}
+
+			/**
+			* Function to get captain rules using ajax submit
+			*/
+			function getCaptainRules(btnId,load){
+				$.ajax({
+					url :"<%=admin_list_url%>/get_captain_rules",
+					type: "GET",
+					beforeSend: function() {
+						if(load){
+							startTextLoading(btnId);
+						}
+					},
+					success:function(response){
+						var totalCaptains = parseInt(response.active_captains)+parseInt(response.not_active_captains);
+						$('.total_captains').html(totalCaptains);
+						$('.active_captains').html(response.active_captains);
+						$('.inactive_captains').html(response.not_active_captains);
+						$('.busy_captains').html(response.busy_captains);
+						$('.free_captains').html(response.free_captains);
+						$('.assigned_captains').html(response.assigned_captains);
+						$('.arrived_at_customer_location_captains').html(response.arrived_at_customer_location_captains);
+						$('.way_to_customer_captains').html(response.way_to_customer_captains);
+						$('.arrived_at_restaurant_captains').html(response.arrived_at_restaurant_captains);
+						$('.way_to_restaurant_captains').html(response.way_to_restaurant_captains);
+						stopTextLoading(btnId);
+					}
+				});
+			}//End getCaptainRules()
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/** Function to update seen class on ticket view btn **/
+		$(document).on('click','.btn_view_seen',function(){
+			if($(this).hasClass('bg-green')) $(this).removeClass('bg-green').addClass('bg-orange');
+		});
+
+		/** Function to initialize map*/
+		var map;
+		var bounds = new google.maps.LatLngBounds();
+		var loc;
+
+		function initMap(historyData){
+			if(historyData && historyData.length >0){
+				var mapOptions = { mapTypeId: google.maps.MapTypeId.ROADMAP };
+				map =  new google.maps.Map(document.getElementById("map"), mapOptions);
+
+				for(i= 0; i < historyData.length; i++){
+					if(historyData[i].latitude && historyData[i].longitude){
+						loc = new google.maps.LatLng(historyData[i].latitude,historyData[i].longitude);
+						bounds.extend(loc);
+						addMarker(loc, historyData[i]);
+					}
+				}
+				map.fitBounds(bounds);
+				map.panToBounds(bounds);
+			}else{
+				$("#map").html('<h5 class="text-center"><%= __("admin.captain_tracking.location_data_not_available"); %></h5>');
+			}
+		}//end initMap()
+
+		function addMarker(location, extraOptions) {
+			var name			= extraOptions.full_name;
+			var mobileNumber	= "<br/> "+extraOptions.mobile_number ;
+			var activeOrders	= "<br/> # Orders: "+(extraOptions.active_orders ? extraOptions.active_orders :0);
+			var orderStatus		= extraOptions.order_status  ? extraOptions.order_status  : "free" ;
+			var icon			= (DRIVER_ORDER_STATUS[orderStatus] && DRIVER_ORDER_STATUS[orderStatus]["icon"]) ? DRIVER_ORDER_STATUS[orderStatus]["icon"] :"";
+			var marker = new google.maps.Marker({
+				position		: location,
+				map				: map,
+				title			: name,
+				mobile_number	: mobileNumber,
+				active_orders	: activeOrders,
+				icon			: icon
+			});
+
+			//create the info windows
+			var content 		= document.createElement("DIV");
+			var title 			= document.createElement("DIV");
+			var mobile_number 	= document.createElement("DIV");
+			var totalOrders 	= document.createElement("DIV");
+			title.innerHTML 	= name;
+			mobile_number.innerHTML = mobileNumber;
+			totalOrders.innerHTML = activeOrders;
+			content.appendChild(title);
+			content.appendChild(mobile_number);
+			content.appendChild(totalOrders);
+
+			var infowindow = new google.maps.InfoWindow({
+				content: content
+			});
+
+			// Open the infowindow on marker click
+			google.maps.event.addListener(marker, "click", function() {
+				infowindow.open(map, marker);
+			});
+		}//end addMarker()
+
+		/**
+		* Function to get Location of captain using ajax submit
+		*/
+		function getLocationData(){
+			$.ajax({
+				url :"<%=admin_list_url+'/get_captain_location'%>?captain_type=<%= captainType%>",
+				type: "POST",
+				success:function(response){
+					if(response.status == "<%=STATUS_SUCCESS%>"){
+						var historyData = response.result;
+						initMap(historyData);
+					}else{
+						notice(response.status,response.message);
+					}
+				}
+			});
+		}//End getLocationData()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

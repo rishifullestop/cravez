@@ -1,0 +1,256 @@
+<%
+	type		=	(typeof type !== typeof undefined)			?	type		:"";
+	displayType	=	(typeof displayType !== typeof undefined)	?	displayType	:__('admin.master.master');
+%>
+<div class="container-fluid">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"  aria-controls="panel-collapse-id">
+								<%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm">
+								<div class="row clearfix dataTables_wrapper">
+									<div class="col-md-5">
+										<div class="form-group">
+											<div class="form-line">
+												<% var filterColumnNumber = (type == "category")	?	1	:0; %>
+												<input class="form-control" name="name" id="column_filter_<%=filterColumnNumber%>"  onkeyup="searchDatatable(<%=filterColumnNumber%>)" placeholder="<%= __("admin.master.search_by_name"); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Status -->
+									<div class="col-md-5">
+										<div class="form-group">
+											<div class="form-line">
+												<% var filterColumnNumber = (type == "category" || type == "faq_category")	?	2	:1; %>
+												<select class="form-control show-tick" name="status" id="column_filter_<%=filterColumnNumber%>" onchange="searchDatatable(<%=filterColumnNumber%>)" name="status">
+													<option value=""><%=__("admin.master.search_by_status");%></option>
+													<%
+													if(GLOBAL_STATUS_SEARCH_DROPDOWN && Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).length > 0){
+														Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).map(searchStatus=>{ %>
+															<option value="<%=searchStatus%>"><%=(GLOBAL_STATUS_SEARCH_DROPDOWN[searchStatus]["status_name"]) ? GLOBAL_STATUS_SEARCH_DROPDOWN[searchStatus]["status_name"] :"";%></option>
+														<% 	});
+													} %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-md-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2> <%= displayType; %> </h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<% if(type == "faq_category"){ %>
+							<li>
+								<a href="<%=WEBSITE_ADMIN_URL+'faqs'%>" target="_blank" class='<%= getPermissionClass(module_type,["faq","list"]); %>'>
+									<button type="button" class="btn btn-sm bg-teal waves-effect">
+										<%= __('admin.master.faq_list'); %>
+									</button>
+								</a>
+							</li>
+						<% }%>
+						<li>
+							<a href="<%=admin_list_url+'/'+type%>/add" class='<%= getPermissionClass(module_type,["master","add"]); %>'>
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __('admin.system.add')+" "+displayType; %>
+								</button>
+							</a>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								<i class="material-icons">more_vert</i>
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li class='<%= getPermissionClass(module_type,["master","add"]); %>'>
+									<a href="<%=admin_list_url+'/'+type%>/add">
+										<%= __('admin.system.add')+" "+displayType; %>
+									</a>
+								</li>
+								<% if(type == "faq_category"){ %>
+									<li class='<%= getPermissionClass(module_type,["faq","list"]); %>'>
+										<a href="<%=WEBSITE_ADMIN_URL+'faqs'%>" target="_blank">
+											<%= __('admin.master.faq_list'); %>
+										</a>
+									</li>
+								<% } %>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body checkbox-dataTable hideScroll">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<% if(type == "category"){ %>
+									<th width="15%">	<%= __("admin.master.image"); %></th>
+								<% }%>
+								<th width="30%">	<%= __('admin.master.name');%>		</th>
+								<% if(type == "faq_category"){ %>
+									<th width="15%"> <%= __("admin.master.parent_category"); %></th>
+								<% }%>
+								<th width="10%"> <%= __('admin.system.status');%>	</th>
+								<th width="20%"> <%= __('admin.system.modified');%>	</th>
+								<th width="10%"> <%= __('admin.system.action'); %>	</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable ="";
+		$(document).ready(function() {
+			var orderFieldNumber = "<%= (type == 'category' || type == 'faq_category') ? 3: 2;%>"
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"  : true,
+				"fnStateSave" : function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad" : function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[ orderFieldNumber, "desc" ]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					<% if(type == "category"){ %>
+						{
+							"data"			: 	{},
+							"orderable"		:   false,
+							"searchable"	:	false,
+							"render"		: 	function(result){
+								var imagePath	=	(result['<%=IMAGE_FIELD_NAME%>']) 	? 	result['<%=IMAGE_FIELD_NAME%>'] :'';
+								var id 			=	(result._id) 						? 	result._id 						:'';
+								var imgHtml		=	'';
+								if(imagePath && imagePath !=""){
+									imgHtml = "<a href='"+imagePath+"'  class='items-image' data-lightbox='roadtrip"+id+"'><img src='"+imagePath+"' class='img-thumbnail set_image_dim'  alt='Master Image'/></a>"
+								}
+								return imgHtml;
+							}
+						},
+					<% } %>
+					{ "data": 'name' },
+					<% if(type == "faq_category"){ %>
+						{
+							"data"		 : "parent_category",
+							"orderable"	 : false,
+							"searchable" : false
+						},
+					<% } %>
+					{
+						"data"			: 	"status",
+						"orderable"		:   false,
+						"field_type"	:   "<%= NUMERIC_FIELD %>",
+						"field_name"	:   "status",
+						"render": function(active){
+							return (active == parseInt('<%=ACTIVE%>')) ? '<span class="label label-success m-t-5"><%=__("admin.system.active")%></span>': '<span class="label label-danger m-t-5"><%=__("admin.system.inactive")%></span>';
+						}
+					},
+					{
+						"data": 'modified',
+						"searchable"	: 	false,
+						"render" 		: 	function(modified){
+							return moment(modified).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+							var id 			=	(result._id)		? result._id 		: '';
+							var status 		=	(result.status)		? result.status 	:parseInt('<%= DEACTIVE %>');
+
+							/** Status Link Text **/
+							var statusLinkText  =	(status == parseInt('<%= DEACTIVE %>')) ? "<%= __('admin.system.active'); %>" : "<%= __('admin.system.deactive'); %>" ;
+							/** Status Link Title **/
+							var statusLinkTitle =	(status == parseInt('<%= DEACTIVE %>')) ?  	"<%= __('admin.system.click_to_activate'); %>"  : "<%= __('admin.system.click_to_deactivate'); %>" ;
+
+							var dropDownButton 		=	''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %> '+
+									'<span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url+"/"+type%>/edit/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["master","edit"]); %>">'+
+											' <%= __("admin.system.edit"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Status Link **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url+"/"+type%>/change_status/'+id+'/'+status+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["master","update_status"]); %>" data-confirm-message="<%=__("admin.master.do_you_want_to_change_status_of_this_master",displayType.toLowerCase()); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+statusLinkTitle+'">'+
+											statusLinkText+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+						}
+					}
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url+"/"+type%>",
+					type	: 	"POST",
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/**
+		*Javascript function to search datatable
+		*/
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

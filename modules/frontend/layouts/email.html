@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%- settings["Site.site_title"] %></title>
+	<style>
+	    body{margin:0; font-family:arial; color:#333; font-size:14px; line-height:20px;}
+	    table tr td{vertical-align:top;}
+	</style>
+  </head>
+  <body>
+    	<table width="1000px" align="center" cellpadding="0" cellspacing="0" style="background-color:#fff;">
+			<tbody>
+				<tr>
+					<td align="center" style="background-color:#2E2C2A; padding:10px 15px;">
+					    <a href="<%=WEBSITE_URL%>" style="color:#FFFFFF; text-decoration: none;">
+							<h2><%- settings["Site.project_title"] %></h2>
+                        </a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<table width="1000px" height="400px" align="center" cellpadding="0" cellspacing="0"  style="padding:15px;">
+							<tr>
+								<td>{{MESSAGE_BODY}}</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td align="center" style="background-color:#2E2C2A; text-align:center; padding:15px 10px 10px 10px;">
+						<table style="margin:0 auto;">
+							<tr>
+                                 <td style="color:#FFFFFF;">
+									<%= settings["Site.copyright_text"]; %>
+								</td>
+							</tr>
+                        </table>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+  </body>
+</html>

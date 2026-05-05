@@ -1,0 +1,152 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= isEditable && __('admin.admin_module.edit_admin_module') || __('admin.admin_module.add_admin_modules'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>/<%=moduleType%>" >
+								<button type="button" class="btn bg-indigo waves-effect">
+								  <%= __("admin.system.back"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="edit_admin_module" data-submit-btn-id="admin-module-edit-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="parent" class="control-label"><%= __('admin.admin_module.parent'); %></label>
+										<select class="form-control show-tick"  name="parent" id="parent" data-live-search="true">
+												<option value=""><%=__("admin.admin_module.select_parent");%></option>
+								            <%
+												if(moduleList && moduleList.length > 0){
+													moduleList.forEach(function(parent,index){%>
+														<option value="<%=parent._id%>" <%= parent._id == String(result?.parent_id) ? 'selected' : ''%>><%=parent.title%></option>
+												<% 	});
+												}
+											%>
+								        </select>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="title" class="control-label"><%= __('admin.admin_module.title'); %><span class="required"> *</span> </label>
+										<input name="title" id="title" value="<%=result?.title || ''%>" type="text" class="form-control"/>
+									</div>
+									<span id="title_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="path" class="control-label"><%= __('admin.admin_module.path'); %><span class="required"> *</span> </label>
+										<input name="path" id="path" value="<%=result?.path || ''%>" type="text" class="form-control"/>
+									</div>
+									<span id="path_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="group_path" class="control-label"><%= __('admin.admin_module.group_path'); %><span class="required"> *</span> </label>
+										<input name="group_path" id="group_path" value="<%=result?.group_path || ''%>" type="text" class="form-control"/>
+									</div>
+									<span id="group_path_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="icon" class="control-label"><%= __('admin.admin_module.icon'); %> </label>
+										<input name="icon" id="icon" value="<%=result?.icon || ''%>" type="text" class="form-control"/>
+									</div>
+									<span id="icon_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="order" class="control-label"><%= __('admin.admin_module.order'); %><span class="required"> *</span> </label>
+										<input name="order" value="<%=result?.order || ''%>" id="order" type="text" class="form-control"/>
+									</div>
+									<span id="order_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="slug" class="control-label"><%= __('admin.admin_module.slug'); %> <span class="required"> *</span></label>
+										<input name="slug" id="slug" value="<%=result?.slug || ''%>" type="text" class="form-control"/>
+									</div>
+									<span id="slug_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group materialize_checkbox">
+									<div class="form-lie checkbox_wrapper">
+										<input name="only_for_menu" id="only_for_menu" class="filled-in chk-col-pink" type="checkbox" <%=(result?.only_for_menu)? "checked"	: '' %> value="true"/>
+										<label for="only_for_menu" class="materialize-chekbox-label"><%= __('admin.admin_module.only_for_menu'); %></label>
+									</div>
+									<span id="only_for_menu_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group materialize_checkbox">
+									<div class="form-lie checkbox_wrapper">
+										<input name="only_for_permission" id="only_for_permission" class="filled-in chk-col-pink" type="checkbox" <%=(result?.only_for_permission)? "checked"	: '' %> value="true"/>
+										<label for="only_for_permission" class="materialize-chekbox-label"><%= __('admin.admin_module.only_for_permission'); %></label>
+									</div>
+									<span id="only_for_permission_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<button type="button" id="admin-module-edit-btn-id" <%- ADMIN_LOADING_TEXT %> class="btn bg-pink btn-sm waves-effect btn-submit">
+							 <%= __('admin.system.submit'); %>
+						</button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+						<a href="<%= admin_list_url %>/<%=moduleType%>"><button type="button" class="btn bg-brown btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor("css") %>
+<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		/**
+		 * Function to submit form
+		 */
+		$(".btn-submit").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("edit_admin_module",function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	});
+</script>

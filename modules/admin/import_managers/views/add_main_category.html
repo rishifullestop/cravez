@@ -1,0 +1,148 @@
+<!-- HTML to append in add more -->
+<table id="category_form_html" class="hide">
+    <tbody>
+        <tr id="category_row_{index}" class="table_row">
+            <td>
+                <button type="button" class="btn bg-red remove-category hide">x</button>
+            </td>
+            <td>
+                <input type="text" name="categories[{INDEX}][main_category_id]" id="main_category_id_{INDEX}" class="form-control input-column cuisine_id_field" readonly/>
+                <input type="hidden" name="categories[{INDEX}][index]" value="{INDEX}" />
+                <span id="main_category_id_{INDEX}_error" class="error"></span>
+            </td>
+            <td>
+                <select class="form-control show-tick cuisines-select input-column" id="cuisine_id_{INDEX}" name="categories[{INDEX}][cuisine_id]">
+                    <option value=""><%=__("admin.merchant_upload.select_main_category"); %></option>
+                    <%
+                    if(cuisines.length > 0){
+                        cuisines.map(mainCategory=>{ %>
+                            <option value="<%= mainCategory._id %>" data-id="<%= mainCategory.cuisine_id %>"><%= mainCategory.name.en %></option>
+                    <%  });
+                    } %>
+                </select>
+                <span id="cuisine_id_{INDEX}_error" class="error"></span>
+            </td>
+            <td>
+                <div class="materialize_checkbox">
+                    <input type="checkbox" name="categories[{INDEX}][is_available]" id="is_available_{INDEX}" class="filled-in chk-col-indigo" value="true"/>
+                    <label for="is_available_{INDEX}"></label>
+                    <span id="is_available_{INDEX}_error" class="error"></span>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Form -->
+<form id="add_main_category" action="<%=WEBSITE_ADMIN_URL%>merchant_upload/add_main_category" data-submit-btn-id="category-btn-id" method="post" class="on_click_submit" role="form">
+    <div class="row clearfix">
+        <input type="hidden" name="restaurant_slug"  id="restaurant_slug"/>
+        <div class="col-sm-12">
+			<div class="">
+				<table class="row-border full-length-header hover table table-bordered dataTable fixed_header_table">
+					<thead>
+						<tr>
+							<th width="4%"> </th>
+							<th> <%=__("admin.merchant_upload.main_category_id")%> </th>
+							<th> <%=__("admin.merchant_upload.main_category_name")%> *</th>
+							<th> <%=__("admin.merchant_upload.is_available")%> </th>
+						</tr>
+					</thead>
+					<tbody id="category_form"></tbody>
+				</table>
+			</div>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-sm bg-green add-more-btn" onclick="AppendHTML()"><%=__("admin.merchant_upload.add_more")%></button>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" id="category-btn-id" class="btn bg-brown btn-sm waves-effect category-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+            <a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    /** Function to append inputs in form*/
+    var rowCount = 0;
+    function AppendHTML(){
+        var defaultHTML     = $("#category_form_html tbody").html();
+        var htmlToAppend    = defaultHTML.replace(RegExp('{INDEX}','g'),rowCount);
+        $("#category_form").append(htmlToAppend);
+        rowCount++;
+
+        if($(document).find("#add_main_category .remove-category").length > 1){
+            $(document).find("#add_main_category .remove-category").removeClass("hide");
+        }
+        $(".add-more-btn").addClass("hide");
+        $(".add-more-btn").last().removeClass("hide");
+    }
+
+    /** Add one row default*/
+    $(document).ready(function(){
+        AppendHTML();
+        $("#add_main_category .show-tick").selectpicker("refresh");
+    });
+
+    /**
+    * Function to submit form
+    */
+    $(".category-btn-submit").click(function(){
+        var btnId = $(this).attr("id");
+        $("#restaurant_error").text("");
+        var restaurantSlug = $("#restaurant_slug").val();
+        if(!restaurantSlug || restaurantSlug == ""){
+            display_errors([{param:"restaurant",msg:"<%= __('admin.merchant_upload.please_select_restaurant_first')%>"}],"merchant_file");
+            return false;
+        }
+        startTextLoading(btnId);
+        ajax_submit("add_main_category",function(status,response){
+            stopTextLoading(btnId);
+            if(status){
+                if(response.redirect_url){
+                    notice(response.status,response.message);
+                    $("#upload_action").val('').trigger("change");
+                    resetMerchantForm();
+                    window.location.href = response.redirect_url;
+                }else{
+                    window.location.reload(true);
+                }
+            }
+        });
+    });
+
+    /** Delete category row*/
+    $(document).on("click",".remove-category",function(){
+        var openModal = false;
+        var that = this;
+        $(that).parents(".table_row").find("input.input-column").each(function(){
+            if($(this).val() != ""){
+                openModal = true;
+            }
+        });
+
+        if(!openModal){
+            $(that).parents(".table_row").remove();
+            if($(document).find("#add_main_category .remove-category").length <= 1){
+                $(document).find("#add_main_category .remove-category").addClass("hide");
+            }
+            $(".add-more-btn").last().removeClass("hide");
+        }else{
+            confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.merchant_upload.main_categories_remove_comfirm_message"); %>',function(result){
+                if(result){
+                    $(that).parents(".table_row").remove();
+                    if($(document).find("#add_main_category .remove-category").length <= 1){
+                        $(document).find("#add_main_category .remove-category").addClass("hide");
+                    }
+                    $(".add-more-btn").last().removeClass("hide");
+                }
+                swal.close();
+            });
+        }
+    });
+
+    /** Set main category id*/
+    $(document).on("change","select.cuisines-select",function(){
+        var cuisineId = $(this).children("option:selected").data("id");
+        $(this).parents("tr").find(".cuisine_id_field").val(cuisineId);
+    });
+</script>

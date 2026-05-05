@@ -1,0 +1,259 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.setting.add_setting'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" >
+								<button type="button" class="btn bg-indigo waves-effect">
+									<%= __("admin.system.back"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="add-setting" data-submit-btn-id="setting-add-btn-id" method="post" class="on_click_submit" role="form" enctype="mutlipart/form-data">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="title" class="control-label"><%= __('admin.setting.title'); %><span class="required"> *</span> </label>
+										<input name="title" id="title" type="text" class="form-control"/>
+									</div>
+									<span id="title_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="key_value" class="control-label"><%= __('admin.setting.key_value'); %><span class="required"> *</span> </label>
+										<input name="key_value" id="key_value" type="text" class="form-control"/>
+									</div>
+									<span id="message" class="message demo-image-copyright"><%=__("admin.setting.key_value_example")%></span>
+									<span id="key_value_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="input_type" class="control-label"><%= __('admin.setting.input_type'); %><span class="required"> *</span> </label>
+										<select class="form-control show-tick"  name="input_type" id="input_type">
+											<option value=""><%=__("admin.setting.select_input_type");%></option>
+								           <% 	if(SETTING_INPUT_TYPE_DROPDOWN && SETTING_INPUT_TYPE_DROPDOWN.length > 0){
+													SETTING_INPUT_TYPE_DROPDOWN.map(records=>{
+														if(records && typeof records.input_id !== typeof undefined && typeof records.input_name !== typeof undefined){ %>
+															<option value="<%=records.input_id%>"><%=records.input_name%></option>
+												<% 		}
+													});
+												} %>
+								        </select>
+									</div>
+									<span id="input_type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix value_section">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="validate_type" class="control-label"><%= __('admin.setting.validate_type'); %> </label>
+										<select class="form-control show-tick"  name="validate_type" id="validate_type">
+											<option value=""><%=__("admin.setting.select_validate_type");%></option>
+								            <% 	if(SETTINGS_VALIDATE_TYPE_DROPDOWN && SETTINGS_VALIDATE_TYPE_DROPDOWN.length > 0){
+													SETTINGS_VALIDATE_TYPE_DROPDOWN.map(records=>{
+														if(records && typeof records.input_id !== typeof undefined && typeof records.input_name !== typeof undefined){ %>
+															<option value="<%=records.input_id%>"><%=records.input_name%></option>
+												<% 		}
+													});
+												} %>
+								        </select>
+									</div>
+									<span id="validate_type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix image_section hide">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="image_validate_type" class="control-label"><%= __('admin.setting.validate_type'); %> </label>
+										<select class="form-control show-tick image_validate"  name="image_validate_type" id="image_validate_type">
+											<option value=""><%=__("admin.setting.select_validate_type");%></option>
+								            <% 	if(SETTINGS_VALIDATE_FILE_TYPE_DROPDOWN && SETTINGS_VALIDATE_FILE_TYPE_DROPDOWN.length > 0){
+													SETTINGS_VALIDATE_FILE_TYPE_DROPDOWN.map(records=>{
+														if(records && typeof records.input_id !== typeof undefined && typeof records.input_name !== typeof undefined){ %>
+															<option value="<%=records.input_id%>"><%=records.input_name%></option>
+												<% 		}
+													});
+												} %>
+								        </select>
+									</div>
+									<span id="image_validate_type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix value_section">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="value" class="control-label"><%= __('admin.setting.values'); %><span class="required"> *</span> </label>
+										<input name="value" id="value" type="text" class="form-control"/>
+									</div>
+									<span id="value_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix other_section hide">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="allowed_extensions" class="control-label"><%= __('admin.setting.allowed_extensions'); %><span class="required"> *</span> </label>
+										<input name="allowed_extensions" id="allowed_extensions" type="text" class="form-control"/>
+									</div>
+									<span id="message" class="message demo-image-copyright"><%= __('admin.setting.enter_comma_seperated_extensions');%></span>
+									<span id="allowed_extensions_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix other_section hide">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="allowed_mimes" class="control-label"><%= __('admin.setting.allowed_mimes'); %><span class="required"> *</span> </label>
+										<input name="allowed_mimes" id="allowed_mimes" type="text" class="form-control"/>
+									</div>
+									<span id="message" class="message demo-image-copyright"><%= __('admin.setting.enter_comma_seperated_mimes');%></span>
+									<span id="allowed_mimes_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix image_section hide">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="image_value" class="control-label"><%= __('admin.setting.values'); %><span class="required"> *</span> </label>
+										<input name="image_value" id="image_value" type="file" class="form-control cfilestyle"/>
+									</div>
+									<span id="image_value_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="order" class="control-label"><%= __('admin.setting.order'); %> </label>
+										<input name="order" id="order" type="text" class="form-control"/>
+									</div>
+									<span id="order_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<div class="switch">
+											<label for="required" class="control-label font-14"><b>Required</b> </label>
+											<label>
+												<input type="checkbox" value="1" name="required" id="required" >
+												<span class="lever switch-col-green"></span>
+											</label>
+										</div>
+									</div>
+									<span id="required_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<div class="switch">
+											<label for="editable" class="control-label font-14"><b>Editable</b> </label>
+											<label>
+													<input type="checkbox" value="1" name="editable" id="editable" >
+												<span class="lever switch-col-green"></span>
+											</label>
+										</div>
+									</div>
+									<span id="editable_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+							<button type="button" id="setting-add-btn-id" <%- ADMIN_LOADING_TEXT %> class="btn bg-pink btn-sm waves-effect btn-submit">
+								<%= __('admin.system.submit'); %>
+							</button>
+							<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+							<a href="<%= admin_list_url %>"><button type="button" class="btn bg-brown btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css">
+	<link href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			customFileStyle();
+			
+			/**
+			 * Function to submit form
+			 */
+			$(".btn-submit").click(function(){
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				submit_multipart_form("add-setting",function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			});
+			
+			/**
+			 * Function to switch according to input type
+			 */
+			$('#input_type').on('change',function(){ 
+				$('.other_section').addClass('hide');
+				var value	=	$(this).val();
+				if(value == '<%= INPUT_FILE %>'){
+					$('.image_section').removeClass('hide');
+					$('.value_section').addClass('hide');
+				}else{
+					$('.image_section').addClass('hide');
+					$('.value_section').removeClass('hide');
+				}
+			});
+		});
+		
+		/**
+		 * Function to show allowed extensions and allowed mime types input
+		 */
+		$('.image_validate').on('change',function(){  
+			var value	=	$(this).val();
+			if(value == 'other'){ 
+				$('.other_section').removeClass('hide');
+			}else{ 
+				$('.other_section').addClass('hide');
+			}
+		});
+	</script>

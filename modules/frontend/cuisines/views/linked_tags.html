@@ -1,0 +1,42 @@
+<%
+	var result = result;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("cuisines.linked_tags"); %>
+						</h2>
+					</div>
+					<div class="panel-body">
+						<div class="rulebutton">
+							<ul>
+								<%
+								var haveTag = false;
+								result.map(records=>{
+									if(records.tags){
+										records.tags.map(linkedTags=>{
+											haveTag = true;
+										%>
+											<li>
+												<span><%=linkedTags%></span>
+											</li> <%
+										});
+									}
+								});
+								%>
+							</ul>
+							<% if(!haveTag){ %>
+								<div class="col-sm-12 text-center">
+									<p> <%=__("system.no_records.found")%> </p>
+								</div> <%
+							}%>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

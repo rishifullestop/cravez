@@ -1,0 +1,223 @@
+<%
+const monthNames= ["","Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"];
+var months      = (months) ? months :[];
+var years       = (years) ? years :[];
+%>
+<div class="container-fluid" id="main-container">
+    <!--Search Start -->
+    <div class="row clearfix">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-col-pink">
+                    <div class="panel-heading" role="tab" id="panel-heading-id">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-target="#panel-collapse-id"
+                                data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+                                aria-controls="panel-collapse-id">
+                                <%= __("admin.system.search"); %>
+                                <span class="pull-right collapse-toggle-icon"></span>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel"
+                        aria-labelledby="panel-heading-id">
+                        <div class="panel-body">
+                            <form id="searchForm" name="searchForm">
+                                <div class="row clearfix dataTables_wrapper">
+                                    <!-- Search by restaurant name -->
+                                    <div class="col-xs-12 col-sm-4">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <select class="form-control show-tick restaurant_id"
+                                                    name="search_restaurant_id" id="restaurant_ids"
+                                                    data-live-search="true"
+                                                    data-title="<%= __('admin.report.search_by_restaurant_name'); %>">
+
+                                                    <%-restaurant_list%>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- reset button -->
+                                    <div class="col-sm-2">
+                                        <button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+                                            <%= __("admin.system.reset")%>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Search End -->
+
+    <div class="row clearfix">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        <%=  __("admin.report.area_sales_share_report"); %>
+                    </h2>
+                    <ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['area_sales_share_report','export']); %>">
+                        <li>
+                            <a href="javascript:void(0);" id="dataExportBtn">
+                                <button type="button" class="btn btn-sm bg-green waves-effect" id="exportBtn">
+                                    <%= __("admin.report.export")%>
+                                </button>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="body">
+                    <table id="datatable-listing"
+                        class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0"
+                        width="100%">
+                        <thead>
+                            <tr>
+                                <th width="20%"><%= __("admin.report.area_name"); %></th>
+                                <th width="15%"><%= __("admin.report.restaurant_name"); %></th>
+                                <th width="10%"><%= monthNames[months[0]]+ "-"+ years[0] %> Amount</th>
+                                <th width="10%"><%= monthNames[months[0]]+ "-"+ years[0] %> Orders</th>
+                                <th width="10%"><%= monthNames[months[1]] +"-" +years[1]%> Amount</th>
+                                <th width="10%"><%= monthNames[months[1]] +"-" +years[1]%> Orders</th>
+                                <th width="15%"><%= monthNames[months[2]]+ "-"+ years[2] %> Amount</th>
+                                <th width="15%"><%= monthNames[months[2]]+ "-"+ years[2] %> Orders</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('css') %>
+<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor('script') %>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+<script type="text/javascript">
+    /** Function to initialize datatable and get server side data*/
+    var dataTable = "";
+    $(document).ready(function () {
+        $('#exportBtn').attr('disabled', true);
+        dataTable = $("#datatable-listing").DataTable({
+            "bStateSave"    : true,
+            "fnStateSave"   : function (oSettings, oData) {
+                localStorage.setItem('DataTables', JSON.stringify(oData));
+            },
+            "fnStateLoad"   : function (oSettings) {
+                return JSON.parse(localStorage.getItem('DataTables'));
+            },
+            "order"         : [[2, "desc"]],
+            "dom"           : 'Blrtip',
+            "serverSide"    : true,
+            "scrollX"       : true,
+            "lengthMenu"    : PAGING_LENGTH_MENU,
+            "columns"       : [
+                {
+                    "data"      : "area_name",
+                    "field_type": "<%=OBJECT_ID_FIELD %>",
+                    "field_name": "area_id",
+                    "orderable" : false,
+                    "render"    : function (area_name) {
+                        return area_name[DEFAULT_LANGUAGE_CODE];
+                    }
+                },
+                {
+                    "data"      : "restaurant_name",
+                    "field_type": "<%=OBJECT_ID_FIELD %>",
+                    "field_name": "restaurant_id",
+                    "orderable" : false,
+                    "render"    : function (restaurant_name) {
+                        return restaurant_name[DEFAULT_LANGUAGE_CODE];
+                    }
+                },
+                {
+                    "data"      : "current_month",
+                    "searchable": false,
+                    "render"    : function (current_month) {
+                        return currencyFormat(current_month);
+                    }
+                },
+                {
+                    "data"      : "current_month_orders",
+                    "searchable": false
+                },
+                {
+                    "data"      : "last_month",
+                    "searchable": false,
+                    "render"    : function (last_month) {
+                        return currencyFormat(last_month);
+                    }
+                },
+                {
+                    "data"      : "last_month_orders",
+                    "searchable": false
+                },
+                {
+                    "data"      : "third_month",
+                    "searchable": false,
+                    "render"    : function (third_month) {
+                        return currencyFormat(third_month);
+                    }
+                },
+                {
+                    "data"      : "third_month_orders",
+                    "searchable": false
+                },
+            ],
+            "ajax": {
+                url : "<%=admin_list_url%>/area_sales_share_report",
+                type: "POST",
+                data: function (d) {
+                    d.restaurant_ids    = $('#restaurant_ids').val();
+                },
+                dataSrc: function (res) {
+                    adjustPermissionsClass();
+                    return res.data;
+                }
+            }
+        });
+
+
+    });
+
+    $("#restaurant_ids").change(function () {
+        if ($("#restaurant_ids").val() === "") {
+            $('#exportBtn').attr('disabled', true);
+        } else{
+            $('#exportBtn').removeAttr('disabled');
+        }
+        dataTable.draw()
+    });
+
+    /** Javascript function to search datatable */
+    function searchDatatable(columnNumber) {
+        var query = $('#column_filter_' + columnNumber).val();
+        dataTable.column(columnNumber).search(query).draw()
+    }//end searchDatatable()
+
+    /**
+    * Export Details action
+    *
+    * @param  null
+    *
+    * @return void
+    */
+    $(document).on("click", "#dataExportBtn", function () {
+        var restaurantIds   = $("#restaurant_ids").val();
+        var sortedCol       = dataTable.order()[0][0];
+        var sortedDir       = dataTable.order()[0][1];
+        var columns         = dataTable.settings().init().columns;
+        var sortedColName   = columns[sortedCol].data;
+
+        var exportURL = "<%=admin_list_url%>/area_sales_share_report/export_data?sort_field=" + sortedColName + "&sort_dir=" + sortedDir;
+        if (restaurantIds) exportURL += "&restaurant_ids=" + restaurantIds;
+        window.location.href = exportURL;
+    });
+
+</script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

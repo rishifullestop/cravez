@@ -1,0 +1,147 @@
+<%
+	var result 		 = (typeof result !== typeof undefined && result) 				? 	result 			:{};
+	var cuisinesList = (typeof cuisine_list !== typeof undefined && cuisine_list) 	?	cuisine_list	:"";
+	var categoryId	 = (result._id)	?	result._id	:"";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="pending-category-edit" action="<%=list_url+'/edit/'+categoryId%>" data-submit-btn-id="pending-category-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("categories.edit_category"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="category_image" class="control-label">
+											<%= __("categories.category_image"); %>
+										</label>
+										<input type="file" data-input="false" name="image"  class="form-control cfilestyle" id="category_image" />
+										<span class='tooltipShow tooltipHelp brand-tooltip ' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('system.extension_and_size_suggestion_message',ALLOWED_IMAGE_EXTENSIONS.join(', '),MASTER_IMAGE_RESOLUTION)%>">
+											<i class="material-icons">info</i>
+										</span>
+										<input type="hidden" name="old_image" value="<%=result.image%>">
+									</div>
+									<span id="image_error" class="error"></span>
+								</div>
+							</div>
+							<% if(result[IMAGE_FIELD_NAME]) { %>
+								<div class="col-sm-2">
+									<a href="<%=result[IMAGE_FIELD_NAME]%>" class="items-image" data-lightbox="roadtrip">
+										<img class="img-thumbnail float-right set_image_dim" src="<%=result[IMAGE_FIELD_NAME]%>" alt="image">
+									</a>
+								</div>
+							<% } %>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="cuisine_list" class="control-label">
+											<%= __("categories.cuisines"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" name="cuisine_id" id="cuisine_list" data-live-search="true">
+											<option value=""><%= __("categories.select_cuisine"); %></option>
+											<%-cuisinesList%>
+										</select>
+									</div>
+									<span id="cuisine_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_english" class="control-label">
+											<%= __("categories.name_in_english"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_english" class="form-control" name="name_english" value="<%=result.name ? result.name.en :'';%>"/>
+									</div>
+									<span id="name_english_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_arabic" class="control-label">
+											<%= __("categories.name_in_arabic"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_arabic" class="form-control" name="name_arabic" value="<%=result.name ? result.name.ar :'';%>"/>
+									</div>
+									<span id="name_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="order" class="control-label">
+											<%= __("categories.order"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="order" class="form-control" name="order" value="<%=result.order ? result.order :'';%>"/>
+									</div>
+									<span id="order_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group demo-tagsinput-area">
+									<div class="form-line category-tags">
+										<label for="tags" class="control-label">
+											<%= __("categories.tags"); %><span class="required"> *</span>
+										</label>
+										<input type="text" class="form-control notSubmitOnEnter" data-role="tagsinput" value="<%=result.tags ?  result.tags.join() :'';%>" name="tags">
+										<span id="info-message" class="message demo-image-copyright">
+											<%= __("categories.push_name"); %>
+										</span>
+									</div>
+									<span id="tags_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="pending-category-add-btn-id" class="btn bg-brown btn-sm waves-effect panding-cat-btn-submit" <%- FRONT_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-tagsinput/bootstrap-tagsinput.css">
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-tagsinput/bootstrap-tagsinput.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		/*
+		 *	Set File input design (jsFileStyle)
+		 */
+		customFileStyle();
+		$("#pending-category-edit .show-tick").selectpicker('refresh');
+	});
+
+	/**
+	 * Function to submit form
+	 */
+	$('.panding-cat-btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('pending-category-edit',function(status,response){
+			if(status){
+				$('#form_modal').modal("hide");
+				if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+				if(response.status && response.message) notice(response.status,response.message);
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+	$(".bootstrap-tagsinput input").addClass('notSubmitOnEnter');
+</script>

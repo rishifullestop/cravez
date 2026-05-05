@@ -1,0 +1,548 @@
+﻿
+#role-menu ul{padding-left: 40px !important;}
+#role-menu ul li.middle-child ul li::before {top: -3px;}
+#role-menu ul li.middle-child li:last-child::before { height: 35px; }
+#role-menu .expend-btn { max-width: 25px; max-height: 25px; height: 25px; width: 25px; text-align: center; }
+
+.col-555 {color: #555 !important;}
+.padding-20{padding: 20px !important;}
+.modal-footer-seperator{border-top: 1px solid  #eee !important;}
+.height-100{height: 100px !important;}
+
+.account-section {
+    background-color:
+#fff;
+border-radius: 5px;
+/* padding: 27px 45px; */
+/* box-shadow: 0 0 6px
+    rgba(0,0,0,0.12); */
+}
+.account-form-section {
+    border: 1px solid
+    #e1e2e3;
+    padding: 30px 30px 30px;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.account-section-heading {
+    display: inline-block;
+    background-color:
+    #fff;
+    position: absolute;
+    top: -28px;
+    left: 20px;
+    padding: 0px 10px;
+}
+
+.account-section-heading h2 {
+    font-size: 14px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    margin-bottom: 0px;
+    text-transform: uppercase;
+}
+.list-style-none{list-style:none;}
+.top-30{top:30px !important;}
+.v-align-bottom { vertical-align: bottom !important;}
+
+/* for admin permission module */
+.materialize-chekbox-label {
+    line-height: 22px !important;
+    font-size: 14px !!important;
+    font-weight: bold !important;
+}
+
+.card .header{
+    padding: 20px 25px;
+}
+
+.card .header ul li a button.btn-sm{
+    margin-top:-9px !important;
+}
+
+.width-100{
+    width:100% !important;
+}
+.chosen-container{
+    width:100% !important;
+}
+.m-t--8{
+    margin-top:-8px !important;
+}
+.display-inline{
+    display:inline !important;
+}
+.border-top-none{
+    border-top:none !important;
+}
+.label {padding: 6px 8px; font-size: 13px; border-radius: 0px; }
+
+.export { text-align: center; padding-top: 5px;}
+.action-btn-container{
+    margin-left:-5px;
+    margin-top: -5px;
+}
+.action-btn-container li{
+    display:inline-block;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+/* body,button{
+    text-transform: capitalize;
+} */
+
+.table-border-0{
+    border: 0px !important
+}
+.table-border-0 th, .table-border-0 td{
+    border: 0px !important
+}
+
+
+#form_modal .modal-footer{
+    padding: 20px 35px 20px;
+}
+.jq-toast-single{
+    font-size: 14px;
+    font-family: 'Open Sans', sans-serif;
+}
+.m-b-8{margin-bottom: 8px !important;}
+.full-length-header-td{
+	white-space: nowrap;
+}
+
+/* *For pie chart */
+.pie-chart{width:100%;min-height:350px;}
+.survey-question{color: #333;font-weight: bold;font-size: 14px;}
+.survey-given-options{margin-top: 15px}
+.no-shadow {box-shadow: none !important;}
+
+/**For survey option */
+.view-checkin-btn{position: absolute;right:0px;top: 0px;}
+.padding-80{padding:80px !important;}
+
+/** Set data table heading width fixed for shift schedule module **/
+.fixed-width-table { table-layout:fixed !important; word-wrap:break-word; }
+/**For back button*/
+.survey-back-button{margin-top:-50px;margin-right:15px}
+.survey-back-button .bg-indigo{color: #fff !important;}
+
+/**For view page in survey management */
+.selected-answer p{margin-bottom: -26px;margin-left: 2px;font-size: 16px;}
+
+
+/**For dashboard page */
+.progress {height: 10px;}
+.remove_actions{
+     text-decoration: none!important;
+     border: none!important;
+     border-radius: 0px!important;
+    display: block!important;
+}
+.csv-actions li {
+    display: block!important;
+    padding: 0px!important;
+ }
+.csv-actions{
+     position: absolute;
+    top: 15px;
+    right: -10px;
+    list-style: none;
+}
+.csv-action{
+    right: 25px!important;
+}
+.status_box {
+    position: relative;
+}
+.total_paid {
+    vertical-align: top!important;
+    padding: 10px 0 0 10px!important;
+}
+.progress-bar-blue{
+    background-color: #5351fa!important;
+}
+.progress-bar-green{
+    background-color: #03cb9a!important;
+}
+.progress-bar-yellow{
+    background-color: #f6b900!important;
+}
+.client-knob li{
+    width: 100%!important;
+}
+.client-knob .client-value{
+text-align: center;
+}
+.survey-question-type{height:55px}
+.survey-given-options{height:60px}
+
+/**For slider management */
+.form-group .form-line .slider-image-type{border:none}
+.slider-image{position: relative}
+.slider-image .item-image{position: absolute;margin-left:-98px;}
+
+/** tags input css **/
+
+.category-tags .bootstrap-tagsinput {
+    border: 1px solid #AEAEAE!important;
+    height: 45px!important;
+    padding: 6px 12px!important;
+    border-radius: 4px;
+}
+.category-tags span.tag {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+
+.sales_report .heading_text {
+    padding-top: 0px!important;
+    padding-left: 0px!important;
+}
+
+.scroll-body{
+  max-height:500px;
+}
+.font-bold {font-weight: bold !important; }
+
+.rejection-class {display : inline !important; }
+
+/*
+.dataTable-item .dataTables_scrollHeadInner{
+    width:100% !important;
+}
+.dataTable-item .dataTables_scrollHeadInner table{
+    width: 100%!important;
+*/
+}
+/*
+.body .dataTables_scroll .dataTables_scrollBody {
+    overflow: unset!important;
+*/
+}
+
+.hoverButton:hover{ color : #fff !important; }
+
+.menu-class { list-style-type: none !important; }
+.padding-1{padding: 1px !important;}
+
+#live-location-report #map {
+    height: 500px;
+}
+
+.captain-map-legend{
+    display: inline-block;
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 22px;
+    vertical-align: top;
+}
+
+.icon-seperator img {
+    height: 18px;
+    vertical-align: middle;
+}
+
+.icon-seperator {
+    display: inline-block;
+    margin-left: 15px;
+    vertical-align: middle;
+}
+.modal-footer{
+	padding: 20px 35px 20px;
+}
+
+.captain-statics-class{
+    height: 132px !important;
+}
+.v-align-middle{ vertical-align: middle !important;}
+.search-and-refresh{
+	top: 10px !important;
+}
+.card .header ul.search-and-refresh li a button.btn-sm{
+	margin-top: -3px !important
+}
+
+.order-details-tab{
+    width : 170px !important;
+}
+
+.order-details-tab.active{
+    background: #52287A !important;
+    border: #52287A !important;
+}
+
+.fixed_header_table {position: relative;}
+.fixed_header_table tr th{position: relative;}
+.fixed_header_table tr th:first-child{width:20px !important;}
+.fixed_header_table input{
+	width: 190px !important;
+}
+
+.all_restaurant .ticket_class_one li label {
+	min-width: 115px;
+}
+
+.all_restaurant .ticket_class_two li label {
+	min-width: 125px;
+}
+
+.ticket_class_three{
+  height : 195px !important;
+}
+
+.ticket_class_three ul li label {
+    min-width: 155px;
+}
+
+.ticket_class_three ul li span {
+    white-space: nowrap;
+    width: 135px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.monitoring_ticket .orders {
+    height: 380px !important;
+}
+
+.progress .order-progress {
+    line-height: 23px !important;
+}
+
+.order-progress{
+    float: left;
+    width: 0;
+    height: 100%;
+    font-size: 12px;
+    line-height: 20px;
+    color: #fff;
+    text-align: center;
+}
+.order_status_box {
+    height: 538px !important;
+}
+.supervisor_heading_class{
+    padding : 0px !important;
+}
+
+.supervisor_separate_box{
+   margin : 0px !important;
+}
+
+.orange_progress .progress-bar {
+    background-color: #f64000;
+}
+
+.progress_bar .progress-bar {
+    background-color: #01cd98;
+}
+
+.skyblue_progress .progress-bar {
+    background-color: #DB8234;
+}
+
+.heading_text ul li a.sales-report-cravez {
+    background-color: #7E7EEE;
+    color: #fff;
+    border: 1px solid #7E7EEE;
+}
+
+.heading_text ul li a.sales-report-restaurant {
+    background-color: #FAB80E;
+    color: #fff;
+    border: 1px solid #FAB80E;
+}
+
+.heading_text ul li a.sales-report-pickup {
+    background-color: #C9CBCF;
+    color: #fff;
+    border: 1px solid #C9CBCF;
+}
+
+.sales_th{
+    background-color: #fff !important;
+    color: #0e0e0e !important;
+}
+
+.excel_format:after {
+    top: 100%;
+    left: 22px;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: rgba(255, 255, 255, 0);
+    border-top-color: #3E98E6;
+    border-width: 13px;
+}
+
+.chart_format_btn{background-color: #e4a51a;}
+.chart_format_btn:hover{background-color: #d49918;}
+.chart_format_btn i{background-color: #d49918;}
+.chart_format_btn:hover i{background-color: #e4a51a;}
+.chart_format:after {top: 100%;left: 22px;border: solid transparent;content: " ";height: 0;width: 0;position: absolute;pointer-events: none;border-color: rgba(255, 255, 255, 0);border-top-color: #d49918;border-width: 13px;}
+
+.supervisor__sales_legends li small{
+	height: 10px;
+	width: 10px;
+	display: inline-block;
+	border-radius: 50%;
+}
+small.sales-report-cravez{background-color:#7E7EEE;}
+small.sales-report-restaurant{background-color:#FAB80E}
+small.sales-report-pickup{background-color:#C9CBCF}
+.sales_report .heading_text.display-block-ruby{display:block !important}
+.sales_report .heading_text.display-block-ruby h3{display:inline-block !important}
+
+.hideScroll .dataTables_scroll .dataTables_scrollBody{
+    overflow: unset !important;
+}
+
+.dashboard_number.category_box ul li{width:25%;}
+.dashboard_number.branch_box ul li{width:25%;}
+.approved_restaurant.restaurant_box ul li{width:25%;}
+
+
+.dataTables_scrollBody{min-height:300px;}
+/* table.table-bordered.dataTable tbody tr:first-child td .dropdown-menu, table.table-bordered.dataTable tbody tr:nth-child(2) td .dropdown-menu{top:100% !important; bottom:auto  !important;} */
+/* table.table-bordered.dataTable tbody tr:last-child td .dropdown-menu, table.table-bordered.dataTable tbody tr:nth-last-child(2) td .dropdown-menu{top:auto; bottom:100%;} */
+
+.all_restaurant ul li span{max-width: 175px !important;}
+@media (min-width:1441px) and (max-width:1600px){
+.all_restaurant ul.ticket_class_one li span{max-width:215px;}
+}
+@media (min-width:1366px) and (max-width:1440px){
+.all_restaurant ul.ticket_class_one li span{max-width:195px;}
+}
+@media (min-width: 1200px) and (max-width:1365px){
+.all_restaurant ul.ticket_class_one li span{max-width:135px;}
+.all_restaurant ul li span{max-width:95px;}
+}
+
+.order-logs-class { height : 195px !important;}
+
+.captain-btn:hover { color : #fff !important;}
+
+.m-r-1 { margin-right: 1px !important;}
+
+.display-inline-block{
+	display: inline-block !important;
+}
+/** 10 march 2021 vertical tab*/
+
+.flex-column {
+
+	-ms-flex-direction: column !important;
+
+	flex-direction: column !important;
+
+}
+
+.nav {
+
+	display: -ms-flexbox;
+
+	display: flex;
+
+	-ms-flex-wrap: wrap;
+
+	flex-wrap: wrap;
+
+	padding-left: 0;
+
+	margin-bottom: 0;
+
+	list-style: none;
+
+}
+
+
+
+.nav-link {
+
+	display: block;
+
+	width: auto;
+
+	margin: 0 0.3em 0.3em;
+
+	padding: 0.5em 0.5em;
+
+	text-decoration: none;
+
+	color: #fff;
+
+	background-color: #cc94f1;
+
+}
+
+
+
+.nav-link:hover, .nav-link:focus {
+
+	color: #fff;
+
+	text-decoration: none;
+
+}
+
+.nav-pills .nav-link.active,
+
+.nav-pills .show > .nav-link {
+
+	color: #fff;
+
+	background-color: #6d00b7;
+
+	/* background-color: #522979; */
+
+}
+
+.wizard-content{
+
+	display: block;
+
+	border: 1px solid #6d00b7;
+
+	min-height: 380px;
+
+	padding-top: 10px;
+
+}
+
+.remove-tab{
+
+	color: #E91E63;
+
+	border-radius: 50%;
+
+}
+
+.module_search_button{
+
+	position: relative;
+
+    top: 30px;
+
+}
+.nav-pills .badge {
+	background: none !important;
+}
+
+/*To show highlighted row in datatable*/
+.highlight-datatable-row {
+    background-color: #ffff85 !important;
+}

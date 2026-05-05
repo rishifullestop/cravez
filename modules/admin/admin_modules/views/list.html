@@ -1,0 +1,285 @@
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								 <%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by title -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_0" onkeyup="searchDatatable(0)" placeholder="<%= __('admin.admin_module.search_by_title'); %>" name="firstName">
+										</div>
+									</div>
+								</div>
+								<!-- Search By parent name-->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" id="column_filter_1" name="search_by_parent_name" onChange="searchDatatable(1)">
+												<option value=""><%=__("admin.admin_module.search_by_parent_name");%></option>
+												<%
+													result.map((parent,index)=>{%>
+														<option value="<%=parent._id%>"><%=parent.title%></option>
+														<% 
+													});
+												%>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- Search by Status -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" id="column_filter_3" name="status" onChange="searchDatatable(3)">
+												<option value=""><%=__("admin.admin_module.search_by_status");%></option>
+												<%
+												if(GLOBAL_STATUS_SEARCH_DROPDOWN && Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).length > 0){
+													Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).map(searchStatus=>{ %>
+														<option value="<%=searchStatus%>"><%=(GLOBAL_STATUS_SEARCH_DROPDOWN[searchStatus]["status_name"]) ? GLOBAL_STATUS_SEARCH_DROPDOWN[searchStatus]["status_name"] :"";%></option>
+												<% 	});
+												} %>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.admin_module.admin_modules"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>/<%=moduleType%>/add" class='<%= getPermissionClass(module_type,["admin_modules","add"]); %>'>
+								<button type="button" class="btn bg-indigo waves-effect">
+									<%= __('admin.admin_module.add_admin_modules'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr><th width="25%"><%= __("admin.admin_module.title"); %></th>
+								<th width="20%"><%= __("admin.admin_module.parent_name");%></th>
+								<th width="15%"><%= __("admin.admin_module.order");%></th>
+								<th width="10%"><%= __("admin.system.status");%></th>
+								<th width="20%"><%= __("admin.system.modified");%></th>
+								<th width="10%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("css") %>
+<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable	=	"";
+		let oldId 		= 	"";
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"order"		: [],
+				"sDom"		: "ltipr",
+				"serverSide": true,
+				"scrollX"	: true,
+				"lengthMenu": PAGING_LENGTH_MENU,
+				"columns"	: [
+					{
+						"data"			: {},
+						"field_name"	: "title",
+						"render"		: function(result){
+							let titleHtml = result.title;
+							if(result.only_for_permission) titleHtml+=" (Only For Permission)"
+							return titleHtml;
+						}
+					},
+					{ 	
+						"data"		 : 'parent_name',
+						"field_type" : "<%=OBJECT_ID_FIELD %>",
+						"field_name" : "parent_id",
+						"orderable"	 : false
+					},
+					{
+						"data"			: {},
+						"field_name"	: "order",
+						"render"		: function(result){
+							var id 			= (result._id) 		 ? result._id		: "";
+							var parentId 	= (result.parent_id) ? result.parent_id	: 0;
+							var orderLink =
+								'<div>'+
+									'<span id="orderData_'+id+'" onclick="showtextBox(this)" class = "orderElement">'+result.order+'</span>'+
+									'<div id="orderDiv_'+id+'" class="orderdiv" style="display:none;">'+
+										'<input name="orderNewValue" id="orderValue_'+id+'" class="form-control list-order-text-box" value="'+result.order+'" type="text"/>'+
+										'<span id="orderNewValue_error" class="error"></span>'+
+										'<a href="javascript:void(0)" class="form-control list-order-submit-button btn-success submit_order" data-parent-id="'+parentId+'" data-id="'+id+'">'+
+											'<i class="material-icons list-order-submit-button-ican">done</i>'+
+										'</a>'+
+									'</div>'+
+								'</div>';
+							return orderLink;
+						}
+					},
+					{
+						"data"		: "is_active",
+						"field_type": "<%= NUMERIC_FIELD %>",
+						"render"	: function(active){
+							var statusObject 	= 	<%- JSON.stringify(GLOBAL_STATUS_SEARCH_DROPDOWN)%>;
+							var statusClass		=	(statusObject[active] && statusObject[active]["label_class"]) ? statusObject[active]["label_class"] :"";
+							var statusLabel		=	(statusObject[active] && statusObject[active]["status_name"]) ? statusObject[active]["status_name"] :"";
+							return '<span class="label '+statusClass+'">'+statusLabel+'</span>';
+						}
+					},
+					{
+						"data"			: 'modified',
+						"searchable"	: false,
+						"render" 		: function(modified){
+							return moment(modified).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+						}
+					},
+					{
+						"data"			: {},
+						"orderable"		: false,
+						"searchable"	: false,
+						"render" 		: function(result){
+							var id 		=	(result._id)		?	result._id			:"";
+							var status	= 	(result.is_active)	? 	result.is_active	:"0";
+
+							/** Status Link  **/
+							var statusLinkText  = (status == "<%= DEACTIVE %>") ? "<%= __('admin.system.activate'); %>"			 :"<%= __('admin.system.deactive'); %>" ;
+							var statusLinkTitle = (status == "<%= DEACTIVE %>") ? "<%= __('admin.system.click_to_activate'); %>" :"<%= __('admin.system.click_to_deactivate'); %>" ;
+							var statusLinkIcon  = (status == "<%= DEACTIVE %>") ? "done"	: "block";
+
+							var dropDownButton 	=	''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %> '+
+									'<span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/<%=moduleType%>/edit/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["admin_modules","edit"]); %>">'+
+											''+
+											' <%= __("admin.system.edit"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Status Link  **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/<%=moduleType%>/update-status/'+id+'/'+status+'" class=" waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["admin_modules","active_deactive"]); %>" data-confirm-message="<%= __("admin.admin_module.you_want_to_change_admin_module_status"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+statusLinkTitle+'">'+
+											''+
+											statusLinkText+
+										'</a>'+
+									'</li>'+
+									/** Delete Link */
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/<%=moduleType%>/delete/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["admin_modules","delete"]); %>" data-confirm-message="<%= __("admin.admin_module.you_want_to_delete_this_admin_module"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+											''+
+											'<%= __("admin.system.delete"); %>'+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+						}
+					}
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>/<%=moduleType%>",
+					type	: "POST",
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+
+			/** Update Order value*/
+			$(document).on('click', '.submit_order', function(e){
+				var id 		= $(this).attr("data-id");
+				var parentId= $(this).attr("data-parent-id");
+				var order 	= $(this).parent().find("input[type='text']").val();
+				updateModuleOrder(id,parentId,order);
+			});
+
+			/** Update Order value*/
+			$(document).on('keyup', '.list-order-text-box', function(e){
+				if (e.keyCode == 13) {
+					$(this).parent().find(".submit_order").trigger("click");
+					return false;
+				}
+			});
+		});
+
+		/**
+		 * Function to update order value
+		 */
+		function updateModuleOrder(moduleId,parentId,order){
+			var options = {
+				url		: 	"<%=admin_list_url%>/<%=moduleType%>/change_order",
+				data	: 	{new_order: $.trim(order), id : moduleId, parent_id : parentId},
+				method	:	"POST",
+			}
+			ajaxRequest(options,function(res){
+				if(res.status == "success") {
+					notice("success",res.message);
+					dataTable.draw();
+				}else{
+					notice("error",res.message);
+				}
+			});
+		};//End updateModuleOrder();
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/** Javascript function to show text Box */
+		var oldValue = "";
+		function showtextBox(obj){
+			var idArray	= obj.id.split("_");
+			var current_id	 = idArray[1];
+			$("#orderDiv_"+current_id).show();
+			$("#orderData_"+current_id).hide();
+			if(current_id != oldId && oldId != ""){
+				$("#orderValue_"+oldId).val(oldValue);
+				$("#orderDiv_"+oldId).hide();
+				$("#orderData_"+oldId).show();
+			}
+			oldId 		= current_id;
+			oldValue 	= $("#orderValue_"+current_id).val();
+		};//end showtextBox();
+	</script>

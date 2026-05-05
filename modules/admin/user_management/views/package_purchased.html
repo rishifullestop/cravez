@@ -1,0 +1,81 @@
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%= __("admin.user_management.packages"); %>
+				</h2>
+			</div>
+			<div class="body">
+				<table id="datatable-customer-package" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="20%"><%= __("admin.user_management.package_name"); %></th>
+							<th width="20%"><%= __("admin.user_management.amount"); %></th>
+							<th width="20%"><%= __("admin.user_management.package_valid_till"); %></th>
+							<th width="20%"><%= __("admin.user_management.remaining_package_orders"); %></th>
+							<th width="20%"><%= __("admin.user_management.gifted_by"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable ="";
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-customer-package').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem('DataTables', JSON.stringify(oData));
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse(localStorage.getItem('DataTables'));
+			},
+			"order"		: 	[[0, "desc"]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":   PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ "data" : "package_name" },
+				{
+					"data": 'amount' ,
+					"searchable" : 	false,
+					"render" 	 : 	function(amount){
+						return (amount) ? currencyFormat(amount) : '';
+					}
+				},
+				{
+					"data": 'valid_till' ,
+					"searchable" : 	false,
+					"render" 	 : 	function(valid_till){
+						return moment(valid_till).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_FORMAT);
+					}
+				},
+				{
+					"data": 'number_of_orders' 
+				},
+				{
+					"data": {} ,
+					"searchable" : 	false,
+					"orderable" : false,
+					"render" 	 : 	function(result){
+						var friendName	=	(result.friend_name) ? '<a href="<%= admin_list_url%>/view_customer/'+result.friend_id+'" target="_blank">'+result.friend_name+'</a>' : '<%= __('admin.user_management.self_purchased');%>';
+						return friendName;
+					}
+				},
+			],
+			"ajax":{
+				url 	: "<%=admin_list_url%>/customer_package_list/"+'<%= user_id %>',
+				type	: "POST",
+				dataSrc	: function(res){
+					return res.data;
+				}
+			}
+		});
+	});
+</script>
+

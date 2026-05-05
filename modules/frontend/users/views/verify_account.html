@@ -1,0 +1,71 @@
+<%
+	var validateString 	= (typeof validate_string !== typeof undefined && validate_string) ? validate_string :"";
+%>
+<form id="verify-mobile" data-submit-btn-id="verify-mobile-btn-id" method="post" class="on_click_submit" role="form">
+	<div class="msg"><%= __("user.verify_mobile_number"); %></div>
+	<div class="input-group">
+		<span class="input-group-addon">
+			<i class="material-icons hide-before-load hideMe">email</i>
+		</span>
+		<div class="form-line">
+			<input type="hidden" name="_csrf" value="<%=(typeof csrf_token !== typeof undefined) ? csrf_token : '';%>">
+			<input type="password" class="form-control" name="email_otp" placeholder="<%= __('user.email_otp');%> *" data-blank-error-message="<%= __('user.please_enter_email_otp')%>">
+		</div>
+		<span id="email_otp_error" class="error m-t-0"></span>
+	</div>
+	<div class="input-group">
+		<span class="input-group-addon">
+			<i class="material-icons hide-before-load hideMe">stay_current_portrait</i>
+		</span>
+		<div class="form-line">
+			<input type="password" class="form-control" name="mobile_otp" placeholder="<%= __('user.mobile_otp');%> *" data-blank-error-message="<%= __('user.please_enter_mobile_otp')%>">
+		</div>
+		<span id="mobile_otp_error" class="error m-t-0"></span>
+	</div>
+	<button type="button" id="verify-mobile-btn-id" class="btn btn-block bg-pink waves-effect btn-submit" <%- FRONT_LOADING_TEXT %> ><i class="material-icons font-14">save</i> <%= __("system.submit"); %></button>
+	<div class="row m-t-15 m-b--20">
+		<div class="col-xs-6">
+			<a href="javascript:void(0);" class="resendOTPLink" data-type="email_otp"><%= __('user.resend_email_otp'); %></a>
+		</div>
+		<div class="col-xs-6 align-right">
+			<a href="javascript:void(0);" class="resendOTPLink" data-type="mobile_otp"><%= __('user.resend_mobile_otp'); %></a>
+		</div>
+	</div>
+</form>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		/** Function to submit form */
+		$(".btn-submit").click(function(){
+			if(client_side_validation("verify-mobile")){
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				ajax_submit("verify-mobile",function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						if(typeof response.redirect_url !== typeof undefined && response.redirect_url !=""){
+							window.location.href = response.redirect_url;
+						}
+						stopTextLoading(btnId);
+					}
+				});
+			}
+		});
+
+		/** Function to resend OTP Link */
+		$(".resendOTPLink").click(function(){
+			let otpType = $(this).data("type");
+			
+			var options = {
+				url		: 	"<%=WEBSITE_URL%>resend_otp/"+otpType,
+				data	: 	{'validate_string': '<%= validateString %>'},
+				method	:	"POST",
+			}
+			ajaxRequest(options,function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					window.location.reload();
+				}			
+			});
+		});
+	</script>

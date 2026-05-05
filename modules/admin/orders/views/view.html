@@ -1,0 +1,1424 @@
+<%
+	var selectedButton	=  	type ? type :"order_details";
+	var originalUrl 	=  	admin_list_url+"/view/"+result._id;
+	var isCompleted     =  	(result.is_completed) 	? result.is_completed :"";
+	var orderStatus     =  	(result.order_status) 	? result.order_status :"";
+	var showMidifyBtn   =  	(isCompleted) 	? false :true;
+	var customerAddress =	(orderDetails.customer_address_detail) ? orderDetails.customer_address_detail : {};
+
+	if(ORDER_FINISH_ACTIONS.indexOf(orderStatus) != -1) showMidifyBtn = false;
+%>
+<input type="hidden" name="script_init" id="script_init" value="1">
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+                    <h2>
+                        <%= __('admin.orders.order_details'); %>
+                    </h2>
+                    <ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+                            <a href="<%=admin_list_url%>" ><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __('admin.system.back'); %></button></a>
+                        </li>
+                    </ul>
+				</div>
+				<ul class="nav nav-tabs order-tabbing">
+					<li>
+						<a data-toggle="tab" href="#order_details" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','view']); %>" data-type="order_details">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.order_details'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#financial_info_section" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','financial_info']); %>" data-type="financial_info_section">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.financial_info_section'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#delivery_info" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','delivery_info']); %>" data-type="delivery_info">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.delivery_info'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#address" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','addresses']); %>" data-type="address">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.addresses'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#client_info" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','client_info']); %>" data-type="client_info">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.client_info'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#offer_info" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','offer_dtail']); %>" data-type="offer_info">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.offer_info'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#order_items" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','order_items']); %>" data-type="order_items">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.order_items'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#order_status" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','order_status']); %>" data-type="order_status">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.order_delivery_status'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#location_map" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','location_map']); %>" data-type="location_map">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none show-location-map">
+								<%= __('admin.orders.location_map'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#voc_client" data-action-url="<%=WEBSITE_ADMIN_URL%>voc_management/order_voc_list/<%=result._id%>/<%=VOC_FOR_CLIENT%>" class="action-btn get-tab-details <%= getPermissionClass(module_type,['order_detail','voc_client']); %>" data-type="voc_client">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.voc_client'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#voc_captain" data-action-url="<%=WEBSITE_ADMIN_URL%>voc_management/order_voc_list/<%=result._id%>/<%=VOC_FOR_CAPTAIN%>" class="action-btn get-tab-details <%= getPermissionClass(module_type,['order_detail','voc_captain']); %>" data-type="voc_captain">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.voc_captain'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#tickets" data-action-url="<%=WEBSITE_ADMIN_URL%>tickets/order_ticket_list/<%=result._id%>" class="action-btn  get-tab-details <%= getPermissionClass(module_type,['order_detail','ticket_list']); %>" data-type="tickets">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.tickets'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#refund_and_compensation" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','refund_and_compensation_list']); %>" data-type="refund_and_compensation">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.refund_and_compensation'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#restaurant_details" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','restaurant_details']); %>" data-type="restaurant_details">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.restaurant_details'); %>
+							</button>
+						</a>
+					</li>
+					<li>
+						<a data-toggle="tab" href="#modifications" class="get-tab-details <%= getPermissionClass(module_type,['order_detail','order_items']); %>" data-type="modifications">
+							<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+								<%= __('admin.orders.modifications'); %>
+							</button>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="tab-content">
+				<div id="order_details" class="tab-pane fade in active">
+					<div class="card">
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.order_id'); %></th>
+									<td><%= (result.unique_order_id) ? result.unique_order_id :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.order_date'); %></th>
+									<td><span class="setDateTimeFormat" data-date-time="<%= (result &&  result.order_date) ? result.order_date : '';%>"></span></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.order_notes'); %></th>
+									<td><%- (result &&  result.request_note) ? result.request_note : '';%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.order_status'); %></th>
+									<td><%- (result.admin_status && ORDER_STATUS_TYPES[result.admin_status]) ? '<span class="label '+ORDER_STATUS_TYPES[result.admin_status].label_class+'">'+ORDER_STATUS_TYPES[result.admin_status].status_name+'</span>' :'<span class="label label-danger">'+(result.admin_status) ? result.admin_status : ""+'</span>';%></td>
+								</tr><%
+								if(result.admin_status == ORDER_REJECTED || result.admin_status == ORDER_CANCELLED || result.admin_status == ORDER_REJECTED_BY_ADMIN){ %>
+									<tr>
+										<th class="text-right" width="25%"><%= (result.admin_status == ORDER_REJECTED || result.admin_status == ORDER_REJECTED_BY_ADMIN) ? __('admin.orders.rejection_reason') :  __('admin.orders.cancellation_reason')%></th>
+										<td><%= (result.rejection_reason) ? result.rejection_reason :"N/A";%></td>
+									</tr><%
+								} %>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div id="financial_info_section" class="tab-pane fade">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.financial_info_section'); %>
+							</h2>
+							<ul class="header-dropdown m-r--5 btn-right-top-margin"><%
+								if(!result.refund_amount_status){ %>
+									<li>
+										<a href="javascript:void(0);" class="open-refund-amount-modal <%= getPermissionClass(module_type,['orders','refund_amount']); %>" data-id="<%= result._id %>"><button type="button" class="btn btn-sm bg-orange waves-effect"><%= __('admin.orders.refund_and_compensation'); %></button></a>
+									</li><%
+								} %>
+							</ul>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.net_order_amount'); %></th>
+									<td><%= (typeof orderDetails.net_amount !== typeof undefined) ? currencyFormat(orderDetails.net_amount) :"";%></td>
+								</tr><%
+								if(orderDetails.additional_tax && typeof orderDetails.additional_tax !== typeof undefined){ %>
+									<tr>
+										<th class="text-right" width="25%"><%= __('admin.orders.additional_tax'); %></th>
+										<td><%= (typeof orderDetails.additional_tax !== typeof undefined) ? currencyFormat(orderDetails.additional_tax) :"";%></td>
+									</tr><%
+								}
+								if(orderDetails.branch_extra_charge && typeof orderDetails.branch_extra_charge !== typeof undefined){ %>
+									<tr>
+										<th class="text-right" width="25%"><%= __('admin.orders.extra_charges'); %></th>
+										<td><%= (typeof orderDetails.branch_extra_charge !== typeof undefined) ? currencyFormat(orderDetails.branch_extra_charge) :"";%></td>
+									</tr><%
+								} %>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.delivery_fee'); %></th>
+									<td><%= (typeof orderDetails.delivery_fee !== typeof undefined) ? currencyFormat(orderDetails.delivery_fee) :"";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.discount_value'); %></th>
+									<td><%= (typeof orderDetails.discount_price !== typeof undefined) ? currencyFormat(orderDetails.discount_price) :"";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.total_order_amount'); %></th>
+									<td><%= (typeof orderDetails.total_amount !== typeof undefined) ? currencyFormat(orderDetails.total_amount) :"";%></td>
+								</tr><%
+								if(result.is_modified){ %>
+									<tr>
+										<th class="text-right" width="25%"><%= __('admin.orders.modified_order_amount'); %></th>
+										<td><%= (typeof result.modify_order_price !== typeof undefined) ? currencyFormat(result.modify_order_price) :"";%></td>
+									</tr><%
+								} %>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.payment_method'); %></th>
+									<td><%= (orderDetails.payment_title) ? orderDetails.payment_title[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.amount_debited_by_wallet'); %></th>
+									<td><%= (typeof result.amount_debited_by_wallet !== typeof undefined) ? currencyFormat(result.amount_debited_by_wallet) : currencyFormat(0);%></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div id="delivery_info" class="tab-pane fade">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.delivery_info'); %>
+							</h2>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.preparation_time'); %></th>
+									<td><%= (orderDetails.preparation_time) ? orderDetails.preparation_time+' '+__('admin.orders.minutes') :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.delivery_duration'); %></th>
+									<td><%= (orderDetails.delivery_duration) ? orderDetails.delivery_duration+' '+__('admin.orders.minutes') :"N/A";%></td>
+								</tr>
+								<% if(result.admin_status != ORDER_DELIVERED && !result.is_completed){ %>
+									<tr>
+										<th class="text-right" width="25%"><%= __('admin.orders.time_passed'); %></th>
+										<%
+											var tempTimePassed 		= 	(result.time_passed) ? (result.time_passed) : 0;
+											var timePassedLabel     = 	(!isNaN(tempTimePassed)) ? tempTimePassed+" "+ __('admin.orders.min'): "0"+" "+__('admin.orders.min');
+											timePassedLabel			=	(tempTimePassed > TIME_PASSED_MINUTE_LIMIT) ? __('admin.orders.order_not_delivered')  : timePassedLabel;
+										%>
+										<td><%= timePassedLabel;%></td>
+									</tr>
+								<% } %>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.delivery_by'); %></th>
+									<td><%= (result.delivery_detail && result.delivery_detail.title) ? result.delivery_detail.title :"N/A";%><%- (result.captain_name) ? '(<a href='+ WEBSITE_ADMIN_URL+'user_management/view_driver/'+result.captain_id+' target="_blank">'+result.captain_name+'</a>)' : '';%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.order_assigned_status'); %></th>
+									<td><%= (result.assignment_type) ? ASSIGNMENT_TYPE[result.assignment_type] :"";%></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div id="address" class="tab-pane fade">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.addresses'); %>
+							</h2>
+							<ul class="header-dropdown m-r--5 btn-right-top-margin"><%
+								if(!result.is_completed && result.delivery_type != DELIVERY_BY_PICK_UP){ %>
+									<li>
+										<a href="<%= originalUrl %>" class="action-btn <%= getPermissionClass(module_type,['orders','change_address']); %>" data-open-modal="true" data-action-url="<%=admin_list_url%>/change_address/<%=result._id%>" >
+											<button type="button" class="btn btn-sm bg-orange waves-effect">
+												<%= __('admin.orders.change_address'); %>
+											</button>
+										</a>
+									</li><%
+								} %>
+							</ul>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.address_title'); %></th>
+									<td><%= (customerAddress.address_title) ? customerAddress.address_title :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.city'); %></th>
+									<td><%= (customerAddress.city_name) ? customerAddress.city_name[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.area'); %></th>
+									<td><%= (customerAddress.area_name) ? customerAddress.area_name[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.block'); %></th>
+									<td><%= (customerAddress.block_name) ? customerAddress.block_name[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.street'); %></th>
+									<td><%= (customerAddress.street) ? customerAddress.street :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.address_type'); %></th>
+									<td><%= (customerAddress.address_type) ? customerAddress.address_type :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.building_number'); %></th>
+									<td><%= (customerAddress.building_number) ? customerAddress.building_number :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.floor_number'); %></th>
+									<td><%= (customerAddress.floor_number) ? customerAddress.floor_number :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.flat_number'); %></th>
+									<td><%= (customerAddress.flat_number) ? customerAddress.flat_number :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.jadda'); %></th>
+									<td><%= (customerAddress.jadda) ? customerAddress.jadda :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.venue'); %></th>
+									<td><%= (customerAddress.venue) ? customerAddress.venue :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" ><%= __('admin.orders.delivery_latitude'); %></th>
+									<td><%= (orderDetails.customer_latitude) ? orderDetails.customer_latitude :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" ><%= __('admin.orders.delivery_longitude'); %></th>
+									<td><%= (orderDetails.customer_longitude) ? orderDetails.customer_longitude :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.additional_directions'); %></th>
+									<td><%= (customerAddress.additional_directions) ? customerAddress.additional_directions : "N/A";%></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div id="client_info" class="tab-pane fade">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.client_info'); %>
+							</h2>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.name'); %></th>
+									<td><%- (result.customer_name) ? '<a href='+ WEBSITE_ADMIN_URL+'user_management/view_customer/'+result.customer_id+' target="_blank">'+result.customer_name+'</a>' : 'N/A';%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.number'); %></th>
+									<td><%= (result.customer_mobile) ? result.customer_mobile :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.orders.country'); %></th>
+									<td><%= (customerAddress.country && customerAddress.country[DEFAULT_LANGUAGE_CODE]) ? customerAddress.country[DEFAULT_LANGUAGE_CODE] : __('admin.orders.kuwait');%></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div id="offer_info" class="tab-pane fade">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.offer_info'); %>
+							</h2>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<%  if(orderDetails.discount_price || orderDetails.composite_id || orderDetails.corporate_id || orderDetails.offer_id || orderDetails.branch_discount){ %>
+								<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+									<%  if(orderDetails.offer_code && orderDetails.offer_type){ %>
+										<tr>
+											<th class="text-right" width="25%"><%= __('admin.orders.offer_code'); %></th>
+											<td><%= (orderDetails.offer_code) ? orderDetails.offer_code :"N/A";%></td>
+										</tr>
+										<tr>
+											<th class="text-right" width="25%"><%= __('admin.orders.offer_type'); %></th>
+											<td><%= (orderDetails.offer_type) ? OFFER_TYPES[orderDetails.offer_type] :"N/A";%></td>
+										</tr> <%
+										if(orderDetails.offer_discount > 0){ %>
+											<tr>
+												<th class="text-right" width="25%"><%= __('admin.orders.offer_discount'); %></th>
+												<td><%= (orderDetails.offer_discount) ? currencyFormat(orderDetails.offer_discount) :0;%></td>
+											</tr><%
+										} %>
+										<tr>
+											<th class="text-right" width="25%"><%= __('admin.orders.offer_description'); %></th>
+											<td><%- (orderDetails.offer_description) ? nl2br(orderDetails.offer_description.en) :"";%></td>
+										</tr>
+										<tr>
+											<th class="text-right" width="25%"><%= __('admin.orders.offer_description_in_ar'); %></th>
+											<td><%- (orderDetails.offer_description) ? nl2br(orderDetails.offer_description.ar) :"";%></td>
+										</tr>
+									<% } %>
+									<% if(orderDetails.corporate_discount > 0 || orderDetails.corporate_delivery_fees){ %>
+										<tr>
+											<th class="text-right" width="25%"><%= __('admin.orders.corporate_name'); %></th>
+											<td><%= (orderDetails.corporate_name) ? orderDetails.corporate_name[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+										</tr> <%
+										if(orderDetails.corporate_discount >0){ %>
+											<tr>
+												<th class="text-right" width="25%"><%= __('admin.orders.corporate_discount'); %></th>
+												<td><%= (orderDetails.corporate_discount) ? currencyFormat(orderDetails.corporate_discount) :"N/A";%></td>
+											</tr><%
+										}
+										if(orderDetails.corporate_delivery_fees >0){ %>
+											<tr>
+												<th class="text-right" width="25%"><%= __('admin.orders.corporate_delivery_fees'); %></th>
+												<td><%= (orderDetails.corporate_delivery_fees) ? currencyFormat(orderDetails.corporate_delivery_fees) :"N/A";%></td>
+											</tr><%
+										}%>
+									<% } %>
+									<%  if(orderDetails.branch_discount && orderDetails.branch_discount_type){ %>
+										<tr>
+											<th class="text-right" width="25%"><%= __('admin.orders.branch_discount_type'); %></th>
+											<td><%= (orderDetails.branch_discount_type) ? BRANCH_DISCOUNT_TYPE[orderDetails.branch_discount_type] :'';%></td>
+										</tr>
+										<tr>
+											<th class="text-right" width="25%"><%= __('admin.orders.branch_discount'); %></th>
+											<td><%= (orderDetails.branch_discount) ? currencyFormat(orderDetails.branch_discount) :0;%></td>
+										</tr><%
+									} %>
+									<% if(orderDetails.composite_id){ %>
+										<tr>
+											<th class="text-right" width="25%"><%= __('admin.orders.composite_id'); %></th>
+											<td><%= __('admin.orders.public_composite_offer');%></td>
+										</tr> <%
+										if(orderDetails.composite_delivery_fees >0){ %>
+											<tr>
+												<th class="text-right" width="25%"><%= __('admin.orders.composite_delivery_fees'); %></th>
+												<td><%= (orderDetails.composite_delivery_fees) ? currencyFormat(orderDetails.composite_delivery_fees) :"N/A";%></td>
+											</tr><%
+										}
+										if(orderDetails.composite_discount >0){ %>
+											<tr>
+												<th class="text-right" width="25%"><%= __('admin.orders.composite_discount'); %></th>
+												<td><%= (orderDetails.composite_discount) ? currencyFormat(orderDetails.composite_discount) :"N/A";%></td>
+											</tr><%
+										}
+									}
+									if(orderDetails.discount_price >0){ %>
+										<tr>
+											<th class="text-right" width="25%"><%= __('admin.orders.total_discount'); %></th>
+											<td><%= (orderDetails.discount_price) ? currencyFormat(orderDetails.discount_price) :0;%></td>
+										</tr> <%
+									} %>
+								</table><%
+							}else{ %>
+								<div class="text-center">
+									<%= __('admin.orders.no_offer_applicable');%>
+								</div><%
+							} %>
+						</div>
+					</div>
+				</div>
+				<div id="order_items" class="tab-pane fade">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.order_items'); %>
+							</h2>
+							<ul class="header-dropdown m-r--5 btn-right-top-margin"><%
+								if(showMidifyBtn){ %>
+									<li>
+										<a href="javascript:void(0);" id="modify_order" class="btn btn-sm bg-indigo m-t--10 waves-effect modify_order <%= getPermissionClass(module_type,['orders','modify_orders']); %>">
+											<%= __('admin.orders.modify_order'); %>
+										</a>
+									</li><%
+								} %>
+								<li><a href="javascript:void(0);" data-confirm-message="<%= __("admin.order.you_want_to_reset_your_order"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" class="reset_order hidden"><button type="button" class="btn btn-sm bg-orange waves-effect"><%= __('admin.orders.reset_order'); %></button></a>
+								</li>
+								<li class="add_items hidden"><a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_RESTAURANT_URL+'modify_orders/add_items/'+result._id %>" data-open-modal="true" class="action-btn add_new_items"><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __('admin.orders.add_items'); %></button></a>
+								</li>
+							</ul>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+								<thead>
+									<tr>
+										<th width="15%"><%= __("admin.orders.item_name_english"); %></th>
+										<th width="15%"><%= __("admin.orders.item_name_arabic"); %></th>
+										<th width="10%"><%= __("admin.orders.quantity"); %></th>
+										<th width="15%"><%= __("admin.orders.price"); %></th>
+										<th width="10%"><%= __("admin.orders.discount"); %></th>
+										<th width="10%"><%= __("admin.orders.net_amount"); %></th>
+										<th width="10%"><%= __("admin.orders.total_amount"); %></th>
+										<th width="10%"><%= __("admin.orders.notes"); %></th>
+										<%if(showMidifyBtn) { %>
+										   <th width="15%"><%= __("admin.orders.action"); %></th>
+										<%} %>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div id="order_status" class="tab-pane fade">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.order_status_update'); %>
+							</h2>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table id="datatable-listing-logs" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+								<thead>
+									<tr>
+										<th width="25%"><%= __("admin.orders.status"); %></th>
+										<th width="25%"><%= __("admin.orders.date"); %></th>
+										<th width="25%"><%= __("admin.orders.changed_by"); %></th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.driver_status_logs'); %>
+							</h2>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table id="datatable-listing-driver-logs" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+								<thead>
+									<tr>
+										<th width="25%"><%= __("admin.orders.driver_status"); %></th>
+										<th width="25%"><%= __("admin.orders.date"); %></th>
+										<th width="25%"><%= __("admin.orders.changed_by"); %></th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div id="location_map" class="tab-pane fade">
+					<!--- Pickup Map-->
+					<div class="card" id="pick-up-location-map">
+						<div class="header">
+							<h2>
+								<%= __("admin.orders.location_map"); %>
+							</h2>
+							<ul class="header-dropdown m-r--5 btn-right-top-margin">
+								<li>
+									<a  class="refresh-location-btn">
+										<button type="button" class="btn btn-sm bg-indigo waves-effect">
+											<%= __("admin.orders.refresh"); %>
+										</button>
+									</a>
+								</li>
+							</ul>
+						</div>
+						<div id="legend" class="col-sm-12 m-t-10 text-center">
+							<ul class="order-legends">
+								<li>
+									<img src="<%=STORE_GOOGLE_MAP_ICON%>" />
+									<p class="captain-map-legend"><%= __("admin.orders.pickup_location"); %></p>
+								</li>
+								<li>
+									<img src="<%=DROPOFF_LOCATION_GOOGLE_MAP_ICON%>" class="dropoff-icon"/>
+									<p class="captain-map-legend"><%= __("admin.orders.drop_off_location"); %></p>
+								</li><%
+								if(result.order_status != ORDER_DELIVERED){ %>
+									<li>
+										<img src="<%=CAPTAIN_ICON_IMAGE%>" />
+										<p class="captain-map-legend"><%= __("admin.orders.captain_location"); %></p>
+									</li><%
+								} %>
+							</ul>
+						</div>
+						<div class="body table-responsive" id="pick-location-report">
+							<div id="pick-up-map" style="height:500px" class="col-sm-12"></div>
+						</div>
+					</div>
+				</div>
+				<div id="voc_client" class="tab-pane fade"></div>
+				<div id="voc_captain" class="tab-pane fade"></div>
+				<div id="tickets" class="tab-pane fade"></div>
+				<div id="refund_and_compensation" class="tab-pane fade">
+					<!--Search Start -->
+					<div class="row clearfix">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+								<div class="panel panel-col-pink">
+									<div class="panel-heading" role="tab" id="panel-heading-id">
+										<h4 class="panel-title">
+											<a class="collapsed" role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+											aria-controls="panel-collapse-id">
+												<%= __("admin.system.search"); %>
+												<span class="pull-right collapse-toggle-icon"></span>
+											</a>
+										</h4>
+									</div>
+									<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+										<div class="panel-body">
+											<form id="searchForm" name="searchForm" >
+												<div class="row clearfix dataTables_wrapper">
+													<!-- Search by refund type -->
+													<div class="col-xs-12 col-sm-4">
+														<div class="form-group">
+															<div class="form-line">
+																<select class="form-control show-tick" id="column_filter_0" onchange="searchDatatable(0)" name="refund_type">
+																	<option value=""><%= __("admin.orders.search_by_refund_type")%></option>
+																	<% Object.keys(REFUND_TYPE).map(key=>{ %>
+																		<option value="<%=key%>"><%= REFUND_TYPE[key]%></option>
+																	<% }); %>
+																</select>
+															</div>
+														</div>
+													</div>
+													<div class="col-xs-12 col-sm-2">
+														<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+															<%= __("admin.system.reset")%>
+														</button>
+													</div>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--Search End -->
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.refund_and_compensation'); %>
+							</h2>
+							<ul class="header-dropdown m-r--5 btn-right-top-margin"><%
+								if(!result.refund_amount_status){ %>
+									<li>
+										<a href="javascript:void(0);" class="open-refund-amount-modal <%= getPermissionClass(module_type,['orders','refund_amount']); %>" data-id="<%= result._id %>"><button type="button" class="btn btn-sm bg-orange waves-effect"><%= __('admin.orders.refund_and_compensation'); %></button></a>
+									</li><%
+								} %>
+							</ul>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table id="datatable-listing-refund" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+								<thead>
+									<tr>
+										<th width="20%"><%= __("admin.orders.refund_type"); %></th>
+										<th width="20%"><%= __("admin.orders.refund_amount"); %></th>
+										<th width="20%"><%= __("admin.orders.caused_by"); %></th>
+										<th width="20%"><%= __("admin.orders.total_amount"); %></th>
+										<th width="20%"><%= __("admin.orders.refund_reason"); %></th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div id="restaurant_details" class="tab-pane fade">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.restaurant_details'); %>
+							</h2>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+								<tr>
+									<th class="text-right" width="30%"><%= __('admin.orders.restaurant_address'); %></th>
+									<td><%= (orderDetails.restaurant_address) ? orderDetails.restaurant_address :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="30%"><%= __('admin.orders.restaurant_name_in_english'); %></th>
+									<td><%= (result.restaurant_detail) ? result.restaurant_detail.name[ENGLISH_LANGUAGE_CODE] :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="30%"><%= __('admin.orders.restaurant_name_in_arabic'); %></th>
+									<td><%= (result.restaurant_detail) ? result.restaurant_detail.name[ARABIC_LANGUAGE_CODE] :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="30%"><%= __('admin.orders.restaurant_branch_name_in_english'); %></th>
+									<td><%= (result.restaurant_branch_detail && result.restaurant_branch_detail.name) ? result.restaurant_branch_detail.name[ENGLISH_LANGUAGE_CODE] :"N/A";%></td>
+								</tr>
+								<tr>
+									<th class="text-right" width="30%"><%= __('admin.orders.restaurant_branch_name_in_arabic'); %></th>
+									<td><%= (result.restaurant_branch_detail && result.restaurant_branch_detail.name) ? result.restaurant_branch_detail.name[ARABIC_LANGUAGE_CODE] :"N/A";%></td>
+								</tr>
+								<% if(result.restaurant_branch_contact_number_detail && result.restaurant_branch_contact_number_detail.length > 0){
+									result.restaurant_branch_contact_number_detail.map(contactNumberRecords=>{
+									%>
+									<tr>
+										<th class="text-right" width="30%"><%=contactNumberRecords.attribute_title%></th>
+										<td class="padding-5">
+											<table class="row-border hover table table-bordered m-b-0" cellspacing="0" width="100%">
+												<tr>
+													<th class="text-right" width="35%"><%= __("admin.orders.phone_number")%></th>
+													<td>
+														<%=( contactNumberRecords.country_code && contactNumberRecords.value) ? contactNumberRecords.country_code+""+contactNumberRecords.value : "";%>
+													</td>
+												</tr>
+												<tr>
+													<th class="text-right" width="35%"><%= __("admin.orders.contact_name")%></th>
+													<td><%=(contactNumberRecords.contact_name) ?contactNumberRecords.contact_name : "";%></td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+
+									<% });
+								} %>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div id="modifications" class="tab-pane fade">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.orders.modifications'); %>
+							</h2>
+						</div>
+						<div class="row clearfix">
+							<div class="panel-group add_choice_data modify_log padding-20" id="accordion" role="tablist" aria-multiselectable="true"><%
+								if(modify_details.length > 0){
+									modify_details.map((data,key)=>{ %>
+										<div class="panel panel-default">
+											<div class="panel-heading">
+												<h4 class="panel-title">
+													<a role="button" data-toggle="collapse" href="#collapse_<%= key%>" aria-expanded="true" aria-controls="collapse_<%= key%>" class="<%= (key == 0) ? '' : 'collapsed'%>">
+														<div class="row">
+															<div class="col-md-3"><%= __('admin.orders.version') %> : <%= (data.version) ? data.version : ''%></div>
+															<div class="col-md-4"><%= __('admin.orders.modified_by') %> : <%= (data.user_name) ? data.user_name : ''%></div>
+															<div class="col-md-4"><%= __('admin.orders.modified_on') %> : <span class="setDateTimeFormat" data-date-time="<%= (data &&  data.modified) ? data.modified : '';%>"></span></div>
+															<div class="col-md-1"><span class="pull-right collapse-toggle-icon"></span></div>
+														</div>
+													</a>
+												</h4>
+											</div>
+											<div id="collapse_<%= key%>" class="panel-collapse collapse <%= (key == 0) ? 'in' : ''%>" role="tabpanel" aria-labelledby="heading_<%= key%>" aria-expanded="true" data-parent="#accordion" style="">
+												<div class="body table-responsive" id="aniimated-thumbnials">
+													<table id="datatable" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+														<thead>
+															<tr>
+																<th width="20%"><%= __("admin.orders.item_name"); %></th>
+																<th width="20%"><%= __("admin.orders.qty"); %></th>
+																<th width="20%"><%= __("admin.orders.item_main_price"); %></th>
+															</tr>
+														</thead>
+														<tbody><%
+															if(data.modify_details.length > 0){
+																data.modify_details.map(item=>{
+																	let mainExtraItemHtml = "";
+																	if(item.extra_items && item.extra_items.length > 0){
+																		item.extra_items.map((mainExtraItemRecords,index)=>{
+																			let extraItemName = mainExtraItemRecords.extra_item_name && mainExtraItemRecords.extra_item_name[ENGLISH_LANGUAGE_CODE] ? mainExtraItemRecords.extra_item_name[ENGLISH_LANGUAGE_CODE] : "";
+																			mainExtraItemHtml += (index != 0) ? ', ' : '';
+																			mainExtraItemHtml += extraItemName;
+																		});
+																	} %>
+																	<tr class="<%= (item.is_new) ? 'btn-success' : ''%>">
+																		<td>
+																			<%= (item.item_name) ? item.item_name[DEFAULT_LANGUAGE_CODE] : '';%><br/>
+																			<%= (mainExtraItemHtml) ? __("admin.order.extra_item")+' : '+mainExtraItemHtml : "";%>
+																		</td>
+																		<td><%= (item.qty) ? item.qty : ''; %></td>
+																		<td><%= (item.item_main_price) ? currencyFormat(item.item_main_price) : 0; %></td>
+																	</tr><%
+																});
+															} %>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div><%
+									});
+								}else{ %>
+									<p class="text-center"><%= __('system.no_nodifications_found')%></p><%
+								} %>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="main-container"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal to refund amount to user -->
+<div class="modal fade" id="refund_modal" tabindex="-1" role="dialog" aria-labelledby="refund_modal" aria-hidden="true">
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&key=<%= GOOGLE_AUTO_COMPLETE_API_KEY%>"></script>
+
+
+	<script type="text/javascript">
+		/* To blank container on tab */
+		$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+			$('#main-container').html('');
+			$('.order-details-tab').removeClass('active');
+			$(this).find(".order-details-tab").addClass('active');
+			$($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+		});
+
+		/* To replace url type */
+		$(document).on('click','.get-tab-details',function(e){
+			var type = $(this).attr("data-type");
+			window.history.replaceState(null, null, "<%= originalUrl+'/'%>"+type);
+		});
+
+
+			/* Event triggered when click on tab btn */
+			$("a[data-type='<%=selectedButton%>']").trigger("click");
+
+			/** Refresh map */
+			$(".refresh-location-btn,.show-location-map").click(function() {
+				getLocationData();
+			});
+
+			var orderId	= "<%= (result._id) 		?	result._id			:''%>";
+			var userId	= "<%= (result.captain_id) 	?	result.captain_id	:''%>";
+			var map;
+			var bounds = new google.maps.LatLngBounds();
+			var myMarker = [];
+			var centerPoint = '';
+
+			function initialize(historyData) {
+				setTimeout(function(){
+					if((historyData.order_detail && historyData.order_detail.restaurant_latitude && historyData.order_detail.restaurant_longitude) || (historyData.captain_detail) || (historyData.order_detail && historyData.order_detail.customer_latitude && historyData.order_detail.customer_longitude)){
+						var captainMobile	= (historyData.captain_detail && historyData.captain_detail.mobile_number) ? historyData.captain_detail.mobile_number : '';
+						var captainName		= (historyData.captain_detail && historyData.captain_detail.full_name) ? historyData.captain_detail.full_name : '';
+						var captainLat		= (historyData.captain_detail && historyData.captain_detail.latitude) ? historyData.captain_detail.latitude : '';
+						var captainLong		= (historyData.captain_detail && historyData.captain_detail.longitude) ? historyData.captain_detail.longitude : '';
+						var dropLatitude	= (historyData.order_detail && historyData.order_detail.customer_latitude) 	? historyData.order_detail.customer_latitude	:"";
+						var dropLongitude	= (historyData.order_detail && historyData.order_detail.customer_longitude) ? historyData.order_detail.customer_longitude	:"";
+						var pickLatitude	= (historyData.order_detail && historyData.order_detail.restaurant_latitude) ? historyData.order_detail.restaurant_latitude	:"";
+						var pickLongitude	= (historyData.order_detail && historyData.order_detail.restaurant_longitude) ? historyData.order_detail.restaurant_longitude	:"";
+						var pickUpAddress	= (historyData.order_detail && historyData.order_detail.restaurant_address) ? historyData.order_detail.restaurant_address	:"";
+						var dropOffAddress	= (historyData.order_detail && historyData.order_detail.customer_address) ? historyData.order_detail.customer_address	:"";
+						/**Set map icons*/
+						var icons = {
+							store: {
+								name: "<%= __('admin.orders.pickup_location')%>",
+								icon: '<%=STORE_GOOGLE_MAP_ICON%>'
+							},
+							user: {
+								name: "<%= __('admin.orders.drop_off_location')%>",
+								icon: '<%=DROPOFF_LOCATION_GOOGLE_MAP_ICON%>'
+							},
+							captain: {
+								name: "<%= __('admin.orders.captain_location')%>",
+								icon: '<%=CAPTAIN_ICON_IMAGE%>'
+							},
+						};
+						var store	=	'';
+						var user	=	'';
+						var captain	=	'';
+						if(pickLatitude && pickLongitude){
+							store	=	[{"id": 0, "location" : {"lat": pickLatitude, "lng" : pickLongitude} , "icon" : icons['store'].icon,"title":pickUpAddress}];
+						}
+						if(dropLatitude && dropLongitude){
+							user	=	[{"id": 1,"location" : {"lat": dropLatitude, "lng" :dropLongitude} , "icon" : icons['user'].icon,"title":dropOffAddress}];
+						}
+						if(captainLat && captainLong){
+							captain	=	[{"id": 2,"location" : {"lat": captainLat, "lng" :captainLong} , "icon" : icons['captain'].icon,"title":captainName,"mobile_number":captainMobile}];
+						}
+
+						if(pickLatitude && pickLongitude){
+							centerPoint	=	new google.maps.LatLng(pickLatitude, pickLongitude);
+						}else{
+							centerPoint	=	new google.maps.LatLng(dropLatitude, dropLongitude);
+						}
+						map = new google.maps.Map(
+							document.getElementById("pick-up-map"), {
+							mapTypeId: google.maps.MapTypeId.ROADMAP
+						});
+
+						/** set auto zoom and add markers*/
+						var pickLoc	=	new google.maps.LatLng(pickLatitude, pickLongitude);
+						bounds.extend(pickLoc);
+						pushMarker(store, "<%= __('admin.orders.pickup_location')%>");
+						var dropLoc	=	new google.maps.LatLng(dropLatitude, dropLongitude);
+						bounds.extend(dropLoc);
+						pushMarker(user, "<%= __('admin.orders.drop_off_location')%>");
+						if(historyData.order_status != '<%= ORDER_DELIVERED %>'){
+							var captainLoc	=	new google.maps.LatLng(captainLat, captainLong);
+							bounds.extend(captainLoc);
+							pushMarker(captain, "<%= __('admin.orders.captain_location')%>");
+						}
+
+						map.fitBounds(bounds);
+						map.panToBounds(bounds);
+					}else{
+						$("#pick-up-map").html('<h5 class="text-center"><%=__("admin.orders.location_not_available")%></h5>');
+					}
+				},500);
+			}
+
+			/** add marker on map*/
+			function pushMarker(data, type) {
+				var marker;
+				$.each( data, function( key, value ) {
+					myMarker[ value.id ] = addMarker(map, value,type);
+				})
+			}
+
+			/**create the markers*/
+			function addMarker(map, data,type) {
+				var marker = new google.maps.Marker({
+					position: new google.maps.LatLng(data.location.lat, data.location.lng),
+					map: map,
+					title: type,
+					icon: data.icon
+				});
+				/** To set auto zoom*/
+
+				/**create the info windows*/
+				var content = document.createElement("DIV");
+				var title = document.createElement("DIV");
+				var mobile = document.createElement("DIV");
+				title.innerHTML = data.title;
+				content.appendChild(title);
+				if(data.mobile_number){
+					mobile.innerHTML = data.mobile_number;
+					content.appendChild(mobile);
+				}
+
+				var infowindow = new google.maps.InfoWindow({
+					content: content
+				});
+
+				// Open the infowindow on marker click
+				google.maps.event.addListener(marker, "click", function() {
+					infowindow.open(map, marker);
+				});
+
+				// Default info box for service provider should be open.Igore if store and customer address
+				if(data.id != 0 && data.id != 1){
+					infowindow.open(map, marker);
+				}
+				return marker;
+			}
+			/**
+			* Function to change current order
+			*/
+			$( ".modify_order").click(function() {
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				$.ajax({
+					url 	:	"<%=WEBSITE_RESTAURANT_URL%>modify_orders/add_multiple_item_cart/"+orderId,
+					type	: 	"POST",
+					success	: 	function(res){
+						if(res.status== 'success'){
+							$(".add_items").removeClass("hidden");
+							$(".modify_order").addClass("hidden");
+							$(".reset_order").removeClass("hidden");
+						}else{
+							notice(res.status,res.message);
+						}
+						stopTextLoading(btnId);
+					}
+				});
+			});
+			/**
+			* Function to reset current order
+			*/
+			$(".reset_order").click(function() {
+				var confirmMessage  	=	$(this).attr('data-confirm-message');
+				var confirmHeading  	= 	$(this).attr('data-confirm-heading');
+				confirmBox("warning",confirmHeading,confirmMessage,function(result){
+					if(result){
+						$.ajax({
+							url 	:	"<%=WEBSITE_RESTAURANT_URL%>modify_orders/delete_item_cart",
+							type	: 	"POST",
+							data	:	{'order_id':orderId},
+							success	: 	function(res){
+								if(res.status == 'success'){
+									notice('success',"<%= __('admin.order.order_reset_successfully') %>");
+									$(".add_items").addClass("hidden");
+									$(".modify_order").removeClass("hidden");
+									$(".reset_order").addClass("hidden");
+									swal.close();
+								}
+							}
+						});
+					}
+				});
+			});
+
+			/**
+			* Function to get Location of captain using ajax submit
+			*/
+			function getLocationData(){
+				$.ajax({
+					url :"<%=admin_list_url%>/get_location",
+					type: "POST",
+					data : {user_id:  userId,order_id:orderId},
+					success:function(response){
+						if(response.status == "success"){
+							var historyData = response.result;
+							initialize(historyData);
+						}else{
+							notice(response.status,response.message);
+						}
+					}
+				});
+			}//End getLocationData()
+
+			/**
+			* Function to show modal for status change
+			*/
+			$(document).on('click','.open-refund-amount-modal',function(){
+				var orderId 		= $(this).attr('data-id');
+
+				$('#refund_amount').val('');
+				$.ajax({
+					url :"<%=admin_list_url%>/refund_amount/"+orderId,
+					type: "GET",
+					success:function(response){
+						$('#refund_modal').modal({
+							backdrop: 'static',
+							keyboard: false
+						});
+						$('#refund_modal').html(response);
+						$('#refund_modal').modal('show');
+					}
+				});
+			});
+
+			/**Call location function*/
+			$(document).ready(function(){
+				getLocationData();
+			});
+
+			/** Function to initialize datatable and get server side data */
+			var dataTable 			=	"";
+			var dataTableLog 		=	"";
+			var dataTableDriverLog  =   "";
+			var dataTableRefund     =   "";
+			var ORDER_STATUS_TYPES	=	<%- JSON.stringify(ORDER_STATUS_TYPES);%>;
+			var REFUND_TYPE			=	<%- JSON.stringify(REFUND_TYPE);%>;
+			var CAUSED_BY_OBJECT    =   <%-JSON.stringify(CAUSED_BY_OBJECT)%>;
+			$(document).ready(function() {
+				dataTable 	= 	$('#datatable-listing').DataTable({
+					"bStateSave"	: true,
+					"fnStateSave"	: function (oSettings, oData) {
+						localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+					},
+					"fnStateLoad"	: function (oSettings) {
+						return JSON.parse( localStorage.getItem('DataTables') );
+					},
+					"order"		: 	[[ 0, "desc" ]],
+					"sDom"		:	"ltipr",
+					"serverSide": 	true,
+					"scrollX"	: 	true,
+					"lengthMenu":	PAGING_LENGTH_MENU,
+					"columns"	: 	[
+						{
+							"data"		 : {},
+							"searchable" : 	false,
+							"render" 	 : 	function(result){
+								var itemName	= (result.item_name) ? (result.item_name['<%= ENGLISH_LANGUAGE_CODE %>']) : '';
+								var itemHtml	= itemName+'<br/>';
+								if(result.unit_lists && result.unit_lists.length > 0){
+									var text	=	(result.item_type == '<%= HALF_AND_HALF_ITEM%>') ? '<%= __('admin.order.half_pizza');%>' : '<%= __('admin.order.pizza');%>';
+									if(result.item_type == '<%= HALF_AND_HALF_ITEM%>' || result.item_type == '<%= DEAL_ITEM%>'){
+										result.unit_lists.map((data,key)=>{
+											let extraItemsArray = data.extra_items ? data.extra_items : [];
+											let extraItemHtml = "";
+											if(extraItemsArray && extraItemsArray.length > 0){
+												extraItemsArray.map((exItemRecords,parentIndex)=>{
+													exItemRecords.extra_item_ids.map((tmpExItem,index)=>{
+														let extraItemName = tmpExItem.extra_item_name && tmpExItem.extra_item_name['<%= ENGLISH_LANGUAGE_CODE %>'] ? tmpExItem.extra_item_name['<%= ENGLISH_LANGUAGE_CODE %>'] : "";
+														extraItemHtml += (parentIndex != 0 && index != 0) ? ', ' : '';
+														extraItemHtml += extraItemName;
+													});
+												});
+											}
+											key	=	key+1;
+											var unitNames	=	(data.unit_name['<%= ENGLISH_LANGUAGE_CODE %>']) ? data.unit_name['<%= ENGLISH_LANGUAGE_CODE %>']+', ':"";
+											var doughNames	=	(data.dough_name['<%= ENGLISH_LANGUAGE_CODE %>']) ? data.dough_name['<%= ENGLISH_LANGUAGE_CODE %>']+', ':"";
+											var seclectorNames	=	(data.selector_name['<%= ENGLISH_LANGUAGE_CODE %>']) ? data.selector_name['<%= ENGLISH_LANGUAGE_CODE %>']:"";
+											itemHtml	+=	key+'. '+text+': ' +unitNames+doughNames+seclectorNames+'<br/>';
+
+											if(extraItemHtml){
+												itemHtml += '<%= __("admin.order.extra_item");%>: '+extraItemHtml+'<br/>';
+											}
+										});
+									}
+								}else{
+									if(result.unit_name){
+										itemHtml += (result.unit_name['<%= ENGLISH_LANGUAGE_CODE %>']) ? result.unit_name['<%= ENGLISH_LANGUAGE_CODE %>'] :"";
+
+										itemHtml += (result.dough_name && result.dough_name['<%= ENGLISH_LANGUAGE_CODE %>']) ? ", "+result.dough_name['<%= ENGLISH_LANGUAGE_CODE %>'] :"";
+
+										itemHtml += "<br/>";
+									}
+								}
+								let mainExtraItemHtml = "";
+								if(result.extra_items && result.extra_items.length > 0){
+									result.extra_items.map((mainExtraItemRecords,index)=>{
+										let extraItemName = mainExtraItemRecords.extra_item_name && mainExtraItemRecords.extra_item_name['<%= ENGLISH_LANGUAGE_CODE %>'] ? mainExtraItemRecords.extra_item_name['<%= ENGLISH_LANGUAGE_CODE %>'] : "";
+										mainExtraItemHtml += (index != 0) ? ', ' : '';
+										mainExtraItemHtml += extraItemName;
+									});
+								}
+								itemHtml += (mainExtraItemHtml) ? '<%= __("admin.order.extra_item");%>: '+mainExtraItemHtml : '';
+								return itemHtml;
+							}
+						},
+						{
+							"data"		 : {},
+							"searchable" : 	false,
+							"render" 	 : 	function(result){
+								var itemName	= (result.item_name) ? (result.item_name['<%= ARABIC_LANGUAGE_CODE %>']) : '';
+								var itemHtml	= itemName+'<br/>';
+								if(result.unit_lists && result.unit_lists.length > 0){
+									var text	=	(result.item_type == '<%= HALF_AND_HALF_ITEM%>') ? '<%= __("admin.order.half_pizza");%>' : '<%= __("admin.order.pizza");%>';
+									if(result.item_type == '<%= HALF_AND_HALF_ITEM%>' || result.item_type == '<%= DEAL_ITEM%>'){
+										result.unit_lists.map((data,key)=>{
+											let extraItemsArray = data.extra_items ? data.extra_items : [];
+											let extraItemHtml = "";
+											if(extraItemsArray && extraItemsArray.length > 0){
+												extraItemsArray.map((exItemRecords,parentIndex)=>{
+													exItemRecords.extra_item_ids.map((tmpExItem,index)=>{
+														let extraItemName = tmpExItem.extra_item_name && tmpExItem.extra_item_name['<%= ENGLISH_LANGUAGE_CODE %>'] ? tmpExItem.extra_item_name['<%= ENGLISH_LANGUAGE_CODE %>'] : "";
+														extraItemHtml += (parentIndex != 0 ||  index != 0) ? ', ' : '';
+														extraItemHtml += extraItemName;
+													});
+												});
+											}
+											key	=	key+1;
+											var unitNames	=	(data.unit_name['<%= ARABIC_LANGUAGE_CODE %>']) ? data.unit_name['<%= ARABIC_LANGUAGE_CODE %>']+', ':"";
+											var doughNames	=	(data.dough_name['<%= ARABIC_LANGUAGE_CODE %>']) ? data.dough_name['<%= ARABIC_LANGUAGE_CODE %>']+', ':"";
+											var seclectorNames	=	(data.selector_name['<%= ARABIC_LANGUAGE_CODE %>']) ? data.selector_name['<%= ARABIC_LANGUAGE_CODE %>']:"";
+											itemHtml	+=	key+'. '+text+': ' +unitNames+doughNames+seclectorNames+'<br/>';
+
+											if(extraItemHtml){
+												itemHtml += '<%= __("admin.order.extra_item");%>: '+extraItemHtml+'<br/>';
+											}
+										});
+									}
+								}else{
+									if(result.unit_name){
+										itemHtml += (result.unit_name['<%= ARABIC_LANGUAGE_CODE %>']) ? result.unit_name['<%= ARABIC_LANGUAGE_CODE %>']+", " :"";
+
+										itemHtml += (result.dough_name && result.dough_name['<%= ARABIC_LANGUAGE_CODE %>']) ? result.dough_name['<%= ARABIC_LANGUAGE_CODE %>'] :"";
+
+										itemHtml += "<br/>";
+									}
+								}
+								let mainExtraItemHtml = "";
+								if(result.extra_items && result.extra_items.length > 0){
+									result.extra_items.map((mainExtraItemRecords,index)=>{
+										let extraItemName = mainExtraItemRecords.extra_item_name && mainExtraItemRecords.extra_item_name['<%= ARABIC_LANGUAGE_CODE %>'] ? mainExtraItemRecords.extra_item_name['<%= ARABIC_LANGUAGE_CODE %>'] : "";
+										mainExtraItemHtml += (index != 0) ? ', ' : '';
+										mainExtraItemHtml += extraItemName;
+									});
+								}
+								itemHtml += (mainExtraItemHtml) ? '<%= __("admin.order.extra_item");%>'+': '+mainExtraItemHtml : '';
+								return itemHtml;
+							}
+						},
+						{ "data": 'qty' },
+						{
+							"data"		 : 'price',
+							"searchable" : 	false,
+							"render" 	 : 	function(price){
+								return (typeof price !== typeof undefined) ? currencyFormat(price) : '';
+							}
+						},
+						{
+							"data"		 : 'discounted_price',
+							"searchable" : 	false,
+							"render" 	 : 	function(discounted_price){
+								return (typeof discounted_price !== typeof undefined) ? currencyFormat(discounted_price) : '';
+							}
+						},
+						{
+							"data"		 : 'net_amount',
+							"searchable" : 	false,
+							"render" 	 : 	function(net_amount){
+								return (typeof net_amount !== typeof undefined) ? currencyFormat(net_amount) : '';
+							}
+						},
+						{
+							"data"		 : 'sub_total',
+							"searchable" : 	false,
+							"render" 	 : 	function(sub_total){
+								return (typeof sub_total !== typeof undefined) ? currencyFormat(sub_total) : '';
+							}
+						},
+						{
+							"data"		 : 'note',
+							"orderable"  : 	false,
+							"render" 	 : 	function(note){
+								return (note) ? "<span class='readmore nl2br'>"+note+"</span>" :"";
+							}
+						},
+						<% if(showMidifyBtn){ %>
+						{
+							"data"		 : 'item_id',
+							"orderable"	 : false,
+							"searchable" : false,
+							"render" 	 : function(item_id){
+								var id     		= (item_id) ? item_id : "";
+								var dropDownButton = '<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_RESTAURANT_URL%>modify_orders/change_quantity/'+orderId+'/'+id+'/addtocart" data-open-modal="true" class="action-btn add_items hidden">'+
+									'<button type="button" class="btn bg-green waves-effect">'+
+										' <%= __("admin.orders.change_quantity"); %>'+
+									'</button>'+
+								'</a>';
+								return dropDownButton;
+							}
+						},
+						<% } %>
+					],
+					"ajax":{
+						url 	:	"<%=admin_list_url%>/list_items/"+orderId,
+						type	: 	"POST",
+						dataSrc	: 	function(res){
+							adjustPermissionsClass();
+							return res.data;
+						}
+					},
+					"drawCallback": function( settings ) {
+						/** Description read more **/
+						readMore();
+					}
+				});
+
+				dataTableLog = 	$('#datatable-listing-logs').DataTable({
+					"bStateSave"	: true,
+					"fnStateSave"	: function (oSettings, oData) {
+						localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+					},
+					"fnStateLoad"	: function (oSettings) {
+						return JSON.parse( localStorage.getItem('DataTables') );
+					},
+					"order"		: 	[[ 1, "desc" ]],
+					"sDom"		:	"ltipr",
+					"serverSide": 	true,
+					"scrollX"	: 	true,
+					"lengthMenu":	PAGING_LENGTH_MENU,
+					"columns"	: 	[
+						{
+							"data"		 : 'status',
+							"sortable"   : 	false,
+							"render" 	 : 	function(status){
+								var statusLabel = (status && ORDER_STATUS_TYPES[status]) ? '<span class="label '+ORDER_STATUS_TYPES[status].label_class+'">'+ORDER_STATUS_TYPES[status].status_name+'</span>' : '';
+								return statusLabel;
+							}
+						},
+						{
+							"data"		 : 'created',
+							"searchable" : 	false,
+							"render" 	 : 	function(created){
+								return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+							}
+						},
+						{
+							"data"		 : 'user_name',
+							"orderable" : 	false,
+						},
+					],
+					"ajax":{
+						url 	:	"<%=admin_list_url%>/status_logs/"+orderId,
+						type	: 	"POST",
+						dataSrc	: 	function(res){
+							adjustPermissionsClass();
+							return res.data;
+						}
+					}
+				});
+
+				dataTableDriverLog = 	$('#datatable-listing-driver-logs').DataTable({
+					"bStateSave"	: true,
+					"fnStateSave"	: function (oSettings, oData) {
+						localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+					},
+					"fnStateLoad"	: function (oSettings) {
+						return JSON.parse( localStorage.getItem('DataTables') );
+					},
+					"order"		: 	[[ 1, "desc" ]],
+					"sDom"		:	"ltipr",
+					"serverSide": 	true,
+					"scrollX"	: 	true,
+					"lengthMenu":	PAGING_LENGTH_MENU,
+					"columns"	: 	[
+						{
+							"data"		 : 'status',
+							"sortable"   : 	false,
+							"render" 	 : 	function(status){
+								var statusLabel = (status && ORDER_STATUS_TYPES[status]) ? '<span class="label '+ORDER_STATUS_TYPES[status].label_class+'">'+ORDER_STATUS_TYPES[status].status_name+'</span>' : '';
+								return statusLabel;
+							}
+						},
+						{
+							"data"		 : 'created',
+							"searchable" : 	false,
+							"render" 	 : 	function(created){
+								return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+							}
+						},
+						{
+							"data"		 : 'user_name',
+							"orderable"  : 	false,
+						},
+					],
+					"ajax":{
+						url 	:	"<%=admin_list_url%>/status_logs/"+orderId+"?driver_logs=true",
+						type	: 	"POST",
+						dataSrc	: 	function(res){
+							adjustPermissionsClass();
+							return res.data;
+						}
+					}
+				});
+
+				dataTableRefund = 	$('#datatable-listing-refund').DataTable({
+					"bStateSave"	: true,
+					"fnStateSave"	: function (oSettings, oData) {
+						localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+					},
+					"fnStateLoad"	: function (oSettings) {
+						return JSON.parse( localStorage.getItem('DataTables') );
+					},
+					"order"		: 	[],
+					"sDom"		:	"ltipr",
+					"serverSide": 	true,
+					"scrollX"	: 	true,
+					"lengthMenu":	PAGING_LENGTH_MENU,
+					"columns"	: 	[
+						{
+							"data"		 : 'refund_type' ,
+							"orderable"  :  false,
+							"render" 	 : 	function(refund_type){
+								return REFUND_TYPE[refund_type];
+							}
+						},
+						{
+							"data"		 : 'refund_amount' ,
+							"searchable" : 	false,
+							"render" 	 : 	function(refund_amount){
+								return (refund_amount) ? currencyFormat(refund_amount) : '';
+							}
+						},
+						{
+							"data"		 : 'order_caused_by_whom',
+							"searchable" : 	false,
+							"orderable"  :  false,
+							"render" 	 : 	function(order_caused_by_whom){
+								return CAUSED_BY_OBJECT[order_caused_by_whom];
+							}
+						},
+						{
+							"data"		 : {},
+							"searchable" : 	false,
+							"render" 	 : 	function(result){
+								let paidAmount = result.paid_amount ? result.paid_amount : "";
+								let orderPrice = result.order_price ? result.order_price : "";
+								return (paidAmount) ? currencyFormat(paidAmount) : currencyFormat(orderPrice);
+							}
+						},
+						{ 	"data"		: {},
+							"orderable"	: false,
+							"searchable": false,
+							"render"	: function(result){
+								let refundReason = result.refund_reason ? result.refund_reason : "";
+								return (refundReason) ? "<span class='readmore'>"+refundReason+"</span>" :"";
+							}
+						},
+					],
+					"ajax":{
+						url 	:	"<%=admin_list_url%>/refund_details/"+orderId,
+						type	: 	"POST",
+						dataSrc	: 	function(res){
+							adjustPermissionsClass();
+							return res.data;
+						}
+					},
+					"drawCallback": function( settings ) {
+						/** Description read more **/
+						readMore();
+					}
+				});
+
+				$(document).on('click','.get-tab-details',function(){
+					dataTable.columns.adjust().draw();
+					dataTableLog.columns.adjust().draw();
+					dataTableDriverLog.columns.adjust().draw();
+					dataTableRefund.columns.adjust().draw();
+				});
+			});
+
+			/** Javascript function to search datatable refund */
+			function searchDatatable(columnNumber){
+				var query= $('#column_filter_'+columnNumber).val();
+				dataTableRefund.column(columnNumber).search(query).draw()
+			}//end searchDatatable()
+
+			/**
+			* Function to clear state for refund datatable
+			*/
+			$(document).on('click','#reset',function(){
+				dataTableRefund.state.clear();
+			});
+	</script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

@@ -1,0 +1,196 @@
+<%
+	let menuRequests	 	= (result.menu_requests) 	  ? result.menu_requests 	 : {};
+	let categoryRequests 	= (result.category_requests) ? result.category_requests : {};
+	let itemRequests		= (result.item_requests) 	  ? result.item_requests 	 : {};
+	let branchRequests	 	= (result.branch_requests)   ? result.branch_requests 	 : {};
+	let restaurantRequests	= (result.restaurant_requests)   ? result.restaurant_requests 	 : {};
+%>
+<div class="approved_restaurant padding-0 restaurant_box">
+	<ul>
+		<li>
+			<a href="<%= WEBSITE_ADMIN_URL %>restaurants" target="_blank" class="text-decoration-none reset_storage">
+				<div class="content_box bg_blue_box">
+					<figure><img src="images/restaurant-icon1.png" alt="img"></figure>
+					<div class="content_restaurant">
+						<strong><%= result.approved_restaurants%></strong>
+						<span><%= __("admin.dashboard.approved_restaurants")%></span>
+					</div>
+				</div>
+			</a>
+		</li>		
+		<li>
+			<a href="<%= WEBSITE_ADMIN_URL %>restaurant_enquiries?status=<%=PENDING%>" target="_blank" class="text-decoration-none reset_storage">
+				<div class="content_box bg_yellow_box">
+					<figure><img src="images/restaurant-icon2.png" alt="img"></figure>
+					<div class="content_restaurant">
+						<strong><%= restaurantRequests.pending_restaurant %></strong> <span><%= __("admin.dashboard.pending_restaurants")%></span>
+					</div>
+				</div>
+			</a>
+		</li>
+		<li>
+			<a href="<%= WEBSITE_ADMIN_URL %>restaurant_enquiries?status=<%=IN_REVIEW%>" target="_blank" class="text-decoration-none reset_storage">
+				<div class="content_box bg_violet_box">
+					<figure><img src="images/restaurant-icon2.png" alt="img"></figure>
+					<div class="content_restaurant">
+						<strong><%= restaurantRequests.in_review_restaurant %></strong>
+						<span><%= __("admin.dashboard.in_review_restaurant")%></span>
+					</div>
+				</div>
+			</a>
+		</li>
+		<li>
+			<a href="<%= WEBSITE_ADMIN_URL %>restaurant_enquiries?status=<%=REJECTED%>" target="_blank" class="text-decoration-none reset_storage">
+				<div class="content_box bg_red_box">			
+					<figure><img src="images/restaurant-icon.png" alt="img"></figure>
+					<div class="content_restaurant">
+						<strong><%= restaurantRequests.rejected_restaurant %></strong>
+						<span><%= __("admin.dashboard.rejected_restaurant")%></span>
+					</div>				
+				</div>
+			</a>
+		</li>
+	</ul>
+</div>
+<div class="number_box">
+	<h3><span><%= __("admin.dashboard.branches")%></span></h3>
+	<div class="dashboard_number branch_box">
+		<ul>
+			<li>
+				<div class="number_bg_box darkblue_border">
+					<strong><%= (result.approved_branch) ? result.approved_branch : 0 %></strong>
+					<span><%= __("admin.dashboard.approved_branch")%></span>
+				</div>
+			</li>			
+			<li>
+				<div class="number_bg_box darkblue_border">
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_pending_branches?status=<%=PENDING%>" target="_blank" class="reset_storage">
+						<strong><%= (branchRequests.pending_branch) ? branchRequests.pending_branch : 0 %></strong>
+						<span><%= __("admin.dashboard.pending_branch")%></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box darkblue_border">
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_pending_branches?status=<%=IN_REVIEW%>" target="_blank" class="reset_storage">
+					<strong><%= (branchRequests.in_review_branch) ? branchRequests.in_review_branch : 0 %></strong>
+					<span><%= __("admin.dashboard.in_review_branch")%></span>
+				</a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box darkblue_border">
+					<strong><%= (branchRequests.rejected_branch) ? branchRequests.rejected_branch : 0 %></strong>
+					<span><%= __("admin.dashboard.rejected_branch")%></span>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+<div class="number_box">
+	<h3><span><%= __("admin.dashboard.menu")%></span></h3>
+	<div class="dashboard_number menu_box">
+		<ul>
+			<li>
+				<div class="number_bg_box blue_border">
+					<strong><%= (result.total_menu) ? result.total_menu : 0%></strong>
+					<span><%= __("admin.dashboard.total_menu")%></span>
+				</div>
+			</li>	
+			<li>
+				<div class="number_bg_box blue_border">
+					<strong><%= (result.approved_menu) ? result.approved_menu : 0 %></strong>
+					<span><%= __("admin.dashboard.approved_menu")%></span>
+				</div>
+			</li>			
+			<li>
+				<div class="number_bg_box blue_border">
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_menu?status=<%=PENDING%>" target="_blank" class="reset_storage">
+						<strong><%= (menuRequests.pending_menu) ? menuRequests.pending_menu : 0 %></strong>
+						<span><%= __("admin.dashboard.pending_menu")%></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box blue_border">
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_menu?status=<%=IN_REVIEW%>" target="_blank" class="reset_storage">
+						<strong><%= (menuRequests.in_review_menu) ? menuRequests.in_review_menu : 0 %></strong>
+						<span><%= __("admin.dashboard.in_review_menu")%></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box blue_border">
+					<strong><%= (menuRequests.rejected_menu) ? menuRequests.rejected_menu : 0 %></strong>
+					<span><%= __("admin.dashboard.rejected_menu")%></span>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="number_box">
+	<h3><span><%= __("admin.dashboard.categories")%></span></h3>
+	<div class="dashboard_number category_box">
+		<ul>
+			<li>
+				<div class="number_bg_box pink_border">
+					<strong><%= (result.approved_category) ? result.approved_category : 0 %></strong>
+					<span><%= __("admin.dashboard.approved_category")%></span>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box pink_border">
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_category?status=<%=PENDING%>" target="_blank" class="reset_storage">
+						<strong><%= (categoryRequests.pending) ? categoryRequests.pending : 0 %></strong>
+						<span><%= __("admin.dashboard.pending_categories")%></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box pink_border">
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_category?status=<%=IN_REVIEW%>" target="_blank" class="reset_storage">
+						<strong><%= (categoryRequests.in_review) ? categoryRequests.in_review : 0 %></strong>
+						<span><%= __("admin.dashboard.in_review_categories")%></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box pink_border">
+					<strong><%= (categoryRequests.rejected) ? categoryRequests.rejected : 0 %></strong>
+					<span><%= __("admin.dashboard.rejected_category")%></span>
+				</div>
+			</li>
+						
+		</ul>
+	</div>
+</div>
+<div class="number_box">
+	<h3><span><%= __("admin.dashboard.items")%></span></h3>
+	<div class="dashboard_number">
+		<ul>
+			<li>
+				<div class="number_bg_box orange_border">
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_item?status=<%=PENDING%>" target="_blank" class="reset_storage" data-datatable_id="datatable-pending-item">
+						<strong><%= (itemRequests.pending_item) ? itemRequests.pending_item : 0 %></strong>
+						<span><%= __("admin.dashboard.pending_items")%></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box orange_border">
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_item?status=<%=IN_REVIEW%>" target="_blank" class="reset_storage" data-datatable_id="datatable-pending-item">
+						<strong><%= (itemRequests.in_review_item) ? itemRequests.in_review_item : 0 %></strong>
+						<span><%= __("admin.dashboard.items_in_review")%></span>
+					</a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box orange_border">
+					<strong><%= (result.approved_item) ? result.approved_item : 0 %></strong>
+					<span><%= __("admin.dashboard.items_approved")%></span>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>

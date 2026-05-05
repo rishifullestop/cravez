@@ -1,0 +1,153 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+                                    <!-- Search by report type -->
+                                    <div class="col-xs-12 col-sm-4">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <select class="form-control show-tick type" id="type" name="type">
+                                                    <% if(CRAVEZ_ORDERS_REPORT_TYPE && Object.keys(CRAVEZ_ORDERS_REPORT_TYPE).length> 0){
+                                                        Object.keys(CRAVEZ_ORDERS_REPORT_TYPE).map(type=>{ %>
+                                                        <option value=<%=type%>>
+                                                            <%=(CRAVEZ_ORDERS_REPORT_TYPE[type]) ? CRAVEZ_ORDERS_REPORT_TYPE[type] :"";%>
+                                                        </option>
+                                                        <%}); }%>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+									<!-- reset button -->
+									<div class="col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.report.cravez_orders_half_yearly_report"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['cravez_orders_half_yearly_report','export']); %>">
+						<li>
+							 <a href="javascript:void(0);" id="dataExportBtn">
+								<button type="button" class="btn btn-sm bg-green waves-effect">
+									<%= __("admin.report.export")%>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor('script') %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable = "";
+		var REPORT_CHART_MONTH_NAMES = <%-JSON.stringify(REPORT_CHART_MONTH_NAMES) %>;
+		$(document).ready(function() {
+           getData();
+        });
+
+        var dateRanges = null;
+	    function getData(){
+            $.ajax({
+                url: "<%=admin_list_url%>/cravez_orders_half_yearly_report",
+                type: "POST",
+                data: {
+                    type: $('#type').val(),
+                },
+                success: function (d) {
+                    dataTable = $("#datatable-listing").DataTable({
+                        "dom": 'Blrtip',
+                        "ordering": false,
+						"scrollX": true,
+                        "data": d.data,
+                        "columns": d.columns,
+                    });
+                }
+            });
+        }	
+		$("#type").change(function () {
+            if ($.fn.dataTable.isDataTable('#datatable-listing')) {
+                 dataTable.destroy();
+                 $('#datatable-listing').empty();
+                 getData();
+            } else {
+                 $('#datatable-listing').empty();
+                 getData();
+            }
+        });
+	
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("click","#dataExportBtn",function(){
+            var type            = $('#type').val();
+			if(type){
+				var exportURL = "<%=admin_list_url%>/cravez_orders_half_yearly_report/export_data?type=" + type;
+				window.location.href=exportURL;
+			}
+		});
+
+		var MIN_YEAR_FOR_REPORT = parseInt("<%=MIN_YEAR_FOR_REPORT%>");
+		function getYearDropdown(){
+			var currentYear = new Date().getFullYear();			
+			var yearsOption = "";
+			for(yearValue=currentYear; yearValue >= MIN_YEAR_FOR_REPORT; yearValue--){
+				yearsOption = '<option value="'+yearValue+'">'+yearValue+'</option>';
+				$("#graph_year").append(yearsOption);
+				$("#graph_year").selectpicker("refresh");
+
+			}
+		};
+		getYearDropdown();
+</script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

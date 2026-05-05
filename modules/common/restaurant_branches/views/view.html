@@ -1,0 +1,217 @@
+<%
+var result 				= 	(typeof result !== typeof undefined && result)  ?	result 	:{};
+var branchDetails		=	branch_details;
+var restaurantDetails	=	restaurant_details;
+
+var tmpBranchDetails	=	(tmp_branch_details)			?	tmp_branch_details : "";
+var submitForApproval	=	(tmpBranchDetails && tmpBranchDetails.submit_for_approval)	?	tmpBranchDetails.submit_for_approval	:"";
+var branchId			=	(branchDetails._id)				?	branchDetails._id				:"";
+var branchStatus		=	(branchDetails.status)			?	branchDetails.status			:"";
+var isFreezed			=	(branchStatus == IN_REVIEW && isRestaurant(module_type)) ? true 	: false;
+%>
+<div class="row m-b-20">
+	<div class="col-sm-12 dashboard_page ">
+		<div class="marchant_file">
+			<div class="restaurant_left">
+				<div class="heading_text clearfix">
+					<h3 class="width-70 float-left"><%= __('branch.restaurants'); %></h3>
+					<% if(!isRestaurant(module_type)){ %>
+						<a href="<%= WEBSITE_ADMIN_URL %>restaurant_enquiries/update-restaurant/<%= restaurantDetails._id %>" class="col-indigo float-right <%= getPermissionClass(module_type,['restaurant_enquiries','update']); %>" >
+							<i class="material-icons font-20">mode_edit</i>
+						</a> <%
+					} %>
+				</div>
+				<div class="all_restaurant">
+					<ul>
+						<li>
+							<label><%= __('branch.restaurants_id'); %></label>
+							<span><%= (restaurantDetails.restaurant_number) ? restaurantDetails.restaurant_number : "" %>
+							<% if(!isRestaurant(module_type)){ %>
+								<br />DB ID : (<%= restaurantDetails._id %>)
+							<% } %>
+							</span>
+						</li>
+						<li>
+							<label><%= __('branch.en_name'); %></label>
+							<span><%= restaurantDetails.name.en %></span>
+						</li>
+						<li>
+							<label><%= __('branch.ar_name'); %></label>
+							<span><%= restaurantDetails.name.ar %></span>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="restaurant_right">
+				<div class="heading_text">
+					<h3><%= __('branch.branch'); %></h3>
+				</div>
+				<div class="all_restaurant">
+					<ul>
+						<li>
+							<label><%= __('branch.branch_id'); %></label>
+							<span><%= (branchDetails.branch_number) ? branchDetails.branch_number : "" %></span>
+						</li>
+						<li>
+							<label><%= __('branch.en_name'); %></label>
+							<span><%= branchDetails.name.en %></span>
+						</li>
+						<li>
+							<label><%= __('branch.ar_name'); %></label>
+							<span><%= branchDetails.name.ar %></span>
+						</li>
+						<% if(branchStatus){ %>
+							<li>
+								<label><%= __('branches.status'); %></label>
+								<span><div class="label <%= STATUS_LABELS[branchStatus].class %> m-l-5 m-t-5"><%= STATUS_LABELS[branchStatus].status_name %></div></span>
+							</li>
+						<% } %>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<% if(!submitForApproval && isRestaurant(module_type)){ %>
+	<div class="alert bg-grey alert-dismissible submit-for-approval <%= getPermissionClass(module_type,['branches','send_for_approval']); %> <%= (!tmpBranchDetails)? 'hide' :  '' %>" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<%= __("branches.send_for_approval_info_message")%>
+	</div>
+<% } %>
+<div class="row">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%= __('branch.branch_details'); %>
+				</h2>
+				<% if(!submitForApproval && isRestaurant(module_type)){ %>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin submit-for-approval <%= (!tmpBranchDetails)? 'hide' :  '' %>">
+						<li class="<%= getPermissionClass(module_type,['branches','send_for_approval']); %>">
+							<a href="javascript:void(0);" class="submit_for_approval" >
+								<button type="button" class="btn btn-sm m-t--5 bg-indigo waves-effect" >
+									<%= __("branches.resend_for_approval"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				<% } %>
+			</div>
+			<div class="body">
+				<div class="navbar_menu">
+					<nav class="navbar navbar-expand-lg navbar-light">
+						<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+						<div class="collapse navbar-collapse" id="navbarSupportedContent">
+							<!-- Nav tabs -->
+							<ul class="nav nav-tabs tab-nav-right" role="tablist">
+								<li class="active branch-panel-link">
+									<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_detail/<%= branchId %>" class="action-btn" data-container="branch-panels">
+										<%= __("branch.branch_details");%>
+									</a>
+								</li>
+								<li class="branch-panel-link">
+									<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_areas/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access" data-container="branch-panels">
+										<%= __("branch.covered_areas");%>
+									</a>
+								</li>
+								<li class="branch-panel-link">
+									<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_attributes/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access" data-container="branch-panels">
+										<%= __("branch.branch_attributes");%>
+									</a>
+								</li>
+								<li class="branch-panel-link">
+									<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_phones/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access" data-container="branch-panels">
+										<%= __("branch.phones");%>
+									</a>
+								</li>
+								<li class="branch-panel-link">
+									<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_payments/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access" data-container="branch-panels">
+										<%= __("branch.payment_methods");%>
+									</a>
+								</li>
+								<li class="branch-panel-link">
+									<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_calendars/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access" data-container="branch-panels">
+										<%= __("branch.calendar");%>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</nav>
+					<!-- Tab panes -->
+					<div class="tab-content">
+						<div role="tabpanel" class="tab-pane fade in active" id="branch-panels">
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="hideMe branch-invalid-access">
+	<div class="row">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="body text-center">
+				<h4><%= __("system.invalid_access");%></h4>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	/**
+	 * Function to resubmit branch for approval
+	 */
+	 $('.submit_for_approval').click(function(){
+		swal({
+			title : "<%= __('system.are_you_sure') %>",
+			text  : "<%= __('branches.you_want_to_submit_new_changes_for_reapproval')%>",
+			type  : "warning",
+			showCancelButton   : true,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText  : "Ok",
+			closeOnConfirm     : false,
+			showLoaderOnConfirm: true,
+		}, function (isConfirm) {
+			if(isConfirm){
+				var options = {
+					url 	: "<%= WEBSITE_RESTAURANT_URL+slug %>/pending_branches/send_for_approval/<%= branchId %>",
+					method	: "POST"
+				};
+				ajaxRequest(options,function(response){
+					if(response.status == "success"){
+						window.location.href = "<%= base_url %>pending_branches/<%= branchId %>";
+					}else{
+						swal.close();
+						notice("error",response.message);
+					}
+				});
+			}
+		});
+	});
+
+	/**
+	* Function to manage freezed event
+	* Freezed event is when restaurant submit any branch details and admin mark branch as in review, then all add/edit activity is freezed
+	*/
+	function updateFreezedEvent(){
+		<% if(!isFreezed){ %>
+			$(".freezed_event").removeClass("hideMe");
+			$("form.freezed_event").addClass("on_click_submit");
+		<% } %>
+	};// end updateFreezedEvent()
+
+	/* Trigger click event on active tab */
+	$(".branch-panel-link.active").find("a").trigger("click");
+
+	/*
+	 *	Function is triggered when user click on Branch tabs(Branch details, Phone, Areas, etc)
+	 */
+	$(document).on("click",".branch-panel-link",function(){
+		$(".branch-panel-link").removeClass("active");
+		$(this).addClass("active");
+	});
+
+</script>

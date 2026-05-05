@@ -1,0 +1,62 @@
+<%
+	var validateString 	= (typeof validate_string !== typeof undefined && validate_string) ? validate_string :"";
+	var otpType 	= (typeof otp_type !== typeof undefined && otp_type) ? otp_type :"";
+%>
+<div class="sign_box">
+	<div class="form_section">
+		<figure><img src="<%= WEBSITE_IMG_URL %>logo.png" alt="img"></figure>
+		<form id="verify-otp" data-submit-btn-id="verify-otp-btn-id" method="post" class="on_click_submit" role="form">
+			<input type="hidden" name="_csrf" value="<%=(typeof csrf_token !== typeof undefined) ? csrf_token : "";%>">
+			<input type="hidden" name="otp_type" value="<%= otpType %>">
+			<div class="form-group">
+				<label><%= __("user.otp");%></label>
+				<input type="password" class="form-control" name="otp" placeholder="<%= __("user.otp");%> *" data-blank-error-message="<%= __("user.please_enter_otp")%>">
+				<span id="otp_error" class="error"></span>
+			</div>
+
+			<div class="submit_btn">
+				<a href="javascript:void(0);" id="resendOTPLink"><%= __("user.resend_otp"); %></a>
+                <button type="button" id="verify-otp-btn-id" <%- FRONT_LOADING_TEXT %> class="btn btn-default btn-submit">
+					<%= __("system.submit"); %>
+				</button>
+				<div class="clearfix"></div>
+				<a href="<%= WEBSITE_URL%>login" ><%= __("reset_password.back_to_login"); %></a>
+			</div>
+		</form>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		/** Function to submit form */
+		$(".btn-submit").click(function(){
+			if(client_side_validation("verify-otp")){
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				ajax_submit("verify-otp",function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						if(typeof response.redirect_url !== typeof undefined && response.redirect_url !=""){
+							window.location.href = response.redirect_url;
+						}
+						stopTextLoading(btnId);
+					}
+				});
+			}
+		});
+
+		/** Function to resend OTP Link */
+		$("#resendOTPLink").click(function(){
+			var options = {
+				url		: 	"<%=WEBSITE_URL%>resend_otp/<%= otpType %>",
+				data	: 	{'validate_string': '<%= validateString %>','page': '<%= page %>'},
+				method	:	"POST",
+			}
+			ajaxRequest(options,function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					window.location.reload();
+				}
+			});
+		});
+	</script>

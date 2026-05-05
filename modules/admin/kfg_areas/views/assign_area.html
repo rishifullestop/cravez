@@ -1,0 +1,59 @@
+<div class="row clearfix" >
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="assign-area" action="<%=admin_list_url%>/assign_area/<%=kfg_area_id%>" data-submit-btn-id="area-assign-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.kfg_areas.assign_area"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix selected">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<select class="form-control show-tick" name="area_id" id="area_id" data-live-search="true">
+											<option value=""><%= __("admin.kfg_areas.select_area"); %></option>
+											<%-area_list%>
+										</select>
+									</div>
+									<span id="area_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="area-assign-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){
+		/**
+		 * Function to submit form
+		 */
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('assign-area',function(status,response){
+				if(status){
+					$("#reset").trigger("click");
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	});
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+</script>
+

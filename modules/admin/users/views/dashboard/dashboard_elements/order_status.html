@@ -1,0 +1,86 @@
+<div class="number_box">
+	<h3><span><%= __('admin.dashboard.order_status') %></span></h3>
+	<div class="dashboard_number menu_box">
+		<ul>
+			<li>
+				<div class="number_bg_box skyblue_border">
+					<strong><%= totalPendingOrders%></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>orders?status=<%= ORDER_PENDING %>&is_confirm=false" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.pending_for_processing') %></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box skyblue_border">
+					<strong><%= totalSubmittedOrders%></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>orders?status=<%= ORDER_PENDING %>&is_confirm=true" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.submitted') %></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box skyblue_border">
+					<strong><%= totalPreparingOrders%></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>orders?status=<%= ORDER_PREPARING %>" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.preparing') %></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box skyblue_border">
+					<strong><%= totalPickupOrders%></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>orders?status=<%= ORDER_READY_TO_PICK_UP %>" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.ready_to_pick_up') %></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box skyblue_border">
+					<strong><%= totalWayOrders%></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>orders?status=<%= ORDER_ON_THE_WAY %>" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.out_of_delivery') %></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box skyblue_border">
+					<strong><%= totalDeliveredOrders%></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>orders?status=<%= ORDER_DELIVERED %>" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.delivered_orders') %></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box skyblue_border">
+					<strong><%= totalRejectedOrders%></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>orders?status=<%= ORDER_REJECTED %>" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.rejected_orders') %></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box skyblue_border">
+					<strong><%= totalCancelledOrders%></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>orders?status=<%= ORDER_CANCELLED %>" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.cancelled') %></span></a>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+<div class="number_box">
+	<h3><span><%= __('admin.dashboard.order_related_request') %></span></h3>
+	<div class="dashboard_number menu_box">
+		<ul>
+			<li>
+				<div class="number_bg_box pink_border">
+					<strong><%=(result.total_refund_requests) ? result.total_refund_requests : 0;%></strong>
+					<span><%= __('admin.dashboard.total_refund_requests') %></span>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box pink_border">
+					<strong><%=(result.total_order_modification_requests) ? result.total_order_modification_requests : 0;%></strong>
+					<span><%= __('admin.dashboard.total_order_modification_requests') %></span>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box pink_border">
+					<strong><%=(result.total_client_voc) ? result.total_client_voc : 0;%></strong>
+					<span><%= __('admin.dashboard.total_client_voc') %></span>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box pink_border">
+					<strong><%=(result.total_captain_voc) ? result.total_captain_voc : 0;%></strong>
+					<span><%= __('admin.dashboard.total_captain_voc') %></span>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>

@@ -1,0 +1,290 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by customer name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="customer_name" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.report.search_by_customer_name'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by restaurant name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick restaurant_id" id="search_restaurant_id" name="search_restaurant_id" data-child-name="search_branch_id" data-live-search="true">
+													<option value=""><%=__("admin.report.search_by_restaurant_name");%></option>
+													<%-restaurant_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by branch -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick branch_id disabled" id="search_branch_id" name="search_branch_id" data-live-search="true" data-placeholder="<%=__('admin.report.search_by_branch')%>" data-live-search="true" disabled>
+													<option value=""><%=__("admin.report.search_by_branch");%></option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by date -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="date" class="form-control" placeholder="<%= __('admin.report.search_by_date'); %>"  id="date-range-picker"  name="search_by_date" autocomplete="off">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-4">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.report.customer_order_reports"); %>
+					</h2>
+					<ul
+						class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['customer_order_report','export']); %>">
+						<li>
+							<a href="javascript:void(0);" id="dataExportBtn">
+								<button type="button" class="btn btn-sm bg-green waves-effect">
+									<%= __("admin.report.export")%>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.report.customer_name"); %></th>
+								<th width="18%"><%= __("admin.report.total_orders"); %></th>
+								<th width="18%"><%= __("admin.report.total_order_value"); %></th>
+								<th><%= __("admin.report.date"); %></th>
+								<th width="15%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable		 =	"";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[3,"desc"]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{   "data"		 : "customer_name",
+					    "orderable"	 :  false,
+					},
+					{"data": "total_orders"},
+					{
+						"data"	: 'total_order_amount',
+						"render": function(orderAmount){
+							return (orderAmount) ? currencyFormat(orderAmount) :0;
+						}
+					},
+					{
+						"data"	: 'date',
+						"render": function(date){
+							return moment(date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_FORMAT) ;
+						}
+					},
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+							let customerId = (result.customer_id) ? result.customer_id :"";
+
+							/*  view order Link  */
+							var dropDownButton 	= ''+
+								'<a href="<%=WEBSITE_ADMIN_URL%>orders?customer_id='+customerId+'&customer_order=true" target="_blank" class="btn bg-indigo waves-effect m-l-5 m-t-5"><%= __("admin.report.view_orders"); %></a>';
+
+							return dropDownButton;
+						}
+					}
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>/customer_order",
+					type	: 	"POST",
+					data    :   function(d){
+						d.from_date 	=	$('#from_date').val();
+						d.to_date   	= 	$('#to_date').val();
+						d.branch_id   	= 	$('#search_branch_id').val();
+						d.restaurant_id = 	$('#search_restaurant_id').val();
+					},
+					dataSrc	: 	function(res){
+						return res.data;
+					}
+				}
+			});
+
+			$("#search_restaurant_id, #search_branch_id").change(function(){
+				dataTable.draw();
+			});
+
+			/**
+			* Get branch list
+			*/
+			$("select[name='search_restaurant_id']").change(function(){
+				getBranchDropDownList($(this));
+			});
+
+			/**
+			* Get dropdown value by local storage
+			*/
+			let tempRestaurantId = 	"";
+			let tempBranchId 	 =	"";
+			if(localStorage["search_" +window.location.pathname]){
+
+				let searchFormData = JSON.parse(localStorage["search_" +window.location.pathname]);
+				for(index in searchFormData){
+					if(searchFormData[index].name && searchFormData[index].name == "search_branch_id" && searchFormData[index].value){
+						tempBranchId = searchFormData[index].value;
+					}
+					if(searchFormData[index].name && searchFormData[index].name == "search_restaurant_id" && searchFormData[index].value){
+						tempRestaurantId = searchFormData[index].value;
+					}
+				}
+
+				if(tempRestaurantId) getBranchDropDownList($("select[name='search_restaurant_id']"),tempRestaurantId,tempBranchId);
+			}
+		});
+
+		/**
+		* Get branch search dropdown list
+		*/
+		function getBranchDropDownList(currentObj,restaurantId,branchId){
+			if(currentObj){
+
+				var currentValue	=	currentObj.val();
+				var childInputName	=	currentObj.attr("data-child-name");
+				var childObj		=	(childInputName) ?  $("select[name='"+childInputName+"']") :"";
+				var placeholder		=	childObj.attr("data-placeholder");
+				var childFirstOption=	'<option value="">'+placeholder+'</option>';
+
+				if(!currentValue && restaurantId) currentValue = restaurantId;
+
+				childObj.attr("disabled",true).removeClass("disabled").html(childFirstOption);
+				if(!branchId) childObj.val("").trigger("change");
+				$(".show-tick").selectpicker('refresh');
+
+				if(currentValue){
+					/** Get dropdown list **/
+					var options = {
+						url 	: "<%=admin_list_url%>/customer_order/branch_list",
+						data	: {restaurant_id : currentValue},
+						method	: "post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_SUCCESS%>"){
+							/** Append dropdown list **/
+							childObj.attr("disabled",false).removeClass("disabled").html(childFirstOption+response.branch_list);
+							if(branchId) childObj.val(branchId);
+							$(".show-tick").selectpicker('refresh');
+						}else if(response.status && response.message){
+							notice(response.status,response.message);
+						}
+					});
+				}
+			}
+		}// end getBranchDropDownList()
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("click","#dataExportBtn",function(){
+			var fromDate 		= $("#from_date").val();
+			var toDate 			= $("#to_date").val();
+			var restaurantId 	= $("#search_restaurant_id").val();
+			var branchId 		= $("#search_branch_id").val();
+			var startDate 		= (fromDate) ? fromDate : "";
+			var endDate 		= (toDate) ? toDate : "";
+			var sortedCol 		= dataTable.order()[0][0];
+			var sortedDir 		= dataTable.order()[0][1];
+			var columns 		= dataTable.settings().init().columns;
+			var sortedColName 	= columns[sortedCol].data;
+
+			if (startDate && endDate) {
+				var exportURL = "<%=admin_list_url%>/customer_order/export_data?from_date=" + startDate + "&to_date=" + endDate + "&sort_field=" + sortedColName + "&sort_dir=" + sortedDir;
+			} else{
+				var exportURL = "<%=admin_list_url%>/customer_order/export_data?sort_field=" + sortedColName + "&sort_dir=" + sortedDir;
+			}
+			if (restaurantId) exportURL += "&restaurant_id=" + restaurantId;
+			if (branchId) exportURL += "&branch_id=" + branchId;
+			window.location.href = exportURL;
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+

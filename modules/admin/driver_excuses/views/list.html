@@ -1,0 +1,376 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by driver name -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="driver_name" class="form-control" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('admin.driver_excuses.search_by_name'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Date Range -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="date-range-picker" id="date-range-picker" placeholder="<%= __('admin.driver_in_out_shifts.search_by_date'); %>" autocomplete="off">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" >
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- Search by status -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="column_filter_6"  onChange="searchDatatable(6)" name="status_search">
+													<option value=""><%=__("admin.driver_excuses.search_by_status");%></option>
+														<%
+														Object.keys(DRIVER_EXCUSE_STATUS).map(key=>{%>
+															<option value="<%=key%>">
+																<%=(DRIVER_EXCUSE_STATUS[key].status_name) ? DRIVER_EXCUSE_STATUS[key].status_name :"";%>
+															</option> <%
+														}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-1">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<!-- Modal Box for reject excuse-->
+	<div id="myModal" class="modal fade" role="dialog" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header border-bottom">
+					<h4 class="modal-title set-model-header" id="smallModalLabel"><%= __("admin.driver_excuses.rejection_confirm_request"); %></h4>
+				</div>
+				<form id="reject_excuse" data-submit-btn-id="reject-btn-id" method="post" class="on_click_submit"  method="post"  role="form" action="">
+					<div class="modal-body" id="assign_status_model">
+						<div class="row clearfix">
+							<div class="col-sm-12 no-bottom-border">
+								<label for="rejection_reason" class="control-label"><%= __("admin.driver_excuses.rejection_reason"); %><span class="required"> *</span> </label>
+								<div class="form-grop margin-0">
+									<div class="form-line">
+										<textarea  id="rejection_reason" rows="6" class="resize-none form-control" name="rejection_reason"></textarea>
+									</div>
+									<span id="rejection_reason_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer border-top">
+						<button type="button"  id="reject-btn-id" class="noHover btn bg-pink btn-sm waves-effect btn-submit-reject" <%- ADMIN_LOADING_TEXT %> >
+							<i class="material-icons font-14">save</i> <%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" data-dismiss="modal" class="noHover btn bg-grey btn-sm  waves-effect cancel-btn">
+							<i class="material-icons font-14">cancel</i><%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Box for cancel excuse-->
+	<div id="myCancelModal" class="modal fade" role="dialog" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header border-bottom">
+					<h4 class="modal-title set-model-header" id="smallModalLabel"><%= __("admin.driver_excuses.cancel_confirm"); %></h4>
+				</div>
+				<form id="cancel_excuse" data-submit-btn-id="cancel-btn-id" method="post" class="on_click_submit"  method="post"  role="form" action="">
+					<div class="modal-body" id="assign_status_model">
+						<div class="row clearfix">
+							<div class="col-sm-12 no-bottom-border">
+								<label for="cancel_reason" class="control-label"><%= __("admin.driver_excuses.cancel_reason"); %><span class="required"> *</span> </label>
+								<div class="form-grop margin-0">
+									<div class="form-line">
+										<textarea  id="cancel_reason" rows="6" class="resize-none form-control" name="cancel_reason"></textarea>
+									</div>
+									<span id="cancel_reason_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer border-top">
+						<button type="button"  id="cancel-btn-id" class="noHover btn bg-brown btn-sm btn-sm waves-effect btn-submit-cancel" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %> </button>
+						<button type="button" data-dismiss="modal" class="noHover btn bg-blue-grey btn-sm  waves-effect cancel-btn"> <%= __("admin.system.cancel"); %> </button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.driver_excuses.driver_excuses"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.driver_excuses.driver_id");%></th>
+								<th><%= __("admin.driver_excuses.driver_name");%></th>
+								<th><%= __("admin.driver_excuses.date");%></th>
+								<th><%= __("admin.driver_excuses.start_time");%></th>
+								<th><%= __("admin.driver_excuses.end_time");%></th>
+								<th width="20%"><%= __("admin.driver_excuses._applied_reason");%></th>
+								<th width="15%"><%= __("admin.system.status");%></th>
+								<th width="15%"><%= __("admin.system.action");%></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var DRIVER_EXCUSE_STATUS	= <%- JSON.stringify(DRIVER_EXCUSE_STATUS)%>;
+		var dataTable 	=	"";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ 	"data" 		 : 	'captain_id',
+						"orderable"	 :  false,
+						"searchable" :	false,
+					},
+					{ 	"data" : 'driver_name'},
+					{ 	"data"		: 'date',
+						"render" 	: function(date){
+							return moment(date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_FORMAT);
+						}
+					},
+					{
+						"data"		: 'from',
+						"render" 	: function(from){
+							return from ? set24HourFormat(parseFloat(from)) : "--:--";
+						}
+					},
+					{
+						"data"		: 'to',
+						"render" 	: function(to){
+							return to ? set24HourFormat(parseFloat(to)) : "--:--";
+						}
+					},
+					{
+						"data" 	 	:	'reason',
+						"orderable"	:   false,
+						"render" 	: 	function(reason){
+							return (reason) ? "<span class='readmore'>"+reason+"</span>" :"";
+						}
+					},
+					{
+						"data"		 : 	{},
+						"orderable"	 :   false,
+						"field_name" : "status",
+						"field_type" : "<%= NUMERIC_FIELD%>",
+						"render" 	 : 	function(result){
+							var id 		 	= (result._id) 			?	result._id 			:"";
+							var driverId 	= (result.driver_id) 	? 	result.driver_id	:"";
+							var status 	  	= (result.status)		? 	result.status 		:"<%=PENDING%>";
+							var reason		= (result.rejection_reason)	?	result.rejection_reason	:"";
+							reason			= (result.cancel_reason)	?	result.cancel_reason	:reason;
+
+							var statusLabel = (status && DRIVER_EXCUSE_STATUS[status]) ? '<span class="label '+DRIVER_EXCUSE_STATUS[status].class+'">'+DRIVER_EXCUSE_STATUS[status].status_name+'</span>' : '';
+
+							if(reason && (status == "<%= REJECTED %>" || status == "<%= CANCELLED %>")){
+								statusLabel +=  '<i class="material-icons font-20 rejection-info-icon" title="'+reason+'" data-toggle="tooltip" data-placement="left" >info</i>';
+							}
+
+							return statusLabel;
+						}
+					},
+					{
+						"data"		 : 	{},
+						"orderable"	 :   false,
+						"field_name" : "status",
+						"field_type" : "<%= NUMERIC_FIELD%>",
+						"render" 	 : 	function(result){
+							var id 		 	= (result._id) 			?	result._id 			:"";
+							var driverId 	= (result.driver_id) 	? 	result.driver_id 	:"";
+							var status 	  	= (result.status)		? 	result.status 		:"<%=PENDING%>";
+							var isCompleted = (result.is_completed) ? 	result.is_completed	:"";
+							var showActions	= (status == "<%=PENDING%>" && !isCompleted) ? true : false;
+							var cancelActions = false;
+
+							if(!showActions && status != "<%=REJECTED%>" && status != "<%=CANCELLED%>" && !isCompleted){
+								cancelActions = true;
+							}
+
+							var dropDownButton 	= (showActions || cancelActions) ? ''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %>'+
+									' <span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">' : '';
+									dropDownButton += (showActions) ? '<li>'+
+										'<a href="javascript:void(0);" data-href="<%=admin_list_url%>/approve/'+id+'/'+driverId+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["driver_excuses","approve_reject"]); %>" data-confirm-message="<%= __("admin.driver_excuses.do_you_want_to_approve"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+										'<%= __("admin.system.approve"); %>'+
+									'</li>':'';
+
+									dropDownButton += (showActions) ? '<li>'+
+										'<a href="javascript:void(0)" class="waves-effect waves-block open-modal reject-excuse <%= getPermissionClass(module_type,["driver_excuses","approve_reject"]); %>" data-id="'+id+'" data-user-id="'+driverId+'">'+
+										' <%= __("admin.system.disapprove"); %>'+
+									'</li>':'';
+
+									dropDownButton += (cancelActions) ? '<li>'+
+										'<a href="javascript:void(0)" class="waves-effect waves-block open-modal cancel-excuse <%= getPermissionClass(module_type,["driver_excuses","approve_reject"]); %>"" data-id="'+id+'" data-user-id="'+driverId+'">'+
+										' <%= __("admin.system.cancel"); %>'+
+									'</li>':'';
+
+									dropDownButton += (showActions) ? '<li>'+
+										'<a href="javascript:void(0);" data-href="<%=admin_list_url%>/delete/'+id+'/'+driverId+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["driver_excuses","delete"]); %>" data-confirm-message="<%= __("admin.driver_excuses.do_you_want_to_delete"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+										'<%= __("admin.system.delete"); %>'+
+									'</li>'+
+								'</ul>'+
+							'</div>': '';
+							return dropDownButton;
+
+						}
+					}
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>",
+					type	: "POST",
+					data 	: function(d){
+						d.fromDate 	= $('#from_date').val();
+				        d.toDate 	= $('#to_date').val();
+					},
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function( settings ) {
+					readMore();
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Search by status
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(".search_by_status").change(function(){
+			dataTable.draw();
+		});
+
+		/** Submit form */
+		$(".btn-submit-reject").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("reject_excuse",function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/*** Open modal*/
+		$(document).on("click",".reject-excuse",function(){
+			var btnDataId  = $(this).data("id");
+			var btnUserId  = $(this).data("user-id");
+			var formAction = "<%=admin_list_url%>/reject/<%= REJECTED%>/"+btnDataId+"/"+btnUserId;
+			$("form#reject_excuse").attr("action",formAction);
+			$("#rejection_reason").val("");
+			$("#rejection_reason_error").text("");
+			$("#myModal").modal("show");
+		});
+
+		/*** Open modal for cancel excuse*/
+		$(document).on("click",".cancel-excuse",function(){
+			var btnDataId  = $(this).data("id");
+			var btnUserId  = $(this).data("user-id");
+			var formAction = "<%=admin_list_url%>/cancel/"+btnDataId+"/"+btnUserId;
+			$("form#cancel_excuse").attr("action",formAction);
+			$("#cancel_reason").val("");
+			$("#cancel_reason_error").text("");
+			$("#myCancelModal").modal("show");
+		});
+
+		/** Submit form for cancel excuse*/
+		$(".btn-submit-cancel").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("cancel_excuse",function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

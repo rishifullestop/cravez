@@ -1,0 +1,247 @@
+<%
+	var fromDate  	= (from_date != "" ) ? 	from_date+" "+START_DATE_TIME_FORMAT:"";
+	var toDate  	= (to_date != "") 	 ?	to_date+" "+END_DATE_TIME_FORMAT 	:"";
+	var finalDate  	= (from_date!= "" && to_date != "") ? from_date+' - '+to_date :"";
+%>
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							aria-controls="panel-collapse-id">
+								<%= __("system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control" id="column_filter_8" data-live-search="true" onchange="searchDatatable(8)" name="branch_id" <%= (branch_id) ? 'disabled' : ''%>>
+													<option value=""><%= __('orders.select_branch'); %></option>
+													<%- branch_list %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="unique_order_id" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('orders.search_by_order_id'); %>">
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="customer_mobile" id="column_filter_4"  onkeyup="searchDatatable(4)" placeholder="<%= __('orders.search_by_customer_mobile'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by order Date -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('orders.search_by_order_date'); %>" value="<%=finalDate%>" name="date-range-picker">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=fromDate%>">
+											<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=toDate%>">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("orders.rejected_orders"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="javascript:void(0);" class='refresh hide status_change'>
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __('system.refresh'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="10%"><%= __("orders.order_id"); %></th>
+								<th width="10%"><%= __("orders.order_date"); %></th>
+								<th width="10%"><%= __("orders.order_status"); %></th>
+								<th width="10%"><%= __("orders.client_name"); %></th>
+								<th width="10%"><%= __("orders.mobile_number"); %></th>
+								<th width="10%"><%= __("orders.payment_method"); %></th>
+								<th width="10%"><%= __("orders.net_amount"); %></th>
+								<th width="10%"><%= __("orders.captain_id"); %></th>
+								<th width="10%"><%= __("orders.branch_id"); %></th>
+								<th width="10%"><%= __("system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data */
+		var dataTable 			=	"";
+		var ORDER_STATUS_TYPES	= 	<%- JSON.stringify(ORDER_STATUS_TYPES)%>;
+
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[ 1, "desc" ]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ 	"data": 'unique_order_id',
+						"orderable" : 	false,
+					},
+					{
+						"data"		 : 'order_date',
+						"searchable" : 	false,
+						"render" 	 : 	function(order_date){
+							return moment(order_date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data": {},
+						"field_type" : "<%=EXACT_FIELD%>",
+						"field_name" : "restaurant_status",
+						"render" : function(result){
+							let labelClass 	= "";
+							let labelText	= "";
+							if(result.restaurant_status && ORDER_STATUS_TYPES[result.restaurant_status]){
+								labelClass 	= ORDER_STATUS_TYPES[result.restaurant_status].label_class;
+								labelText 	= ORDER_STATUS_TYPES[result.restaurant_status].status_name;
+								if(ORDER_STATUS_TYPES[result.restaurant_status].restaurant_status_name){
+									labelText = ORDER_STATUS_TYPES[result.restaurant_status].restaurant_status_name;
+								}
+							}
+
+							var statusLabel 	= (result.restaurant_status && ORDER_STATUS_TYPES[result.restaurant_status]) ? '<p><span class="label '+labelClass+'">'+labelText+'</span></p>' : '';
+							var modifiedStatus 	= (result.is_modified)	? '<p><span class="label label-warning"><%=__("admin.orders.modified_order")%></span></p>' : '';
+
+							return statusLabel+modifiedStatus;
+						}
+					},
+					{
+						"data"		 : 'full_name',
+						"orderable" : 	false,
+					},
+					{
+						"data"		 : 'mobile_number',
+						"orderable" : 	false,
+					},
+					{
+						"data"		: 'payment_type',
+						"orderable" : 	false,
+					},
+					{
+						"data"		 : 'net_amount',
+						"searchable" : 	false,
+						"render" 	 : 	function(net_amount){
+							return  (typeof net_amount !== typeof undefined) ? currencyFormat(net_amount) : '';
+						}
+					},
+					{
+						"data"		 : 'delivery_by',
+						"orderable" : 	false,
+					},
+					{
+						"data"		 : 'branch_name',
+						"field_type" : "<%=OBJECT_ID_FIELD %>",
+						"field_name" : "branch_id",
+						"orderable" : 	false,
+					},
+					{
+						"data"		: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render"	: function(result){
+							var id =	(result._id) ?	result._id	:"";
+
+							var actionButtons=	'<ul class="action-btn-container">'+
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=list_url%>/mark_prepared/'+id+'" class="confirm_box" data-confirm-message="<%= __("order.you_want_to_mark_prepared"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+											'<button type="button" class="btn bg-orange waves-effect noHover"><%= __("order.mark_as_prepared");%></button>'+
+										'</a>'+
+									'</li>';
+							actionButtons +=	'</ul>';
+							return actionButtons;
+						}
+					},
+				],
+				"ajax":{
+					url 	:	"<%=list_url%>/rejected_orders",
+					type	: 	"POST",
+					data	: 	function (d) {
+						d.fromDate 	=	$('#from_date').val();
+						d.toDate	= 	$('#to_date').val();
+					},
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/** Javascript function to refresh */
+		$('.refresh').click(function(){
+			$(this).addClass("hide");
+			dataTable.draw();
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_JS_PAGE_PATH %>date_range_picker/config.js"></script>

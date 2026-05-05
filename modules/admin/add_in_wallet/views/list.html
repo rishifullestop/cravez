@@ -1,0 +1,209 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by offer name in english -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.add_in_wallet.search_by_offer_name_in_english'); %>" name="offer_name_in_english">
+											</div>
+										</div>
+									</div>
+									<!-- Search by offer name in arabic -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('admin.add_in_wallet.search_by_offer_name_in_arabic'); %>" name="offer_name_in_arabic">
+											</div>
+										</div>
+									</div>
+									<!-- Search by date -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="valid_till" class="form-control" placeholder="<%= __('admin.add_in_wallet.search_by_date'); %>"  id="date-range-picker"  name="search_by_date" autocomplete="off">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-3">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.add_in_wallet.add_in_wallet"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn  <%= getPermissionClass(module_type,['add_in_wallet','add']); %>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.add_in_wallet.add_wallet"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.add_in_wallet.offer_name_in_english"); %></th>
+								<th><%= __("admin.add_in_wallet.offer_name_in_arabic"); %></th>
+								<th><%= __("admin.add_in_wallet.client_criteria"); %></th>
+								<th><%= __("admin.add_in_wallet.account_criteria"); %></th>
+								<th><%= __("admin.add_in_wallet.order_criteria"); %></th>
+								<th><%= __("admin.add_in_wallet.number_of_orders"); %></th>
+								<th><%= __("admin.add_in_wallet.date"); %></th>
+								<th><%= __("admin.add_in_wallet.amount"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable		 =	"";
+		var statusObject     = <%-JSON.stringify(CLIENT_CRITERIA) %>;
+		var dateFormatHtml	 =  '<%=DATE_FORMAT_HTML%>';
+		var ACCOUNT_CRITERIA = <%-JSON.stringify(ACCOUNT_CRITERIA)%>;
+
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ "data"	: "offer_name.en" },
+					{ "data"	: "offer_name.ar" },
+					{
+						"data"			: 	"client_criteria",
+						"orderable"	 	:   false,
+						"searchable" 	: 	false,
+						"field_type"	:   "<%= NUMERIC_FIELD %>",
+						"render"		: 	function(client_criteria){
+							var statusClass		=	(statusObject[client_criteria] && statusObject[client_criteria]["label_class"]) ? statusObject[client_criteria]["label_class"] :"";
+							var statusLabel		=	(statusObject[client_criteria] && statusObject[client_criteria]["status_name"]) ? statusObject[client_criteria]["status_name"] :"";
+							return '<span class="label '+statusClass+'">'+statusLabel+'</span>';
+						}
+					},
+					{
+						"data"	 	 : 	{},
+						"orderable"	 :  false,
+						"searchable" : 	false,
+						"render"	 : 	function(result){
+							var accountCriteria 	   = (result.account_criteria) 			? result.account_criteria 						: "";
+							var accountCriteriaAmount  = (result.account_criteria_amount)   ? currencyFormat(result.account_criteria_amount): currencyFormat(0);
+							return ACCOUNT_CRITERIA[accountCriteria]+" "+accountCriteriaAmount;
+						}
+					},
+					{
+						"data"	 	 : 	{},
+						"orderable"	 :  false,
+						"searchable" : 	false,
+						"render"	 : 	function(result){
+							var orderCriteria 		  = (result.order_criteria) 		 ? result.order_criteria 						: "";
+							var orderCriteriaAmount   = (result.order_criteria_amount)   ? currencyFormat(result.order_criteria_amount) : currencyFormat(0);
+							return (ACCOUNT_CRITERIA[orderCriteria]) ? ACCOUNT_CRITERIA[orderCriteria]+" "+orderCriteriaAmount : "";
+						}
+					},
+					{ 	"data"		 : "number_of_orders",
+						"searchable" : 	false,
+						"render"	 : 	function(number_of_orders){
+							return (number_of_orders) ? number_of_orders :0;
+						} 
+					},
+					{
+						"data"	 	 : 	{},
+						"orderable"	 :  false,
+						"searchable" : 	false,
+						"render"	 : 	function(result){
+							var validFrom = (result.valid_from) ? result.valid_from : "";
+							var validTo   = (result.valid_to)   ? result.valid_to   : "";
+							return moment(validFrom).tz(DEFAULT_TIME_ZONE).format(dateFormatHtml)+" - "+moment(validTo).tz(DEFAULT_TIME_ZONE).format(dateFormatHtml) ;
+						}
+					},
+					{
+						"data"	 	 : 	{},
+						"orderable"	 :  false,
+						"searchable" : 	false,
+						"render"	 : 	function(result){
+							return (result.amount) ? currencyFormat(result.amount) 	:currencyFormat(0);
+						}
+					},
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>",
+					type	: 	"POST",
+					data    :   function(d){
+						d.from_date = $('#from_date').val();
+						d.to_date   = $('#to_date').val();
+					},
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

@@ -1,0 +1,104 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix" >
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.cms.edit_cms'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" >
+								<button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __('admin.system.back'); %></button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="edit-cms" data-submit-btn-id="cms-edit-btn-id" method="post" class="on_click_submit" role="form">
+						<%
+						var pagesDescriptions = result.pages_descriptions;
+						if(Array.isArray(language_list) && language_list.length > 0){ %>
+							<div class="row clearfix"> <%
+								language_list.map(languages=>{ %>
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="form-line">
+												<label for="name_<%= languages.lang_code; %>" class="control-label">
+													<%= __("admin.cms.page_name_in_"+languages.title.toLowerCase()); %> <span class="required"> *</span>
+												</label>
+												<input type="hidden" name="pages_descriptions[<%= languages._id %>][language_id]" value="<%= languages._id; %>"/>
+												<input type="text" id="name_<%= languages.lang_code; %>" class="form-control" name="pages_descriptions[<%= languages._id %>][name]" value="<%= pagesDescriptions[languages._id]['name']; %>" data-blank-error-message="<%= __('admin.cms.please_enter_page_name_in_'+languages.title.toLowerCase())%>" data-error-id="name_<%= languages.lang_code; %>"/>
+											</div>
+											<span id="name_<%= languages.lang_code; %>_error" class="error"></span>
+										</div>
+									</div> <%
+								});%>
+							</div> <%
+							language_list.map(languages=>{
+								languageId	= 	(languages._id)	?	languages._id	:"";
+								body 		= 	(pagesDescriptions[languageId] && pagesDescriptions[languageId]['body']) ? pagesDescriptions[languageId]['body'] :"";
+								body		= 	body.replace(new RegExp('WEBSITE_IMG_URL/','g'),WEBSITE_PUBLIC_UPLOADS_PATH);
+								body		=	body.replace(new RegExp('WEBSITE_URL/','g'),WEBSITE_URL); %>
+								<div class="row clearfix">
+									<div class="col-sm-12">
+										<div class="form-group">
+											<div class="form-line">
+												<label for="body_<%= languages.lang_code; %>" class="control-label">
+													<%= __("admin.cms.page_description_in_"+languages.title.toLowerCase()); %> <span class="required"> *</span>
+												</label>
+												<textarea rows="4"  id="body_<%= languages.lang_code; %>" class="form-control no-resize ckeditor"  name="pages_descriptions[<%= languageId %>][body]"data-blank-error-message="<%= __('admin.cms.please_enter_page_description_in_'+languages.title.toLowerCase())%>" data-error-id="body_<%= languages.lang_code; %>"><%= body; %></textarea>
+											</div>
+											<span id="body_<%= languages.lang_code; %>_error" class="error"></span>
+											<% if(languages.lang_code ==  DEFAULT_LANGUAGE_CODE){ %>
+												<span id="body_error" class="error"></span>
+											<% } %>
+										</div>
+									</div>
+								</div>
+						<% 	});
+						} %>
+						<button type="button" id="cms-edit-btn-id" class="btn bg-brown btn-sm waves-effect btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __('admin.system.submit'); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('script') %>
+	<script src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>ckeditor/ckeditor.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		<%
+		if(Array.isArray(language_list) && language_list.length > 0){
+			language_list.map(languages=>{ %>
+
+				CKEDITOR.replace('body_<%= languages.lang_code; %>', {
+					filebrowserUploadUrl: '<%= WEBSITE_ADMIN_URL %>users/ckeditor_uploader',
+					height: 600
+				});
+		<%	});
+		} %>
+
+		/**
+		 * Function to submit form
+		 */
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			updateCkeditorValue();
+			startTextLoading(btnId);
+
+			if(client_side_validation('edit-cms')){
+				ajax_submit('edit-cms',function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	</script>

@@ -1,0 +1,133 @@
+<%
+	var result 		        = 	(typeof result !== typeof undefined && result)                          ?	result 			    : [];
+	var selectedCuisines    = 	(typeof selected_cuisines !== typeof undefined && selected_cuisines)    ?	selected_cuisines 	: [];
+%>
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <form action="<%=WEBSITE_URL%>cuisines/select_cuisines" data-modal-id="form_modal" id="select_cuisines_form" data-submit-btn-id="select_cuisines_btn"
+            method="post" class="on_click_submit" role="form">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-seperator p-l-20 p-b-0">
+                        <h2 class="modal-title">
+                            <%= __("cuisines.select_cuisines"); %>
+                        </h2>
+                    </div>
+                    <div class="modal-body padding-20 scroll-body">
+                        <div class="row clearfix">
+                            <div class="col-sm-12 body">
+                                <table id="datatable-add-cuisines" class="row-border full-length-header hover table table-bordered cb-data-table datatable"
+                                    cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <div class="materialize_checkbox m-t--25 list-checkbox">
+                                                    <div class="checkbox_wrapper">
+                                                        <input class="filled-in chk-col-pink " id="list-checkbox-head" type="checkbox">
+                                                        <label for="list-checkbox-head" class="checkbox list-checkbox p-l-20"></label>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <th><%= __("cuisines.cuisine_name");%></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% result.map((record, index)=>{ %>
+                                        <tr>
+                                            <td>
+                                                <div class="materialize_checkbox list-checkbox">
+                                                    <div class="checkbox_wrapper">
+                                                        <%
+                                                            let cuisineId   = (record._id) ? record._id : "";
+                                                            let found       = false;
+                                                            found           = selectedCuisines.find(element => element.cuisine_id == cuisineId.toString());
+                                                        %>
+                                                        <input class="filled-in chk-col-pink list-checkbox-input" <%=(found) ? "checked" : "";%> id="list-checkbox-<%=index%>" name="cuisine_id[]" type="checkbox" value="<%=cuisineId%>">
+                                                        <label for="list-checkbox-<%=index%>" class="checkbox list-checkbox p-l-20"></label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><%=(record.name[DEFAULT_LANGUAGE_CODE]) ? record.name[DEFAULT_LANGUAGE_CODE] : ""%></td>
+                                        </tr>
+                                       <%}); %>
+                                    </tbody>
+                                </table>
+                                <span id="cuisine_id_error" class="error model_select_error"></span>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="select_cuisines_btn" class="btn bg-brown btn-sm waves-effect btn-submit" <%- FRONT_LOADING_TEXT %>>
+                            <%= __("system.submit"); %>
+                        </button>
+                        <a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');">
+                            <button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		/* for initialization of modal datatable */
+		var dataTable = $('#datatable-add-cuisines').DataTable({
+			"order"     :   false,
+			"sDom"      :    "ftr",
+			"serverSide":   false,
+			"scrollX"   :   false,
+			"paging"	:	false,
+			"columnDefs": [
+				{ orderable: false, "targets": [ 0 ] }
+			]
+		});
+
+		/* for check all checkboxes functionality */
+		$('#list-checkbox-head').on('click', function(){
+			if($(this).is(':checked')){
+				$('.checkbox_wrapper').find('input:checkbox').prop('checked', true);
+			}else{
+				$('.checkbox_wrapper').find('input:checkbox').prop('checked', false);
+			}
+		});
+
+		/* on page ready all checkboxes checked then top header checkbox automatically check */
+		if ($('.list-checkbox-input').length == $('.list-checkbox-input:checked').length) {
+			$('#list-checkbox-head').prop('checked', true);
+		}
+
+		/* when all list checkboxes checked then head checkbox automatically check */
+		$(document).on('click', '.list-checkbox-input', function(e){
+			let totalCheckbox   =   $('.list-checkbox-input').length;
+			let checkedChekboxes=   $('.list-checkbox-input:checked').length;
+			let selectAll       =   (totalCheckbox == checkedChekboxes) ? true : false;
+			$("#list-checkbox-head").prop("checked",selectAll);
+		});
+	});
+
+	/* For save checked checkboxes data  */
+	$(".btn-submit").click(function () {
+		var btnId = $(this).attr("id");
+		confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("cuisines.you_want_to_submit_form_only_selected_cuisines_will_remain"); %>',function(result){
+            if(result){
+                startTextLoading(btnId);
+                ajax_submit("select_cuisines_form", function (status, response) {
+                    if (status) {
+                        $("#reset").trigger("click");
+                    } else {
+                        stopTextLoading(btnId);
+                    }
+                });
+            }
+            swal.close();
+		});
+	});
+	
+	$(".scroll-body").mCustomScrollbar({
+		theme:"dark-3",
+		mouseWheelPixels: 300
+	});
+</script>

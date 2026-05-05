@@ -1,0 +1,115 @@
+<%	
+	type		=	(typeof type !== typeof undefined)			?	type		:""; 
+	displayType	=	(typeof displayType !== typeof undefined)	?	displayType	:__('admin.master.master'); 
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix" >
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2> <%= __("admin.system.add")+" "+displayType;%> </h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url+"/"+type%>" ><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __("admin.system.back"); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="add-master" data-submit-btn-id="master-add-btn-id" method="post" class="on_click_submit" role="form">
+						<%
+						if(type == "category"){ %>
+							<div class="row clearfix">
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="form-lin no-bottom-border">
+											<label for="image" class="control-label"><%= __("admin.master.image"); %><span class="required"> *</span> :</label>
+											<input name="image" id="image" type="file" data-text="<%=__('admin.master.select_image')%>"  data-input="false" class="form-control jfilestyle"/>
+											<span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __("admin.system.extension_and_size_suggestion_message",ALLOWED_IMAGE_EXTENSIONS.join(", "),IMAGE_RESOLUTION)%>">
+												<i class="material-icons">info</i>
+											</span>
+										</div>
+										<span id="image_error" class="error"></span> 
+									</div>
+								</div>
+							</div>
+						<% 
+						}
+						if(type == "faq_category"){ %>
+							<div class="row clearfix">
+								<div class="col-sm-12">
+									<div class="form-group">
+										<div class="form-line">
+											<label for="parent_id" class="control-label"><%= __("admin.master.category"); %> :</label>
+											<select class="form-control" name="parent_id">
+												<option value=""><%= __("admin.master.select_parent_category"); %></option>
+												<%-category_list%>
+											</select>
+										</div>
+										<span id="parent_id_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						<% } %>
+						<div class="row clearfix">
+							<% if(typeof language_list !== typeof undefined && Array.isArray(language_list) && language_list.length > 0){
+								language_list.forEach(function(languages){ %>
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="form-line">
+												<label for="name_<%= languages.lang_code; %>" class="control-label">
+													<%= __("admin.master.name_in_"+languages.title.toLowerCase()); %> <span class="required"> *</span>
+												</label>
+												<input type="hidden" name="master_descriptions[<%= languages._id %>][language_id]" value="<%=languages._id%>"/>
+												<input type="text" id="name_<%= languages.lang_code; %>" class="form-control" name="master_descriptions[<%=languages._id%>][name]" data-blank-error-message="<%= __('admin.master.please_enter_name_in_'+languages.title.toLowerCase())%>" data-error-id="name_<%= languages.lang_code; %>" />
+											</div>
+											<span id="name_<%= languages.lang_code; %>_error" class="error"></span>
+											<span id="master_descriptions_<%= languages._id %>_name_error" class="error"></span>
+											<% if(languages.lang_code ==  DEFAULT_LANGUAGE_CODE){ %>
+												<span id="name_error" class="error"></span>
+											<% } %>
+										</div>
+									</div> 
+								<% });
+							} %>
+						</div>
+						<button type="button" id="master-add-btn-id" class="btn bg-brown btn-sm waves-effect btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("admin.system.submit"); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>jquery-filestyle.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			/** file browser **/
+			$(".jfilestyle").jfilestyle({input: false});
+		
+			/**
+			 * Function to submit form
+			 */
+			$('.btn-submit').click(function(){
+				var btnId = $(this).attr('id');
+				startTextLoading(btnId);
+				if(client_side_validation('add-master')){
+					submit_multipart_form("add-master",function(status,response){
+						if(status){
+							window.location.href = response.redirect_url;
+						}else{
+							stopTextLoading(btnId);
+						}
+					});
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	</script>

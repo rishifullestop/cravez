@@ -1,0 +1,127 @@
+<%
+var result 		= (result) ? result   : {}; 
+var fromDate	= (result.from_date) ? newDate(result.from_date,DATABASE_DATE_FORMAT) : newDate("",DATABASE_DATE_FORMAT);
+var toDate		= (result.to_date) ? newDate(result.to_date,DATABASE_DATE_FORMAT) : newDate("",DATABASE_DATE_FORMAT);
+var isEditable  = (typeof is_editable !== typeof undefined && is_editable) ? is_editable : "";
+%>
+
+<div class="row clearfix" >
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-task" action="<%=(is_editable) ? admin_list_url+'/edit/'+result._id : admin_list_url+'/add'%>" data-submit-btn-id="task-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (is_editable) ?  __("admin.task_assignment.edit_task_assignment")  : __("admin.task_assignment.add_task_assignment"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix selected">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="date" class="control-label">
+											<%=  __('admin.task_assignment.date'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control" id="task-date-range-picker" value="<%=fromDate+' - '+toDate%>">
+									</div>
+									<input class="form-control hide" id="task_from_date" type="text" name="from_date" value="<%=fromDate%>">
+									<input class="form-control hide" id="task_to_date" type="text" name="to_date" value="<%=toDate%>">
+									<span id="date_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="agent_id" class="control-label">
+											<%= __("admin.task_assignment.agent_id"); %><span class="required"> *</span>
+										</label>
+										<select id="agent_id" class="form-control show-tick" name="agent_id"  data-live-search="true">
+											<option value=""><%- __('admin.task_assignment.select_agent_id')%></option>
+											<%-users_list%>
+										</select>	
+									</div>
+									<span id="agent_id_error" class="error"></span> 
+								</div>
+							</div> 
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12"> 
+								<div class="form-group materialize_checkbox task_checkbox">
+									<div class="form-lie checkbox_wrapper">
+										<label for="business_rule" class="control-label">
+											<%= __("admin.task_assignment.business_rule"); %><span class="required"> *</span>
+										</label> 
+									</div>
+								</div>
+							</div>
+							<div class="row clearfix m-l-10">								
+								<%
+									Object.keys(BUSINESS_TYPE_OBJECT).map((records,key)=>{ 
+										var checked = '';
+										if(result.business_rule && result.business_rule.length > 0){
+											result.business_rule.map((value)=>{
+												if(records == value) checked = 'checked';
+											})
+										}%>
+										<div class="col-sm-4"> 
+											<div class="form-group materialize_checkbox task_checkbox">
+												<div class="form-lie checkbox_wrapper">
+													<input name="business_rule" id="<%= records %>" class="filled-in chk-col-pink" type="checkbox" value="<%= records %>" <%= checked%>>
+													<label for="<%= records %>" class="materialize-chekbox-label"><%= BUSINESS_TYPE_OBJECT[records] %></label>
+												</div>
+											</div>
+										</div>
+										<%
+									});
+								%>
+							</div>
+							<span id="business_rule_error" class="error"></span>
+						</div> 
+						<div class="modal-footer modal-footer-seperator">
+							<button type="button" id="vacation-request-add-btn-id" class="btn  bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+								<%= __("admin.system.submit"); %>
+							</button>
+							<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+								<%= __("admin.system.cancel"); %>
+							</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		/**
+		 * Function to submit form
+		 */
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('add-task',function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	
+		/**
+		 * Function for date range picker
+		 */
+		var fromDateInput 	= '#task_from_date';
+		var toDateInput 	= '#task_to_date';
+		var datePickerInput = '#task-date-range-picker';
+		var stopTableDraw   = true;
+		var minDate			= new Date();
+		$(document).ready(function(){
+			initDateRangePicker();
+		});
+		
+		$(".show-tick").selectpicker('refresh');
+	</script>
+	
+
+

@@ -1,0 +1,268 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by driver name -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="driver_name" name="driver_name" data-live-search="true" title='<%=__("admin.manage_vehicles.search_by_driver_name");%>' multiple>
+													<%-driver_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by plate number -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('admin.manage_vehicles.search_by_plate_number'); %>" name="plate_number">
+											</div>
+										</div>
+									</div>
+									<!-- Search by vehicle type -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="column_filter_3"  onChange="searchDatatable(3)" name="vehicle_type">
+													<option value=""><%= __('admin.manage_vehicles.search_by_vehicle_type'); %></option>
+													<%
+													if(typeof VEHICLE_TYPE!== typeof undefined && Object.keys(VEHICLE_TYPE).length > 0){
+														Object.keys(VEHICLE_TYPE).map(type=>{
+															%>
+															<option value="<%=type%>" ><%=VEHICLE_TYPE[type]%></option>
+													<% 	});
+													} %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by status -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="column_filter_9"  onChange="searchDatatable(9)" name="status">
+													<option value=""><%= __('admin.manage_vehicles.search_by_status'); %></option>
+													<%
+													if(typeof VEHICLE_STATUS!== typeof undefined && Object.keys(VEHICLE_STATUS).length > 0){
+														Object.keys(VEHICLE_STATUS).map(status=>{
+															%>
+															<option value="<%=status%>" ><%=VEHICLE_STATUS[status]%></option>
+													<% 	});
+													} %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- datatable reset -->
+									<div class="col-xs-12 col-sm-2">
+										<div class="form-group">
+											<button type="button" id="reset" class="btn btn-danger btn-sm waves-effect"><%= __("admin.system.reset")%></button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.manage_vehicles.manage_vehicle"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<!-- <li>
+							<a href="<%=admin_list_url%>" data-action-url="<%=admin_list_url%>/add" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['manage_vehicles','add']); %>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __('admin.manage_vehicles.add_vehicle'); %>
+								</button>
+							</a>
+						</li> -->
+						<li class="export-list <%= getPermissionClass(module_type,['manage_vehicles','export']); %>">
+							<select class="export-details form-control border-bottom m-t--8">
+								<option value=""><%= __("admin.system.select_export_type"); %></option>
+								<option value="<%=EXPORT_ALL%>"><%= __("admin.system.export_all"); %></option>
+								<option value="<%=EXPORT_FILTERED%>"><%= __("admin.system.export_filtered"); %></option>
+							</select>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.manage_vehicles.driver_name"); %></th>
+								<th><%= __("admin.manage_vehicles.plate_number"); %></th>
+								<th><%= __("admin.manage_vehicles.licence"); %></th>
+								<th><%= __("admin.manage_vehicles.vehicle_type"); %></th>
+								<th><%= __("admin.manage_vehicles.model"); %></th>
+								<th><%= __("admin.manage_vehicles.manufacture"); %></th>
+								<th><%= __("admin.manage_vehicles.year"); %></th>
+								<th><%= __("admin.manage_vehicles.color"); %></th>
+								<th><%= __("admin.manage_vehicles.location"); %></th>
+								<th><%= __("admin.system.status"); %></th>
+								<!-- <th><%= __("admin.system.action"); %></th> -->
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css" rel="stylesheet">
+	
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable ="";
+		var VEHICLE_STATUS	=	<%- JSON.stringify(VEHICLE_STATUS);%>;
+		var VEHICLE_TYPE	=	<%- JSON.stringify(VEHICLE_TYPE);%>;
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem('DataTables', JSON.stringify(oData));
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse(localStorage.getItem('DataTables'));
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":   PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ 	
+						"data"	    : {},
+						"orderable" : false,
+						"searchable": false,
+						"render"    : function(result){
+							return '<a href='+ WEBSITE_ADMIN_URL+'user_management/view_driver/'+result.driver_id+' target="_blank">'+result.driver_name+'</a>';
+						}
+					},
+					{ 	"data"	    : 'plate_number'},
+					{
+						"data"		 : {},
+						"searchable" : false,
+						"orderable"	 : false,
+						"render"	 : function(result){
+							return "<a href='"+result.full_image_path+"'data-lightbox ='roadtrip_"+result._id+"' class='img-thumbnail'><img src='"+result.full_image_path+"' alt='Licence image' class='set_image_dim'></a>";
+						}
+					},
+					{ 	"data"		: 'vehicle_type',
+						"orderable" : false,
+						"searchable": false,
+						"render"	 : function(vehicle_type){
+							return (vehicle_type) ? VEHICLE_TYPE[vehicle_type] : '';
+						}
+					},
+					{ 	"data"		: 'model',
+						"orderable" : false,
+						"searchable": false
+					},
+					{ 	"data"		: 'manufacture',
+						"orderable" : false,
+						"searchable": false
+					},
+					{ 	 "data"		: 'year',
+						"searchable": false,
+						"orderable" : false,
+				    },
+					{ 	 "data"		: 'color',
+						"searchable": false,
+						"orderable" : false,
+				    },
+					{ 	 "data"		: 'location',
+						"searchable": false,
+						"orderable" : false,
+				    },
+					{ 	 "data"		: 'status',
+						"searchable": false,
+						"orderable" : false,
+						"render"	: function(status){
+							return (status) ? '<span class="label label-info">'+VEHICLE_STATUS[status]+'</span>' : '';
+						}
+					},
+					// {
+					// 	"data"			: 	'_id',
+					// 	"orderable"		:   false,
+					// 	"searchable"	: 	false,
+					// 	"render" 		: 	function(id){
+					// 		/*  edit Link  */
+					// 		var dropDownButton	= '<a href="<%=admin_list_url%>" data-action-url="<%=admin_list_url%>/edit/'+id+'" data-open-modal="true" class="action-btn btn bg-indigo waves-effect ml-5 m-t-5 <%= getPermissionClass(module_type,["manage_vehicles","edit"]); %>"><%= __("admin.system.edit"); %></a>';
+					// 		return dropDownButton;
+					// 	}
+					// }
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>",
+					type	: "POST",
+					data: function (d) {
+						d.driver_id	   = $('#driver_name').val();
+						d.export_count = <%= export_count %>;
+					},
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+		
+		/**
+		* Function to filter by driver name
+		*/
+		$('#driver_name').change(function(){
+			dataTable.draw();
+		});
+		
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("change",".export-details",function(){
+			var type = $(this).val();
+			if(type && type!=""){
+				$(this).val("");
+				window.location.href = "<%=admin_list_url%>/export_data/<%= export_count %>/"+type;
+			}
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

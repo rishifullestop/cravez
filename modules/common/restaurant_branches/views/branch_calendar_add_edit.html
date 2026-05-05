@@ -1,0 +1,706 @@
+<%
+	var result 		= 	(typeof result !== typeof undefined && result)  ?	result 	:{};
+	var branchId 	= 	(typeof branch_id !== typeof undefined && branch_id)  			?	branch_id 		:"";
+	var isEditable 	=	(typeof is_editable !== typeof undefined && is_editable) ? is_editable :"";
+	var calendarId	=	(result._id)	?	result._id	:"";
+	var formUrl 	=	(isEditable)	?	list_url+"/update_branch_calendar/"+branchId+"/"+calendarId :list_url+'/add_branch_calendar/'+branchId;
+	var oldStatus	=	(typeof result.status !== typeof undefined)	?	result.status	:OPEN;
+	var oldOpenType	=	(typeof result.type !== typeof undefined)	?	result.type		:DEFAULT_WEEK;
+	var oldCloseType=	(typeof result.type !== typeof undefined)	?	result.type		:WEEK_DAY;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-calendar" action="<%=formUrl%>" data-submit-btn-id="calendar-add-btn-id" method="post" class="freezed_event" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("branch_calendar.manage_calendar"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-lin">
+										<label for="status" class="control-label col-555">
+											<%= __("system.status"); %><span class="required"> *</span>
+										</label>
+										<% CALENDAR_STATUS.map(records=>{
+											var statusKey = records.status_id; %>
+											<input name="status" type="radio" value="<%=statusKey%>" id="status_<%=statusKey%>" class="with-gap radio-col-indigo" <%= (oldStatus == statusKey) ?  'checked' :''; %> >
+											<label for="status_<%=statusKey%>"> <%=records.status_name%> </label>
+										<% }); %>
+									</div>
+									<span id="status_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="open_status_form">
+							<div class="row clearfix">
+								<div class="col-sm-12">
+									<div class="form-group">
+										<div class="form-lin">
+											<% Object.keys(OPEN_STATUS).map(key=>{ %>
+												<input name="open_type" type="radio" value="<%=key%>" id="open_type_<%=key%>" class="with-gap radio-col-indigo" <%= (oldOpenType == key) ? 'checked' :'';%> >
+												<label for="open_type_<%=key%>"> <%=OPEN_STATUS[key].description%> </label>
+												<br/>
+											<% }); %>
+										</div>
+										<span id="open_type_error" class="error"></span>
+									</div>
+								</div>
+							</div>							
+							
+							<div class="calendar-form-fields m-t-10"> </div>
+							<div class="row clearfix">
+								<div class="col-sm-2 materialize_checkbox">
+									<input type="checkbox" id="is_exception" name="is_exception" class="filled-in chk-col-indigo" >
+									<label for="is_exception"><%=__("branch_calendar.exceptions")%></label>
+								</div>
+							</div>
+							<div class="exception-form-fields m-t-10"> </div>
+							
+							<div class="row clearfix">
+								<div class="col-sm-2 materialize_checkbox">
+									<input type="checkbox" id="special_week" name="special_week" class="filled-in chk-col-indigo" >
+									<label for="special_week"><%=__("branch_calendar.special_week")%></label>
+								</div>
+							</div>
+							<div class="sw-form-fields m-t-10"> </div>
+						</div>
+						<div class="close_status_form hide">
+							<div class="row clearfix">
+								<div class="col-sm-12">
+									<div class="form-group">
+										<div class="form-lin">
+											<% Object.keys(CLOSE_STATUS).map(key=>{ %>
+												<input name="close_type" type="radio" value="<%=key%>" id="close_type_<%=key%>" class="with-gap radio-col-indigo" <%= (oldCloseType == key) ? 'checked' :''; %> >
+												<label for="close_type_<%=key%>"> <%=CLOSE_STATUS[key].description%> </label>
+												<br/>
+											<% }); %>
+										</div>
+										<span id="close_type_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+							<div class="close-form-fields m-t-10"> </div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="calendar-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white calendar_btn_submit freezed_event hideMe " <%- FRONT_LOADING_TEXT %> >
+							<%= __("system.submit"); %>
+						</button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" >
+							<button type="button" class="btn bg-blue-grey btn-sm waves-effect">
+								<%= __("system.cancel"); %>
+							</button>
+						</a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="hide">
+	<!-- Calendar add More Div -->
+	<div class="calendar-extra-fields hide">
+		<div class="calendar-input  calendar-{index}">
+			<div class="row clearfix m-t-10">
+				<div class="col-sm-6">
+					<div class="form-group">
+						<div class="form-line">
+							<input type="hidden" class="calendar_id" name="calendar[{index}][id]" value={calendar_id} readonly/>
+							<input type="text" id="calendar_from_{index}" name="calendar[{index}][from]"  class="form-control time" placeholder="<%= __('branch_calendar.from')%>"  data-blank-error="<%=__('branch_calendar.please_select_from')%>" value={form_time} readonly/>
+						</div>
+						<span id="calendar_from_{index}_error" class="error"></span>
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<div class="form-group">
+						<div class="form-line">
+							<input type="text" id="calendar_to_{index}" name="calendar[{index}][to]"  class="form-control time" placeholder="<%= __('branch_calendar.to')%>" data-blank-error="<%=__('branch_calendar.please_select_to')%>" value={to_time} readonly/>
+						</div>
+						<span id="calendar_to_{index}_error" class="error"></span>
+					</div>
+				</div>
+			</div>
+			<div class="row clearfix">
+				<div class="col-sm-7"></div>
+				<div class="col-sm-5 text-right">
+					<button type="button" id="delete_calendar_{index}" class="btn bg-red waves-effect m-r-5 col-white delete_calendar" <%- FRONT_LOADING_TEXT %> data-rel="calendar-{index}"> <%= __("system.delete")%> </button>
+					<button type="button" class="btn bg-green waves-effect col-white addmore_calendar" onclick="appendCalendarInput()"> <%= __("system.add_more")%> </button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="exception-extra-fields hide">
+		<div class="exception-input  exception-{index}">
+			<div class="row clearfix m-t-10">
+				<div class="col-sm-4">
+					<div class="form-group">
+						<div class="form-line">
+							<select id="exception_day_{index}" name="exception[{index}][day]"  class="form-control" data-blank-error="<%=__('branch_calendar.please_select_day')%>">
+								<option value="" ><%= __("branch_calendar.select_day") %></option>
+								<% Object.keys(DAY_LIST).map(dayKey=>{ %>
+									<option value="<%=dayKey%>" ><%= DAY_LIST[dayKey] %></option>
+								<% }); %>
+							</select>
+						</div>
+						<span id="exception_day_{index}_error" class="error"></span>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="form-group">
+						<div class="form-line">
+							<input type="hidden" class="exception_id" name="exception[{index}][id]" value={exception_id} readonly/>
+							<input type="text" id="exception_from_{index}" name="exception[{index}][from]"  class="form-control time" placeholder="<%= __('branch_calendar.from')%>"  data-blank-error="<%=__('branch_calendar.please_select_from')%>" value={form_time} readonly/>
+						</div>
+						<span id="exception_from_{index}_error" class="error"></span>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="form-group">
+						<div class="form-line">
+							<input type="text" id="exception_to_{index}" name="exception[{index}][to]"  class="form-control time" placeholder="<%= __('branch_calendar.to')%>" data-blank-error="<%=__('branch_calendar.please_select_to')%>" value={to_time} readonly/>
+						</div>
+						<span id="exception_to_{index}_error" class="error"></span>
+					</div>
+				</div>
+			</div>
+			<div class="row clearfix">
+				<div class="col-sm-7"></div>
+				<div class="col-sm-5 text-right">
+					<button type="button" id="delete_exception_{index}" class="btn bg-red waves-effect m-r-5 col-white delete_exception" <%- FRONT_LOADING_TEXT %> data-rel="exception-{index}"> <%= __("system.delete")%> </button>
+					<button type="button" class="btn bg-green waves-effect col-white addmore_exception" onclick="appendExceptionInput()"> <%= __("system.add_more")%> </button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- SW add More Div -->
+	<div class="sw-extra-fields hide">
+		<div class="sw-input  sw-{index}">
+			<div class="row clearfix m-t-10">
+				<div class="col-sm-4">
+					<div class="form-group">
+						<div class="form-line">
+							<select id="sw_day_{index}" name="sw[{index}][day]"  class="form-control" data-blank-error="<%=__('branch_calendar.please_select_day')%>">
+								<option value="" ><%= __("branch_calendar.select_day") %></option>
+								<% Object.keys(DAY_LIST).map(dayKey=>{ %>
+									<option value="<%=dayKey%>" ><%= DAY_LIST[dayKey] %></option>
+								<% }); %>
+							</select>
+						</div>
+						<span id="sw_day_{index}_error" class="error"></span>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="form-group">
+						<div class="form-line">
+							<input type="hidden" class="sw_id" name="sw[{index}][id]" value={sw_id} readonly/>
+							<input type="text" id="sw_from_{index}" name="sw[{index}][from]"  class="form-control time" placeholder="<%= __('branch_calendar.from')%>"  data-blank-error="<%=__('branch_calendar.please_select_from')%>" value={form_time} readonly/>
+						</div>
+						<span id="sw_from_{index}_error" class="error"></span>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="form-group">
+						<div class="form-line">
+							<input type="text" id="sw_to_{index}" name="sw[{index}][to]"  class="form-control time" placeholder="<%= __('branch_calendar.to')%>" data-blank-error="<%=__('branch_calendar.please_select_to')%>" value={to_time} readonly/>
+						</div>
+						<span id="sw_to_{index}_error" class="error"></span>
+					</div>
+				</div>
+			</div>
+			<div class="row clearfix">
+				<div class="col-sm-7"></div>
+				<div class="col-sm-5 text-right">
+					<button type="button" id="delete_sw_{index}" class="btn bg-red waves-effect m-r-5 col-white delete_sw" <%- FRONT_LOADING_TEXT %> data-rel="sw-{index}"> <%= __("system.delete")%> </button>
+					<button type="button" class="btn bg-green waves-effect col-white addmore_sw" onclick="appendSWInput()"> <%= __("system.add_more")%> </button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Close extra fields -->
+	<div class="close-extra-fields">
+		<div class="row clearfix close-input close-{index}">
+			<div class=" m-t-10 ">
+				<div class="col-sm-7">
+					<div class="form-group">
+						<div class="form-line">
+							<input type="hidden" class="close_day_id" name="close_day[{index}][id]" value={close_id} readonly/>
+							<select id="close_day_{index}" name="close_day[{index}][day]"  class="form-control" data-blank-error="<%=__('branch_calendar.please_select_day')%>">
+								<option value="" ><%= __("branch_calendar.select_day") %></option>
+								<% Object.keys(DAY_LIST).map(dayKey=>{ %>
+									<option value="<%=dayKey%>" ><%= DAY_LIST[dayKey] %></option>
+								<% }); %>
+							</select>
+						</div>
+						<span id="close_day_{index}_error" class="error"></span>
+					</div>
+				</div>
+				<div class="col-sm-5 text-right">
+					<button type="button" id="delete_close_{index}" class="btn bg-red waves-effect m-r-5 col-white delete_close" data-rel="close-{index}"> <%= __("system.delete")%> </button>
+					<button type="button" class="btn bg-green waves-effect col-white addmore_close" onclick="appendCloseInput()"> <%= __("system.add_more")%> </button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/** Call to freezed event **/
+	updateFreezedEvent();
+
+	/**
+	 * Function to submit form
+	 */
+	var isEditable = "<%=isEditable%>";
+	$('.calendar_btn_submit').click(function(){
+		var btnId = $(this).attr('id');
+		function submitForm(){
+			startTextLoading(btnId);
+			ajax_submit('add-calendar',function(status,response){
+				if(status){
+					$(".submit-for-approval").removeClass("hide");
+					$('#form_modal').modal("hide");
+					$(".branch-panel-link.active").find("a").trigger("click");
+					if(response.status && response.message) notice(response.status,response.message);
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		}
+
+		<% if(isRestaurant(module_type)){ %>
+			confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("branch_calendar.branch_calendar_add_comfirm_message"); %>',function(result){
+				if(result){
+					submitForm();
+				}
+				swal.close();
+			});
+		<% }else{ %>
+			submitForm();
+		<% } %>
+	});
+
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+
+	$("input[name='status']").change(function(){
+		if($(this).val() == "<%= OPEN%>"){
+			$(".close_status_form").addClass("hide").show();
+			$(".open_status_form").removeClass("hide").show();
+			$(".exception-form-fields").html('');
+			$(".sw-form-fields").html('');
+			$(".calendar-form-fields").html('');
+		}else{
+			$(".open_status_form").addClass("hide").show();
+			$(".close_status_form").removeClass("hide").show();
+			$(".close-form-fields").html('');
+		}
+		getChildDetails();
+	});
+
+	$("#is_exception").change(function(){
+		$(".exception-form-fields").html(" ");
+		if($(this).prop("checked")){
+			appendExceptionInput();
+		}
+	});
+	
+	$("#special_week").change(function(){
+		$(".sw-form-fields").html(" ");
+		if($(this).prop("checked")){
+			appendSWInput();
+		}
+	});
+
+	/** For tiime picker **/
+	$('.time').datetimepicker({
+		format			: '<%=DATEPICKER_TIME_FORMAT%>',
+		ignoreReadonly	: true,
+	});
+
+	$(document).on("click",".delete_exception",function(){
+		var buttonId 	= 	$(this).attr("id");
+		var exceptionId = 	$(this).closest(".exception-input").find(".exception_id").val();
+		var divClass 	= 	$(this).attr("data-rel");
+		var message		=	(exceptionId)	? '<%= __("branch_calendar.exception_permanently_delete_confirm_message"); %>' :'<%= __("branch_calendar.exception_delete_confirm_message"); %>';
+		confirmBox("warning",'<%= __("system.are_you_sure") %>',message,function(result){
+			if(result){
+				startTextLoading(buttonId);
+				if(exceptionId){
+					var options =	{
+						url 	: 	'<%=list_url+'/delete_calendar/'+branchId%>',
+						data	:	{calendar_id: exceptionId},
+						method	:	"post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_ERROR%>"){
+							$("#from_error").html(response.message);
+						}else{
+							$("."+divClass).html('');
+							$(".exception-form-fields .addmore_exception").hide().last(".addmore_exception").show();
+							stopTextLoading(buttonId);
+						}
+					});
+				}else{
+					$("."+divClass).html('');
+					$(".exception-form-fields .addmore_exception").hide().last(".addmore_exception").show();
+					stopTextLoading(buttonId);
+				}
+			}
+			swal.close();
+		});
+	});
+	
+	$(document).on("click",".delete_sw",function(){
+		var buttonId 	= 	$(this).attr("id");
+		var swId		= 	$(this).closest(".sw-input").find(".sw_id").val();
+		var divClass 	= 	$(this).attr("data-rel");
+		var message		=	(swId)	? '<%= __("branch_calendar.sw_permanently_delete_confirm_message"); %>' :'<%= __("branch_calendar.sw_delete_confirm_message"); %>';
+		confirmBox("warning",'<%= __("system.are_you_sure") %>',message,function(result){
+			if(result){
+				startTextLoading(buttonId);
+				if(swId){
+					var options =	{
+						url 	: 	'<%=list_url+'/delete_calendar/'+branchId%>',
+						data	:	{calendar_id: swId},
+						method	:	"post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_ERROR%>"){
+							$("#from_error").html(response.message);
+						}else{
+							$("."+divClass).html('');
+							$(".sw-form-fields .addmore_sw").hide().last(".addmore_sw").show();
+							stopTextLoading(buttonId);
+						}
+					});
+				}else{
+					$("."+divClass).html('');
+					$(".sw-form-fields .addmore_sw").hide().last(".addmore_sw").show();
+					stopTextLoading(buttonId);
+				}
+			}
+			swal.close();
+		});
+	});
+	
+	
+	$(document).on("click",".delete_calendar",function(){
+		var buttonId 	= 	$(this).attr("id");
+		var calendarId = 	$(this).closest(".calendar-input").find(".calendar_id").val();
+		var divClass 	= 	$(this).attr("data-rel");
+		var message		=	(calendarId)	? '<%= __("branch_calendar.calendar_permanently_delete_confirm_message"); %>' :'<%= __("branch_calendar.calendar_delete_confirm_message"); %>';
+		confirmBox("warning",'<%= __("system.are_you_sure") %>',message,function(result){
+			if(result){
+				startTextLoading(buttonId);
+				
+				if(calendarId){
+					var options =	{
+						url 	: 	'<%=list_url+'/delete_calendar/'+branchId%>',
+						data	:	{calendar_id: calendarId},
+						method	:	"post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_ERROR%>"){
+							$("#from_error").html(response.message);
+						}else{
+							$("."+divClass).html('');
+							$(".calendar-form-fields .addmore_calendar").hide().last(".addmore_calendar").show();
+							stopTextLoading(buttonId);
+						}
+					});
+				}else{
+					$("."+divClass).html('');
+					$(".calendar-form-fields .addmore_calendar").hide().last(".addmore_calendar").show();
+					stopTextLoading(buttonId);
+				}
+			}
+			swal.close();
+		});
+	});
+	
+	$(document).on("click",".delete_close",function(){
+		var buttonId 	= 	$(this).attr("id");
+		var closeDayId 	= 	$(this).closest(".close-input").find(".close_day_id").val();
+		var divClass 	=	$(this).attr("data-rel");
+		var message		=	(closeDayId)	? '<%= __("branch_calendar.you_want_to_delete_this_day_it_will_be_permanently_deleted"); %>' :'<%= __("branch_calendar.you_want_to_delete_this_day"); %>';
+		confirmBox("warning",'<%= __("system.are_you_sure") %>',message,function(result){
+			if(result){
+				startTextLoading(buttonId);
+				if(closeDayId){
+					var options =	{
+						url 	: 	'<%=list_url+'/delete_calendar/'+branchId%>',
+						data	:	{calendar_id: closeDayId},
+						method	:	"post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_ERROR%>"){
+							$("#status_error").html(response.message);
+						}else{
+							$("."+divClass).html('');
+							$(".close-form-fields .addmore_close").hide().last(".addmore_close").show();
+							$(".branch-panel-link.active").find("a").trigger("click");
+							stopTextLoading(buttonId);
+						}
+					});
+				}else{
+					$("."+divClass).html('');
+					$(".close-form-fields .addmore_close").hide().last(".addmore_close").show();
+					stopTextLoading(buttonId);
+				}
+			}
+			swal.close();
+		});
+	});
+
+	function appendExceptionInput(data){
+		var errorsArray  =  [];
+
+		$(".exception-form-fields span.error").html('');
+		$(".exception-form-fields input, .exception-form-fields select").each(function(){
+			if(!$(this).val() && $(this).attr("data-blank-error")){
+				errorsArray.push({param: $(this).attr("id"), msg: $(this).attr("data-blank-error") });
+			}
+		});
+
+		if(errorsArray.length > 0){
+			display_errors(errorsArray,'add-calendar');
+		}else{
+			var day 		=	(data && data.day)			?	data.day			:"<%=SUNDAY%>";
+			var exceptionId	=	(data && data._id)			?	data._id			:"";
+			var fromHour 	=	(data && data.from_hour)	?	data.from_hour		:"00";
+			var fromMinute 	=	(data && data.from_minute)	?	data.from_minute	:"00";
+			var toHour 		=	(data && data.to_hour) 		?	data.to_hour		:"00";
+			var toMinute 	=	(data && data.to_minute) 	?	data.to_minute		:"00";
+			var formTime 	=	"";
+			var toTime	 	=	"";
+			if(data){
+				if(String(fromHour).length ==1) 	fromHour 	=	"0"+fromHour;
+				if(String(fromMinute).length ==1) 	fromMinute 	= 	"0"+fromMinute;
+				if(String(toHour).length ==1) 		toHour		= 	"0"+toHour;
+				if(String(toMinute).length ==1) 	toMinute	= 	"0"+toMinute;
+				toTime 		= 	toHour+":"+toMinute;
+				formTime 	=	fromHour+":"+fromMinute;
+			}
+
+			var html 		=	$(".exception-extra-fields").html();
+			var index		= 	$(".exception-form-fields .exception-input").length;
+			html 			= 	html.replace(/{index}/g,index).replace(/{form_time}/g,formTime).replace(/{to_time}/g,toTime).replace(/{exception_id}/g,exceptionId);
+			$(".exception-form-fields").append(html);
+
+			if(index ==0) $(".exception-form-fields .delete_exception").remove();
+
+			$(".exception-form-fields .addmore_exception").hide().last(".addmore_exception").show();
+
+			if(data){
+				if($("#exception_day_"+index+" option[value="+day+"]").length > 0) $("#exception_day_"+index).val(day);
+			}
+
+			if(data) $("#is_exception").prop("checked",true);
+
+			/** For tiime picker **/
+			$('.time').datetimepicker({
+				format			: '<%=DATEPICKER_TIME_FORMAT%>',
+				ignoreReadonly	: true,
+			});
+		}
+	}; // end appendExceptionInput()
+	
+	/** Add SW input boxes*/
+	function appendSWInput(data){
+		var errorsArray  =  [];
+
+		$(".sw-form-fields span.error").html('');
+		$(".sw-form-fields input, .sw-form-fields select").each(function(){
+			if(!$(this).val() && $(this).attr("data-blank-error")){
+				errorsArray.push({param: $(this).attr("id"), msg: $(this).attr("data-blank-error") });
+			}
+		});
+
+		if(errorsArray.length > 0){
+			display_errors(errorsArray,'add-calendar');
+		}else{
+			var day 		=	(data && data.day)			?	data.day			:"<%=SUNDAY%>";
+			var swId	=	(data && data._id)			?	data._id			:"";
+			var fromHour 	=	(data && data.from_hour)	?	data.from_hour		:"00";
+			var fromMinute 	=	(data && data.from_minute)	?	data.from_minute	:"00";
+			var toHour 		=	(data && data.to_hour) 		?	data.to_hour		:"00";
+			var toMinute 	=	(data && data.to_minute) 	?	data.to_minute		:"00";
+			var formTime 	=	"";
+			var toTime	 	=	"";
+			if(data){
+				if(String(fromHour).length ==1) 	fromHour 	=	"0"+fromHour;
+				if(String(fromMinute).length ==1) 	fromMinute 	= 	"0"+fromMinute;
+				if(String(toHour).length ==1) 		toHour		= 	"0"+toHour;
+				if(String(toMinute).length ==1) 	toMinute	= 	"0"+toMinute;
+				toTime 		= 	toHour+":"+toMinute;
+				formTime 	=	fromHour+":"+fromMinute;
+			}
+
+			var html 		=	$(".sw-extra-fields").html();
+			var index		= 	$(".sw-form-fields .sw-input").length;
+			html 			= 	html.replace(/{index}/g,index).replace(/{form_time}/g,formTime).replace(/{to_time}/g,toTime).replace(/{sw_id}/g,swId);
+			$(".sw-form-fields").append(html);
+
+			if(index ==0) $(".sw-form-fields .delete_sw").remove();
+
+			$(".sw-form-fields .addmore_sw").hide().last(".addmore_sw").show();
+
+			if(data){
+				if($("#sw_day_"+index+" option[value="+day+"]").length > 0) $("#sw_day_"+index).val(day);
+			}
+
+			if(data) $("#special_week").prop("checked",true);
+
+			/** For tiime picker **/
+			$('.time').datetimepicker({
+				format			: '<%=DATEPICKER_TIME_FORMAT%>',
+				ignoreReadonly	: true,
+			});
+		}
+	}; // end appendSWInput()
+	
+	function appendCalendarInput(data){
+		var errorsArray  =  [];
+
+		$(".calendar-form-fields span.error").html('');
+		$(".calendar-form-fields input").each(function(){
+			if(!$(this).val() && $(this).attr("data-blank-error")){
+				errorsArray.push({param: $(this).attr("id"), msg: $(this).attr("data-blank-error") });
+			}
+		});
+
+		if(errorsArray.length > 0){
+			display_errors(errorsArray,'add-calendar');
+		}else{
+			var calendarId	=	(data && data._id)			?	data._id			:"";
+			var fromHour 	=	(data && data.from_hour)	?	data.from_hour		:"00";
+			var fromMinute 	=	(data && data.from_minute)	?	data.from_minute	:"00";
+			var toHour 		=	(data && data.to_hour) 		?	data.to_hour		:"00";
+			var toMinute 	=	(data && data.to_minute) 	?	data.to_minute		:"00";
+			var formTime 	=	"";
+			var toTime	 	=	"";
+			if(data){
+				if(String(fromHour).length ==1) 	fromHour 	=	"0"+fromHour;
+				if(String(fromMinute).length ==1) 	fromMinute 	= 	"0"+fromMinute;
+				if(String(toHour).length ==1) 		toHour		= 	"0"+toHour;
+				if(String(toMinute).length ==1) 	toMinute	= 	"0"+toMinute;
+				toTime 		= 	toHour+":"+toMinute;
+				formTime 	=	fromHour+":"+fromMinute;
+			}
+
+			var html 		=	$(".calendar-extra-fields").html();
+			var index		= 	$(".calendar-form-fields .calendar-input").length;
+			html 			= 	html.replace(/{index}/g,index).replace(/{form_time}/g,formTime).replace(/{to_time}/g,toTime).replace(/{calendar_id}/g,calendarId);
+			
+			$(".calendar-form-fields").append(html);
+
+			if(index ==0) $(".calendar-form-fields .delete_calendar").remove();
+
+			$(".calendar-form-fields .addmore_calendar").hide().last(".addmore_calendar").show();
+
+			/** For tiime picker **/
+			$('.time').datetimepicker({
+				format			: '<%=DATEPICKER_TIME_FORMAT%>',
+				ignoreReadonly	: true,
+			});
+		}
+	}; // end appendCalendarInput()
+
+	function appendCloseInput(data){
+		var errorsArray  =  [];
+
+		$(".close-form-fields span.error").html('');
+		$(".close-form-fields select").each(function(){
+			if(!$(this).val() && $(this).attr("data-blank-error")){
+				errorsArray.push({param: $(this).attr("id"), msg: $(this).attr("data-blank-error") });
+			}
+		});
+
+		if(errorsArray.length > 0){
+			display_errors(errorsArray,$("form").attr("id"));
+		}else{
+			var day 	=	(data && data.day)	?	data.day	:"<%=SUNDAY%>";
+			var closeId =	(data && data._id)	?	data._id	:"";
+			var html 	=	$(".close-extra-fields").html();
+			var index	= 	$(".close-form-fields .close-input").length;
+			html 		= 	html.replace(/{index}/g,index).replace(/{close_id}/g,closeId);
+			$(".close-form-fields").append(html);
+
+			if(data){
+				if($("#close_day_"+index+" option[value="+day+"]").length > 0) $("#close_day_"+index).val(day);
+			}
+
+			if(index ==0) $(".close-form-fields .delete_close").remove();
+
+			$(".close-form-fields .addmore_close").hide().last(".addmore_close").show();
+		}
+	};// end appendCloseInput()
+
+	getChildDetails();
+	function getChildDetails(){
+		/** Ajax options */
+		var currentStatus  = $("input[name='status']:checked").val();
+		var type	=	(currentStatus == "<%=OPEN%>") ?  $("input[name='open_type']:checked").val(): $("input[name='close_type']:checked").val();
+		if(type){
+			var options =	{
+				url 	: 	'<%=list_url+'/get_calendar_child_details/'+branchId%>',
+				data	:	{type: type, status: currentStatus},
+				method	:	"post"
+			};
+
+			ajaxRequest(options,function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					if(response.exception_result && response.exception_result.length >0){
+						response.exception_result.map(records=>{
+							if(currentStatus == "<%=OPEN%>"){
+								if($(".exception-form-fields .exception_id").find("input[value='"+records._id+"']").length ==0){
+									appendExceptionInput(records);
+								}
+							}else{
+								if($(".close-form-fields .close_day_id").find("input[value='"+records._id+"']").length ==0){
+									appendCloseInput(records);
+								}
+							}
+						});
+					}else if(currentStatus == "<%=CLOSE%>"){
+						appendCloseInput();
+					}
+					
+					if(response.sw_result && response.sw_result.length >0){
+						response.sw_result.map(records=>{
+							if(currentStatus == "<%=OPEN%>"){
+								if($(".sw-form-fields .sw_id").find("input[value='"+records._id+"']").length ==0){
+									appendSWInput(records);
+								}
+							}else{
+								if($(".close-form-fields .close_day_id").find("input[value='"+records._id+"']").length ==0){
+									appendCloseInput(records);
+								}
+							}
+						});
+					}
+
+					if(response.parent_result && response.parent_result.length > 0){
+						response.parent_result.map(records=>{
+							if($(".calendar-form-fields .calendar_id").find("input[value='"+records._id+"']").length ==0){
+								appendCalendarInput(records);
+							}
+						});
+					}else{
+						appendCalendarInput();
+					}
+				}else if(response.status && response.message){
+					notice(response.status,response.message);
+				}
+			});
+		}
+	}// end getChildDetails()
+</script>

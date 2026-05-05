@@ -1,0 +1,39 @@
+<div class="equal_spacing">
+	<div class="dashboard_page team-leader">
+		<h1><%= __("system.dashboard"); %></h1>
+		<!-- Tickets  Section -->
+			<%- include dashboard_elements/ticket_info.html %>
+			
+		<!-- Payment Status Section-->
+			<div class="number_box">
+				<h3><span><%= __('admin.dashboard.payment_status') %></span></h3>
+				<div class="dashboard_number menu_box">
+					<ul>
+						<li>
+							<div class="number_bg_box skyblue_border">
+								<strong><%= (result.total_unsettled_payments) ? result.total_unsettled_payments : 0;%></strong>
+								<a href="<%= WEBSITE_ADMIN_URL %>report/unsettled_payment" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.total_unsettled_payments') %></span></a>
+							</div>
+						</li>
+						<li>
+							<div class="number_bg_box skyblue_border">
+								<strong><%= (result.total_settled_payments) ? result.total_settled_payments : 0;%></strong>
+								<a href="<%= WEBSITE_ADMIN_URL %>report/settled_payments" target="_blank" class="text-decoration-none reset_storage"><span><%= __('admin.dashboard.total_settlement_payments') %></span></a>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		<!-- Members info Section-->
+			<%- include dashboard_elements/members_info.html %>
+		
+		<!-- Login Logout Time & Upcoming week schedule Section -->
+			<%- include dashboard_elements/login_logout_and_week_schedule.html %>
+		
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		$(".breadcrumb").remove();
+	</script>

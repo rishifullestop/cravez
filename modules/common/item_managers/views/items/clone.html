@@ -1,0 +1,155 @@
+
+<%
+let itemId		= item_id;
+let formUrl		= list_url+"/clone/"+itemId;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="clone" action="<%= formUrl %>" data-modal-id="form_modal" data-submit-btn-id="clone-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%=__("item_manager.item_clone") %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20 materialize_checkbox">
+                        <div class="row clearfix" >
+                            <div class="col-sm-6" id="selectMenu">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="menu_ids" class="control-label">
+                                            <%= __("items.menu"); %> <span class="required"> *</span>
+                                        </label>
+                                        <select id="menu_ids" class="form-control show-tick" name="menu_ids" title="<%=__('items.select_menu')%>" multiple>
+                                            <%- menu_list %>
+                                        </select>
+                                        <span class="message demo-image-copyright"> <%=__("items.leave_blank_to_select_all")%> </span>
+                                    </div>
+                                    <span id="menu_ids_error" class="error"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6" id="selectCategory">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="category_ids" class="control-label">
+                                            <%= __("items.category"); %> <span class="required"> *</span>
+                                        </label>
+                                        <select id="category_ids" class="form-control show-tick" name="category_ids" title="<%=__('items.select_category')%>" multiple>
+                                            <%- category_list %>
+                                        </select>
+                                        <span class="message demo-image-copyright"> <%=__("items.leave_blank_to_select_all")%> </span>
+                                    </div>
+                                    <span id="category_ids_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row clearfix">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="name_in_english" class="control-label">
+                                            <%= __("items.name_in_english"); %><span class="required"> *</span>
+                                        </label>
+                                        <input type="text" id="name_in_english" class="form-control" name="name_in_english"/>
+                                    </div>
+                                    <span id="name_in_english_error" class="error"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="name_in_arabic" class="control-label">
+                                            <%= __("items.name_in_arabic"); %><span class="required"> *</span>
+                                        </label>
+                                        <input type="text" id="name_in_arabic" class="form-control" name="name_in_arabic"/>
+                                    </div>
+                                    <span id="name_in_arabic_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row clearfix">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="description_in_english" class="control-label">
+                                            <%= __("items.description_in_english"); %><span class="required"> *</span>
+                                        </label>
+                                        <textarea name="description_in_english" id="description_in_english" class="form-control height-50 resize-none"></textarea>
+                                    </div>
+                                    <span id="description_in_english_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row clearfix">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="description_in_arabic" class="control-label">
+                                            <%= __("items.description_in_arabic"); %><span class="required"> *</span>
+                                        </label>
+                                        <textarea name="description_in_arabic" id="description_in_arabic" class="form-control height-50 resize-none"></textarea>
+                                    </div>
+                                    <span id="description_in_arabic_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="clone-btn-id" class="btn bg-brown btn-sm waves-effect clone-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".show-tick").selectpicker('refresh');
+
+        /**
+         * Function to submit form
+         */
+        $('.clone-btn-submit').click(function(){
+            var btnId = $(this).attr('id');
+
+            function submitForm(){
+                startTextLoading(btnId);
+                ajax_submit('clone',function(status,response){
+                    if(status){
+                        $('#form_modal').modal("hide");
+                        $("#reset").first().trigger("click");
+                    }else{
+                        stopTextLoading(btnId);
+                    }
+                });
+            };
+
+            <% if(isRestaurant(module_type)){ %>
+                confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("items.item_clone_comfirm_message"); %>',function(result){
+                    submitForm();
+                    swal.close();
+                });
+            <% }else{ %>
+                submitForm();
+            <% } %>
+        });
+
+        $(document).on("change","#menu_ids",function(){
+            var selectedMenu = $(this).val();
+            var options = {
+                url 	: "<%= list_url %>/get_categories",
+                data	: {menus: selectedMenu},
+                method	: "post"
+            }
+            ajaxRequest(options,function(response){
+                if(response.status && response.message) notice(response.status,response.message);
+                var optionsHtml = (response.result) ? response.result  : "";
+                $("#category_ids").html(optionsHtml);
+                $("#category_ids").selectpicker('refresh');
+            });
+        });
+	});
+</script>

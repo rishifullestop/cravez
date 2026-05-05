@@ -1,0 +1,155 @@
+<%
+ let restaurantDetails 		= 	(typeof restaurant_details !== typeof undefined && restaurant_details) 			? 	restaurant_details 		:{};
+ let restaurantSubDetails 	=	(typeof restaurant_sub_details !== typeof undefined && restaurant_sub_details)	?	restaurant_sub_details 	:{};
+ let thermalLayout = (restaurantDetails.thermal_layout_format) ? restaurantDetails.thermal_layout_format : "";
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('user.edit_profile'); %>
+					</h2>
+				</div>
+				<div class="body">
+					<form id="update-profile" data-submit-btn-id="update-profile-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_english" class="control-label">
+											<%= __("user.restaurant_english_name"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_english" class="form-control" name="name_in_english" value="<%= (restaurantDetails.name && restaurantDetails.name.en) 	?	restaurantDetails.name.en :''; %>" data-blank-error-message="<%= __('user.please_enter_restaurant_name_in_english') %>"/>
+										<input type="hidden" name="_csrf" value="<%= (csrf_token ) ? csrf_token :''; %>" />
+									</div>
+									<span id="name_in_english_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_arabic" class="control-label">
+											<%= __("user.restaurant_arabic_name"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_arabic" class="form-control" name="name_in_arabic" value="<%= (restaurantDetails.name && restaurantDetails.name.ar)	? restaurantDetails.name.ar :''; %>" data-blank-error-message="<%= __('user.please_enter_restaurant_name_in_arabic') %>"/>
+									</div>
+									<span id="name_in_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line  cursor-not-allowed">
+										<label for="email" class="control-label"><%= __('user.email'); %><span class="required"> *</span> </label>
+										<input name="email_address" id="email_address" type="text" class="form-control readonly" value="<%= (restaurantSubDetails.email) 	?	restaurantSubDetails.email :''; %>" readonly="true" data-blank-error-message="<%= __('user.please_enter_email') %>" data-email-error-message="<%= __('user.please_enter_valid_email_address') %>"/>
+									</div>
+									<span id="email_address_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line  cursor-not-allowed">
+										<label for="mobile_number" class="control-label"><%= __('user.mobile_number'); %><span class="required"> *</span> </label>
+										<input name="mobile_number" id="mobile_number" type="text" class="form-control readonly" value="<%= (restaurantSubDetails.mobile_number) 	?	restaurantSubDetails.mobile_number :''; %>" readonly="true" data-blank-error-message="<%= __('user.please_enter_mobile_number') %>" data-allowed-pattern="<%= MOBILE_NUMBER_REGULAR_EXPRESSION %>" data-pattern-error-message="<%= __('user.invalid_mobile_number') %>"/>
+									</div>
+									<span id="mobile_number_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line  cursor-not-allowed">
+										<label for="contact_person_name" class="control-label"><%= __('user.contact_person_name'); %><span class="required"> *</span> </label>
+										<input name="contact_person_name" id="contact_person_name" type="text" class="form-control" value="<%= (restaurantSubDetails.contact_person) 	?	restaurantSubDetails.contact_person :''; %>" data-blank-error-message="<%= __('user.please_enter_contact_person_name') %>"/>
+									</div>
+									<span id="contact_person_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line  cursor-not-allowed">
+										<label for="account_manager_name" class="control-label"><%= __('user.account_manager_name'); %><span class="required"> *</span> </label>
+										<input name="account_manager_name" id="account_manager_name" type="text" class="form-control" value="<%= (restaurantSubDetails.account_manager)	? restaurantSubDetails.account_manager :''; %>" data-blank-error-message="<%= __('user.please_enter_account_manager_name') %>"/>
+									</div>
+									<span id="account_manager_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_address" class="control-label">
+											<%= __("user.restaurant_address"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="restaurant_address" class="form-control" name="restaurant_address" value="<%= (restaurantSubDetails.address) 	?	restaurantSubDetails.address :''; %>" data-blank-error-message="<%= __('user.please_enter_restaurant_address') %>"/>
+									</div>
+									<span id="restaurant_address_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="thermal_layout_format" class="control-label">
+											<%= __("user.thermal_layout_format"); %><span class="required"> *</span>
+										</label>
+										<select name="thermal_layout_format" class="form-control" id="thermal_layout_format" data-blank-error-message="<%= __('user.please_select_thermal_layout_format') %>" >
+											<%
+											Object.keys(THERMAL_LAYOUT_FORMAT).map(key=>{ %>
+												<option value="<%=key%>" <%= (thermalLayout == key) ? "selected" :""; %> >
+													<%=THERMAL_LAYOUT_FORMAT[key]%>
+												</option><%
+											});	%>
+										</select>
+									</div>
+									<span id="thermal_layout_format_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_description" class="control-label">
+											<%= __("user.restaurant_description"); %><span class="required"> *</span>
+										</label>
+										<textarea id="restaurant_description" class="form-control" name="restaurant_description" data-blank-error-message="<%= __('user.please_enter_restaurant_description') %>"><%= (restaurantDetails.description) ? restaurantDetails.description :''; %></textarea>
+									</div>
+									<span id="restaurant_description_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<button type="button"  id="update-profile-btn-id"  <%- FRONT_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit"><%= __('system.submit'); %></button>
+
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+
+		/**
+		 * Function to submit form
+		 */
+		$(".btn-submit").click(function(){
+			if(client_side_validation("update-profile")){
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				ajax_submit("update-profile",function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			}
+		});
+	</script>

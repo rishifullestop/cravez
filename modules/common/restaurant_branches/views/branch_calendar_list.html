@@ -1,0 +1,154 @@
+<%
+var result 		= 	(typeof result !== typeof undefined && result) 		?	result 		:[];
+var branchId	=	(typeof branch_id !== typeof undefined && branch_id)?	branch_id 	:"";
+%>
+
+<div class="row pull-right">
+	<div class="col-sm-2">
+		<% if(slug != BURGER_KING && slug != PIZZA_HUT){ %>
+			<a href="<%= originalUrl %>" data-action-url="<%=list_url+'/add_branch_calendar/'+branchId%>" data-open-modal="true" class="action-btn freezed_event hideMe">
+				<button type="button" class="btn btn-sm bg-indigo waves-effect">
+					<%= __("branch_calendar.manage_calendar"); %>
+				</button>
+			</a>
+		<% } %>
+	</div>
+</div>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="body">
+			<table id="datatable-calendar-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+				<thead>
+					<tr>
+						<th width="24%"><%= __("system.status");%></th>
+						<th width="24%"><%= __("branch_calendar.day");%></th>
+						<th width="23%"><%= __("branch_calendar.from");%></th>
+						<th width="23%"><%= __("branch_calendar.to");%></th>
+						<th width="4%"> <%= __("system.action");%> </th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var openStatusObject 	= 	<%- JSON.stringify(OPEN_STATUS)%>;
+	var statusObject 		= 	<%- JSON.stringify(CALENDAR_STATUS)%>;
+	var closeStatusObject 	= 	<%- JSON.stringify(CLOSE_STATUS)%>;
+	var dayListObject 		= 	<%- JSON.stringify(DAY_LIST)%>;
+	var checkboxArray = {};
+	$(document).ready(function() {
+		/** Call to freezed event **/
+		updateFreezedEvent();
+
+		var dataTable = $('#datatable-calendar-listing').DataTable({
+			"order"		: 	[],
+			"sDom"		:	"ftr",
+			"serverSide": 	false,
+			"scrollX"	: 	true,
+			"data"		:	JSON.parse('<%-JSON.stringify(result); %>'),
+			"columns"	: 	[
+				{ 	"data"		:	'status',
+					"orderable"	: 	false,
+					"render" 	: 	function(status){
+						var statusTitle = "";
+						statusObject.map(records=>{
+							if(records.status_id ==  status) statusTitle = records.status_name;
+						});
+						return statusTitle;
+					}
+				},
+				{ 	"data"		: 	{},
+					"orderable"	:	false,
+					"render"	: 	function(result){
+						var type 	= 	(result.type)	?	result.type		:"";
+						var status 	= 	(result.status)	?	result.status	:"";
+						var day 	= 	(result.day)	?	result.day		:"<%=SUNDAY%>";
+
+						var typeTitle = (status == "<%=OPEN%>") ? ((openStatusObject[type] && openStatusObject[type].title)	?	openStatusObject[type].title :"") :((closeStatusObject[type] && closeStatusObject[type].title)	?	closeStatusObject[type].title:"");
+
+						if(status != "<%=OPEN%>"){
+							typeTitle += (dayListObject[day])	?	" ("+dayListObject[day]+")" :"";
+						}
+						return typeTitle;
+					}
+				},
+				{ 	"data"		 : {},
+					"orderable"	 : false,
+					"render"	 : 	function(result){
+						var status 		=	(result.status)		?	result.status		:"";
+						var fromHour 	=	(result.from_hour)	?	result.from_hour	:"00";
+						var fromMinute 	=	(result.from_minute)?	result.from_minute	:"00";
+						var formHtml 	=	"";
+
+						if(status == "<%=OPEN%>"){
+							if(String(fromHour).length ==1) 	fromHour 	=	"0"+fromHour;
+							if(String(fromMinute).length ==1) 	fromMinute 	= 	"0"+fromMinute;
+							formHtml = fromHour+":"+fromMinute;
+						}
+						return formHtml;
+					}
+				},
+				{ 	"data"		 :  {},
+					"orderable"	 : 	false,
+					"render"	 : 	function(result){
+						var status 		=	(result.status)		?	result.status		:"";
+						var toHour 		=	(result.to_hour)	?	result.to_hour		:"00";
+						var toMinute 	=	(result.to_minute)	?	result.to_minute	:"00";
+						var toHtml 		=	"";
+
+						if(status == "<%=OPEN%>"){
+							if(String(toHour).length ==1) 		toHour		= 	"0"+toHour;
+							if(String(toMinute).length ==1) 	toMinute	= 	"0"+toMinute;
+							toHtml = toHour+":"+toMinute;
+						}
+						return toHtml;
+					}
+				},
+				{ 	"data"		: 	"_id",
+					"orderable" : 	false,
+					"render" 	: 	function(id){
+						/*  Delete Link  */
+						var actionBtn = "";
+						<% if(slug != BURGER_KING && slug != PIZZA_HUT){ %>
+							actionBtn =  '<a href="javascript:void(0)" data-id="'+id+'" class="delete-calendar btn bg-red waves-effect ml-5 m-t-5 freezed_event hideMe"><%= __("system.delete"); %></a>';
+						<%}%>
+						return actionBtn;
+					}
+				},
+			],
+			"drawCallback": function( settings ) {
+				/** Call to freezed event **/
+				updateFreezedEvent();
+			},
+			"columnDefs": [
+				{ orderable: false, searchable: false, "targets": [ 4 ] }
+			]
+		});
+
+
+		/** Get area list*/
+		$(document).on('click','.delete-calendar',function(){
+			let calendarId = $(this).attr("data-id");
+
+			if(calendarId){
+				confirmBox("warning",'<%= __("system.are_you_sure"); %>','<%= __("branch_calendar.calendar_delete_comfirm_message"); %>',function(result){
+					if(result){
+						/** Ajax options */
+						var options = {
+							url 	: 	'<%=list_url+'/delete_calendar/'+branchId%>',
+							data	:	{calendar_id: calendarId},
+							method	:	"post"
+						};
+						ajaxRequest(options,function(response){
+							if(response.status && response.message) notice(response.status,response.message);
+							$(".branch-panel-link.active").find("a").trigger("click");
+						});
+					}
+					swal.close();
+				});
+			}
+		});
+	});
+</script>

@@ -1,0 +1,176 @@
+<!--Search Start -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-col-pink">
+				<div class="panel-heading" role="tab" id="panel-heading-id">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							aria-controls="panel-collapse-id">
+							<%= __("system.search"); %>
+							<span class="pull-right collapse-toggle-icon"></span>
+						</a>
+					</h4>
+				</div>
+				<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+					<div class="panel-body">
+						<form id="searchForm" name="searchForm" >
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by name in english -->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('pending_branches.search_by_name_in_arabic'); %>">
+										</div>
+									</div>
+								</div>
+								<!-- Search by name in arabic-->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_2"  onkeyup="searchDatatable(2)" placeholder="<%= __('pending_branches.search_by_name_in_english'); %>">
+										</div>
+									</div>
+								</div>
+								<!-- Search by status -->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" id="column_filter_4"  onChange="searchDatatable(4)" name="branch_status_search">
+												<option value=""><%=__("categories.search_by_status");%></option>
+													<%
+													Object.keys(COMMAN_STATUS_SEARCH_DROPDOWN).map(key=>{
+														if(key != APPROVED && (isRestaurant(module_type) || (!isRestaurant(module_type) && key != REJECTED ))){ %>
+															<option value="<%=key%>">
+																<%= COMMAN_STATUS_SEARCH_DROPDOWN[key].status_name%>
+															</option> <%
+														}
+													}); %>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- reset button -->
+								<div class="col-xs-12 col-sm-2">
+									<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+										<%= __("system.reset")%>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Search End -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%=  __("pending_branches.pending_restaurant_branches"); %>
+				</h2>
+			</div>
+			<div class="body hideScroll">
+				<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="15%"><%= __("pending_branches.branch_number");%></th>
+							<th width="15%"><%= __("pending_branches.name_in_ar");%></th>
+							<th width="15%"><%= __("pending_branches.name_in_en");%></th>
+							<th width="23%"><%= __("pending_branches.address");%></th>
+							<th width="17%"><%= __("system.status");%></th>
+							<th><%= __("system.action"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable	=	"";
+	$(document).ready(function() {
+		/** Refresh bootstrap select box **/
+		$(".show-tick").selectpicker('refresh');
+
+		var COMMAN_STATUS_SEARCH_DROPDOWN = <%- JSON.stringify(COMMAN_STATUS_SEARCH_DROPDOWN) %>;
+		dataTable = $('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{
+					"data"		: 	'branch_number',
+					"orderable"	:	false,
+				},
+				{
+					"data": 'name.ar',
+				},
+				{ 	"data": 'name.en' },
+				{
+					"data": 'address',
+					"orderable"	 : false,
+					"searchable" : false
+				},
+				{
+					"data"			: {},
+					"orderable"		: false,
+					"field_name"	: "status",
+					"field_type"	:	"<%=NUMERIC_FIELD%>",
+					"searchable"	: false,
+					"render": function(result){
+						var status	= (result && result.status)	?	result.status	:	"<%= PENDING %>";
+						var rejectionReason	= (result && result.rejection_reason)	?	result.rejection_reason	:"";
+						var statusTab	=	(COMMAN_STATUS_SEARCH_DROPDOWN[status]) ?	' <span class="label '+COMMAN_STATUS_SEARCH_DROPDOWN[status].class+'">'+COMMAN_STATUS_SEARCH_DROPDOWN[status].status_name+'</span> ': '';
+
+						if(rejectionReason && status == "<%= REJECTED %>"){
+							statusTab +=  '<i class="material-icons font-20 rejection-info-icon" title="'+rejectionReason+'" data-toggle="tooltip" data-placement="left" >info</i>';
+						}
+						return statusTab;
+					}
+				},
+				{
+					"data"			: 	{},
+					"orderable"		:   false,
+					"searchable"	: 	false,
+					"render" 		: 	function(result){
+						var id = (result.branch_id) ? result.branch_id 	:'';
+						var dropDownButton = '<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/view/'+id+'" data-restaurant-url="<%=base_url%>pending_branches/'+id+'" class="action-btn btn bg-indigo waves-effect <%= getPermissionClass(module_type,["branches","branch_details"]); %> "><%= __("pending_branches.branch_details"); %></a>';
+						return dropDownButton;
+					}
+				}
+			],
+			"ajax":{
+				url 	:	"<%=list_url%>",
+				type	: 	"POST",
+				dataSrc	: 	function(result){
+					adjustPermissionsClass();
+					return result.data;
+				}
+			},
+			"drawCallback": function(){
+				$('[data-toggle="tooltip"]').tooltip();
+			}
+		});
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+</script>

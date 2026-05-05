@@ -1,0 +1,111 @@
+<div class="sign_box">
+	<div class="form_section">
+		<figure class="m-b-15"><img src="<%= WEBSITE_IMG_URL %>logo.png" alt="img"></figure>
+		<form id="restaurant_onboarding" data-submit-btn-id="restaurant_onboarding_id" method="post" class="on_click_submit" role="form">
+			<div class="form-group">
+				<label for="restaurant_english_name"><%= __("restaurant_onboarding.restaurant_english_name");%> *</label>
+				<input type="hidden" name="_csrf" value="<%=(typeof csrf_token !== typeof undefined) ? csrf_token : '';%>">
+				<input type="text" class="form-control" name="restaurant_english_name" id="restaurant_english_name" placeholder="<%= __('restaurant_onboarding.restaurant_english_name'); %> *" data-blank-error-message="<%= __('restaurant_onboarding.please_enter_restaurant_name_in_english') %>">
+				<span id="restaurant_english_name_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="restaurant_arabic_name"><%= __("restaurant_onboarding.restaurant_arabic_name");%> *</label>
+				<input type="text" class="form-control" name="restaurant_arabic_name" id="restaurant_arabic_name" placeholder="<%= __('restaurant_onboarding.restaurant_arabic_name');%> *" data-blank-error-message="<%= __('restaurant_onboarding.please_enter_restaurant_name_in_arabic') %>">
+				<span id="restaurant_arabic_name_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="email_address"><%= __("restaurant_onboarding.email_address");%> *</label>
+				<input type="text" class="form-control" name="email_address" id="email_address" placeholder="<%= __('restaurant_onboarding.email_address');%> *" data-blank-error-message="<%= __('restaurant_onboarding.please_enter_restaurant_email_address') %>" data-email-error-message="<%= __('restaurant_onboarding.please_enter_valid_email_address') %>">
+				<span id="email_address_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="contact_number"><%= __("restaurant_onboarding.contact_number");%> *</label>
+				<input type="text" class="form-control" name="contact_number" id="contact_number" placeholder="<%= __('restaurant_onboarding.contact_number');%> *" data-blank-error-message="<%= __('restaurant_onboarding.please_enter_restaurant_contact_number') %>" >
+				<span id="contact_number_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="contact_person_name"><%= __("restaurant_onboarding.contact_person_name");%> *</label>
+				<input type="text" class="form-control" name="contact_person_name" id="contact_person_name" placeholder="<%= __('restaurant_onboarding.contact_person_name');%> *" data-blank-error-message="<%= __('restaurant_onboarding.please_enter_contact_person_name') %>">
+				<span id="contact_person_name_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="account_manager_name"><%= __("restaurant_onboarding.account_manager_name");%> *</label>
+				<input type="text" class="form-control" name="account_manager_name" id="account_manager_name" placeholder="<%= __('restaurant_onboarding.account_manager_name');%> *" data-blank-error-message="<%= __('restaurant_onboarding.please_enter_account_manager_name') %>">
+				<span id="account_manager_name_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="restaurant_address"><%= __("restaurant_onboarding.restaurant_address");%> *</label>
+				<input type="text" class="form-control" name="restaurant_address" id="restaurant_address" placeholder="<%= __('restaurant_onboarding.restaurant_address');%> *" data-blank-error-message="<%= __('restaurant_onboarding.please_enter_restaurant_address') %>">
+				<span id="restaurant_address_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="restaurant_description"><%= __("restaurant_onboarding.restaurant_description");%> </label>
+				<textarea id="restaurant_description" class="form-control p-t-15 no-resize height-100" name="restaurant_description" placeholder="<%= __('restaurant_onboarding.restaurant_description'); %>"></textarea>
+				<span class="message demo-image-copyright col-white">(<%=__("restaurant_onboarding.max_150_characters_allowed")%>)</span>
+				<span id="restaurant_description_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="file_upload"><%= __("restaurant_onboarding.file_upload");%> *</label>
+				<input type="file" data-input="false" name="file" class="form-control jfilestyle" id="file" data-blank-error-message="<%= __('restaurant_onboarding.please_select_file') %>" />
+				<span class='tooltipShow tooltipHelp brand-tooltip onboarding-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('system.extension_message',ALLOWED_RESTAURANT_ONBOARDING_EXTENSIONS.join(', '))%>">
+					<i class="material-icons">info</i>
+				</span>
+				<span id="file_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="restaurant_logo"><%= __("restaurant_onboarding.logo");%> *</label>
+				<input type="file" data-input="false" name="restaurant_logo" class="form-control jfilestyle" id="restaurant_logo" data-blank-error-message="<%= __('restaurant_onboarding.please_select_logo') %>" />
+				<span class='tooltipShow tooltipHelp brand-tooltip onboarding-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('restaurant_onboarding.extension_message',ALLOWED_IMAGE_EXTENSIONS.join(', '))%>">
+					<i class="material-icons">info</i>
+				</span>
+				<span id="restaurant_logo_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="landing_image"><%= __("restaurant_onboarding.landing_image");%> *</label>
+				<input type="file" data-input="false" name="landing_image" class="form-control jfilestyle" id="landing_image" data-blank-error-message="<%= __('restaurant_onboarding.please_select_landing_image') %>" />
+				<span class='tooltipShow tooltipHelp brand-tooltip onboarding-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('restaurant_onboarding.extension_message',ALLOWED_IMAGE_EXTENSIONS.join(', '))%>">
+					<i class="material-icons">info</i>
+				</span>
+				<span id="landing_image_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="detail_image"><%= __("restaurant_onboarding.detail_image");%> *</label>
+				<input type="file" data-input="false" name="detail_image" class="form-control jfilestyle" id="detail_image" data-blank-error-message="<%= __('restaurant_onboarding.please_select_detail_image') %>" />
+				<span class='tooltipShow tooltipHelp brand-tooltip onboarding-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('restaurant_onboarding.extension_message',ALLOWED_IMAGE_EXTENSIONS.join(', '))%>">
+					<i class="material-icons">info</i>
+				</span>
+				<span id="detail_image_error" class="error"></span>
+			</div>
+			<div class="submit_btn">
+				<a href="<%= WEBSITE_URL%>login" ><%= __("forgot_password.back_to_login"); %></a>
+				<button type="button" id="restaurant_onboarding_id" class="btn btn-default btn-submit" <%- FRONT_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+			</div>
+		</form>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_CSS_PATH%>jquery-filestyle.min.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>jquery-filestyle.min.js"></script>
+	<script type="text/javascript">
+	/**
+	 * Function to submit form
+	*/
+	$(".btn-submit").click(function(){
+		if(client_side_validation("restaurant_onboarding")){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("restaurant_onboarding",function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		}
+	});
+	//$('[data-toggle="tooltip"]').tooltip({ container: 'body' });
+	//$('[data-toggle="tooltip"]').tooltip({ boundary: 'window' });
+	//$('[data-toggle="tooltip"]').tooltip({placement:"auto"});
+
+</script>

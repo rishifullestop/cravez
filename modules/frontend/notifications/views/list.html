@@ -1,0 +1,166 @@
+<div class="container-fluid">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by user name -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="search_by_user_name" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('notifications.search_by_user_name'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by message -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="search_by_message" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('notifications.search_by_message'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by created date -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="search_by_created_date" id="date-range-picker" placeholder="<%= __('notifications.search_by_created_date'); %>">
+												<input class="form-control hide" id="from_date" type="text" name="from_date">
+												<input class="form-control hide" id="to_date" type="text" name="to_date">
+											</div>
+										</div>
+									</div>
+									<!-- datatable reset -->
+									<div class="col-xs-12 col-sm-2">
+										<div class="form-group">
+											<button type="button" id="reset" class="btn btn-danger btn-sm waves-effect"><%= __("system.reset")%></button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("notifications.notifications"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="25%"><%= __("notifications.user_name"); %></th>
+								<th width="55%"><%= __("notifications.message"); %></th>
+								<th><%= __("notifications.received_on"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+
+<%-contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable ="";
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem('DataTables', JSON.stringify(oData));
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse(localStorage.getItem('DataTables'));
+				},
+				"order"		: [[2, "desc"]],
+				"sDom"		: "ltipr",
+				"serverSide": true,
+				"scrollX"	: true,
+				"lengthMenu": PAGING_LENGTH_MENU,
+				"columns"	: [
+					{
+						"data"		: {},
+						"field_name":'created_by_name',
+						"orderable"	: false,
+						"render" 	: function(result){
+							var userId   	  	= (result.created_by) 			?	result.created_by:'';
+							var createdByName 	= (result.created_by_name)		? 	result.created_by_name:'';
+							var createdRoleId 	= (result.created_role_id)		? 	result.created_role_id:'';
+							var extraParameters = (result.extra_parameters)		? 	result.extra_parameters:{};
+							var userType 		= (extraParameters.user_type)	? 	extraParameters.user_type:"";
+							return	generateUserLink(createdByName,userId,createdRoleId,userType);
+						}
+					},
+					{
+						"data"		:	{},
+						"field_name":	'message',
+						"orderable" : 	false,
+						"render" 	: 	function(result){
+							var message	=	(result.message)	?	result.message	:"";
+							var url		=	(result.url)		?	result.url		:"";
+							if(url && url.indexOf('javascript') == -1){
+								message = '<a href="<%=WEBSITE_URL%>'+url+'" target="_blank">'+message+'</a>';
+							}
+							return message;
+						}
+					},
+					{
+						"data"			: 'created',
+						"searchable"	: false,
+						"render" 		: function(created){
+							return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+						}
+					},
+				],
+				"ajax":{
+					url 	: 	"<%=WEBSITE_URL%>notifications",
+					type	: 	"POST",
+					data	:	function(d){
+						d.fromDate 	= $('#from_date').val();
+				        d.toDate 	= $('#to_date').val();
+					},
+					dataSrc	: function(res){
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+		var maxDate 				= new Date();
+		var DATE_RANGE_OPEN_SIDE 	= "left";
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_JS_PAGE_PATH %>date_range_picker/config.js"></script>

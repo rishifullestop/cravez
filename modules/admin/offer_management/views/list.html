@@ -1,0 +1,276 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by title in english -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.offer_management.search_by_title_in_english'); %>" name="title_in_english">
+											</div>
+										</div>
+									</div>
+									<!-- Search by title in arabic -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('admin.offer_management.search_by_title_in_arabic'); %>" name="title_in_arabic">
+											</div>
+										</div>
+									</div>
+									<!-- Search by valid till-->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="valid_till" class="form-control" placeholder="<%= __('admin.offer_management.search_by_valid_till'); %>"  id="date-range-picker"  name="search_by_valid_till" autocomplete="off">
+											</div>
+											<span id="valid_till_error" class="error model_select_error"></span>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- Search by Status -->
+									<div class="col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="status" id="column_filter_6" onchange="searchDatatable(6)" name="status">
+													<option value=""><%=__("admin.offer_management.search_by_status");%></option>
+													<%
+													if(GLOBAL_STATUS_SEARCH_DROPDOWN && Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).length > 0){
+														Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).map(searchStatus=>{ %>
+															<option value="<%=searchStatus%>"><%=(GLOBAL_STATUS_SEARCH_DROPDOWN[searchStatus]["status_name"]) ? GLOBAL_STATUS_SEARCH_DROPDOWN[searchStatus]["status_name"] :"";%></option>
+														<% 	});
+													} %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by offer code -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_2"  onkeyup="searchDatatable(2)" placeholder="<%= __('admin.offer_management.search_by_offer_code'); %>" name="offer_code">
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" data-href="<%=admin_list_url%>">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.offer_management.offer_management"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li class="<%= getPermissionClass(module_type,['offer','add'])%>">
+							<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.offer_management.add_offer"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="15%"><%= __("admin.offer_management.title_in_english");%></th>
+								<th width="15%"><%= __("admin.offer_management.title_in_arabic");%></th>
+								<th><%= __("admin.offer_management.offer_code");%></th>
+								<th><%= __("admin.offer_management.valid_till");%></th>
+								<th><%= __("admin.offer_management.total_redeemption");%></th>
+								<th><%= __("admin.offer_management.offer_status");%></th>
+								<th><%= __("admin.system.status");%></th>
+								<th><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link  href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css" rel="stylesheet">
+	<link href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link href='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' rel='stylesheet' type='text/css'>
+
+<%- contentFor("script") %>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js'></script>
+	<script src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js" type="text/javascript"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>jquery-filestyle.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable	  	=	"";
+		var statusObject  	=  <%- JSON.stringify(GLOBAL_STATUS_SEARCH_DROPDOWN)%>;
+		var dateFormatHtml	=  '<%=DATE_FORMAT_HTML%>';
+		var offerStatus 	=  <%- JSON.stringify(OFFER_STATUS)%>;
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ "data":"title.en" },
+					{ "data":"title.ar" },
+					{ "data":"offer_code"},
+					{
+						"data"	 	 : 	{},
+						"orderable"	 :  false,
+						"searchable" : 	false,
+						"render"	 : 	function(result){
+							var validFrom = (result.valid_from) ? result.valid_from : "";
+							var validTo   = (result.valid_to)   ? result.valid_to   : "";
+							return moment(validFrom).tz(DEFAULT_TIME_ZONE).format(dateFormatHtml)+" - "+moment(validTo).tz(DEFAULT_TIME_ZONE).format(dateFormatHtml) ;
+						}
+					},
+					{
+						"data"	 	 : 	{},
+						"searchable" : 	false,
+						"orderable"	 :  false,
+						"render"	 : 	function(result){
+							var id 				 =	(result._id)			   ? result._id 		 	   :'';
+							var totalRedeem 	 = (result.total_redeem)       ? result.total_redeem       : 0;
+							var totalRedeemCount = (result.total_redeem_count) ? result.total_redeem_count : 0;
+							return (!totalRedeem) ? '<a  href="<%=WEBSITE_ADMIN_URL%>orders?offer_id='+id+'" target="_blank" class="reset_storage waves-effect waves-block <%= getPermissionClass(module_type,["orders","list"])%>">'+
+								totalRedeemCount+'</a>' : '<a  href="<%=WEBSITE_ADMIN_URL%>orders?offer_id='+id+'" target="_blank" class="reset_storage waves-effect waves-block <%= getPermissionClass(module_type,["orders","list"])%>">'+
+									totalRedeemCount+" / "+totalRedeem+'</a>';
+						}
+					},
+					{
+						"data"			: 	"status",
+						"orderable"	 	:   false,
+						"searchable" 	: 	false,
+						"field_type"	:   "<%= NUMERIC_FIELD %>",
+						"render"		: 	function(status){
+							var statusClass		=	(offerStatus[status] && offerStatus[status]["label_class"]) ? offerStatus[status]["label_class"] :"";
+							var statusLabel		=	(offerStatus[status] && offerStatus[status]["status_name"]) ? offerStatus[status]["status_name"] :"";
+							return '<span class="label '+statusClass+'">'+statusLabel+'</span>';
+						}
+					},
+					{
+						"data"			: 	"is_active",
+						"orderable"	 	:  false,
+						"field_type"	:   "<%= NUMERIC_FIELD %>",
+						"render"		: 	function(active){
+							var statusClass		=	(statusObject[active] && statusObject[active]["label_class"]) ? statusObject[active]["label_class"] :"";
+							var statusLabel		=	(statusObject[active] && statusObject[active]["status_name"]) ? statusObject[active]["status_name"] :"";
+							return '<span class="label '+statusClass+'">'+statusLabel+'</span>';
+						}
+					},
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+							var id 				=	(result._id)		? 	result._id 		 :'';
+							var status			=	(result.is_active)	? 	result.is_active :'<%= DEACTIVE %>';
+							var offerStatus 	=   (result.status)     ?   result.status 	 : '<%=OFFER_PUBLISHED%>';
+							var hideEditButton  =   (offerStatus != '<%=OFFER_PUBLISHED%>') ? 'hide' : '';
+
+							/** Status link text, title and  link icon **/
+							var statusLinkText  =	(status == '<%= DEACTIVE %>') ? "<%= __('admin.system.active'); %>"			   :"<%= __('admin.system.deactive'); %>";
+							var statusLinkTitle	=  	(status == '<%= DEACTIVE %>') ? "<%= __('admin.system.click_to_activate'); %>" :"<%= __('admin.system.click_to_deactivate'); %>" ;
+							var statusLinkIcon  =	(status == '<%= DEACTIVE %>') ?	"done"	 : "block";
+							var buttonColor		=   (status == '<%= DEACTIVE %>') ?	"bg-blue": "bg-red";
+
+							var dropDownButton 		=	''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %> '+
+									'<span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a  href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/'+id+'" data-open-modal="true" class="action-btn waves-effect waves-block '+hideEditButton+' <%= getPermissionClass(module_type,["offer","edit"])%>">'+
+											' <%= __("admin.system.edit"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Redeem offer Link **/
+									'<li>'+
+										'<a  href="<%=WEBSITE_ADMIN_URL%>orders?offer_id='+id+'" target="_blank" class="waves-effect waves-block <%= getPermissionClass(module_type,["orders","list"])%>">'+
+											' <%= __("admin.offer_management.redeem_offer"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Status Link **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/update-status/'+id+'/'+status+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["offer","active_deactive"])%>" data-confirm-message="<%= __("admin.offer_management.do_you_want_to_change_status_of_this_offer"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+statusLinkTitle+'">'+
+											statusLinkText+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+
+							return dropDownButton;
+						}
+					}
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>?offer_type=<%=offer_type%>",
+					type	: 	"POST",
+					data    :   function(d){
+						d.from_date = $('#from_date').val();
+						d.to_date   = $('#to_date').val();
+					},
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

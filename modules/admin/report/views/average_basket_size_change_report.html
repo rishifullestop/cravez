@@ -1,0 +1,320 @@
+    <div class="container-fluid" id="main-container">
+        <!--Search Start -->
+        <div class="row clearfix">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-col-pink">
+                        <div class="panel-heading" role="tab" id="panel-heading-id">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-target="#panel-collapse-id"
+                                    data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+                                    aria-controls="panel-collapse-id">
+                                    <%= __("admin.system.search"); %>
+                                        <span class="pull-right collapse-toggle-icon"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel"
+                            aria-labelledby="panel-heading-id">
+                            <div class="panel-body">
+                                <form id="searchForm" name="searchForm">
+                                    <div class="row clearfix dataTables_wrapper">
+                                        <!-- Search by report type -->
+                                        <div class="col-xs-12 col-sm-4">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <select class="form-control show-tick type" id="type" name="type">
+                                                        <% if(REPORT_TYPE && Object.keys(REPORT_TYPE).length> 0){
+                                                            Object.keys(REPORT_TYPE).map(type=>{
+                                                                %>
+                                                                <option value="<%=type%>" >
+                                                                    <%=(REPORT_TYPE[type]) ? REPORT_TYPE[type] :"";%>
+                                                                </option>
+                                                            <%}); }%>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Search by year -->
+                                        <div class="col-xs-12 col-sm-4">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <select class="form-control show-tick " id="graph_year"
+                                                        name="graph_year" multiple
+                                                        data-title="<%=__('admin.report.search_by_year')%>">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Search by month -->
+                                        <div class="col-xs-12 col-sm-4">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <select class="form-control show-tick disabled" id="graph_month"
+                                                        name="graph_month" multiple
+                                                        data-title="<%=__('admin.report.search_by_month')%>" disabled>
+                                                        <% for(var i=1; i<=12 ; i++){%>
+                                                            <option value="<%=i%>">
+                                                                <%= monthNames[i]%>
+                                                            </option>
+                                                            <%}%>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Search by restaurant name -->
+                                        <div class="col-xs-12 col-sm-4">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <select class="form-control show-tick restaurant_id" name="search_restaurant_id" id="restaurant_id"
+                                                        data-live-search="true">
+                                                        <option value="">
+                                                            <%= __("admin.report.search_by_restaurant_name"); %>
+                                                        </option>
+                                                        <%-restaurant_list%>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- reset button -->
+                                        <div class="col-sm-4">
+                                            <button type="button" id="reset_btn" class="btn btn-sm waves-effect btn-danger"
+                                                data-href="<%= admin_list_url%>/average_basket_size_change_report">
+                                                <%= __("admin.system.reset")%>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Search End -->
+
+        <div class="row clearfix">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>
+                            <%= __("admin.report.average_basket_size_change_report"); %>
+                        </h2>
+                        <ul
+                            class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['average_basket_size_change_report','export']); %>">
+                            <li>
+                                <a href="javascript:void(0);" id="dataExportBtn">
+                                    <button type="button" class="btn btn-sm bg-green waves-effect">
+                                        <%= __("admin.report.export")%>
+                                    </button>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="body">
+                        <div id="avg_basket_size_change_mom" class="p-b-20">
+                            <h4 class='text-center'>
+                                <%= __('admin.report.no_data_available')%>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- contentFor('css') %>
+        <link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+        <%- contentFor("script") %>
+            <script type="text/javascript"
+                src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+            <script type="text/javascript">
+                google.charts.load("current", { "packages": ["line"] });
+
+                $(document).ready(function () {
+                    google.charts.setOnLoadCallback(drawChart);
+                });
+                $("#type").change(function () {
+                    $("#graph_month").val('');
+                    $("#graph_year").val('');
+                    $("#restaurant_id").val('');
+                    if($("#type").val()== "<%=MONTH%>"){
+                        $("select[name='graph_year']").removeAttr("multiple");
+                        $("select[name='graph_year']").attr("disabled", false).removeClass("disabled");
+                        $("select[name='search_restaurant_id']").attr("disabled", false).removeClass("disabled");
+                        $("select[name='graph_month']").attr("disabled", false).removeClass("disabled");
+                    } else if($("#type").val() == "<%=YEAR%>"){
+                        $("select[name='graph_year']").attr("multiple", true);
+                         $("select[name='graph_year']").attr("disabled", false).removeClass("disabled");
+                         $("select[name='search_restaurant_id']").attr("disabled", false).removeClass("disabled");
+                        $("select[name='graph_month']").attr('disabled', true).addClass("disabled");
+                    } else{
+                        $("select[name='graph_month']").attr('disabled', true).addClass("disabled");
+                        $("select[name='search_restaurant_id']").attr('disabled', true).addClass("disabled");
+                        $("select[name='graph_year']").attr('disabled', true).addClass("disabled");
+                    }
+                    $(".show-tick").selectpicker('refresh');
+                    drawChart();
+                });
+
+                $("#graph_year,#restaurant_id, #graph_month").change(function () {
+                    if ($("#graph_year").val() === null && $("#type").val() == "<%=YEAR%>") {
+                        $("#graph_month").val('');
+                        $("select[name='graph_month']").attr('disabled', true).addClass("disabled");
+                    } else if($("#graph_year").val() != "" && $("#type").val() == "<%=YEAR%>") {
+                         $("#graph_month").val('');
+                        $("select[name='graph_month']").attr('disabled', true).addClass("disabled");
+                    } else if($("#graph_year").val() != "" && $("#type").val() == "<%=MONTH%>"){
+                        $("select[name='graph_month']").attr("disabled", false).removeClass("disabled");
+                    }
+                    $(".show-tick").selectpicker('refresh');
+                    drawChart();
+                });
+
+                function drawChart() {
+                    var restaurantId = $("#restaurant_id").val();
+                    if ($("#graph_year").val()) {
+                        if ($("#graph_month").val()) {
+                            var requestOptions = {
+                                url: "<%= admin_list_url%>/average_basket_size_change_report",
+                                method: "post",
+                                data: { years: $("#graph_year").val(), months: $("#graph_month").val(), restaurant_id: restaurantId }
+                            };
+                            $("#avg_basket_size_change_mom").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_ADMIN_IMG_URL%>pagination_loader.gif" /></div>');
+                            ajaxRequest(requestOptions, function (response) {
+                                if (response.months.length > 0) {
+                                    var data = new google.visualization.DataTable();
+                                    data.addColumn("string", "Day");
+                                    response.months.map(rec => {
+                                        data.addColumn("number", rec);
+                                    });
+
+                                    data.addRows(response.result);
+
+                                    var options = {
+                                        width   : 900,
+                                        height  : 500,
+                                        axes    : {
+                                            x: {
+                                                0: { side: "bottom" }
+                                            }
+                                        },
+                                        legend: { position: "top" },
+                                    };
+                                    var chart = new google.charts.Line(document.getElementById("avg_basket_size_change_mom"));
+                                    chart.draw(data, google.charts.Line.convertOptions(options));
+                                } else {
+                                    $("#avg_basket_size_change_mom").html("<h4 class='text-center'> <%= __('admin.report.no_data_available')%></h4>");
+                                }
+                            });
+
+                        } else {
+                            var requestOptions = {
+                                url     : "<%= admin_list_url%>/average_basket_size_change_report",
+                                method  : "post",
+                                data    : { years: $("#graph_year").val(), restaurant_id: restaurantId }
+                            };
+                            $("#avg_basket_size_change_mom").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_ADMIN_IMG_URL%>pagination_loader.gif" /></div>');
+                            ajaxRequest(requestOptions, function (response) {
+                                if (response.years.length > 0) {
+                                    var data = new google.visualization.DataTable();
+                                    data.addColumn("string", "Month");
+                                    response.years.map(rec => {
+                                        data.addColumn("number", rec);
+                                    });
+
+                                    data.addRows(response.result);
+
+                                    var options = {
+                                        width   : 900,
+                                        height  : 500,
+                                        axes    : {
+                                            x: {
+                                                0: { side: "bottom" }
+                                            }
+                                        },
+                                        legend: { position: "top" },
+                                    };
+                                    var chart = new google.charts.Line(document.getElementById("avg_basket_size_change_mom"));
+                                    chart.draw(data, google.charts.Line.convertOptions(options));
+                                } else {
+                                    $("#avg_basket_size_change_mom").html("<h4 class='text-center'> <%= __('admin.report.no_data_available')%></h4>");
+                                }
+                            });
+                        }
+                    } else {
+                        $("#avg_basket_size_change_mom").html("<h4 class='text-center'> <%= __('admin.report.no_data_available')%></h4>");
+                    }
+
+                }
+
+                var MIN_YEAR_FOR_REPORT = parseInt("<%=MIN_YEAR_FOR_REPORT%>");
+                function getYearDropdown() {
+                    var currentYear = new Date().getFullYear();
+                    var yearsOption = "";
+                    for (yearValue = currentYear; yearValue >= MIN_YEAR_FOR_REPORT; yearValue--) {
+                        yearsOption = '<option value="' + yearValue + '">' + yearValue + '</option>';
+                        $("#graph_year").append(yearsOption);
+                    }
+                    $("#graph_year").val(currentYear);
+			        $("#graph_year").selectpicker("refresh");
+                };
+                getYearDropdown();
+
+                /**
+		        * Get dropdown value by local storage
+		        */
+                let tempType    =  "";
+		        if (localStorage["search_" + window.location.pathname]) {
+        			let searchFormData = JSON.parse(localStorage["search_" + window.location.pathname]);
+                    for(index in searchFormData){
+                        if (searchFormData[index].name && searchFormData[index].name == "type" && searchFormData[index].value) {
+                            tempType = searchFormData[index].value;
+                        }
+                    }
+
+                    if(searchFormData[index].name && searchFormData[index].name == "graph_year" && searchFormData[index].value){
+                        $("#graph_year").val(searchFormData[index].value);
+                        $("#graph_year").selectpicker("refresh");
+                    }
+
+    			    if (tempType == '<%=MONTH%>') {
+                        $("select[name='graph_month']").attr("disabled", false).removeClass("disabled");
+                        $("select[name='graph_year']").attr("disabled", false).removeClass("disabled");
+                        $("select[name='search_restaurant_id']").attr("disabled", false).removeClass("disabled");
+                        $(".show-tick").selectpicker('refresh');
+                    }
+                    if (tempType == '<%=YEAR%>') {
+                        $("select[name='graph_year']").attr("disabled", false).removeClass("disabled");
+                        $("select[name='search_restaurant_id']").attr("disabled", false).removeClass("disabled");
+                        $(".show-tick").selectpicker('refresh');
+                    }
+                }
+
+                $(document).on("click", "#reset_btn", function (e) {
+                    var linkHref    = $(this).attr("data-href");
+                    var anchorHref  = linkHref.replace(WEBSITE_URL, "").split("?")[0];
+                    localStorage.removeItem("search_/" + anchorHref);
+                    localStorage.removeItem("search_" + linkHref);
+                    window.location.reload();
+                });
+
+                /**
+                * Export Details action
+                *
+                * @param  null
+                *
+                * @return void
+                */
+                $(document).on("click", "#dataExportBtn", function () {
+                    var years       = $("#graph_year").val();
+                    var restaurantId= $("#restaurant_id").val();
+                    var months      = $("#graph_month").val();
+                    var exportURL   = "<%=admin_list_url%>/average_basket_size_change_report/export_data?years=" + years;
+                    if(months) exportURL+="&months="+months;
+                    if (restaurantId) exportURL += "&restaurant_id=" + restaurantId;
+                    window.location.href = exportURL;
+                });
+            </script>
+            <script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

@@ -1,0 +1,159 @@
+<%
+	var extraItemList 		= (typeof extra_items_list !== typeof undefined && extra_items_list) ? extra_items_list : [];
+	var selectedExtraItems  = (typeof selected_extra_items !== typeof undefined && selected_extra_items) ?	selected_extra_items : [];
+	var choiceGroupId 		= choice_group_id;
+	var itemStatus			= (item_detail && item_detail.status) ? item_detail.status : "";
+	var flag				= flag;
+%>
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <form action="<%=list_url+"/add_extra/"+choiceGroupId%>" data-modal-id="form_modal" id="select_extra_item_form" data-submit-btn-id="select_extra_item_btn"
+            method="post" class="on_click_submit" role="form">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-seperator p-l-20 p-b-0">
+                        <h2 class="modal-title">
+                            <%= __("choice_group.select_extra_items"); %>
+                        </h2>
+                    </div>
+                    <div class="modal-body padding-20 scroll-body">
+                        <div class="row clearfix">
+                            <div class="col-sm-12 body">
+								<table id="datatable-select-extra-items" class="row-border full-length-header hover table table-bordered cb-data-table datatable"
+                                    cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <div class="materialize_checkbox list-checkbox">
+                                                    <div class="checkbox_wrapper">
+                                                        <input class="filled-in chk-col-pink " id="list-checkbox-head" type="checkbox">
+                                                        <label for="list-checkbox-head" class="checkbox list-checkbox p-l-20"></label>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <th><%= __("choice_group.extra_item_name_in_english");%></th>
+											<th><%= __("choice_group.extra_item_unit_id");%></th>
+										</tr>
+                                    </thead>
+                                    <tbody> <%
+										extraItemList.map((record, index)=>{ %>
+											<tr>
+												<td>
+													<div class="materialize_checkbox list-checkbox m-t-5">
+														<div class="checkbox_wrapper">
+															<%
+																let extraItemId = (record._id) ? record._id : "";
+																let found  		= false;
+
+																selectedExtraItems.map(element=>{
+																	if( String(element.item_extra_id) == String(extraItemId))  found = true;
+																});
+
+															%>
+															<input class="filled-in chk-col-pink list-checkbox-input" <%= (found) ? "checked" : "";%> id="list-checkbox-<%=index%>" name="extra_item_id[]" type="checkbox" value="<%=extraItemId%>">
+															<label for="list-checkbox-<%=index%>" class="checkbox list-checkbox p-l-20"></label>
+														</div>
+													</div>
+												</td>
+												<td><%=(record.name) ? record.name.en : ""%></td>
+												<td><%=(record.item_unit) ? record.item_unit : ""%></td>
+											</tr>
+                                       <% }); %>
+                                    </tbody>
+                                </table>
+                                <span id="extra_item_id_error" class="error model_select_error"></span>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<% if(itemStatus != IN_REVIEW || !isRestaurant(module_type)) { %>
+							<button type="button" id="select_extra_item_btn" class="btn bg-brown btn-sm waves-effect btn-submit <%=(flag) ? 'hide' : ''%>" <%- ADMIN_LOADING_TEXT %>>
+								<%= __("system.submit"); %>
+							</button>
+						<% } %>
+                        <a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');">
+                            <button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		if($('.checkbox_wrapper').find('.list-checkbox-input').length <= 0){
+			$('.list-checkbox-input').prop('checked',false);
+		}
+		/* for initialization of modal datatable */
+		var dataTable = $('#datatable-select-extra-items').DataTable({
+			"order"     :   [],
+			"sDom"      :    "ftr",
+			"serverSide":   false,
+			"scrollX"   :   false,
+			"paging"	:	false,
+			"columnDefs": [
+				{ orderable: false, "targets": [ 0 ] }
+			]
+		});
+
+		/** for check all checkboxes functionality */
+		$('#list-checkbox-head').on('click', function(){
+			if($(this).is(':checked')){
+				$('.checkbox_wrapper').find('input:checkbox').prop('checked', true);
+			}else{
+				$('.checkbox_wrapper').find('input:checkbox').prop('checked', false);
+			}
+		});
+
+		/** when all list checkboxes checked then head checkbox automatically check */
+		$(document).on('click', '.list-checkbox-input', function(e){
+			let totalCheckbox   =   $('.list-checkbox-input').length;
+			let checkedChekboxes=   $('.list-checkbox-input:checked').length;
+			let selectAll       =   (totalCheckbox == checkedChekboxes) ? true : false;
+			$("#list-checkbox-head").prop("checked",selectAll);
+		});
+
+		/** If extras list get on item details page then checkbox disabled */
+		if(<%=flag%> || (<%=itemStatus == IN_REVIEW%> && <%=isRestaurant(module_type)%>)){
+			$('.checkbox_wrapper').find('input:checkbox').prop("disabled",true);
+		}
+	});
+
+	/** on page ready all checkboxes checked then top header checkbox automatically check */
+	if ($('.checkbox_wrapper').find('.list-checkbox-input').length > 0 && $('.list-checkbox-input').length == $('.list-checkbox-input:checked').length) {
+		$('#list-checkbox-head').prop('checked', true);
+	}
+
+	/** For save checked checkboxes data  */
+	$(".btn-submit").click(function () {
+		var btnId = $(this).attr("id");
+		function submitForm(){
+			startTextLoading(btnId);
+			ajax_submit("select_extra_item_form", function (status, response) {
+				if (status) {
+					$("#reset").trigger("click");
+				} else {
+					stopTextLoading(btnId);
+				}
+			});
+		}
+		<% if(isRestaurant(module_type)){ %>
+			confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("choice_group.choice_group_add_comfirm_message"); %>',function(result){
+				if(result){
+					submitForm();
+				}
+				swal.close();
+			});
+		<% }else{ %>
+			submitForm();
+		<% } %>
+	});
+
+	$(".scroll-body").mCustomScrollbar({
+		theme:"dark-3",
+		mouseWheelPixels: 300
+	});
+</script>

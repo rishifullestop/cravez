@@ -1,0 +1,182 @@
+<%
+	var result 		= (typeof result !== typeof undefined && result) ?	result :{};
+	var isEditable 	= is_editable;
+	var shiftId 	= result._id;
+	var formUrl 	= (result && isEditable) ? admin_list_url+"/edit/"+shiftId : admin_list_url+"/add";
+	var fromDate	= (result.date) ? newDate(result.date,DATABASE_DATE_FORMAT) : newDate("",DATABASE_DATE_FORMAT);
+	var toDate		= (result.date) ? newDate(result.date,DATABASE_DATE_FORMAT) : newDate("",DATABASE_DATE_FORMAT);
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form data-modal-id="form_modal" id="add-shift" data-submit-btn-id="shift-add-btn-id" method="post" action="<%=formUrl%>" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%=  __("admin.driver_shifts.assign_shift"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="shift_name" class="control-label">
+											<%= __("admin.driver_shifts.shift_name"); %><span class="required"> *</span>
+										</label>
+										<select id="shift_name" class="form-control show-tick" name="shift_name"  data-live-search="true" data-title="<%- __('admin.driver_shifts.select_shift')%>" multiple>
+											<%
+												let allShiftIds = (result.all_shift_ids) ? result.all_shift_ids :((result.shift_id) ? result.shift_id : []);
+												if(shift_list.length > 0){
+													shift_list.map(records=>{
+														let selectedText = "";
+														allShiftIds.map(tmpId=>{
+															if(String(tmpId) == String(records._id)){
+																selectedText = "selected";
+															}
+														});  %>
+														<option value="<%= records._id%>" <%= selectedText %>><%= records.shift_name+' ('+set24HourFormat(records.start_time)+'-'+set24HourFormat(records.end_time)+')'%></option><%
+													});
+												}
+											%>
+										</select>
+									</div>
+									<span id="shift_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="leave_date" class="control-label">
+											<%=  __('admin.driver_shifts.shift_date'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control" id="shift-date-range-picker" value="<%=fromDate+' - '+toDate%>" <%= (isEditable) ? 'disabled' : '' %>>
+									</div>
+									<input class="form-control hide" id="shift_from_date" type="text" name="from_date" value="<%=fromDate%>">
+									<input class="form-control hide" id="shift_to_date" type="text" name="to_date" value="<%=toDate%>">
+									<span id="shift_date_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="user_name" class="control-label">
+											<%= __("admin.driver_shifts.driver_name"); %><span class="required"> *</span>
+										</label>
+										<select id="user_name" class="form-control show-tick" name="user_name" data-live-search="true" data-title="<%- __('admin.driver_shifts.select_captains')%>" multiple>
+											<%-users_list%>
+										</select>
+									</div>
+									<span id="user_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="city_id" class="control-label">
+											<%=  __('admin.driver_shifts.city'); %><span class="required"> *</span>
+										</label>
+										<select id="city_id" class="form-control show-tick" name="city_id"  data-live-search="true">
+											<option value=""><%- __('admin.driver_shifts.select_city')%></option>
+											<%-cities%>
+										</select>
+									</div>
+									<span id="city_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="area_list" class="control-label">
+											<%= __("admin.driver_shifts.areas"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" name="area_id" id="area_id" data-live-search="true">
+											<option value=''><%=__('admin.driver_shifts.select_area');%></option>
+										</select>
+									</div>
+									<span id="area_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="shift-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){
+		if('<%= is_editable %>'){
+			var cityId		 = '<%= (result.city_id) ? result.city_id : ""; %>';
+			getArea(cityId);
+		}
+
+		/*
+		 *	Function to submit form
+		 */
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('add-shift',function(status,response){
+				if(status){
+					$('#form_modal').modal("hide");
+					if(response.status && response.message) notice(response.status,response.message);
+					getListing();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	});
+
+	/**
+	 * Function to get area list
+	 */
+	$('#city_id').on('change', function() {
+		var cityId	=	$(this).val();
+		getArea(cityId);
+	});
+
+	/** function to get areas by city id*/
+	function getArea(cityId){
+		var firstOptions = "<option value=''><%=__('admin.area_blocks.select_area');%></option>";
+		var areaId		 = '<%= (result.area_id) ? result.area_id : ""; %>';
+		if(cityId){
+			var options = {
+				url 	: "<%=admin_list_url%>/area_list",
+				data	: {city_id : cityId,area_id:areaId},
+				method	: "post"
+			}
+			ajaxRequest(options,function(response){
+				if(response.status == "success"){
+					$("#area_id").html(firstOptions+response.area_list);
+					$(".show-tick").selectpicker('refresh');
+				}
+			});
+		}
+	}
+
+	/**
+	 * Function for date range picker
+	 */
+	var fromDateInput 	= '#shift_from_date';
+	var toDateInput 	= '#shift_to_date';
+	var datePickerInput = '#shift-date-range-picker';
+	var stopTableDraw   = true;
+	var minDate			= new Date();
+	$(document).ready(function(){
+		initDateRangePicker();
+	});
+
+	$(".show-tick").selectpicker('refresh');
+</script>

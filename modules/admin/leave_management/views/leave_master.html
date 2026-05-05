@@ -1,0 +1,114 @@
+<%
+    var leaveResult     =   leave_result;
+    var leaveTypeList   =   leave_type_list;
+%>
+<div class="container-fluid" id="main-container">
+    <div class="row clearfix">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        <%= __('admin.leave_management.vacation_balance'); %>
+                    </h2>
+                </div>
+                <div class="body">
+                    <form id="add-leave" data-submit-btn-id="leave-add-btn-id" method="post" class="on_click_submit" role="form">
+                        <%
+                        leaveTypeList.map(records=>{
+                            var leave           =   "";
+                            var frequency       =   "";
+                            var leaveType       =   records._id;
+                            var leaveTypeTitle  =   records.title;
+                            var attributeId     =   records.attribute_id;
+
+                                /** Get db values **/
+                                if(leaveResult.length > 0){
+                                    leaveResult.map(leaveRecords=>{
+                                        if(String(leaveRecords.type) == String(attributeId)){
+                                            leave      =   leaveRecords.leaves;
+                                            frequency  =   leaveRecords.frequency;
+                                        }
+                                    });
+                                }%>
+                                <div class="row clearfix">
+                                    <div class="col-sm-4 m-b-0">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <label for="type" class="control-label">
+                                                    <%= __("admin.leave_management.type"); %>
+                                                    <span class="required"> *</span>
+                                                </label>
+                                                <input type="hidden" name="data[<%=leaveType%>][type]" value="<%=attributeId%>"/>
+                                                <select name="data[<%=leaveType%>][type]" disabled id="frequency" class="form-control">
+                                                    <option value="<%=leaveType%>"><%=leaveTypeTitle%></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 m-b-0">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <label for="frequency" class="control-label">
+                                                    <%= __("admin.leave_management.frequency"); %>
+                                                    <span class="required"> *</span>
+                                                </label>
+                                                <select name="data[<%=leaveType%>][frequency]" id="frequency" class="form-control">
+                                                    <option value=""><%= __('admin.leave_management.select_frequency');%></option>
+                                                    <%
+                                                        Object.keys(FREQUENCY).map(frequencyType=>{
+                                                            var selected = (frequencyType == frequency) ? "selected" :"";
+                                                            %>
+                                                                <option value="<%=frequencyType%>"<%=selected%>><%= FREQUENCY[frequencyType]%></option>
+                                                            <%
+                                                        });
+                                                    %>
+                                                </select>
+                                            </div>
+                                            <span id="frequency_<%=leaveType%>_error" class="error"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 m-b-0">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <label for="leaves" class="control-label"><%= __('admin.leave_management.leaves'); %><span class="required"> *</span> </label>
+                                                <input name="data[<%=leaveType%>][leaves]" id="leaves" type="text" class="form-control" value="<%=leave%>"/>
+                                            </div>
+                                            <span id="leaves_<%=leaveType%>_error" class="error"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr><%
+                            });
+                        %>
+                        <button type="button" id="leave-add-btn-id" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit">
+                        <%= __('admin.system.submit'); %>
+                        </button>
+                        <a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- contentFor('css') %>
+<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		/**
+        * Function to submit form
+        */
+    	$(".btn-submit").click(function(){
+            var btnId = $(this).attr("id");
+    		startTextLoading(btnId);
+    		submit_multipart_form("add-leave",function(status,response){
+    			if(status){
+    				window.location.href = response.redirect_url;
+    			}else{
+    				stopTextLoading(btnId);
+    			}
+    		});
+        });
+	});
+</script>

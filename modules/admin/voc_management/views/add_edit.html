@@ -1,0 +1,532 @@
+<%
+	var result 		= (result) 		? result     : {};
+	var isEditable  = (typeof is_editable !== typeof undefined && is_editable) ? is_editable : "";
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix" >
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= (isEditable) ? __("admin.voc_management.edit_voc") : __("admin.voc_management.add_voc"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" class="<%= getPermissionClass(module_type,['voc_management','list']); %>">
+								<button type="button" class="btn bg-indigo btn-sm waves-effect">
+									<%= __("admin.system.back"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="add-voc"  data-submit-btn-id="voc-add-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label for="voc_for" class="control-label">
+										<%= __("admin.voc_management.voc_for"); %>
+										<span class="required"> *</span>
+									</label>
+									<div class="voc-for-class">
+										<% Object.keys(VOC_FOR).map(key=>{  %>
+											<input class="with-gap radio-col-cyan <%=key%>"  type="radio" name="voc_for" id="voc_for_<%=key%>" value="<%=key%>" <%=(result.voc_for == key) ? 'checked' : "" %>/>
+											<label for="voc_for_<%=key%>"><%=VOC_FOR[key]%></label>
+										<% 	}); %>
+									</div>
+									<span id="voc_for_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6 type-for-captain hide">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="captain_type" class="control-label">
+											<%= __("admin.voc_management.captain_type"); %>
+											<span class="required"> *</span>
+										</label>
+										<select name="captain_type" id="captain_type" class="form-control">
+											<option value=""><%= __('admin.voc_management.select_captain_type');%></option>
+											<%  Object.keys(VOC_TYPE_FOR_CAPTAIN).map(key=>{
+												var selected = (result.type == key) ? "selected" : "";
+												if(key != VOC_TYPE_FOR_CAPTAIN_DELAYED_PICK_UP_TIME && key != VOC_TYPE_FOR_CAPTAIN_DELAY_IN_ORDER_DELIVERY && key != VOC_TYPE_FOR_CAPTAIN_ORDER_MARKED_PROBLEMATIC ){
+												%>
+													<option value="<%=key%>"<%=selected%>><%= VOC_TYPE_FOR_CAPTAIN[key]%></option>
+												<% }
+											}); %>
+										</select>
+									</div>
+									<span id="captain_type_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6 type-for-client hide">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="client_type" class="control-label">
+											<%= __("admin.voc_management.client_type"); %>
+											<span class="required"> *</span>
+										</label>
+										<select name="client_type" id="client_type" class="form-control">
+											<option value=""><%= __('admin.voc_management.select_client_type');%></option>
+											<% Object.keys(VOC_TYPE_FOR_CLIENT).map(key=>{
+												var selected = (result.type == key) ? "selected" : "";
+											%>
+												<option value="<%=key%>"<%=selected%>><%= VOC_TYPE_FOR_CLIENT[key]%></option>
+											<% }); %>
+										</select>
+									</div>
+									<span id="client_type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="question-add"> <!--  edit add more html -->
+								<% var i = 0; %>
+								<%if(isEditable && result.voc_questions_details && result.voc_questions_details.length > 0) {%>
+									<%result.voc_questions_details.map((records,index)=>{  %>
+										<% let optionNumbers = index+1;  %>
+											<div id="add_questions_<%= optionNumbers %>" class="question-pointer" data-val="<%= optionNumbers %>">
+												<div class="col-sm-12">
+													<hr/>
+													<div class="form-group">
+														<div class="form-line">
+															<label for="question" class="control-label label_index_question">
+																<%= __("admin.voc_management.question"); %> <%= optionNumbers %>
+																<span class="required"> *</span>
+															</label>
+															<textarea id="question" class="form-control" name="data[question][<%= optionNumbers %>][question_val]" rows="2" cols="50"><%=records.question ? records.question : "";%></textarea>
+
+															<input type="hidden" name="data[question][<%= optionNumbers %>][_id]" value="<%= records._id %>" />
+
+															<input type="hidden" name="data[question][<%= optionNumbers %>][question_val_index]" value="<%= optionNumbers %>"/>
+														</div>
+														<span id="question_<%= optionNumbers %>_error" class="error"></span>
+													</div>
+												</div>
+												<div class="col-sm-12">
+													<div class="form-group">
+														<label for="question_type" class="control-label">
+															<%= __("admin.voc_management.question_type"); %>
+															<span class="required"> *</span>
+														</label>
+														<div class="question-type-class">
+															<% Object.keys(VOC_QUESTION_TYPE).map(key=>{  %>
+																<input class="with-gap radio-col-cyan <%=key%>" data-id="option-add_<%=optionNumbers%>" type="radio" name="data[question][<%=optionNumbers%>][question_type]" id="question_type_<%=key%><%= optionNumbers %>" value="<%=key%>" <%=(records.type==key) ? 'checked' : "" %>/>
+																<label for="question_type_<%=key%><%= optionNumbers %>">
+																	<%=VOC_QUESTION_TYPE[key]%>
+																</label>
+															<% 	}); %>
+														</div>
+														<span id="question_type_<%= optionNumbers %>_error" class="error"></span>
+													</div>
+												</div>
+												<div class="add-more-option  option-add_<%= optionNumbers %>" data-val="<%= optionNumbers %>">
+												<% var k = 0; %>
+												<% if(records.options && records.options.length>0){   %>
+													<% records.options.map((optionRecords,optionIndex)=>{   %>
+														<% let optionNumbersVal = optionIndex+1;  %>
+															<div class="col-sm-12 clearfix add-option-fields" id="option-<%= optionNumbersVal %>" data-index="<%= optionNumbersVal %>">
+																<div class="col-sm-9 m-b-0 p-l-0">
+																	<div class="form-group">
+																		<div class="form-line">
+																			<label for="option_1" class="control-label label_index" >
+																				<%= __("admin.voc_management.option"); %> <%= optionNumbersVal %>
+																				<span class="required"> *</span>
+																			</label>
+
+																			<input type="hidden" name="data[question][<%= optionNumbers %>][options][<%= optionNumbersVal %>][option_id]" value="<%=optionRecords.option_id ? optionRecords.option_id : '';%>"/>
+
+																			<input type="text" id="option_1" class="option form-control" name="data[question][<%= optionNumbers %>][options][[<%= optionNumbersVal %>][option]" data-blank-error="<%= __('admin.voc_management.please_enter_option'); %>" value="<%=optionRecords.option ? optionRecords.option : '';%>" />
+
+																			<input type="hidden" name="data[question][<%= optionNumbers %>][options][<%= optionNumbersVal %>][index]" value="<%= optionNumbersVal %>"/>
+																		</div>
+																		<span id="option_<%= optionNumbers %>_<%= optionNumbersVal %>_error" class="error option_error"></span>
+																	</div>
+																</div>
+																<div class="col-sm-3 padding-0">
+																	<div class="multiple_checked_class m-t-25">
+																	<%if (optionNumbersVal > 1)  {%>
+																		<a href="javascript:void(0);" data-voc-questions-id="<%= records._id %>" data-option-id="<%= optionRecords.option_id %>" class="delete " data-confirm-message="<%= __("admin.voc_management.you_want_to_delete_this_option_permanent"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" data-id="option-<%= optionNumbersVal %>" data-val="option-add_<%= optionNumbers %>"><button type="button" class="btn bg-red btn-sm waves-effect"><%= __("admin.system.delete")%></button></a>
+																	<% } %>
+
+																	<a href="javascript:void(0);" class="add-more hide"><button type="button" class="btn bg-green btn-sm waves-effect"><%= __("admin.voc_management.add_more") %></button></a>
+
+																	<%if (k == parseInt(records.options.length) - 1)  {%>
+																		<a href="javascript:void(0);" class="add-more"><button type="button" class="btn bg-green btn-sm waves-effect"><%= __("admin.voc_management.add_more") %></button></a>
+																	<% } %>
+																	</div>
+																</div>
+															</div>
+													<% k++;  }); %>
+												<% } %>
+												</div>
+												<div class="row clearfix">
+													<div class="col-sm-5 ">
+														<div class="col-sm-12 clearfix">
+															<%if (optionNumbers > 1)  {%>
+																<a href="javascript:void(0);" data-voc-questions-id="<%= records._id %>" class="remove_question" data-confirm-message="<%= __("admin.voc_management.you_want_to_delete_this_question_paramenent"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" data-id="add_questions_<%= optionNumbers %>" ><button type="button" class="btn bg-red btn-sm waves-effect"><%= __("admin.voc_management.remove_question"); %></button></a>
+															<% } %>
+															<%if (i == parseInt(result.voc_questions_details.length) - 1)  {%>
+																<a href="javascript:void(0);" class="add_more_question_bank"><button  type="button" id="que-add-more"  class="btn bg-green btn-sm waves-effect" <%- ADMIN_LOADING_TEXT %> ><%= __("admin.voc_management.add_more_question"); %></button></a>
+															<% }else{ %>
+																<a href="javascript:void(0);" class="add_more_question_bank hide"><button  type="button" id="que-add-more"  class=" btn bg-green btn-sm waves-effect" <%- ADMIN_LOADING_TEXT %> > <%= __("admin.voc_management.add_more_question"); %></button></a>
+															<% } %>
+														</div>
+													</div>
+													<div class="col-sm-7">
+													</div>
+												</div>
+											</div>
+									<% i++; }); %>
+								<%}%>
+							</div> <!-- End edit add more html -->
+						</div>
+						<!--  submit btn html -->
+						<button type="button" id="voc-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> > <%= __("admin.system.submit"); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+						<!--  edit  submit btn html -->
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Add more html for options -->
+<div class="add-more-optionval hide">
+	<div class="col-sm-12 clearfix add-option-fields" id="option-{index}" data-index="{index}">
+		<div class="col-sm-9 m-b-0 p-l-0">
+			<div class="form-group">
+				<div class="form-line">
+					<label for="option_{index}" class="control-label label_index" >
+						<%= __("admin.voc_management.option"); %> {label_index}
+						<span class="required"> *</span>
+					</label>
+					<input type="text" id="option_{index}" class="option form-control" name="data[question][{questionindexvalue}][options][{index}][option]" data-blank-error="<%= __('admin.voc_management.please_enter_option'); %>"/>
+					<input type="hidden" name="data[question][{questionindexvalue}][options][{index}][index]" value="{index}"/>
+				</div>
+				<span id="option_{questionindexvalue}_{index}_error" class="error option_error"></span>
+			</div>
+		</div>
+		<div class="col-sm-3 padding-0">
+			<div class="multiple_checked_class m-t-25">
+				<a href="javascript:void(0);"  class="delete hide" data-confirm-message="<%= __("admin.voc_management.you_want_to_delete_this_option"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" data-id="option-{index}" data-val="option-add_{questionindexvalue}"><button type="button" class="btn bg-red btn-sm waves-effect"><%= __("admin.system.delete")%></button></a>
+				<a href="javascript:void(0);" class="add-more"><button type="button" class="btn bg-green btn-sm waves-effect"><%= __("admin.voc_management.add_more") %></button></a>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Add more html for options -->
+
+<!-- Add more html for Qusetiona and options -->
+<div class="add-more-question hide">
+	<div id="add_questions_{questionindex}" class="question-pointer" data-val="{questionindex}">
+		<hr/>
+		<div class="col-sm-12">
+			<div class="form-group">
+				<div class="form-line">
+					<label for="question_[{questionindex}]" class="control-label label_index_question">
+						<%= __("admin.voc_management.question"); %> {label_questionindex}
+						<span class="required"> *</span>
+					</label>
+					<textarea id="question_[{questionindex}]" class="form-control" name="data[question][{questionindex}][question_val]" rows="2" cols="50"><%=result.question ? result.question : "";%></textarea>
+					<input type="hidden" name="data[question][{questionindex}][question_val_index]" value="{questionindex}"/>
+				</div>
+				<span id="question_{questionindex}_error" class="error"></span>
+			</div>
+		</div>
+		<div class="col-sm-12">
+			<div class="form-group">
+				<label for="question_type" class="control-label">
+					<%= __("admin.voc_management.question_type"); %>
+					<span class="required"> *</span>
+				</label>
+				<div class="question-type-class">
+					<% Object.keys(VOC_QUESTION_TYPE).map(key=>{ %>
+						<input class="with-gap radio-col-cyan <%=key%>" data-id="option-add_{questionindex}" type="radio" name="data[question][{questionindex}][question_type]" id="question_type_<%=key%>{questionindex}" value="<%=key%>" <%=(result.question_type==key) ? "checked" : "" %>/>
+						<label for="question_type_<%=key%>{questionindex}">
+							<%=VOC_QUESTION_TYPE[key]%>
+						</label>
+					<% 	}); %>
+				</div>
+				<span id="question_type_{questionindex}_error" class="error"></span>
+			</div>
+		</div>
+		<div class="add-more-option hide option-add_{questionindex}" data-val="{questionindex}">
+			<div class="col-sm-12 clearfix add-option-fields" id="option-1" data-index="1">
+				<div class="col-sm-9 mb0 p-l-0">
+					<div class="form-group">
+						<div class="form-line">
+							<label for="option_{questionindex}_1" class="control-label label_index" >
+								<%= __("admin.voc_management.option"); %> 1
+								<span class="required"> *</span>
+							</label>
+							<input type="text" id="option_{questionindex}_1" class="option form-control" name="data[question][{questionindex}][options][1][option]" data-blank-error="<%= __('admin.voc_management.please_enter_option'); %>"/>
+							<input type="hidden" name="data[question][{questionindex}][options][1][index]" value="1"/>
+						</div>
+						<span id="option_{questionindex}_1_error" class="error option_error"></span>
+					</div>
+				</div>
+				<div class="col-sm-3 padding-0">
+					<div class="multiple_checked_class m-t-25">
+						<a href="javascript:void(0);" class="add-more"><button type="button" class="btn bg-green btn-sm waves-effect"><%= __("admin.voc_management.add_more") %></button></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row clearfix">
+	        <div class="col-sm-5 ">
+	         	<div class="col-sm-12 clearfix">
+					<a href="javascript:void(0);" class="remove_question hide" data-confirm-message="<%= __('admin.voc_management.you_want_to_delete_this_question'); %>" data-confirm-heading="<%= __('admin.system.are_you_sure') %>" data-id="add_questions_{questionindex}"><button type="button" class="btn bg-red btn-sm waves-effect"><%= __("admin.voc_management.remove_question"); %></button></a>
+					<a href="javascript:void(0);" class="add_more_question_bank"><button  type="button" id="que-add-more"  class=" btn bg-green btn-sm waves-effect" <%- ADMIN_LOADING_TEXT %> > <%= __("admin.voc_management.add_more_question"); %> </button></a>
+	         	</div>
+	        </div>
+	        <div class="col-sm-7">
+	        </div>
+	    </div>
+    </div>
+</div>
+<!-- Add more html for option-->
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+
+		/*
+		*	Function to submit form
+		*/
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('add-voc',function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		var count = 1;
+		var editable = '<%=isEditable%>';
+
+		/** Function to add more option */
+		function appendOptionHtml(element){
+			var index = parseInt($(".add-more-option.option-add_"+element.parents('.question-pointer').attr("data-val")+" .add-option-fields:last").attr("data-index"))+1;
+			var labelIndex = parseInt($(".add-more-option.option-add_"+element.parents('.question-pointer').attr("data-val")+" .label_index").length)+1;
+			var html  = $(".add-more-optionval").html();
+
+			$("form").find('span.error').text('');
+			html =html.replace(/{index}/g,index).replace(/{label_index}/g,labelIndex).replace(/{questionindexvalue}/g,element.parents('.question-pointer').attr("data-val"));
+
+			$(".option-add_"+element.parents('.question-pointer').attr("data-val")).append(html);
+			$(".option-add_"+element.parents('.question-pointer').attr("data-val")).find(".add-more").addClass("hide");
+			$(".option-add_"+element.parents('.question-pointer').attr("data-val")).find(".add-more:last").removeClass("hide");
+			$(".option-add_"+element.parents('.question-pointer').attr("data-val")+":last").find(".delete").removeClass("hide");
+
+			/** show delete button when option more than one */
+			if(index == 1){
+				$(".option-add_"+element.parents('.question-pointer').attr("data-val")+":first").find(".delete").remove();
+			}
+		}
+
+		/** Function to add more question */
+		function appendQuestionHtml(){
+			var index = parseInt($(".question-add .question-pointer").length)+1;
+			var indexoption = count;
+			var optionLabelIndex = ($('.option-add .label_index').length)+1;
+			var labelIndex = ($('#add-voc .question-add .label_index_question').length)+1;
+			var html  = $(".add-more-question").html();
+			$("form").find('span.error').text('');
+			/**  Question index Replace */
+			html = html.replace(/{questionindex}/g,index).replace(/{label_questionindex}/g,labelIndex).replace(/{label_index}/g,indexoption).replace(/{index}/g,indexoption).replace(/{label_index}/g,optionLabelIndex);
+
+			/** Appened html **/
+			$(".question-add").append(html);
+			$(".question-add").find(".add_more_question_bank").addClass("hide");
+			$(".question-add .add_more_question_bank:last").removeClass("hide");
+			$(".question-add:last").find(".remove_question").removeClass("hide");
+			$(".question-add .add-more-option:last").removeClass("hide");
+
+			/** show delete button when question more than one */
+			if(index == 1){
+				$(".question-add:first").find(".remove_question").remove();
+			}
+		}
+
+		$(document).ready(function(){
+			if(!editable){
+				/** add more question append*/
+				appendQuestionHtml();
+				/** End add more question append*/
+			}
+
+			/** add more option on click*/
+			$(document).on('click','.add-more',function(){
+				appendOptionHtml($(this));
+				count++;
+			});
+
+			/** add more question on click*/
+			$(document).on('click','.add_more_question_bank',function(){
+				appendQuestionHtml();
+			});
+			
+			/** hide show type according to the voc for */
+			<% if(result.voc_for == VOC_FOR_CAPTAIN){ %>
+				$(".type-for-client").addClass('hide');
+				$(".type-for-captain").removeClass('hide');
+			<% } else if(result.voc_for == VOC_FOR_CLIENT){ %>
+				$(".type-for-captain").addClass('hide');
+				$(".type-for-client").removeClass('hide');
+			<% } %>
+
+			/** Delete Option on Click **/
+			$(document).on('click','.delete',function(){
+				var divId    	    	= $(this).attr("data-id");
+				var divParentClass  	= $(this).attr("data-val");
+				var optionId   	    	= $(this).attr("data-option-id");
+				var vocId 				= $(this).attr("data-voc-questions-id")
+				var confirmMessage  	= $(this).attr('data-confirm-message');
+				var confirmHeading  	= $(this).attr('data-confirm-heading');
+
+				confirmBox("warning",confirmHeading,confirmMessage,function(result){
+					if(result){
+						if (optionId){
+							$.ajax({
+								url: "<%=admin_list_url%>/delete/"+vocId+"/"+optionId,
+								type: "POST",
+								data: { type : "option" },
+								success: function(data) {
+									notice(data.status,data.message);
+									$('.'+divParentClass+ ' > #'+divId).empty();
+									$('.'+divParentClass+ ' > #'+divId).removeClass('col-sm-12');
+									if($('.'+divParentClass).find(".option").length != 0){
+										$("."+divParentClass+" .add-more:last").removeClass("hide");
+									}
+									/**
+									 * if question type input answer then hide option fields
+									 * Reset Options and Question Label
+									*/
+									resetOptions("options",divParentClass);
+								}
+							});
+						}
+						else{
+							$('.'+divParentClass+ ' > #'+divId).empty();
+							$('.'+divParentClass+ ' > #'+divId).removeClass('col-sm-12');
+							if($('.'+divParentClass).find(".option").length != 0){
+								$("."+divParentClass+" .add-more:last").removeClass("hide");
+							}
+							/**
+							 * if question type input answer then hide option fields
+							 * Reset Options and Question Label
+							*/
+							resetOptions("options",divParentClass);
+						}
+					}
+					swal.close();
+				});
+			});
+			/** End Delete Option on Click **/
+
+			/** Delete Question on Click **/
+			$(document).on('click','.remove_question',function(){
+				var divId    	     = $(this).attr("data-id");
+				var confirmMessage   = $(this).attr('data-confirm-message');
+				var confirmHeading   = $(this).attr('data-confirm-heading');
+				var vocId 			 = $(this).attr("data-voc-questions-id");
+
+				confirmBox("warning",confirmHeading,confirmMessage,function(result){
+					if(result){
+						if (vocId){
+							$.ajax({
+								url: "<%=admin_list_url%>/delete/"+vocId,
+								type: "POST",
+								data: { type : "question" },
+								success: function(data) {
+									notice(data.status,data.message);
+									$('#'+divId).empty();
+									/**
+									 * if question type input answer then hide option fields
+									 * Reset Options and Question Label
+									*/
+									resetOptions("questions",divId);
+									if($('.question-add').find(".question-pointer").length != 0){
+										$(".question-add .add_more_question_bank:last").removeClass("hide");
+									}
+									notice(data.message);
+								}
+							});
+						}
+						else{
+							$('#'+divId).empty();
+							if($('.question-add').find(".question-pointer").length != 0){
+								$(".question-add .add_more_question_bank:last").removeClass("hide");
+							}
+							/**
+							 * if question type input answer then hide option fields
+							 * Reset Options and Question Label
+							*/
+							resetOptions("questions",divId);
+						}
+					}
+					swal.close();
+				});
+			});
+			/** End Delete Question on Click **/
+		});
+
+		/** one radio select for single answer or input answer **/
+		/** if question type input answer then hide option fields **/
+		$(document).on('click', '.input', function(){
+			$("."+$(this).attr("data-id")).addClass("hide");
+		});
+		$(document).on('click', '.single', function(){
+			var divId = $(this).attr("data-id");
+			var optionAddition =  $("."+divId).hasClass("hide");
+			if(optionAddition){
+				$("."+divId).removeClass("hide");
+			}
+			if(editable){
+				if($('.'+divId).children().length == 0){
+					var indexValue = divId.replace("option-add_", "");
+					var html  	   = $(".add-more-optionval").html();
+					html 		   = html.replace(/{index}/g,parseInt(indexValue)).replace(/{label_index}/g,1).replace(/{questionindexvalue}/g,parseInt(indexValue));
+					$('.'+divId).append(html);
+					$("."+divId+":first").find(".delete").remove();
+
+				}
+			}
+		});
+		/** End one radio select for single answer or input answer **/
+
+		/**
+		 * if question type input answer then hide option fields
+		 * Reset Options and Question Label
+		 */
+		function resetOptions(type,divParentClass){
+			if(type && type == "options"){
+				$('.'+divParentClass+' .label_index').each(function(index,item){
+					$(item).html('Option '+(index+1)+' <span class="required"> *</span>');
+				});
+			}else{
+				$('.question-add .label_index_question').each(function(index,item){
+					$(item).html('<%= __("admin.voc_management.question"); %> '+(index+1)+' <span class="required"> *</span>');
+				});
+			}
+		}
+
+		/** hide show type according to the voc for **/
+		$(document).on('click', '.captain', function(){
+			$(".type-for-client").addClass('hide');
+			$(".type-for-captain").removeClass('hide');
+		});
+		$(document).on('click', '.client', function(){
+			$(".type-for-captain").addClass('hide');
+			$(".type-for-client").removeClass('hide');
+		});
+
+	</script>

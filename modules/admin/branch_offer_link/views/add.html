@@ -1,0 +1,116 @@
+<div class="row clearfix" >
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-branch-link" action="<%=admin_list_url%>/add" data-submit-btn-id="branch-link-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.branch_offer_link.add_branch_link"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_id" class="control-label">
+											<%= __("admin.branch_offer_link.restaurant"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" name="restaurant_id" id="restaurant_id" data-live-search="true">
+											<option value=""><%= __("admin.branch_offer_link.select_restaurant"); %></option>
+											<%-restaurant_list%>
+										</select>
+									</div>
+									<span id="restaurant_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="branch_ids" class="control-label">
+											<%= __("admin.branch_offer_link.branch"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" name="branch_ids" id="branch_ids" data-live-search="true" title='<%= __("admin.branch_offer_link.select_branch"); %>' multiple>
+										</select>
+									</div>
+									<span id="branch_ids_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="area_id" class="control-label">
+											<%= __("admin.branch_offer_link.area"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" name="area_id" id="area_id" data-live-search="true">
+											<option value=""><%= __("admin.branch_offer_link.select_area"); %></option>
+											<%-area_list%>
+										</select>
+									</div>
+									<span id="area_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="branch-link-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-branch-link',function(status,response){
+			if(status){
+				$("#reset").trigger("click");
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+
+	/**
+	 * Function to get branch list
+	 */
+	$('#restaurant_id').on('change', function() {
+		// var firstOptions = "<option value=''><%=__('admin.branch_offer_link.select_branch');%></option>";
+		var restaurantId = $(this).val();
+		// $("#branch_ids").html(firstOptions);
+		$(".show-tick").selectpicker('refresh');
+
+		if(restaurantId){
+			ajaxRequest({
+				url 	: "<%=admin_list_url%>/restaurant_branch_list",
+				data	: {restaurant_id : restaurantId},
+				method	: "post"
+			},function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					$("#branch_ids").html(response.branch_list);
+					$(".show-tick").selectpicker('refresh');
+				}else if(response.status && response.message){
+					notice(response.status,response.message);
+				}
+			});
+		}
+	});
+</script>

@@ -1,0 +1,493 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" data-listing-url="<%=admin_list_url%>">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by driver name -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="driver_name" class="form-control" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.driver_breaks.search_by_name'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Date Range -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="date-range-picker" id="date-range-picker" placeholder="<%= __('admin.driver_breaks.search_by_date'); %>" autocomplete="off" value="<%=newDate("",DATABASE_DATE_FORMAT)+' - '+newDate("",DATABASE_DATE_FORMAT)%>">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=newDate("",DATABASE_DATE_FORMAT+" 00:00:00")%>">
+											<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=newDate("",DATABASE_DATE_FORMAT+" 23:59:59")%>">
+										</div>
+									</div>
+									<!-- Search by status -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="search_by_status"  name="status_search">
+													<option value=""><%=__("admin.driver_breaks.search_by_status");%></option>
+														<%
+														Object.keys(DRIVER_BREAK_STATUS).map(key=>{%>
+															<option value="<%=key%>" <%= (key == break_status) ? "selected" :"";%> >
+																<%=(DRIVER_BREAK_STATUS[key].status_name) ? DRIVER_BREAK_STATUS[key].status_name :"";%>
+															</option> <%
+														}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-1">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" data-href="<%= admin_list_url%>" >
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<!-- Modal Box for reject break-->
+	<div id="myModal" class="modal fade" role="dialog" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header border-bottom">
+					<h4 class="modal-title set-model-header" id="smallModalLabel"><%= __("admin.driver_breaks.rejection_confirm"); %></h4>
+				</div>
+				<form id="reject_break" data-submit-btn-id="reject-btn-id" method="post" class="on_click_submit"  method="post"  role="form" action="">
+					<div class="modal-body" id="assign_status_model">
+						<div class="row clearfix">
+							<div class="col-sm-12 no-bottom-border">
+								<label for="rejection_reason" class="control-label"><%= __("admin.driver_breaks.rejection_reason"); %><span class="required"> *</span> </label>
+								<div class="form-grop margin-0">
+									<div class="form-line">
+										<textarea  id="rejection_reason" rows="6" class="resize-none form-control" name="rejection_reason"></textarea>
+									</div>
+									<span id="rejection_reason_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer border-top">
+						<button type="button"  id="reject-btn-id" class="noHover btn bg-brown btn-sm waves-effect btn-submit-reject" <%- ADMIN_LOADING_TEXT %> > <%= __("admin.system.submit"); %> </button>
+						<button type="button" data-dismiss="modal" class="noHover btn bg-blue-grey btn-sm  waves-effect cancel-btn"> <%= __("admin.system.cancel"); %> </button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Box for approve break-->
+	<div id="approveModal" class="modal fade" role="dialog" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header border-bottom">
+					<h4 class="modal-title set-model-header" id="smallModalLabel"><%= __("admin.driver_breaks.approve_confirm"); %></h4>
+				</div>
+				<form id="approve_break" data-submit-btn-id="approve-btn-id" method="post" class="on_click_submit"  method="post"  role="form" action="">
+					<div class="modal-body" id="assign_status_model">
+						<div class="row clearfix">
+							<div class="col-sm-12 no-bottom-border">
+								<label for="duration" class="control-label"><%= __("admin.driver_breaks.duration"); %><span class="required"> *</span> </label>
+								<div class="form-grop margin-0">
+									<div class="form-line">
+										<input type="text"  id="duration" class="form-control" name="duration"/>
+									</div>
+									<span id="duration_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer border-top">
+						<button type="button"  id="approve-btn-id" class="noHover btn bg-brown btn-sm waves-effect btn-submit-approve" <%- ADMIN_LOADING_TEXT %> ><%= __("admin.system.submit"); %></button>
+						<button type="button" data-dismiss="modal" class="noHover btn bg-blue-grey btn-sm  waves-effect cancel-btn"><%= __("admin.system.cancel"); %></button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Box for cancel break-->
+	<div id="myCancelModal" class="modal fade" role="dialog" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header border-bottom">
+					<h4 class="modal-title set-model-header" id="smallModalLabel"><%= __("admin.driver_breaks.cancel_confirm"); %></h4>
+				</div>
+				<form id="cancel_break" data-submit-btn-id="cancel-btn-id" method="post" class="on_click_submit"  method="post"  role="form" action="">
+					<div class="modal-body" id="assign_status_model">
+						<div class="row clearfix">
+							<div class="col-sm-12 no-bottom-border">
+								<label for="cancel_reason" class="control-label"><%= __("admin.driver_breaks.cancel_reason"); %><span class="required"> *</span> </label>
+								<div class="form-grop margin-0">
+									<div class="form-line">
+										<textarea  id="cancel_reason" rows="6" class="resize-none form-control" name="cancel_reason"></textarea>
+									</div>
+									<span id="cancel_reason_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer border-top">
+						<button type="button"  id="cancel-btn-id" class="noHover btn bg-brown btn-sm btn-sm waves-effect btn-submit-cancel" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %> </button>
+						<button type="button" data-dismiss="modal" class="noHover btn bg-blue-grey btn-sm  waves-effect cancel-btn"> <%= __("admin.system.cancel"); %> </button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.driver_breaks.driver_breaks"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=originalUrl%>" data-action-url="<%=admin_list_url%>/add" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['driver_breaks','add']); %>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									 <%= __('admin.driver_breaks.add_break'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.driver_breaks.driver_name");%></th>
+								<th><%= __("admin.driver_breaks.date");%></th>
+								<th><%= __("admin.driver_breaks.start_time");%></th>
+								<th><%= __("admin.driver_breaks.end_time");%></th>
+								<th><%= __("admin.driver_breaks.duration");%></th>
+								<th><%= __("admin.driver_breaks.elapsed_time");%></th>
+								<th><%= __("admin.driver_breaks.remaining_time");%></th>
+								<th width="15%"><%= __("admin.system.status");%></th>
+								<th><%= __("admin.system.action");%></th>
+								<th></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<%- contentFor("script") %>
+	<script>
+		var HOURS_IN_A_DAY = <%= HOURS_IN_A_DAY%>;
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>countdown/countdown.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>countdown/config.js"></script>
+	<script type="text/javascript">
+
+		/** Function to initialize datatable and get server side data*/
+		var DRIVER_BREAK_STATUS	= <%- JSON.stringify(DRIVER_BREAK_STATUS)%>;
+		var SECONDS_IN_A_MINUTE = <%= SECONDS_IN_A_MINUTE %>;
+		var dataTable 	=	"";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[9, "desc"]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ 	"data" : 'driver_name'},
+					{ 	"data"		: 'date',
+						"render" 	: function(date){
+							return moment(date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_FORMAT) ;;
+						}
+					},
+					{
+						"data"		: 'start_time',
+						"render" 	: function(start_time){
+							return start_time ? set24HourFormat(parseFloat(start_time)) : "--:--";
+						}
+					},
+					{
+						"data"		: 'end_time',
+						"render" 	: function(end_time){
+							return end_time ? set24HourFormat(parseFloat(end_time)) : "--:--";
+						}
+					},
+					{ 	"data"		: 'duration',
+						"render" 	: function(duration){
+							var hours			= ((duration / SECONDS_IN_A_MINUTE)/SECONDS_IN_A_MINUTE);
+							var roundHours 		= Math.floor(hours);
+							var minutes 		= (hours - roundHours) * SECONDS_IN_A_MINUTE;
+							var roundMinutes 	= Math.round(minutes);
+							var durationString	= (roundHours > 0) ? roundHours+" "+"<%= __('admin.driver_breaks.h'); %>"+" "+roundMinutes+" "+"<%= __('admin.driver_breaks.min'); %>": roundMinutes+" "+'<%= __("admin.driver_breaks.min"); %>';
+							return durationString;
+						}
+					},
+					{ 	"data"		: {},
+						"orderable"	: false,
+						"render" 	: function(result){
+							var status 	  		= (result && result.status)	? result.status   : "<%=PENDING%>";
+							var duration 		= (result.duration) 		? result.duration : "";
+							var elapsedTime 	= (result.elapsed_time) 	? result.elapsed_time : "";
+							var startTime 		= (result.start_time) 		? set24HourFormat(parseFloat(result.start_time)) : "";
+							var endTime 		= (result.end_time) 		? set24HourFormat(parseFloat(result.end_time))   : "";
+							var timestamp 		= result.start_timestamp;
+							var isCompleted		= (result.is_completed)	? 	result.is_completed :"";
+							var hours			= ((elapsedTime / SECONDS_IN_A_MINUTE)/SECONDS_IN_A_MINUTE);
+							var roundHours 		= Math.floor(hours);
+							var minutes 		= (hours - roundHours) * SECONDS_IN_A_MINUTE;
+							var roundMinutes 	= Math.round(minutes);
+							var durationString	= (roundHours > 0) ? roundHours+" "+"<%= __('admin.driver_breaks.h'); %>"+" "+roundMinutes+" "+"<%= __('admin.driver_breaks.min'); %>": roundMinutes+" "+'<%= __("admin.driver_breaks.min"); %>';
+
+							var countDownString = (!isCompleted) ? '<span class="elapsed_time" data-duration="'+duration+'" data-elapsed="'+elapsedTime+'" data-end-time="'+endTime+'" data-countup="'+timestamp+'">0 <%= __("admin.driver_breaks.min"); %></span>' : durationString;
+							if(status != '<%= APPROVED%>') countDownString = "--:--";
+							return countDownString;
+						}
+					},
+					{ 	"data"		: {},
+						"orderable"	: false,
+						"render" 	: function(result){
+							var status 	  		= (result && result.status)	? result.status : "<%=PENDING%>";
+							var startTime 		= (result.start_time) ? set24HourFormat(parseFloat(result.start_time)) : "";
+							var timestamp 		= result.end_timestamp;
+							var countDownString = '<span class="remaining_time" data-start-time="'+startTime+'" data-countdown="'+timestamp+'">0 <%= __("admin.driver_breaks.min"); %></span>';
+							if(status != '<%= APPROVED%>') countDownString = "--:--";
+							return countDownString;
+						}
+					},
+					{
+						"data"		 : 	{},
+						"orderable"	 :   false,
+						"field_name" : "status",
+						"field_type" : "<%= NUMERIC_FIELD%>",
+						"render" 	 : 	function(result){
+							var id 		 	= (result._id) 			? result._id 	: "";
+							var status 	  	= (result.status)		? result.status : "<%=PENDING%>";
+							var driverId 	= (result.driver_id)	?	result.driver_id 	: "";
+							var reason		= (result.rejection_reason)	?	result.rejection_reason	:"";
+							reason			= (result.cancel_reason)	?	result.cancel_reason	:reason;
+
+							var statusLabel = (status && DRIVER_BREAK_STATUS[status]) ? '<span class="label '+DRIVER_BREAK_STATUS[status].class+'">'+DRIVER_BREAK_STATUS[status].status_name+'</span>' : '';
+
+							if(reason && (status == "<%= REJECTED %>" || status == "<%= CANCELLED %>")){
+								statusLabel +=  '<i class="material-icons font-20 rejection-info-icon" title="'+reason+'" data-toggle="tooltip" data-placement="left" >info</i>';
+							}
+							return statusLabel;
+
+						}
+					},
+					{
+						"data"		 : 	{},
+						"orderable"	 :  false,
+						"searchable" :  false,
+						"render" 	 : 	function(result){
+							var id 		 	= (result._id) 			?	result._id 			:"";
+							var driverId 	= (result.driver_id)	? 	result.driver_id 	:"";
+							var status 	  	= (result.status)		? 	result.status 		:"<%=PENDING%>";
+							var isCompleted	= (result.is_completed)	? 	result.is_completed :"";
+							var showActions	  = (status == "<%=PENDING%>") 	? true : false;
+							var cancelActions = false;
+							var endBreakActions = false;
+
+							if(!showActions && status != "<%=REJECTED%>" && status != "<%=CANCELLED%>" && !isCompleted){
+								cancelActions = true;
+							}
+							if(!showActions && status == "<%=APPROVED%>" && !isCompleted){
+								endBreakActions = true;
+							}
+
+							var dropDownButton = "";
+							if(showActions || cancelActions){
+								dropDownButton 	= ""+
+									'<div class="btn-group">'+
+										'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+											'<%= __("admin.system.action"); %>'+
+											' <span class="caret"></span>'+
+										'</button>'+
+										'<ul class="dropdown-menu">';
+
+											dropDownButton += (showActions) ? '<li>'+
+												'<a href="javascript:void(0);"  class="waves-effect waves-block open-modal approve-break <%= getPermissionClass(module_type,["driver_breaks","approve_reject"]); %>" data-id="'+id+'" data-user-id="'+driverId+'">'+
+												'<%= __("admin.system.approve"); %>'+
+											'</li>' : '';
+
+											dropDownButton += (showActions) ? '<li>'+
+												'<a href="javascript:void(0)" class="waves-effect waves-block open-modal reject-break <%= getPermissionClass(module_type,["driver_breaks","approve_reject"]); %>" data-id="'+id+'" data-user-id="'+driverId+'">'+
+												' <%= __("admin.system.reject"); %>'+
+											'</li>':'';
+											dropDownButton += (endBreakActions) ? '<li>'+
+												'<a href="javascript:void(0);" data-href="<%=admin_list_url%>/end_break/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["driver_breaks","end"]); %>" data-confirm-message="<%= __("admin.driver_breaks.do_you_want_to_end_this_break"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+												'<%= __("admin.driver_breaks.end_break"); %>'+
+											'</li>':'';
+											dropDownButton += (cancelActions) ? '<li>'+
+												'<a href="javascript:void(0)" class="waves-effect waves-block open-modal cancel-break <%= getPermissionClass(module_type,["driver_breaks","approve_reject"]); %>" data-id="'+id+'" data-user-id="'+driverId+'">'+
+												' <%= __("admin.system.cancel"); %>'+
+											'</li>':'';
+											dropDownButton += (showActions) ? '<li>'+
+												'<a href="javascript:void(0);" data-href="<%=admin_list_url%>/delete/'+id+'/'+driverId+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["driver_breaks","delete"]); %>" data-confirm-message="<%= __("admin.driver_breaks.do_you_want_to_delete"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+												'<%= __("admin.system.delete"); %>'+
+											'</li>':'';
+									dropDownButton += 	'</ul>'+
+									'</div>';
+							}else if(status == "<%=APPROVED%>" && isCompleted){
+								dropDownButton = '<span class="label label-danger"><%=__("admin.driver_breaks.break_ended")%></span>';
+							}
+							return dropDownButton;
+						}
+					},
+					{ 	"data"		: 'created',
+						"visible"	: false,
+						"render" 	: function(created){
+							return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url+'/'+break_status%>",
+					type	: "POST",
+					data 	: function(d){
+						d.fromDate 	= $('#from_date').val();
+				        d.toDate 	= $('#to_date').val();
+						d.break_status= $('#search_by_status').val();
+					},
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function() {
+					$('[data-toggle="tooltip"]').tooltip();
+					initCountDown();
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Search by status
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$("#search_by_status").change(function(){
+			dataTable.draw();
+		});
+
+		/** Submit form */
+		$(".btn-submit-reject").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("reject_break",function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/*** Open modal*/
+		$(document).on("click",".reject-break",function(){
+			var btnDataId  = $(this).data("id");
+			var btnUserId  = $(this).data("user-id");
+			var formAction = "<%=admin_list_url%>/reject/<%= REJECTED%>/"+btnDataId+"/"+btnUserId;
+			$("form#reject_break").attr("action",formAction);
+			$("#rejection_reason").val("");
+			$("#rejection_reason_error").text("");
+			$("#myModal").modal("show");
+		});
+
+		/** Submit form for approve break */
+		$(".btn-submit-approve").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("approve_break",function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/*** Open modal for approve break */
+		$(document).on("click",".approve-break",function(){
+			var btnDataId  = $(this).data("id");
+			var btnUserId  = $(this).data("user-id");
+			var formAction = "<%=admin_list_url%>/approve/<%= APPROVED%>/"+btnDataId+"/"+btnUserId;
+			$("form#approve_break").attr("action",formAction);
+			$("#duration").val("");
+			$("#duration_error").text("");
+			$("#approveModal").modal("show");
+		});
+
+		/*** Open modal for cancel break*/
+		$(document).on("click",".cancel-break",function(){
+			var btnDataId  = $(this).data("id");
+			var btnUserId  = $(this).data("user-id");
+			var formAction = "<%=admin_list_url%>/cancel/"+btnDataId+"/"+btnUserId;
+			$("form#cancel_break").attr("action",formAction);
+			$("#cancel_reason").val("");
+			$("#cancel_reason_error").text("");
+			$("#myCancelModal").modal("show");
+		});
+
+		/** Submit form for cancel break*/
+		$(".btn-submit-cancel").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("cancel_break",function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

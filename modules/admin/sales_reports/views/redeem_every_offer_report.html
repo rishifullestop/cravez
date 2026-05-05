@@ -1,0 +1,196 @@
+<div class="excel_charts">
+    <a class="excel_btn excel_format" id="excel_btn" href="javascript:void(0)">
+        <i><img src="<%= WEBSITE_ADMIN_IMG_URL %>new_dashboard/excel.png" alt="img"></i><%= __("admin.sales_report.excel"); %>
+    </a>
+    <a class="chart_format_btn" id="charts_btn" href="javascript:void(0)"><i><img src="<%= WEBSITE_ADMIN_IMG_URL %>new_dashboard/pie-chart.png" alt="img"></i><%= __("admin.sales_report.charts"); %></a>
+</div>
+<div class="row clearfix excel_class">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="header">
+                <h2>
+                    <%= __("admin.sales_report.redeem_every_offer_report"); %>
+                </h2>
+            </div>
+            <div class="body">
+                <table id="redeem-every-offer-report-datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th><%= __("admin.sales_report.order_id");%></th>
+                            <th><%= __("admin.sales_report.restaurant_name");%></th>
+                            <th><%= __("admin.sales_report.branch_name");%></th>
+                            <th><%= __("admin.sales_report.order_amount");%></th>
+                            <th><%= __("admin.sales_report.offer_code");%></th>
+                            <th><%= __("admin.sales_report.offer_discount");%></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="separate_box chart_class hide">
+    <div class="delivered_order_section">
+        <div class="sales_report">
+            <div class="heading_text">
+                <h3><%= __('admin.sales_report.total_offer_orders')%></h3>
+            </div>
+            <div id="offer_order_div" style="width: 100%; height: 250px;"></div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/buttons.dataTables.min.css">
+
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/jszip.min.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/pdfmake.min.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/vfs_fonts.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/buttons.html5.min.js "></script>
+<script type="text/javascript">
+    /** Function to initialize datatable and get server side data*/
+    var dataTable =	"";
+    $(document).ready(function() {
+
+        dataTable = $('#redeem-every-offer-report-datatable-listing').DataTable({
+            "bStateSave"	: true,
+            "fnStateSave"	: function (oSettings, oData) {
+                localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+            },
+            "fnStateLoad"	: function (oSettings) {
+                return JSON.parse( localStorage.getItem('DataTables') );
+            },
+            "order"		: 	[],
+            "dom"		: 	'Blrtip',
+			"serverSide": 	true,
+            "scrollX"	: 	true,
+            "lengthMenu":	PAGING_LENGTH_MENU,
+            "columns"	: 	[
+                {   "data"       : {},
+                    "searchable" : false,
+                    "orderable"  : false,
+                    "render" 	 : 	function(result){
+						return '<a href="<%= WEBSITE_ADMIN_URL+'orders/view/'%>'+result._id+'" target="_blank">'+result.unique_order_id+'</a>';
+					}
+                },
+                {   "data"       : 'restaurant_name.en',
+                    "searchable" : false,
+                    "orderable"  : false
+                },
+                {   "data"       : 'branch_name',
+                    "searchable" : false,
+                    "orderable"  : false
+                },
+                {
+                    "data"      : 'order_price',
+                    "searchable":  false,
+                    "render"    : function(order_price){
+                        return (order_price) ? currencyFormat(order_price) : currencyFormat(0);
+                    }
+                },
+                {   "data"       : 'offer_code',
+                    "searchable" : false,
+                    "orderable"  : false
+                },
+                {   "data"       : 'offer_discount',
+                    "searchable" : false,
+                    "render"     : function(offer_discount){
+                        return (offer_discount) ? currencyFormat(offer_discount) : currencyFormat(0);
+                    }
+                }
+            ],
+            buttons: [
+                {
+                    text: 'Export Excel',
+                    extend: 'excelHtml5',
+                    className: 'btn btn-sm bg-indigo waves-effect',
+                    exportOptions: {
+                        orthogonal: 'export',
+                        columns: [ 0, 1, 2, 3, 4, 5]
+                    },
+					customizeData: function (data) {
+                        for (var i = 0; i < data.body.length; i++) {
+                            for (var j = 0; j < data.body[i].length; j++) {
+                                data.body[i][0] = '\u200C' + data.body[i][0];
+                            }
+                        }
+                    }
+                },
+                {
+                    text: 'Export PDF',
+                    extend: 'pdfHtml5',
+                    className: 'btn btn-sm bg-indigo waves-effect',
+                    exportOptions: {
+                        orthogonal: 'export',
+                        columns: [ 0, 1, 2, 3, 4,5]
+                    }
+                }
+            ],
+            "ajax":{
+                url 	: "<%=admin_list_url%>/redeem_every_offer_report?date_from=<%=from_date%>&date_to=<%=to_date%>&restaurant_id=<%=restaurant_id%>&branch_id=<%=branch_id%>",
+                type	: "POST",
+                dataSrc	: function(res){
+                    return res.data;
+                }
+            }
+        });
+    });
+
+    /* show excel table */
+    $('#excel_btn').on('click',function(e){
+        $('.chart_class').addClass("hide");
+        $('.excel_class').removeClass("hide");
+        $('#excel_btn').addClass('excel_format');
+        $('#charts_btn').removeClass('chart_format');
+    });
+
+    /* show chart*/
+    $('#charts_btn').on('click',function(e){
+        $('.excel_class').addClass("hide");
+        $('.chart_class').removeClass("hide");
+        $('#excel_btn').removeClass('excel_format');
+        $('#charts_btn').addClass('chart_format');
+        drawChart();
+    });
+
+    function drawChart(){
+        var totalOrders	  	  =	<%= (total_orders) 		  ? total_orders 		: 0%>;
+        var totalOfferOrders  =	<%= (total_offer_orders)  ? total_offer_orders  : 0%>;
+
+        var visualization;
+        var data = google.visualization.arrayToDataTable([
+            ['Label', 'Value'],
+            ['<%= __("admin.sales_report.total_orders")%>', totalOrders],
+            ['<%= __("admin.sales_report.total_offer_orders")%>', totalOfferOrders],
+        ]);
+
+        var options = {
+            is3D	: false,
+            colors	: ["#cc66ff","#ff9933"],
+            legend	: { position: 'right',maxWidth:100,alignment:'center'},
+            tooltip	: { isHtml:true},
+            pieSliceText: 'percentage',
+            chartArea: {
+                height: "95%",
+                width : "95%"
+            },
+            pieSliceTextStyle:{bold:true}
+        };
+
+        var container = document.getElementById('offer_order_div');
+        visualization = new google.visualization.PieChart(container);
+        visualization.draw(data,options);
+    }
+
+    google.charts.load('current', {
+        packages: ['corechart']
+    }).then(function () {
+        drawChart();
+    });
+
+    var width =  $(document).width();
+    $(window).resize(function(){
+        drawChart();
+    });
+
+</script>

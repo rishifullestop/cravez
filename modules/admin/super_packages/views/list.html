@@ -1,0 +1,216 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix" >
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								 <%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by valid till-->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="valid_till" class="form-control" placeholder="<%= __('admin.super_packages.search_by_valid_till'); %>"  id="date-range-picker"  name="search_by_valid_till" autocomplete="off">
+											</div>
+											<span id="valid_till_error" class="error model_select_error"></span>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+									<div class="col-md-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.super_packages.super_package"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<li>
+							<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['super_packages','add']); %>">
+								<button type="button" class="btn bg-indigo waves-effect btn-sm">
+									<%= __("admin.super_packages.add_package"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li class="<%= getPermissionClass(module_type,['super_packages','add']); %>">
+									<a href="<%=admin_list_url+'/add'%>">
+										<%= __("admin.super_packages.add_package"); %>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+					
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="20%"><%= __("admin.super_packages.title_in_en");%></th>
+								<th width="20%"><%= __("admin.super_packages.title_in_ar");%></th>
+								<th width="20%"><%= __("admin.super_packages.valid_till");%></th>
+								<th width="20%"><%= __("admin.super_packages.days");%></th>
+								<th width="20%"><%= __("admin.super_packages.amount");%></th>
+								<th width="20%"><%= __("admin.super_packages.number_of_orders");%></th>
+								<th width="20%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<%- contentFor("script") %>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable		=	"";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{
+						"data"   	   : "name.en",
+						"searchable"   : false
+					},
+					{
+						"data"   	   : "name.ar",
+						"searchable"   : false
+					},
+					{
+						"data"   	: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render" 	: function(result){
+							var startOn =   moment(result.valid_from).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_FORMAT) ;
+							var endOn   =   moment(result.valid_to).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_FORMAT) ;
+							var date    =  startOn+"-"+endOn;
+							return date;
+						}
+					},
+					{
+						"data"		    : 'days',
+						"field_type"	: "<%= NUMERIC_FIELD %>",
+						"render"		: function(days){
+							var days = (days) ? days : 0;
+							return days;
+						}
+					},
+					{
+						"data"		    : 'amount',
+						"field_type"	: "<%= NUMERIC_FIELD %>",
+						"render"		: function(amount){
+							var packageAmount = (amount) ? amount : 0;
+							return currencyFormat(packageAmount);
+						}
+					},
+					{
+						"data"  		: "number_of_orders",
+						"field_type"	: "<%= NUMERIC_FIELD %>",
+						"render" 		: function(numberOfOrders){
+							return (numberOfOrders) ? numberOfOrders : "<%= PACKAGE_UMLIMITED;%>";
+						}
+					},
+						
+					{
+						"data"		 : {},
+						"orderable"	 : false,
+						"searchable" : false,
+						"render" 	 : function(result){
+							var id = (result && result._id  ) ? result._id : "";
+							var dropDownButton 		=	''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %> '+
+									'<span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu  width-180">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/'+id+'" class="waves-effect action-btn waves-block <%= getPermissionClass(module_type,["super_packages","edit"]); %>" data-open-modal="true">'+
+											' <%= __("admin.system.edit"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Delete Link **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["super_packages","delete"]); %>" data-confirm-message="<%= __("admin.super_packages.you_want_to_delete_this_package"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+											' <%= __("admin.system.delete"); %>'+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+						}
+					},
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>",
+					type	: "POST",
+					data :function(d){
+						d.fromDate = $('#from_date').val();
+						d.toDate   = $('#to_date').val();
+					},
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/* Date range picker configuration */
+	</script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

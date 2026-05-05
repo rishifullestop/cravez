@@ -1,0 +1,1265 @@
+<%
+	var orderType					   = (typeof order_type !== typeof undefined && order_type)	?	order_type	: "";
+	var firstOrders 				   = first_orders;
+	var duplicateOrders 			   = duplicate_orders;
+	var bigOrders 				   	   = big_orders;
+	var orderRejected 			       = order_rejected;
+	var delayedAcceptance 		       = delayed_acceptance;
+	var delayedPreparation 			   = delayed_preparation;
+	var delayedPickupCaptain           = delayed_pickup_by_captain;
+	var delayedPickupCustomer          = delayed_pickup_by_customer;
+	var delayedPickupRestaurant        = delayed_pickup_by_restaurant;
+	var vipOrders 					   = vip_orders;
+	var delayedDelivery 			   = delayed_delivery;
+	var deliveryCravez 				   = delivery_cravez;
+	var deliveryRestaurant 			   = delivery_restaurant;
+	var wayToCustomer 		   		   = way_to_customer;
+	var wayToRestaurant 			   = way_to_restaurant;
+	var delivered 				   	   = order_delivered;
+	var notAssigned 			       = order_not_assigned;
+	var authUserRoleId      		   = auth.user_role_id;
+	let authTeamHead	= 	(auth.team_head)		?	auth.team_head 		:false;
+
+	var fromDate 		= 	newDate(subtractDate(HOURS_IN_A_DAY),DATABASE_DATE_FORMAT);
+	var toDate	 	 	= 	newDate("",DATABASE_DATE_FORMAT);
+	var tempFromDate 	= 	newDate(subtractDate(HOURS_IN_A_DAY),CURRENTDATE_START_DATE_FORMAT);
+	var tempToDate		=	newDate("",CURRENTDATE_END_DATE_FORMAT);
+
+	var defaultStatus=(!orderType) ? [ORDER_SUBMITTED,ORDER_PREPARING,ORDER_READY_TO_PICK_UP,ORDER_ON_THE_WAY] :[];
+%>
+<script>
+$(document).ready(function() {
+	<%
+	if(authUserRoleId == CALL_CENTER_TEAM && !authTeamHead){
+		if(Object.keys(businessRule).length >0){
+			Object.keys(businessRule).map(key=>{ %>
+				$(".<%= key %>").parent().parent("li").removeClass("hide");
+		<%  });
+		}else{  %>
+			$(".rules-div").hide()
+	<%  }
+	}else{ %>
+		$(".rules-div").find("li").removeClass("hide");
+	<%  }  %>
+});
+</script>
+
+<input type="hidden" name="script_init" id="script_init" value="1">
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink rules-div">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a class="collapsed business-rule-panel" role="button" data-toggle="collapse" data-target="#panel-collapse-id1" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.order_tracking.rules"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id1" class="panel-collapse collapse " role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<div class="rulebutton">
+								<ul>
+									<% if(authUserRoleId != FLEET){ %>
+										<li class="hide <%= (orderType == "first_orders") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=first_orders'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.first_order")%> (<span class="first_orders reset_storage"><%= (firstOrders) ? firstOrders :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "duplicate_orders") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=duplicate_orders'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.duplicate_orders")%> (<span class="duplicate_orders reset_storage"><%= (duplicateOrders) ? duplicateOrders :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "big_orders") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=big_orders'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.big_orders")%> (<span class="big_orders reset_storage"><%= (bigOrders) ? bigOrders :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "order_rejected") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=order_rejected'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.order_rejected")%> (<span class="rejected_orders reset_storage"><%= (orderRejected) ? orderRejected :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "delayed_acceptance") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=delayed_acceptance'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.delayed_acceptance")%> (<span class="delayed_acceptance reset_storage"><%= (delayedAcceptance) ? delayedAcceptance :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "delivery_cravez") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=delivery_cravez'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.delivery_cravez")%> (<span class="cravez_delivery_monitoring reset_storage"><%= (deliveryCravez) ? deliveryCravez :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "delivery_restaurant") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=delivery_restaurant'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.delivery_restaurant")%> (<span class="restaurant_delivery_monitoring reset_storage"><%= (deliveryRestaurant) ? deliveryRestaurant :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "delayed_pickup_by_customer") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=delayed_pickup_by_customer'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.delayed_pickup_by_customer")%> (<span class="delayed_pickup_by_customer reset_storage"><%= (delayedPickupCustomer) ? delayedPickupCustomer :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "delayed_pickup_by_restaurant") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=delayed_pickup_by_restaurant'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.delayed_pickup_by_restaurant")%> (<span class="delayed_pickup_by_restaurant reset_storage"><%= (delayedPickupRestaurant) ? delayedPickupRestaurant :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "delayed_pickup_by_captain") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=delayed_pickup_by_captain'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.delayed_pickup_by_captain")%> (<span class="delayed_pickup_by_captain reset_storage"><%= (delayedPickupCaptain) ? delayedPickupCaptain :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "vip_orders") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=vip_orders'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.vip_orders")%> (<span class="vip_orders reset_storage"><%= (vipOrders) ? vipOrders :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "delayed_preparation") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=delayed_preparation'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.delayed_preparation")%> (<span class="delayed_preparation reset_storage"><%= (delayedPreparation) ? delayedPreparation :0%></span>)
+												</label>
+											</a>
+										</li>
+										<li class="hide <%= (orderType == "delayed_delivery") ? 'active' : '';%>">
+											<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=delayed_delivery'%>">
+												<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+													<%= __("admin.order_tracking.delayed_delivery")%> (<span class="delayed_delivery reset_storage"><%= (delayedDelivery) ? delayedDelivery :0%></span>)
+												</label>
+											</a>
+										</li>
+									<% } %>
+									<li class="hide <%= (orderType == "way_to_customer") ? 'active' : '';%>">
+										<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=way_to_customer'%>">
+											<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+												<%= __("admin.order_tracking.way_to_customer")%> (<span class="way_to_customer reset_storage"><%= (wayToCustomer) ? wayToCustomer :0%></span>)
+											</label>
+										</a>
+									</li>
+									<li class="hide <%= (orderType == "way_to_restaurant") ? 'active' : '';%>">
+										<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=way_to_restaurant'%>">
+											<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+												<%= __("admin.order_tracking.way_to_restaurant")%> (<span class="way_to_restaurant reset_storage"><%= (wayToRestaurant) ? wayToRestaurant :0%></span>)
+											</label>
+										</a>
+									</li>
+									<li class="hide <%= (orderType == "delivered") ? 'active' : '';%>">
+										<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=delivered'%>">
+											<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+												<%= __("admin.order_tracking.delivered")%> (<span class="delivered reset_storage"><%= (delivered) ? delivered :0%></span>)
+											</label>
+										</a>
+									</li>
+									<li class="hide <%= (orderType == "not_assigned") ? 'active' : '';%>">
+										<a href="<%= WEBSITE_ADMIN_URL+'order_tracking?order_type=not_assigned'%>">
+											<label class="reset_storage" href="<%= WEBSITE_ADMIN_URL+'order_tracking'%>">
+												<%= __("admin.order_tracking.not_assigned")%> (<span class="not_assigned reset_storage"><%= (notAssigned) ? notAssigned :0%></span>)
+											</label>
+										</a>
+									</li>
+								</ul>
+								<div class="refresh_Button">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect count-refresh-btn" id="count-btn">
+										<%= __("admin.order_tracking.refresh"); %>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-col-pink m-t-20">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-target="#panel-collapse-id2" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+								aria-controls="panel-collapse-id2">
+								<%= __("admin.order_tracking.on_the_floor_status"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id2" class="panel-collapse collapse " role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<!--Floor Status Listing -->
+							<div class="row clearfix">
+								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+									<div class="card">
+										<div class="header p-t-40">
+											<ul class="header-dropdown m-r--5 btn-right-top-margin search-and-refresh">
+												<li>
+													<select class="form-control" id="aassign_area_id" data-live-search="true">
+														<option value=""><%=__("admin.order_tracking.search_by_area");%></option>
+														<%- area_list%>
+													</select>
+												</li>
+												<li>
+													<a  class="refresh-floor-btn">
+														<button type="button" class="btn btn-sm bg-indigo waves-effect">
+															<%= __("admin.order_tracking.refresh"); %>
+														</button>
+													</a>
+												</li>
+											</ul>
+										</div>
+										<div class="body">
+											<table id="datatable-listing-floor-status" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+												<thead>
+													<tr>
+														<th><%= __("admin.system.status"); %></th>
+														<th><%= __("admin.order_tracking.bike"); %></th>
+														<th><%= __("admin.order_tracking.car"); %></th>
+														<th><%= __("admin.order_tracking.total"); %></th>
+													</tr>
+												</thead>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse " role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="mobile_number" id="column_filter_14"  onkeyup="searchDatatable(14)" placeholder="<%= __('admin.order_tracking.search_by_mobile_number'); %>">
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="unique_order_id" id="column_filter_2"  onkeyup="searchDatatable(2)" placeholder="<%= __('admin.order_tracking.search_by_order_id'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Status -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="filter_order_status" name="order_status" title='<%=__("admin.order_tracking.search_by_order_status");%>' multiple>
+													<%
+														Object.keys(FILTER_ORDER_STATUS).map(key=>{
+															var selectedStatus = (defaultStatus.indexOf(key) >= 0) ? "selected" :"";
+															%>
+															<option value="<%=key%>" <%=selectedStatus%> >
+																<%= FILTER_ORDER_STATUS[key].status_name%>
+															</option>
+															<%
+														}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by restaurant name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick restaurant_id" id="search_restaurant_id"  name="search_restaurant_id" data-child-name="search_branch_id" data-live-search="true" multiple title='<%=__("admin.order_tracking.search_by_restaurant_name");%>'>
+													<%- restaurant_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by branch -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick branch_id disabled" id="column_filter_21"  onChange="searchDatatable(21)" name="search_branch_id" data-live-search="true" data-placeholder="<%=__('admin.order_tracking.search_by_branch')%>" data-live-search="true" disabled>
+													<option value=""><%=__("admin.order_tracking.search_by_branch");%></option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by invoice number -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="invoice_number" id="column_filter_3"  onkeyup="searchDatatable(3)" placeholder="<%= __('admin.order_tracking.search_by_invoice_number'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by delivery by -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="delivery_type" name="delivery_type" title='<%=__("admin.orders.search_by_delivery_by");%>' multiple>
+													<% Object.keys(DELIVERY_BY).map(key=>{
+														var selectedStatus = (!orderType && key == DELIVERY_BY_CRAVEZ) ? "selected" :"";
+														%>
+														<option <%=selectedStatus%> value="<%=key%>"><%= DELIVERY_BY[key]%></option>
+													<% }); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by Order Date -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.order_tracking.search_by_order_date'); %>" name="date-range-picker" value="<%= (fromDate && toDate) ? fromDate+' - '+toDate : '';%>"  autocomplete="off">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=tempFromDate%>">
+											<input class="form-control hide" id="to_date"  type="text" name="to_date" value="<%=tempToDate%>">
+										</div>
+									</div>
+									<!-- Search by delivery status -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="column_filter_22"  onChange="searchDatatable(22)" name="delivery_status">
+													<option value=""><%=__("admin.order_tracking.search_by_delivery_status");%></option>
+													<% Object.keys(DELIVERY_STATUS).map(key=>{ %>
+														<option value="<%=key%>"><%= DELIVERY_STATUS[key].status_name%></option>
+													<% }); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by order assigned status -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="is_order_assigned"  name="is_order_assigned">
+													<option value=""><%=__("admin.orders.search_by_order_assigned");%></option>
+													<% Object.keys(ORDER_ASSIGNED_FILTER).map(key=>{%>
+														<option value="<%=key%>">
+															<%= ORDER_ASSIGNED_FILTER[key]%>
+														</option>
+													<% }); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by driver name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="captain_id" name="captain_id" data-live-search="true">
+													<option value=""><%=__("admin.order_tracking.search_by_captain_name");%></option>
+													<%-driver_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" data-href="<%=admin_list_url%>">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<!--Order Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.order_tracking.order_tracking"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a  class="refresh-btn">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.order_tracking.refresh"); %>
+								</button>
+							</a>
+						</li>
+						<li>
+							<a  class="">
+								<button type="button" value="view_on_map" class="btn btn-sm bg-blue-grey waves-effect perform_action">
+									<%= __("admin.order_tracking.view_on_map"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0">
+						<thead>
+							<tr>
+								<th width="1%" class="p-r-10 text-center" >
+									<div class="materialize_checkbox">
+										<input type="checkbox" class="filled-in chk-col-indigo" id="order_select_all">
+										<label for="order_select_all" class="p-l-20 v-align-bottom m-b-0"></label>
+									</div>
+								</th>
+								<th width="2%"><%= __("admin.system.action"); %> </th>
+								<th><%= __("admin.order_tracking.order_id"); %></th>
+								<th><%= __("admin.order_tracking.invoice_number"); %></th>
+								<th><%= __("admin.order_tracking.order_date"); %></th>
+								<th><%= __("admin.order_tracking.last_status_updated_on"); %></th>
+								<th><%= __("admin.order_tracking.restaurant_name"); %></th>
+								<th><%= __("admin.order_tracking.area_name"); %></th>
+								<th><%= __("admin.order_tracking.delivery_area_name"); %></th>
+								<th><%= __("admin.order_tracking.order_status"); %></th>
+								<th><%= __("admin.order_tracking.total_order_amount"); %></th>
+								<th><%= __("admin.order_tracking.captain_name"); %></th>
+								<th><%= __("admin.order_tracking.delivery_by"); %></th>
+								<th><%= __("admin.order_tracking.delivery_status"); %></th>
+								<th><%= __("admin.order_tracking.customer_mobile_number"); %></th>
+								<th><%= __("admin.order_tracking.net_order_amount"); %></th>
+								<th><%= __("admin.order_tracking.discount_value"); %></th>
+								<th><%= __("admin.order_tracking.infinity_service"); %></th>
+								<th><%= __("admin.order_tracking.total_order_amount"); %></th>
+								<th><%= __("admin.order_tracking.time_passed"); %></th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th width="2%"></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal for change address of order -->
+<div class="modal fade" id="map_modal" tabindex="-1" role="dialog" aria-labelledby="modal-map" aria-hidden="true">
+</div><!--modal close-->
+<!-- Modal to reject order request-->
+<div class="modal fade" id="reject_order" tabindex="-1" role="dialog" aria-labelledby="reject_order" aria-hidden="true">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("admin.order_tracking.reject_order") %></h4>
+			</div>
+			<form id="reject-form" data-submit-btn-id="reject-order_btn" method="post" class="on_click_submit" role="form" action=''>
+				<input type="hidden" name="order_id" id="order_id">
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-grop">
+								<div class="form-lin no-bottom-border">
+									<label for="rejection_reason" class="control-label"><%= __('admin.order_tracking.rejection_field'); %><span class="required"> *</span>  </label>
+									<div class="form-grop margin-0">
+										<div class="form-line">
+											<textarea id="rejection_reason" rows="6" class="resize-none form-control" name="rejection_reason"></textarea>
+										</div>
+										<span id="rejection_reason_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="reject-order_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-reject noHover margin-0"><%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div><!--modal close-->
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/fixedHeader.dataTables.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/dataTables.fixedHeader.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.js"></script>
+	<script src="<%= GOOGLE_MAP_SCRIPT%>"></script>
+	<script type="text/javascript">
+		var itemCheckboxArray = {};
+		/** Function to initialize datatable and get server side data*/
+		var dataTable	   = "";
+		var floorDataTable = "";
+		var ORDER_STATUS_TYPES	   =  <%- JSON.stringify(ORDER_STATUS_TYPES)%>;
+		var DELIVERY_ORDER_STATUS  =  <%- JSON.stringify(DELIVERY_ORDER_STATUS)%>;
+		var ASSIGNMENT_TYPE  	   =  <%- JSON.stringify(ASSIGNMENT_TYPE)%>;
+		var adjustInterval	= "";
+
+		<% if(filter_from_date && filter_to_date){ %>
+			$('#from_date').val("<%= filter_from_date %>");
+			$('#to_date').val("<%= filter_to_date %>");
+			var displayStartDate 	= "<%= newDate(filter_from_date,DATABASE_DATE_FORMAT) %>"
+			var displayEndDate 		= "<%= newDate(filter_to_date,DATABASE_DATE_FORMAT) %>"
+			$("#date-range-picker").val(displayStartDate+" - "+displayEndDate);
+			$("#date-range-picker").trigger("change");
+		<% } %>
+
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"fixedHeader": {
+					"headerOffset": $('.navbar').outerHeight()
+				},
+				"columns"	: 	[
+					{
+						"data"		: {},
+						"orderable" : false,
+						"render" 	: 	function(result){
+							let orderId = (result._id) ? 	result._id :"";
+
+							return '<div class=" materialize_checkbox p-l-15">'+
+								'<div class="orderCheckbox_wrapper">'+
+									'<input type="checkbox" class="filled-in chk-col-indigo" id="'+orderId+'">'+
+									'<label for="'+orderId+'" class="checkbox data"></label>'+
+								'</div>'+
+							'</div>';
+						}
+					},
+					{ 	"data"		: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render"	: function(result){
+							var id			= (result._id)	  		  	? 	result._id 	  		  	:'';
+							var customerId	= (result.customer_id)	  	? 	result.customer_id 	  	:"";
+							var isConfirm	= (result.is_confirm)	  	? 	result.is_confirm 	  	:false;
+							var isCompleted	= (result.is_completed)	  	? 	result.is_completed   	:false;
+							var noOfQueue	= (result.number_of_queue)	? 	result.number_of_queue	:'';
+							var deliveryBy	= (result.delivery_type)  	? 	result.delivery_type  	:'';
+							var orderStatus = (result.order_status)   	? 	result.order_status   	:'';
+							var captainId 	= (result.captain_id)   	?	result.captain_id   	:'';
+							var assignedCaptain= (result.assigned_captain)?	result.assigned_captain :'';
+							var previousAssignedCaptains = (result.previous_assigned_captains)?	result.previous_assigned_captains :'';
+							let isAssigned 			=	(captainId) ? captainId :assignedCaptain;
+							let assignedLabelText 	=	(previousAssignedCaptains) ? '<%= __("admin.order_tracking.reassign");%>' :'<%= __("admin.order_tracking.assign");%>';
+
+							var dropDownButton 		= '';
+							if('<%=authUserRoleId%>' == "<%=FLEET%>"){
+								if(!isAssigned && isConfirm && ((!previousAssignedCaptains && orderStatus == '<%= ORDER_PREPARING %>' || orderStatus == '<%= ORDER_READY_TO_PICK_UP %>')|| previousAssignedCaptains) && !isCompleted && deliveryBy == '<%= DELIVERY_BY_CRAVEZ %>'){
+									dropDownButton	+=	'<a href="javascript:void(0);" class="waves-effect action-btn btn btn-primary m-l-5 btn-sm <%= getPermissionClass(module_type,["order_tracking","assign"]); %>" data-action-url="<%=admin_list_url%>/assign_captain_list/'+id+'" data-open-modal="true">'+
+										assignedLabelText+
+									'</a>';
+								}
+								if(isAssigned && isConfirm && !isCompleted && deliveryBy == '<%= DELIVERY_BY_CRAVEZ %>'){
+									dropDownButton += '<a href="javascript:void(0);" data-href="<%=admin_list_url%>/order_undo_assign/'+id+'" class="waves-effect waves-block action-btn btn btn-primary m-l-5 btn-sm confirm_box <%= getPermissionClass(module_type,["order_tracking","undo_assign"]); %>" data-confirm-message="<%= __("admin.order_tracking.you_want_to_undo_this_order"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+										'<%= __("admin.order_tracking.undo_assign");%>'+
+									'</a>';
+								}
+							}else{
+								dropDownButton 		= ''+
+									'<div class="btn-group btn-group-sm m-l-5 m-t-5">'+
+									'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+										'<i class="material-icons">more_vert</i>'+
+									'</button>'+
+									'<ul class="dropdown-menu">'+
+										/** view Link **/
+										'<li>'+
+											'<a href="<%=WEBSITE_ADMIN_URL%>orders/view/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["order_detail","view"]); %>" target="_blank">'+
+												'<%= __("admin.system.view");%>'+
+											'</a>'+
+										'</li>'+
+										'<li>'+ /** view order assignment process Link **/
+											'<a href="<%=WEBSITE_ADMIN_URL%>order_assignment_process/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["order_assignment_process","list"]); %>">'+
+												'<%= __("admin.order_tracking.view_assignment_process");%>'+
+											'</a>'+
+										'</li>';
+										if(orderStatus == '<%= ORDER_REJECTED %>'){
+											dropDownButton	+=	'<li>'+
+																	'<a  href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>orders/change_status/'+id+'" data-open-modal="true" class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,['order_tracking','cancel_order']); %>">'+
+																		'<%= __("admin.orders.cancel_order");%>'+
+																	'</a>'+
+																'</li>'+
+																'<li>'+
+																	'<a href="javascript:void(0);" data-href="<%=WEBSITE_ADMIN_URL%>orders/reschedule/'+id+'?redirect=order_tracking" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,['order_tracking','reschedule_order']); %>" data-id="'+id+'" data-confirm-message="<%= __("admin.order_tracking.you_want_to_reschedule_this_order"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+																		'<%= __("admin.order_tracking.reschedule_order");%>'+
+																	'</a>'+
+																'</li>';
+										}
+										if(isConfirm && !isCompleted && orderStatus!= '<%= ORDER_REJECTED %>'){
+											dropDownButton	+=	'<li>'+
+																	'<a  href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>orders/change_status/'+id+'" data-open-modal="true" class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,['order_tracking','change_status']); %>">'+
+																		'<%= __("admin.orders.change_order_status");%>'+
+																	'</a>'+
+																'</li>';
+										}
+										if(!isAssigned && isConfirm && ((!previousAssignedCaptains && orderStatus == '<%= ORDER_PREPARING %>' || orderStatus == '<%= ORDER_READY_TO_PICK_UP %>')|| previousAssignedCaptains) && !isCompleted && deliveryBy == '<%= DELIVERY_BY_CRAVEZ %>'){
+											dropDownButton	+=	'<li>'+
+																	'<a href="javascript:void(0);" class="waves-effect waves-block action-btn <%= getPermissionClass(module_type,["order_tracking","assign"]); %>" data-action-url="<%=admin_list_url%>/assign_captain_list/'+id+'" data-open-modal="true">'+
+																		assignedLabelText+
+																	'</a>'+
+																'</li>';
+										}
+										if(isAssigned && isConfirm && !isCompleted && deliveryBy == '<%= DELIVERY_BY_CRAVEZ %>'){
+											dropDownButton += '<li>'+
+												'<a href="javascript:void(0);" data-href="<%=admin_list_url%>/order_undo_assign/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["order_tracking","undo_assign"]); %>" data-confirm-message="<%= __("admin.order_tracking.you_want_to_undo_this_order"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+													'<%= __("admin.order_tracking.undo_assign");%>'+
+												'</a>'+
+											'</li>';
+										}
+										if(noOfQueue <= '<%= THIRD_REQUEUE_ORDER %>' && !isCompleted){
+											/** Requeue Link **/
+											dropDownButton += '<li>'+
+																	'<a href="javascript:void(0);" data-href="<%=WEBSITE_ADMIN_URL%>orders/requeue/'+id+'?redirect=order_tracking" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["order_tracking","change_status"]); %>" data-confirm-message="<%= __("admin.order_tracking.you_want_to_requeue_this_order"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+																		'<%= __("admin.order_tracking.requeue");%>'+
+																	'</a>'+
+																'</li>';
+										}
+
+										if(!isConfirm && !isCompleted) {
+											/** Approve Link **/
+											dropDownButton += '<li>'+
+												'<a href="javascript:void(0);" data-href="<%= WEBSITE_ADMIN_URL %>orders/accept_status/'+id+'?redirect=order_tracking" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["order_tracking","accept_reject"]); %>" data-confirm-message="<%= __("admin.order_tracking.you_want_to_accept_this_order"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+													'<%= __("admin.order_tracking.accept"); %>'+
+												'</a>'+
+											'</li>'+
+											/** Reject Link **/
+											'<li>'+
+												'<a href="javascript:void(0)" class="waves-effect waves-block open-modal <%= getPermissionClass(module_type,["order_tracking","accept_reject"]); %>" data-id="'+id+'">'+
+													' <%= __("admin.order_tracking.reject"); %>'+
+												'</a>'+
+											'</li>';
+										}
+										if(!isCompleted && deliveryBy == '<%= DELIVERY_BY_PICK_UP %>'){
+											/** change Address **/
+											dropDownButton += '<li>'+
+												'<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>orders/change_address/'+id+'" data-open-modal="true" class="waves-effect waves-block action-btn <%= getPermissionClass(module_type,["order_tracking","change_address"]); %>">'+
+													' <%= __("admin.order_tracking.change_address"); %>'+
+												'</a>'+
+											'</li>';
+										}
+										if(!isCompleted && orderStatus!= "<%= ORDER_REJECTED %>"){
+											dropDownButton	+=	'<li>'+
+												'<a  href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/confirm_order_status/'+id+'" data-open-modal="true" class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,["order_tracking","confirm_status"]); %>">'+
+													'<%= __("admin.orders.confirm_order_status");%>'+
+												'</a>'+
+											'</li>';
+										}
+									dropDownButton += '</ul> </div>';
+							}
+							return dropDownButton;
+						}
+					},
+					{
+						"data"		 :  {} ,
+						"field_name" : "unique_order_id",
+						"render" 	 : 	function(result){
+							return '<a href="<%= WEBSITE_ADMIN_URL+'orders/view/'%>'+result._id+'" target="_blank">'+result.unique_order_id+'</a>';
+						}
+
+					},
+					{
+						"data": 'invoice_number',
+						"visible"	 :false,
+					},
+					{
+						"data"		 : 'order_date',
+						"searchable" : 	false,
+						"render" 	 : 	function(order_date){
+							return moment(order_date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"		 : 'last_status_updated_on',
+						"visible"	 :false,
+						"searchable" : 	false,
+						"render" 	 : 	function(last_status_updated_on){
+							return moment(last_status_updated_on).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"		 : 'restaurant_name',
+						"field_type" : "<%=OBJECT_ID_FIELD%>",
+						"field_name" : "restaurant_id",
+						"render" 	 : 	function(restaurant_name){
+							return  (restaurant_name) ? restaurant_name[DEFAULT_LANGUAGE_CODE] : '';
+						}
+					},
+					{
+						"data"		 : 'area_name',
+						"orderable" : 	false,
+						"render" 	 : 	function(area_name){
+							return  (area_name) ? area_name[DEFAULT_LANGUAGE_CODE] : '';
+						}
+					},
+					{
+						"data"		 : 'delivery_area_name',
+						"orderable" : 	false,
+						"render" 	 : 	function(delivery_area_name){
+							return  (delivery_area_name) ? delivery_area_name[DEFAULT_LANGUAGE_CODE] : '';
+						}
+					},
+					{
+						"data": {},
+						"orderable" : 	false,
+						"field_type" : "<%=EXACT_FIELD%>",
+						"field_name" : "admin_status",
+						"render" : function(result){
+							var statusLabel 	= (result.admin_status && ORDER_STATUS_TYPES[result.admin_status]) ? '<p><span class="label '+ORDER_STATUS_TYPES[result.admin_status].label_class+'">'+ORDER_STATUS_TYPES[result.admin_status].status_name+'</span></p>' : '<p><span class="label label-danger">'+(result.admin_status) ? result.admin_status : ""+'</span></p>';
+							var confirmStatus 	= (result.is_confirm == false)	? '<p><span class="label label-danger"><%=__("admin.order_tracking.not_confirmed")%></span></p>' : '';
+							var modifiedStatus 	= (result.is_modified && result.admin_status == '<%= ORDER_PENDING %>')	? '<p><span class="label label-warning"><%=__("admin.order_tracking.modified_order")%></span></p>' : '';
+
+							return statusLabel+confirmStatus+modifiedStatus;
+						}
+					},
+					{
+						"data"		 : 'order_price',
+						"searchable" : 	false,
+						"render" 	 : 	function(orderPrice){
+							return (typeof orderPrice !== typeof undefined) ? currencyFormat(orderPrice) :'';
+						}
+					},
+					{
+						"data"		 :  {},
+						"visible"	 : false,
+						"field_type" : "<%=OBJECT_ID_FIELD%>",
+						"field_name" : "captain_id",
+						"render" 	 : 	function(result){
+							return '<a href="<%= WEBSITE_ADMIN_URL+'user_management/view_driver/'%>'+result.captain_id+'" target="_blank">'+result.captain_name+'</a>';
+						}
+
+					},
+					{
+						"data"		 : 'delivery_by',
+						"visible"	 :false,
+						"field_name" : "delivery_type",
+						"orderable"  : 	false,
+					},
+					{
+						"data": {},
+						"orderable" : 	false,
+						"visible"	 :false,
+						"field_name" : "delivery_status",
+						"render" : function(result){
+							var statusLabel 	= (result.delivery_status && DELIVERY_ORDER_STATUS[result.delivery_status]) ? '<span class="label '+DELIVERY_ORDER_STATUS[result.delivery_status].label_class+'">'+DELIVERY_ORDER_STATUS[result.delivery_status].status_name+'</span>' : '';
+							return statusLabel;
+						}
+					},
+					{
+						"data"		 : 'mobile_number',
+						"visible"	 :false,
+					},
+					{
+						"data"		 : 'net_amount',
+						"visible"	 :false,
+						"searchable" : 	false,
+						"render" 	 : 	function(netAmount){
+							return  (typeof netAmount !== typeof undefined) ? currencyFormat(netAmount) :'';
+						}
+					},
+					{
+						"data": 'discount_price',
+						"visible"	 :false,
+						"orderable" : 	false,
+						"render"	: function(discount_price){
+							return  (typeof discount_price !== typeof undefined) ? currencyFormat(discount_price) : '';
+						}
+					},
+					{
+						"data"		: 	"package_id" ,
+						"visible"	 :false,
+						"orderable" : 	false,
+						"render"	:  function(packageId){
+							return  (packageId) ? "<span class='label label-success'><%=__('admin.orders.yes')%></span>" : "<span class='label label-danger'><%=__('admin.orders.no')%></span>";
+						}
+					},
+					{
+						"data"		 : 'order_price',
+						"visible"	 :false,
+						"searchable" : 	false,
+						"render" 	 : 	function(orderPrice){
+							return (typeof orderPrice !== typeof undefined) ? currencyFormat(orderPrice) :'';
+						}
+					},
+					{
+						"data"		: 'elapsed_time',
+						"visible"	 :false,
+						"orderable" : 	false,
+						"render"	: function(elapsed_time){
+							return  (typeof elapsed_time !== typeof undefined) ? elapsed_time+" "+'<%= __("admin.order_tracking.minutes"); %>' : '';
+						}
+					},
+					{
+						"data"		 : 'queue_time',
+						"visible"	 :  false,
+						"searchable" : 	false,
+						"render" 	 : 	function(queue_time){
+							return moment(queue_time).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"		 : 'branch_id',
+						"visible"	 : false,
+						"field_type" : "<%=OBJECT_ID_FIELD%>",
+						"field_name" : "branch_id",
+					},
+					{
+						"data"		 : 	"delivery_status" ,
+						"orderable"  : 	false,
+						"visible"	 :  false,
+					},
+					{
+						"class":          "details-control",
+						"orderable":      false,
+						"data":           null,
+						"defaultContent": ""
+					},
+				],
+				"createdRow": function( row, data, dataIndex){
+					if(!data.is_completed){
+						if(data.delivery_type == '<%= DELIVERY_BY_CRAVEZ %>'){
+							var captainId 	    = (data.captain_id)   	?	data.captain_id   	:'';
+							var assignedCaptain = (data.assigned_captain)?	data.assigned_captain :'';
+							let isAssigned 		= (captainId) ? captainId : assignedCaptain;
+							if(!isAssigned){
+								$(row).addClass('highlight-datatable-row');
+							}
+						}else if(data.delivery_type == '<%= DELIVERY_BY_RESTAURANT %>'){
+							var captainName 	= (data.captain_name)   	?	data.captain_name   	:'';
+							var captainNumber   = (data.captain_number)		?	data.captain_number 	:'';
+							if(!captainName && !captainNumber){
+								$(row).addClass('highlight-datatable-row');
+							}
+						}
+					}
+				},
+				"ajax":{
+					url 	:	"<%=admin_list_url%>?order_type=<%= order_type%>",
+					type	: 	"POST",
+					data	: 	function (d) {
+						d.status			=	$('#filter_order_status').val();
+						d.fromDate 			=   $('#from_date').val();
+						d.toDate 			=   $('#to_date').val();
+						d.delivery_type 	= 	$('#delivery_type').val();
+						d.restaurant_id		= 	$('#search_restaurant_id').val();
+						d.is_order_assigned	=	$('#is_order_assigned').val();
+						d.captain_id		= 	$('#captain_id').val();
+				    },
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+
+			floorDataTable = $('#datatable-listing-floor-status').DataTable({
+				"order"		: 	[],
+				"sDom"		:	"tr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"pagging"	: 	false,
+				"columns"	: 	[
+					{
+						"data"		: 'status_label',
+						"orderable" : false,
+					},
+					{
+						"data"		: 'captain_with_bike',
+						"orderable" : false,
+					},
+					{
+						"data"		: 'captain_with_car',
+						"orderable" : false,
+					},
+					{
+						"data"		: 'total_captain',
+						"orderable" : false,
+					},
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>/get_floor_status_list",
+					type	: 	"POST",
+					data	: 	function (d) {
+						d.area_id = $('#aassign_area_id').val();
+					},
+					dataSrc	: 	function(res){
+						floorDataTable.columns.adjust();
+						window.setTimeout(function(){
+							clearInterval(adjustInterval);
+						},2000);
+						return res.data;
+					}
+				},
+			});
+
+			// Adjust floor status datatable column
+			setInterval(function(){
+				floorDataTable.columns.adjust();
+			},1);
+
+			// Array to track the ids of the details displayed rows
+			var detailRows = [];
+ 			$('#datatable-listing tbody').on( 'click', 'tr td.details-control', function () {
+				var tr = $(this).closest('tr');
+				var row = dataTable.row( tr );
+				var idx = $.inArray( tr.attr('id'), detailRows );
+				var table = $('#datatable-listing').DataTable();
+				// DO SOMETHING HERE TO UPDATE fixedHeader.headerOffset
+				table.fixedHeader.headerOffset($('.navbar').height());   // apply new value
+				// above fails, as there so no such method to update headerOffset (yet)
+				table.fixedHeader.adjust();
+				if ( row.child.isShown() ) {
+					tr.removeClass( 'details' );
+					row.child.hide();
+					// Remove from the 'open' array
+					detailRows.splice( idx, 1 );
+				}else{
+					tr.addClass( 'details' );
+					row.child( format( row.data() ) ).show();
+					// Add to the 'open' array
+					if ( idx === -1 ) {
+						detailRows.push( tr.attr('id') );
+					}
+				}
+			} );
+			// On each draw, loop over the `detailRows` array and show any child rows
+			dataTable.on( 'draw', function () {
+				$.each( detailRows, function ( i, id ) {
+					$('#'+id+' td.details-control').trigger( 'click' );
+				} );
+			} );
+
+			/** Refresh datatable */
+			$(".refresh-btn").click(function(e) {
+				e.stopPropagation();
+				$("#datatable-listing").DataTable().ajax.reload(null, false);
+			});
+
+			/** To Refresh order tracking in every 30 seconds */
+			setInterval(function(){
+				$("#datatable-listing").DataTable().ajax.reload(null,false);
+			}, DEFAULT_REFRESH_TIME);
+
+			/** Refresh floor status datatable */
+			$(".refresh-floor-btn").click(function(e) {
+				$("#datatable-listing-floor-status").DataTable().ajax.reload(null, false);
+			});
+
+			/** To Refresh floor status in every 30 seconds */
+			setInterval(function(){
+				$("#datatable-listing-floor-status").DataTable().ajax.reload(null, false);
+			}, FLOOR_STATUS_REFRESH_TIME);
+
+			/** Refresh count of orders */
+			$(".count-refresh-btn").click(function(e) {
+				var btnId = $(this).attr("id");
+				e.stopPropagation();
+       			getorderData(btnId,true);
+			});
+
+			$(".business-rule-panel").click(function(e) {
+				var btnId	= $(".count-refresh-btn").attr('id');
+       			getorderData(btnId,true);
+			});
+
+			/** get first time rule data*/
+			setTimeout(function(){
+				var btnId	=	$(".count-refresh-btn").attr('id');
+				getorderData(btnId,true);
+			},FIRST_TIME_RULE_GET_TIME);
+
+			/** To Refresh count of orders in every 30 seconds */
+			setInterval(function(){
+				var btnId	=	$(".count-refresh-btn").attr('id');
+				getorderData(btnId,true);
+			},ORDER_RULE_REFRESH_TIME);
+		});
+
+		function format(d){
+			var netAmount 		=	(typeof d.net_amount !== typeof undefined) ? currencyFormat(d.net_amount) :'';
+			var discountPrice 	=	(typeof d.discount_price !== typeof undefined) ? currencyFormat(d.discount_price) : '';
+			var orderPrice 		=	(typeof d.order_price !== typeof undefined) ? currencyFormat(d.order_price) : '';
+			var elapsedTime 	=	(typeof d.elapsed_time !== typeof undefined) ? d.elapsed_time+" "+'<%= __("admin.order_tracking.minutes"); %>' : '';
+			var lastStatusUpdatedOn	= moment(d.last_status_updated_on).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+			var packageId		=	(d.package_id) ? "<span class='label label-success'><%=__('admin.orders.yes')%></span>" : "<span class='label label-danger'><%=__('admin.orders.no')%></span>";
+			var deliveryStatus 	= (d.delivery_status && DELIVERY_ORDER_STATUS[d.delivery_status]) ? '<span class="label '+DELIVERY_ORDER_STATUS[d.delivery_status].label_class+'">'+DELIVERY_ORDER_STATUS[d.delivery_status].status_name+'</span>' : '';
+			var statusLabel 	= (d.admin_status && ORDER_STATUS_TYPES[d.admin_status]) ? '<p><span class="label '+ORDER_STATUS_TYPES[d.admin_status].label_class+'">'+ORDER_STATUS_TYPES[d.admin_status].status_name+'</span></p>' : '<p><span class="label label-danger">'+(d.admin_status) ? d.admin_status : ""+'</span></p>';
+			var confirmStatus 	= (d.is_confirm == false)	? '<p><span class="label label-danger"><%=__("admin.order_tracking.not_confirmed")%></span></p>' : '';
+			var modifiedStatus 	= (d.is_modified && d.admin_status == '<%= ORDER_PENDING %>')	? '<p><span class="label label-warning"><%=__("admin.order_tracking.modified_order")%></span></p>' : '';
+			var customerLatitude	=	(d.customer_latitude )	? 	d.customer_latitude 	:"";
+			var customerLongitude 	=	(d.customer_longitude ) ?	d.customer_longitude	:"";
+			var modifyOrderPrice 	=	(d.modify_order_price ) ? currencyFormat(d.modify_order_price) :"";
+			var isModified 			=	(d.is_modified ) ?	d.is_modified	:"";
+			var tempTimePassed 		= 	d.time_passed ? d.time_passed : 0;
+			var adminStatus 		= 	d.admin_status ? d.admin_status : 0;
+			var isCompleted			=   d.is_completed  ? d.is_completed : '';
+			var timePassedLabel     = 	(!isNaN(tempTimePassed)) ? tempTimePassed+" <%= __('admin.orders.min'); %>" : 0+" <%= __('admin.orders.min'); %>";
+			timePassedLabel			=	(tempTimePassed > "<%=TIME_PASSED_MINUTE_LIMIT%>") ? "<%= __('admin.orders.order_not_delivered'); %>" : timePassedLabel;
+			let timePassedClass		=	(adminStatus == '<%=ORDER_DELIVERED%>' || isCompleted) ? "hide" : "";
+			var assignmentType		=	(d.assignment_type ) ? 	ASSIGNMENT_TYPE[d.assignment_type] :"";
+			var amountDebitedByWallet 	=	(d.amount_debited_by_wallet ) ? currencyFormat(d.amount_debited_by_wallet) :currencyFormat(0);
+
+			var html	='<div class="row clearfix">';
+			var html	='<div class="col-sm-12">';
+			html	+='<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.customer_name"); %>:</strong> '+'<a href="<%= WEBSITE_ADMIN_URL+'user_management/view_customer/'%>'+d.customer_id+'" target="_blank">'+d.full_name+'</a>'+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.customer_mobile_number"); %>:</strong> '+d.mobile_number+'</p></div>';
+
+			html	+='<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.invoice_number"); %>:</strong> '+d.invoice_number+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.captain_name"); %>:</strong> '+((d.captain_id) ? '<a href="<%= WEBSITE_ADMIN_URL+"user_management/view_driver/"%>'+d.captain_id+'" target="_blank">'+d.captain_name+'</a>':(d.captain_name ? d.captain_name :""))+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.delivery_by"); %>:</strong> '+d.delivery_by+'</p></div>';
+
+			html	+='<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.net_order_amount"); %>:</strong> '+netAmount+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.discount_value"); %>:</strong> '+discountPrice+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.infinity_service"); %>:</strong> '+packageId+'</p></div>';
+
+			html	+='<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.total_order_amount"); %>:</strong> '+orderPrice+'</p></div>'+'<div class="col-sm-4 mb0 '+timePassedClass+'"><p><strong><%= __("admin.orders.time_passed"); %>:</strong> '+timePassedLabel+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.last_status_updated_on"); %>:</strong> '+lastStatusUpdatedOn+'</p></div>';
+
+			html	+='<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.delivery_status"); %>:</strong> '+deliveryStatus+'</p></div>'+'<div class="col-sm-4 mb0 '+(!isModified ? "hide" :"")+' "><p><strong><%= __("admin.orders.modified_order_amount"); %>:</strong> '+modifyOrderPrice+'</p></div>';
+
+			html	+='<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.delivery_latitude"); %>:</strong> '+customerLatitude+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.delivery_longitude"); %>:</strong> '+customerLongitude+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.order_status"); %>:</strong> '+statusLabel+confirmStatus+modifiedStatus+'</p></div>';
+
+			html	+='<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.amount_debited_by_wallet"); %>:</strong> '+amountDebitedByWallet+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.order_tracking.order_assigned_status"); %>:</strong> '+assignmentType+'</p></div>';
+
+			html	+='</div></div>';
+			return html;
+		}
+
+		/**
+		* Function to get Location of captain using ajax submit
+		*/
+		function getorderData(btnId,load){
+			$.ajax({
+				url :"<%=admin_list_url%>/get_order_data",
+				type: "post",
+				data: {
+					from_date	: $('#from_date').val(),
+					to_date 	: $('#to_date').val(),
+				},
+				beforeSend: function() {
+					if(load){
+						startTextLoading(btnId);
+					}
+				},
+				success:function(response){
+					$('.first_orders').html(response.first_orders);
+					$('.duplicate_orders').html(response.duplicate_orders);
+					$('.big_orders').html(response.big_orders);
+					$('.rejected_orders').html(response.order_rejected);
+					$('.delayed_acceptance').html(response.delayed_acceptance);
+					$('.delayed_preparation').html(response.delayed_preparation);
+					$('.delayed_pickup_by_captain').html(response.delayed_pickup_by_captain);
+					$('.delayed_pickup_by_customer').html(response.delayed_pickup_by_customer);
+					$('.delayed_pickup_by_restaurant').html(response.delayed_pickup_by_restaurant);
+					$('.vip_orders').html(response.vip_orders);
+					$('.delayed_in_delivery').html(response.delayed_delivery);
+					$('.cravez_delivery_monitoring').html(response.delivery_cravez);
+					$('.restaurant_delivery_monitoring').html(response.delivery_restaurant);
+					$('.way_to_customer').html(response.way_to_customer);
+					$('.way_to_restaurant').html(response.way_to_restaurant);
+					$('.delivered').html(response.order_delivered);
+					$('.not_assigned').html(response.order_not_assigned);
+					stopTextLoading(btnId);
+				}
+			});
+		}//End getLocationData()
+
+		/**check/uncheck checkbox select all check/uncheck*/
+		$(document).on('change','#order_select_all',function(){
+			var isChecked	= $(this).is(':checked');
+			$('.orderCheckbox_wrapper input[type="checkbox"]').not(":disabled").prop("checked",isChecked).trigger("change");
+		});
+
+		/**Check/Uncheck checkbox*/
+		$(document).on('change','.orderCheckbox_wrapper input[type="checkbox"]',function(){
+			var id          = $(this).attr('id');
+			var isChecked	= $(this).is(':checked');
+			if(isChecked){
+				itemCheckboxArray[id] = true;
+			}else{
+				delete itemCheckboxArray[id];
+			}
+			var totalCheckBox = $('.orderCheckbox_wrapper input[type="checkbox"]').not(":disabled").length;
+			var checkedBox = $('.orderCheckbox_wrapper input[type="checkbox"]:checked').length;
+			let selectAll = (totalCheckBox == checkedBox) ? true : false;
+			$("#order_select_all").prop("checked",selectAll);
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Get branch list
+		*/
+		$("select[name='search_restaurant_id']").change(function(){
+			getBranchDropDownList($(this));
+		});
+
+		/** Reload datatable data*/
+		$("#aassign_area_id").change(function(){
+			floorDataTable.ajax.reload();
+		});
+		$("#aassign_area_id").selectpicker('refresh');
+
+		/**
+		* Get branch search dropdown list
+		*/
+		function getBranchDropDownList(currentObj,restaurantId,branchId){
+			if(currentObj){
+
+				var currentValue	=	currentObj.val();
+				var childInputName	=	currentObj.attr("data-child-name");
+				var childObj		=	(childInputName) ?  $("select[name='"+childInputName+"']") :"";
+				var placeholder		=	childObj.attr("data-placeholder");
+				var childFirstOption=	'<option value="">'+placeholder+'</option>';
+
+				if(!currentValue && restaurantId) currentValue = restaurantId;
+
+				childObj.attr("disabled",true).removeClass("disabled").html(childFirstOption);
+				if(!branchId) childObj.val("").trigger("change");
+				$(".show-tick").selectpicker('refresh');
+
+				if(currentValue){
+					/** Get dropdown list **/
+					var options = {
+						url 	: "<%=WEBSITE_ADMIN_URL%>orders/branch_list",
+						data	: {restaurant_id : currentValue},
+						method	: "post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_SUCCESS%>"){
+							/** Append dropdown list **/
+							childObj.attr("disabled",false).removeClass("disabled").html(childFirstOption+response.branch_list);
+							if(branchId) childObj.val(branchId);
+							$(".show-tick").selectpicker('refresh');
+						}else if(response.status && response.message){
+							notice(response.status,response.message);
+						}
+					});
+				}
+			}
+		}// end getBranchDropDownList()
+
+		/** To view on map */
+		$(".perform_action").click(function(){
+			updateItemStatus($(this).val());
+		});
+
+		/** Javascript function to update item status */
+		function updateItemStatus(status,itemId){
+			var itemIdArray = (itemId) ? [itemId] : Object.keys(itemCheckboxArray);
+
+			if(status == "view_on_map"){
+				if(itemIdArray.length < 1){
+					notice("<%= STATUS_ERROR %>","<%= __('admin.order_tracking.please_select_atleast_one_item')%>");
+					return false;
+				}
+				getLocationData(itemIdArray);
+			}
+		}// end updateItemStatus()
+
+		/**
+		* Function to get Location of captain using ajax submit
+		*/
+		function getLocationData(itemIdArray){
+			$.ajax({
+				url :"<%=admin_list_url%>/get_order_location",
+				type: "POST",
+				data : { order_ids : itemIdArray},
+				success:function(response){
+					$('#map_modal').html(response);
+					$('#map_modal').modal('show');
+				}
+			});
+		}//End getLocationData()
+
+		/**
+		* Function to show modal
+		*/
+		$(document).on('click','.open-modal',function(){
+			var orderId = $(this).attr('data-id');
+
+			$('#order_id').val(orderId);
+			$("#rejection_reason_error").text('');
+			$('#rejection_reason').val("");
+			$('#reject-form').attr("action","<%=WEBSITE_ADMIN_URL%>orders/reject_order_status");
+
+			$('#reject_order').modal({
+				backdrop: 'static',
+				keyboard: false
+			});
+			$('#reject_order').modal('show');
+		});
+
+		/**
+		* Function to submit  modal form
+		*/
+		$(".btn-submit-reject").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+
+			ajax_submit("reject-form",function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/**
+		* Function to filter by order status
+		*/
+		$('#filter_order_status,#delivery_type,#search_restaurant_id,#is_order_assigned,#captain_id').change(function(){
+			dataTable.draw();
+		});
+
+		/** set date in query string for rules*/
+		$(document).on("click","div.rulebutton a",function(e){
+			e.stopImmediatePropagation();
+			e.preventDefault();
+
+			var buttonURL	= $(this).attr("href");
+			var fromDate	= $('#from_date').val();
+			var toDate		= $('#to_date').val();
+			if(fromDate && toDate){
+				buttonURL += '&from_date='+fromDate+'&to_date='+toDate
+			}
+			window.location.href = buttonURL;
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

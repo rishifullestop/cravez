@@ -1,0 +1,169 @@
+<div class="container-fluid">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by note -->
+									<div class="col-xs-12 col-sm-6">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0" name="note" onkeyup="searchDatatable(0)" placeholder="<%= __('import_managers.search_by_note'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-xs-12 col-sm-6">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("import_managers.import_managers"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm">
+						<li>
+							<a href="<%=list_url +'/add'%>" class="<%= getPermissionClass(module_type,['import_managers','add']); %>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("import_managers.add_import_manager"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								<i class="material-icons">more_vert</i>
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li>
+									<a href="<%=list_url +'/add'%>" class="<%= getPermissionClass(module_type,['import_managers','add']); %>">
+										<%= __("import_managers.add_import_manager"); %>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("import_managers.note");%></th>
+								<th><%= __("system.status");%></th>
+								<th><%= __("system.created");%></th>
+								<th><%= __("system.action");%></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable =	"";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: [[2, "desc" ]],
+				"sDom"		: "ltipr",
+				"serverSide": true,
+				"scrollX"	: true,
+				"lengthMenu": PAGING_LENGTH_MENU,
+				"columns"	: [
+					{ 	"data"	: 'note',
+						"render": function(note){
+							return (note) ? '<span class="readmore">'+note+'</span>' :'N/A';
+						}
+					},
+					{
+						"data"		: "status",
+						"orderable"	: false,
+						"searchable": false,
+						"render"	: function(status){
+							var spanColor =  (status == '<%= PENDING %>') ? "label-warning" : "label-primary";
+							var spanText  =  (status == '<%= PENDING %>') ? "<%= __('system.pending');%>" : "<%= __('system.in_review');%>";
+							return '<span class="label '+spanColor+'">'+spanText+'</span>';
+						}
+					},
+					{
+						"data"		 : 'created',
+						"searchable" : false,
+						"render" 	 : function(created){
+							return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{ 	"data"		: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render"	: function(result){
+							var id	= (result._id)	? result._id : '';
+
+							return '<a href="<%=list_url%>/download/'+id+'" class="<%= getPermissionClass(module_type,["import_managers","download"]); %>">'+
+								'<button type="button" class="btn bg-blue waves-effect">'+
+									'<%= __("import_managers.download");%>'+
+								'</button>'+
+							'</a>';
+						}
+					},
+				],
+				"ajax":{
+					url 	: "<%= list_url %>",
+					type	: "POST",
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function( settings ) {
+					/** Description read more **/
+					readMore();
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>

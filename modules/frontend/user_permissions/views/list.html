@@ -1,0 +1,194 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __('system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by Name -->
+									<div class="col-xs-12 col-sm-5">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0" onkeyup="searchDatatable(0)" placeholder="<%= __('user_permissions.search_by_name'); %>" name="name">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Email -->
+									<div class="col-xs-12 col-sm-5">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_1" onkeyup="searchDatatable(1)" placeholder="<%= __('user_permissions.search_by_email'); %>" name="email">
+											</div>
+										</div>
+									</div>
+									<!-- datatable reset -->
+									<div class="col-xs-12 col-sm-2">
+										<div class="form-group">
+											<button type="button" id="reset" class="btn btn-danger btn-sm waves-effect"><%= __("system.reset")%></button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("user_permissions.user_permissions"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=list_url%>/add" class='<%= getPermissionClass(module_type,["user_permissions","add"]); %>'>
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									 <%= __('user_permissions.add_user_permissions'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="30%"><%= __("user_permissions.full_name"); %></th>
+								<th width="30%"><%= __("user_permissions.email"); %></th>
+								<th width="10%"><%= __("system.status"); %></th>
+								<th width="20%"><%= __("system.modified"); %></th>
+								<th><%= __("system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable ="";
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem('DataTables', JSON.stringify(oData));
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse(localStorage.getItem('DataTables'));
+				},
+				"order"		: 	[[3, "desc"]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":   PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{"data": 'full_name' },
+					{
+						"data"		: 'email',
+						"render" 	: function(email){
+							return 	(email)	? '<a href="mailto:'+email+'">'+email+'</a>' :email;
+						}
+					},
+					{
+						"data"		: "active",
+						"orderable"	: false,
+						"render"	: function(active){
+							return (active == "<%=ACTIVE%>")	? '<span class="label label-success"><%=__("system.active")%></span>' :'<span class="label label-danger"><%=__("system.inactive")%></span>';
+						}
+					},
+					{
+						"data"		:	'modified',
+						"searchable": 	false,
+						"render"	: 	function(modified){
+							return moment(modified).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+						}
+					},
+					{
+						"data"			: {},
+						"orderable"		: false,
+						"render" 		: function(result){
+							var id 		= (result._id) 		?	result._id 		:"";
+							var status	= (result.active)	? 	result.active	:"<%=DEACTIVE%>";
+
+							/** Status Link  **/
+							var statusLinkText  = (status == "<%= DEACTIVE %>") ? "<%= __('system.activate'); %>"			:"<%= __('system.deactive'); %>" ;
+							var statusLinkTitle = (status == "<%= DEACTIVE %>") ? "<%= __('system.click_to_activate'); %>"  :"<%= __('system.click_to_deactivate'); %>" ;
+
+							var dropDownButton 		=	''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("system.action"); %> '+
+									'<span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a href="<%=list_url%>/edit/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["user_permissions","edit"]); %>">'+
+											' <%= __("system.edit"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Status Link  **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=list_url%>/update-status/'+id+'/'+status+'" class=" waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["user_permissions","active_deactive"]); %>" data-confirm-message="<%= __("user_permissions.you_want_to_change_status"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>" title="'+statusLinkTitle+'">'+
+											''+
+											statusLinkText+
+										'</a>'+
+									'</li>'+
+									/** Delete Link */
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=list_url%>/delete/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["user_permissions","delete"]); %>" data-confirm-message="<%= __("user_permissions.you_want_to_delete_this_user_permissions"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+											'<%= __("system.delete"); %>'+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+						}
+					}
+				],
+				"ajax":{
+					url 	: "<%=list_url%>",
+					type	: "POST",
+					data: function (d) {
+						d.teamLeader = $('#searchTeamLeader').val();
+					},
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/** Javascript function to search team members in datatable */
+		$(document).on('change', '#searchTeamLeader', function(e){
+			dataTable.draw();
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>

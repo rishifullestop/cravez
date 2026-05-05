@@ -1,0 +1,80 @@
+<%
+	var attributeType= attribute_type;
+	var result 		 = 	result;
+	var isEditable 	 =	is_editable;
+	var attributeId	 =  (result._id) ? result._id :"";
+	var formUrl 	 =  (isEditable) ? admin_list_url+"/"+attributeType+"/edit/"+attributeId : admin_list_url+"/"+attributeType+"/add";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-attribute" action="<%=formUrl%>" data-submit-btn-id="attribute-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog  modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.system.edit")+" "+displayType : __("admin.system.add")+" "+displayType; %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="title" class="control-label col-555">
+											<%= __("admin.attribute_management.title"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="title" class="form-control" name="title" value="<%=result.title%>" />
+									</div>
+									<span id="title_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="order" class="control-label col-555">
+											<%= __("admin.attribute_management.order"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="order" class="form-control" name="order" value="<%=result.order%>" />
+									</div>
+									<span id="order_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer modal-footer-seperator">
+							<button type="button" id="attribute-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+								<%= __("admin.system.submit"); %>
+							</button>
+							<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+								<%= __("admin.system.cancel"); %>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	* Function to submit form
+	*/
+	var isEditable = <%=isEditable%>;
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-attribute',function(status,response){
+			if(status){
+				if(isEditable){
+					if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+					if(response.status && response.message) notice(response.status,response.message);
+					$('#form_modal').modal("hide");
+				}else{
+					$("#reset").trigger("click");
+				}
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+</script>

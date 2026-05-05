@@ -1,0 +1,65 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix" >
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("Text Group Setting"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=WEBSITE_PUBLIC_UPLOADS_PATH+'textsetting.xlsx'%>" download><button type="button" class="btn bg-indigo waves-effect"><%= __('Download Sample File'); %></button></a>
+						</li>
+						<li>
+							<a href="<%=admin_list_url%>" ><button type="button" class="btn bg-indigo waves-effect"><%= __('admin.system.back'); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="image_form" data-submit-btn-id="text-setting-import-btn-id" method="post" class="on_click_submit" role="form">
+						<!-- Tab panes -->
+						<div class="tab-content mt-20">
+							<div class="row clearfix">
+								<div class="col-sm-12">
+									<div class="form-group">
+										<div class="form-line">
+											<label for="file" class="control-label">
+												<%= __('File'); %>
+												:
+											</label>
+											<input type=hidden name="import" id="import" value="true">
+											<input type=file name="file" id="file" class="image-browse-select">
+										</div>
+										<span id="file_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<button type="button" id="text-setting-edit-btn-id" class="btn bg-pink btn-sm waves-effect btn-submit" <%- LOADING_BUTTON_TEXT %> ><%= __('admin.system.submit'); %></button>
+						<a href="javascript:location.reload(true);"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __('admin.system.reset'); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('script') %>
+	<script type="text/javascript">
+		/**
+		 * Function to submit form
+		 */
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			submit_multipart_form('image_form',function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					changeTab('<%= DEFAULT_LANGUAGE_CODE %>');
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	</script>
+

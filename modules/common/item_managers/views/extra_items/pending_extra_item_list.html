@@ -1,0 +1,252 @@
+<%
+ var itemDetail 	  = item_detail;
+ var restaurantDetail = restaurant_detail;
+ var itemId 		  = item_id;
+ var itemUnitList 	  = item_unit_list;
+ var status 		  = itemDetail.status;
+ var statusTitle	  = (STATUS_LABELS[status] && STATUS_LABELS[status].status_name) ? STATUS_LABELS[status].status_name :"";
+ var statusClass      = (STATUS_LABELS[status] && STATUS_LABELS[status].class)	     ? STATUS_LABELS[status].class       :"";
+%>
+<% if(isRestaurant(module_type)){ %>
+	<div class="alert bg-grey alert-dismissible submit-for-approval" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<%= __("items.once_you_made_any_changes_those_updated_items_will_be_listed"); %>
+	</div>
+<% } %>
+<div class="row m-b-20">
+	<div class="col-sm-12 dashboard_page ">
+		<div class="marchant_file">
+			<div class="restaurant_right p-l-0">
+				<div class="heading_text">
+					<h3><%= __('extra_items.item_details'); %></h3>
+				</div>
+				<div class="all_restaurant">
+					<ul>
+						<li>
+							<label><%= __('extra_items.restaurant_name'); %></label>
+							<span><%= restaurantDetail.default_name %></span>
+						</li>
+						<li>
+							<label><%= __('extra_items.restaurant_number'); %></label>
+							<span><%= restaurantDetail.restaurant_number %></span>
+						</li>
+						<li>
+							<label><%= __('extra_items.item_name'); %></label>
+							<span><%= itemDetail.name[DEFAULT_LANGUAGE_CODE] %></span>
+						</li>
+						<li>
+							<label><%= __('extra_items.item_id'); %></label>
+							<span><%= itemDetail.item_id %></span>
+						</li>
+						<li>
+							<label><%= __('extra_items.item_status'); %></label>
+							<span class="label m-l-15 col-white p-l-10 font-14 <%=statusClass%>"><%= statusTitle %></span>
+						</li>
+						<% if(status == REJECTED) { %>
+							<li>
+								<label><%= __('extra_items.reject_reason'); %></label>
+								<span  class="nl2br rejection-class"><%= itemDetail.reject_reason%></span>
+							</li>
+						<% } %>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Search Start -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-col-pink">
+				<div class="panel-heading" role="tab" id="panel-heading-id">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false" aria-controls="panel-collapse-id">
+							<%= __("system.search"); %>
+							<span class="pull-right collapse-toggle-icon"></span>
+						</a>
+					</h4>
+				</div>
+				<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+					<div class="panel-body">
+						<form id="searchForm" name="searchForm" >
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by name in english -->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_0" onkeyup="searchDatatable(0)" placeholder="<%= __('extra_items.search_by_name_in_english'); %>" name="name_in_english">
+										</div>
+									</div>
+								</div>
+								<!-- Search by  name in arabic-->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_1" onkeyup="searchDatatable(1)" placeholder="<%= __('extra_items.search_by_name_in_arabic'); %>" name="name_in_arabic">
+										</div>
+									</div>
+								</div>
+								<!-- Search by item unit -->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" name="item_unit" id="column_filter_5" data-live-search="true" onchange="searchDatatable(5)">
+												<option value=""><%= __("extra_items.search_by_item_unit"); %></option>
+												<%-itemUnitList%>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- reset button -->
+								<div class="col-md-3">
+									<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+										<%= __("system.reset")%>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Search End -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%=  __("extra_items.pending_extra_items"); %>
+				</h2>
+				<ul class="header-dropdown m-r--5 btn-right-top-margin">
+					<li class="<%= getPermissionClass(module_type,["item","list"]); %>">
+						<a href="<%=base_url%>pending_item">
+							<button type="button" class="btn btn-sm bg-cyan waves-effect" >
+								<%= __("system.back"); %>
+							</button>
+						</a>
+					</li>
+					<li class="<%= getPermissionClass(module_type,['item','choice_group']); %>">
+						<a href="<%=base_url%>pending_choice_group/<%=itemId%>">
+							<button type="button" class="btn btn-sm bg-purple waves-effect" >
+								<%= __("extra_items.pending_choice_group"); %>
+							</button>
+						</a>
+					</li>
+					<% if((status != IN_REVIEW || !isRestaurant(module_type)) && slug != BURGER_KING && slug != PIZZA_HUT){ %>
+						<li class="<%= getPermissionClass(module_type,["item","extra_items"]); %>">
+							<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/add" data-open-modal="true" class="action-btn">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect" >
+									<%= __("extra_items.add_extra_item"); %>
+								</button>
+							</a>
+						</li>
+					<% } %>
+				</ul>
+			</div>
+			<div class="body hideScroll">
+				<table id="datatable-pending-extra-item" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="20%"><%= __("extra_items.name_in_english");%></th>
+							<th><%= __("extra_items.name_in_arabic");%></th>
+                            <th><%= __("extra_items.extra_fees");%></th>
+                            <th><%= __("extra_items.item_unit");%></th>
+							<th><%= __("system.action"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var STATUS_LABELS = <%- JSON.stringify(STATUS_LABELS)%>;
+	/** Function to initialize datatable and get server side data */
+	var dataTable	=	"";
+	$(document).ready(function() {
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+		dataTable = $('#datatable-pending-extra-item').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ 	"data": 'name.en' },
+                {	"data": 'name.ar' },
+               {	"data"		 : 'extra_fees',
+					"searchable" : 	false,
+					"render"     :  function(extra_fees){
+						return  currencyFormat(extra_fees)
+					}
+				},
+				{	"data"		 : 'item_unit',
+					"field_name" : "item_unit_id",
+					"field_type" : "<%=OBJECT_ID_FIELD %>",
+				},
+				{
+					"data"			: {},
+					"orderable"		: false,
+					"searchable"	: false,
+					"render" 		: function(result){
+						var id 	= (result._id)	? result._id :"";
+						var dropDownButton 	=	'';
+						dropDownButton += '<div class="btn-group">'+
+							'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+								'<%= __("admin.system.action"); %> '+
+								'<span class="caret"></span>'+
+							'</button>'+
+							'<ul class="dropdown-menu">'+
+							<% if((status != IN_REVIEW || !isRestaurant(module_type)) && slug != BURGER_KING && slug != PIZZA_HUT){ %>
+								/** Edit Link **/
+								'<li>'+
+									'<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/edit/'+id+'" data-open-modal="true"  class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,["item","extra_items"]); %>">'+' <%= __("admin.system.edit"); %>'+
+									'</a>'+
+								'</li>'+
+							<% } %>
+								/** Delete Link **/
+								'<li>'+
+									'<a href="javascript:void(0)" data-href="<%=list_url%>/delete/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["item","extra_items"]); %>" data-confirm-message="<%= __("extra_items.you_want_to_delete_this_extra_item"); %>" data-confirm-heading="<%= __("system.are_you_sure") %>">'+
+										' <%= __("system.delete"); %>'+
+									'</a>'+
+								'</li>'+
+							'</ul>'+
+						'</div>';
+						return dropDownButton;
+					}
+				}
+			],
+			"ajax":{
+				url 	: "<%=list_url%>",
+				type	: "POST",
+				dataSrc	: function(result){
+					setTimeout(()=>{
+						dataTable.columns.adjust();
+					},100);
+					adjustPermissionsClass();
+					return result.data;
+				}
+			}
+		});
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+</script>
+<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>

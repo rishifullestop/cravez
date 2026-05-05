@@ -1,0 +1,207 @@
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by To -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_1" onkeyup="searchDatatable(1)" placeholder="<%= __('admin.email_logs.search_by_to'); %>" name="emai_to">
+										</div>
+									</div>
+								</div>
+								<!-- Search by Date Range -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.email_logs.search_by_date_range'); %>">
+										</div>
+										<input class="form-control hide" id="from_date" type="text" name="from_date">
+										<input class="form-control hide" id="to_date" type="text" name="to_date">
+									</div>
+								</div>
+								<!-- Search by subject -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_2" onkeyup="searchDatatable(2)" placeholder="<%= __('admin.email_logs.search_by_subject'); %>" name="subject">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End-->
+	<!--Start Listing-->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.email_logs.email_logs"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.email_logs.from"); %></th>
+								<th><%= __("admin.email_logs.to");%></th>
+								<th><%= __("admin.email_logs.subject"); %></th>
+								<th><%= __("admin.system.status"); %></th>
+								<th><%= __("admin.system.created"); %></th>
+								<th><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css" rel="stylesheet">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable ="";
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-listing').DataTable({
+			"order"		: 	[[4, "desc"]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{
+					"data"	 : 'from',
+					"render" : function(from){
+						return from.replace("<","&lt;").replace(">","&gt;");
+					}	
+				},
+				{"data"  : 'to'},
+				{"data"  : 'subject'},
+				{
+					"data"  	: 'is_sent',
+					"orderable"	: false,
+					"searchable": false,
+					"render" 	: function(isSent){
+						return (isSent) ? '<span class="label label-success m-l-5 m-t-5"><%=__("admin.email_logs.sent")%></span>' : '<span class="label label-danger m-l-5 m-t-5"><%=__("admin.email_logs.not_sent")%></span>';
+					}
+				},
+				{	
+					"data"	 : 'created',
+					"searchable" : false,
+					"render" 	 : function(created){
+						return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+					}
+				},
+				{	
+					"data"  	: '_id',
+					"orderable"	: false,
+					"searchable": false,
+					"render" 	: function(id){
+						return '<a href="<%=admin_list_url%>/view/'+id+'" class="btn bg-teal btn-sm waves-effect"><%= __("admin.system.view"); %></a>'
+					}
+				}
+			],
+			"ajax":{
+				url	 : "<%=admin_list_url%>",
+				type : "POST",
+				data : function (d) {
+			        d.fromDate	= $('#from_date').val();
+			        d.toDate	= $('#to_date').val();
+			    },
+			}
+		});
+
+		/**
+		* Applying date range filter on Email loge details
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		configDemo.on('apply.daterangepicker', function(e,picker){
+			var startDate	= picker.startDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+			var endDate		= picker.endDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_END_DATE%>');
+			$('#from_date').val(startDate);
+			$('#to_date').val(endDate);
+			var displayStartDate	=	picker.startDate.format('<%=DATE_RANGE_DATE_TIME_FORMAT%>');
+			var displayEndDate		=	picker.endDate.format('<%=DATE_RANGE_DATE_TIME_FORMAT%>');
+			$('#date-range-picker').val(displayStartDate+" - "+displayEndDate);
+			dataTable.draw();
+		});
+
+		/**
+		* Unset date range picker value when click to "clear" button
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		configDemo.on('cancel.daterangepicker',function(e){
+			configDemo.data('daterangepicker').setStartDate(new Date());
+			configDemo.data('daterangepicker').setEndDate(new Date());
+
+			$('#from_date').val("");
+			$('#to_date').val("");
+			$('#date-range-picker').val("");
+			dataTable.draw();
+		});
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+	/**
+	 * For date range picker in searching
+	 */
+	var DATE_FORMAT = 	"<%=DATE_RANGE_DATE_FORMAT%>";
+	var START_DATE	= 	new Date();
+	var END_DATE	= 	new Date();
+	var OPENS		= 	"right";
+	var options		= 	{};
+
+	/**Options for date range picker*/
+	options.locale = {
+		format		: 	DATE_FORMAT,
+		cancelLabel	:	"<%= __('admin.date_picker.cancel_label')%>"
+	};
+
+	options.startDate		= 	START_DATE;
+	options.endDate			= 	END_DATE;
+	options.opens			= 	OPENS;
+	options.autoUpdateInput	= 	false;
+	options.maxDate			= 	new Date();
+
+	var configDemo = $('#date-range-picker');
+
+	configDemo.daterangepicker(options, function (start, end, label) {
+		var start_date	= start.format('<%=DATE_RANGE_DATE_FORMAT%>');
+		var end_date	= end.format('<%=DATE_RANGE_DATE_FORMAT%>');
+	});
+</script>

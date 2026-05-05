@@ -1,0 +1,223 @@
+<%
+	var result      =   (typeof result !== typeof undefined && result)  ?	result    	:{};
+	var isEditable 	=	(typeof is_editable !== typeof undefined) 		? 	is_editable :false;
+	let ticketId 	=   (result._id) ? result._id :'';
+	let actionUrl	=   list_url+"/add";
+	if(isEditable) actionUrl = list_url+"/edit/"+ticketId;
+	var titleList 		=	title_list;
+	var subcategoryList = 	subcategory_list;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-tickets" action="<%=actionUrl%>" data-submit-btn-id="tickets-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("tickets.edit_ticket") :__("tickets.add_tickets"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="ticket_no" class="control-label col-555">
+											<%= __("tickets.ticket_no"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="ticket_no" class="form-control" name="ticket_no" value="<%= (!isEditable) ? ticket_no : (result.ticket_id) ? result.ticket_id :'';%>" <%= (isEditable) ? 'readonly' :''; %> />
+									</div>
+									<span id="ticket_no_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="category_id" class="control-label col-555">
+											<%= __("tickets.category"); %><span class="required"> *</span>
+										</label>
+										<select id="category_id" class="form-control show-tick"  data-live-search="true" name="category_id" data-child-name="sub_category_id" >
+											<option value=""> <%= __("tickets.select_category"); %> </option>
+											<%-category_list%>
+										</select>
+									</div>
+									<span id="category_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="sub_category_id" class="control-label col-555">
+											<%= __("tickets.sub_category"); %><span class="required"> *</span>
+										</label>
+										<select id="sub_category_id" class="form-control show-tick"  data-live-search="true" name="sub_category_id" data-child-name="title" data-placeholder='<%= __("tickets.select_sub_category"); %>'>
+											<option value=""> <%= __("tickets.select_sub_category"); %> </option>
+											<%-subcategoryList%>
+										</select>
+									</div>
+									<span id="sub_category_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="title" class="control-label col-555">
+											<%= __("tickets.title"); %><span class="required"> *</span>
+										</label>
+										<select id="title" class="form-control show-tick" name="title"  data-live-search="true"  data-placeholder='<%= __("tickets.select_title"); %>'>
+											<option value=""> <%= __("tickets.select_title"); %> </option>
+											<%-titleList%>
+										</select>
+									</div>
+									<span id="title_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="status" class="control-label col-555">
+											<%= __("tickets.status"); %><span class="required"> *</span>
+										</label>
+										<select id="status" class="form-control show-tick" name="status"  data-live-search="true"  data-placeholder='<%= __("tickets.select_status"); %>'>
+											<option value=""> <%= __("tickets.select_status"); %> </option>
+											<%
+											Object.keys(TICKET_RESTAURANT_STATUS).map((records)=>{ %>
+												<option value="<%= records%>" <%= (result.status == records) ? 'selected' : ''%>><%= TICKET_RESTAURANT_STATUS[records].status_name%></option><%
+											}); %>
+										</select>
+									</div>
+									<span id="status_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="description" class="control-label col-555">
+											<%= __("tickets.description"); %><span class="required"> *</span>
+										</label>
+										<textarea id="description" class="form-control resize-none height-100" rows="5" name="description"  <%=(isEditable) ? 'readonly' : ''%>><%= (result.description) ? result.description :''; %></textarea>
+									</div>
+									<span id="description_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="department" class="control-label col-555">
+											<%= __("tickets.department"); %><span class="required"> *</span>
+										</label>
+										<select id="department" class="form-control show-tick"  data-live-search="true" name="department" >
+											<option value=""> <%= __("tickets.select_department"); %> </option>
+											<%-department_list%>
+										</select>
+									</div>
+									<span id="department_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="tickets-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-blue-grey btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							 <%= __("system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	 var isEditable = '<%=isEditable%>'
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-tickets',function(status,response){
+			if(status){
+				$('#form_modal').modal("hide");
+				if(isEditable){
+					if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+					if(response.status && response.message) notice(response.status,response.message);
+				}else{
+					$("#reset").trigger("click");
+				}
+				// if(response.status && response.message) notice(response.status,response.message);
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/**
+	 * Function to submit form
+	 */
+	$('#order_id').keyup(function(){
+		let orderId = $(this).val();
+
+		$(".external_div").addClass("hide").find("span.error").html('');
+		if(orderId){
+			$(".external_div").removeClass("hide");
+		}else{
+			$(".external_div input").val("");
+		}
+	});
+
+	/**
+	* Get sub category or title list
+	*/
+	$("#category_id,#sub_category_id").change(function(){
+		getChildList($(this));
+	});
+
+	/**
+	* Get child  dropdown list
+	*/
+	function getChildList(currentObj){
+		if(currentObj){
+			var currentValue	=	currentObj.val();
+			var childInputName	=	currentObj.attr("data-child-name");
+			var childObj		=	(childInputName) ?  $("select[name='"+childInputName+"']") :"";
+			var placeholder		=	childObj.attr("data-placeholder");
+			var childFirstOption=	'<option value="">'+placeholder+'</option>';
+
+			childObj.html(childFirstOption);
+			if(childObj.attr("data-child-name")){
+				var subChildObj			=	$("select[name='"+childObj.attr("data-child-name")+"']");
+				var subChildPlaceholder = 	subChildObj.attr("data-placeholder");
+				subChildObj.html('<option value="">'+subChildPlaceholder+'</option>');
+			}
+			$(".show-tick").selectpicker('refresh');
+
+			if(currentValue){
+				/** Get dropdown list **/
+				var options =	{
+					url 	: 	"<%=list_url+'/get_category'%>",
+					data	:	{category_id: currentValue},
+					method	:	"post"
+				}
+				ajaxRequest(options,function(response){
+					if(response.status == "<%=STATUS_SUCCESS%>"){
+						childObj.html(childFirstOption+response.result);
+						$(".show-tick").selectpicker('refresh');
+					}else if(response.status && response.message){
+						notice(response.status,response.message);
+					}
+				});
+			}
+		}
+	}// end getChildList()
+
+	$("#add-tickets .show-tick").selectpicker('refresh');
+</script>

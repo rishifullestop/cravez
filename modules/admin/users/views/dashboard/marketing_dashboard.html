@@ -1,0 +1,71 @@
+<%
+	let restaurantRequests	= (result.restaurant_requests)   ? result.restaurant_requests 	 : {};
+%>
+<div class="equal_spacing">
+	<div class="dashboard_page team-leader">
+		<h1><%= __("system.dashboard"); %></h1>
+		<div class="approved_restaurant padding-0 restaurant_box">
+			<ul>
+				<li>
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurants" target="_blank" class="text-decoration-none reset_storage">
+						<div class="content_box bg_blue_box">
+							<figure><img src="images/restaurant-icon1.png" alt="img"></figure>
+							<div class="content_restaurant">
+								<strong><%= result.approved_restaurants%></strong>
+								<span><%= __("admin.dashboard.approved_restaurants")%></span>
+							</div>
+						</div>
+					</a>
+				</li>		
+				<li>
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_enquiries?status=<%=PENDING%>"" target="_blank" class="text-decoration-none reset_storage">
+						<div class="content_box bg_yellow_box">
+							<figure><img src="images/restaurant-icon2.png" alt="img"></figure>
+							<div class="content_restaurant">
+								<strong><%= restaurantRequests.pending_restaurant %></strong> <span><%= __("admin.dashboard.pending_restaurants")%></span>
+							</div>
+						</div>
+					</a>
+				</li>
+				<li>
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_enquiries?status=<%=IN_REVIEW%>" target="_blank" class="text-decoration-none reset_storage">
+						<div class="content_box bg_violet_box">
+							<figure><img src="images/restaurant-icon2.png" alt="img"></figure>
+							<div class="content_restaurant">
+								<strong><%= restaurantRequests.in_review_restaurant %></strong>
+								<span><%= __("admin.dashboard.in_review_restaurant")%></span>
+							</div>
+						</div>
+					</a>
+				</li>
+				<li>
+					<a href="<%= WEBSITE_ADMIN_URL %>restaurant_enquiries?status=<%=REJECTED%>" target="_blank" class="text-decoration-none reset_storage">
+						<div class="content_box bg_red_box">			
+							<figure><img src="images/restaurant-icon.png" alt="img"></figure>
+							<div class="content_restaurant">
+								<strong><%= restaurantRequests.rejected_restaurant %></strong>
+								<span><%= __("admin.dashboard.rejected_restaurant")%></span>
+							</div>				
+						</div>
+					</a>
+				</li>
+			</ul>
+		</div>
+		
+		<!-- Tickets  Section -->
+			<%- include dashboard_elements/ticket_info.html %>
+			
+		<!-- Offers Section -->
+			<%- include dashboard_elements/offer_info.html %>
+
+		<!-- Members info Section -->
+			<%- include dashboard_elements/members_info.html %>
+
+		<!-- Login Logout Time & Upcoming week schedule Section -->
+			<%- include dashboard_elements/login_logout_and_week_schedule.html %>
+	</div>
+</div>
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		$(".breadcrumb").remove();
+	</script>

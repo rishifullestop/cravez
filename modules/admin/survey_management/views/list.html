@@ -1,0 +1,244 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!--Search By name of survey-->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.survey_management.search_by_name_of_survey'); %>" name="name_of_survey">
+											</div>
+										</div>
+									</div>
+									<!-- Search by instance-->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick status_search"  id="column_filter_1"   onchange="searchDatatable(1)" name="search_by_instance">
+													<option value=""><%=__("admin.survey_management.search_by_instance_screen");%></option>
+													<%
+														Object.keys(INSTANCE).map(instanceType=>{
+															%>
+																<option value="<%=instanceType%>"><%= INSTANCE[instanceType]%></option>
+															<%
+														});
+													%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by valid till-->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="valid_till" class="form-control" placeholder="<%= __('admin.survey_management.search_by_valid_till'); %>"  id="date-range-picker"  name="search_by_valid_till" autocomplete="off">
+											</div>
+											<span id="valid_till_error" class="error model_select_error"></span>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+
+									<div class="col-md-3">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.survey_management.survey_management"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url+'/add'%>" class="<%= getPermissionClass(module_type,['survey_management','add']); %>">
+								<button type="button" class="btn bg-indigo waves-effect btn-sm">
+									<%= __("admin.survey_management.add_survey"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="10%"><%= __("admin.survey_management.name_of_survey");%></th>
+								<th width="10%"><%= __('admin.survey_management.screen');%></th>
+								<th width="25%"><%= __("admin.survey_management.valid_till");%></th>
+								<th width="25%"><%= __("admin.survey_management.survey_description"); %></th>
+								<th width="15%"><%= __("admin.system.status"); %></th>
+								<th width="15%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+    <link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable		=	"";
+	var instance		= <%- JSON.stringify(INSTANCE)%>;
+	/** set variable for daterangepicker */
+	$(document).ready(function() {
+		dataTable = $('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ "data":  'name' },
+				{
+					"data"	    : {},
+					"field_name":"instance",
+					"render"    :function(result){
+						return instance[result.instance];
+					}
+				},
+				{
+				   "data"   	: {},
+				  "orderable"	: false,
+                  "searchable"	: false,
+				  "render" 		: function(result){
+						var startOn =   moment(result.start_on).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_FORMAT) ;
+						var endOn   =   moment(result.end_on).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_FORMAT) ;
+						var date    =  startOn+"-"+endOn;
+					    return date;
+				  	}
+				},
+				{
+					"data"	      : "description",
+					"orderable"   : false,
+					"searchable"  : false,
+					"render"	  :	function(description){
+						return '<span class = "readmore nl2br">'+description+'</span>'
+					}
+			    },
+				{
+                    "data"			: "status",
+                    "orderable"		: false,
+                    "searchable"	: false,
+                    "render": function(status){
+                        var statusTab	= (status == '<%=LIVE%>')	? '<span class="label label-success m-l-5 m-t-5"><%=__("admin.system.live")%></span>': '<span class="label label-danger m-l-5 m-t-5"><%=__("admin.system.not_live")%></span>';
+                        statusTab;
+                        return statusTab;
+                    }
+                },
+				{
+					"data"		 : {},
+					"orderable"	 : false,
+					"searchable" : false,
+					"render" 	 : function(result){
+						var id     		= (result && result._id  ) ? result._id : "";
+						var status		= (result.status) ? result.status	: "<%=NOT_LIVE%>";
+						var statusLinkText  =	(status == '<%= NOT_LIVE %>') ?	"<%= __('admin.survey_management.make_live'); %>"	: "<%= __('admin.survey_management.make_not_live'); %>" ;
+						var dropDownButton 		=	''+
+						'<div class="btn-group">'+
+							'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+								'<%= __("admin.system.action"); %> '+
+								'<span class="caret"></span>'+
+							'</button>'+
+							'<ul class="dropdown-menu  width-180">'+
+								/** Edit Link **/
+								'<li>'+
+									'<a href="<%=admin_list_url%>/edit/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["survey_management","edit"]); %>">'+
+										' <%= __("admin.system.edit"); %>'+
+									'</a>'+
+								'</li>'+
+								'<li>'+
+									'<a href="<%=admin_list_url%>/view_graph/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["survey_management","view_graph"]); %>">'+
+										' <%= __("admin.survey_management.view_graph"); %>'+
+									'</a>'+
+								'</li>'+
+								'<li>'+
+									'<a href="<%=admin_list_url%>/view_history/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["survey_management","view_history"]); %>">'+
+										' <%= __("admin.survey_management.view_history"); %>'+
+									'</a>'+
+								'</li>'+
+								'<li>'+
+									'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/make_live/'+id+'/'+status+'" class="confirm_box waves-effect waves-block <%= getPermissionClass(module_type,["survey_management","make_live"]); %>"  data-confirm-message="<%= __("admin.survey_management.do_you_want_to_live_this_survey"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+										statusLinkText+
+									'</a>'+
+								'</li>'+
+								'<li>'+
+									'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete/'+id+'" class="confirm_box waves-effect waves-block <%= getPermissionClass(module_type,["survey_management","delete"]); %>"  data-confirm-message="<%= __("admin.survey_management.do_you_want_to_delete_this_survey"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+										' <%= __("admin.system.delete"); %>'+
+									'</a>'+
+								'</li>'+
+							'</ul>'+
+						'</div>';
+						return dropDownButton;
+					}
+				}
+			],
+
+			"ajax":{
+				url 	:	"<%=admin_list_url%>",
+				type	: 	"POST",
+				data :function(d){
+					d.fromDate 	    = $('#from_date').val();
+					d.toDate 	    = $('#to_date').val();
+				},
+				dataSrc	: 	function(res){
+					adjustPermissionsClass();
+					return res.data;
+				}
+			},
+			"drawCallback": readMore
+		});
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+	var minDate  	= new Date();
+</script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

@@ -1,0 +1,87 @@
+<%
+	var currentDate		= 	new Date();
+	var firstDay 		= 	new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+	var date 			= 	subtractDate(DAY_IN_A_MONTH*HOURS_IN_A_DAY);
+	var fromDate		=	newDate(date,DATABASE_DATE_FORMAT);
+	var toDate			=	newDate(firstDay,DATABASE_DATE_FORMAT);
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.dashboard.agent_time"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<div class="row clearfix">
+						<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+							<div class="form-group">
+								<div class="form-line">
+									<label for="start_time" class="control-label"><%= __('admin.dashboard.date'); %><span class="required"> * </span> </label>
+									<input class="form-control" id="date-range-picker"  autocomplete="off" value="<%= fromDate+' - '+toDate%>">
+								</div>
+								<span id="date_time_error" class="error model_select_error"></span>
+								<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%= newDate(fromDate,DATABASE_DATE_FORMAT+' '+START_DATE_TIME_FORMAT) %>">
+								<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%= newDate(toDate,DATABASE_DATE_FORMAT+' '+END_DATE_TIME_FORMAT) %>">
+							</div>
+						</div>
+					</div>
+					<div id="login_table"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+
+<script type="text/javascript">
+	var startDate	= $('#from_date').val();
+	var endDate		= $('#to_date').val();
+	if(startDate && endDate) getListing();
+	/** Function to initialize datatable and get server side data*/
+	var dataTable		=	"";
+	var configDemo 		= $('#date-range-picker');
+	/**  function for daterange picker*/
+	configDemo.on('apply.daterangepicker', function(e,picker){
+		var startDate	= picker.startDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+		var endDate		= picker.endDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+
+		$("#from_date").val(startDate);
+		$("#to_date").val(endDate);
+		getListing();
+	});
+
+	function getListing(){
+		var startDate = $("#from_date").val();
+		var endDate = $("#to_date").val();
+
+		if(endDate && startDate){
+			var options		= {
+				url 	: "<%=admin_list_url%>/agent_login/get_agent_login_detail",
+				data    : {from_date : startDate,to_date : endDate},
+				method	: "POST"
+			}
+			ajaxRequest(options,function(response){
+				if(response){
+					if(dataTable != ''){
+						$("#datatable-listing").DataTable().destroy();
+					}
+					$("#login_table").html(response);
+					dataTable = $('#datatable-listing').DataTable({
+						"order"		: 	[[0, "desc"]],
+						"sDom"		:	"ltipr",
+						columnDefs: [
+							{ orderable: false, targets: [1,2] }
+						]
+					});
+				}
+			});
+		}
+	}
+</script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

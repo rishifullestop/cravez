@@ -1,0 +1,20 @@
+<div class="container-fluid">
+	<div id="main-container" data-url="<%= link %>"></div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_CSS_PATH%>lightbox.css">
+	<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_CSS_PATH%>jquery.mCustomScrollbar.min.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>lightbox.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>jquery.mCustomScrollbar.js"></script>
+
+	<script type="text/javascript">
+		fetchData();
+	</script>

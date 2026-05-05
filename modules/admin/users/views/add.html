@@ -1,0 +1,207 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.user.add_user'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" >
+								<button type="button" class="btn bg-indigo waves-effect">
+									<%= __("admin.system.back"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="add-user" data-submit-btn-id="user-add-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-12 align-center">
+								<div class="form-group add-image">
+									<input name="profile_image" id="profile_image" class="form-control image-input-file" type="file"/>
+									<span class="help-inline required profile_image" id="ContentTypeNameSpan">
+										<div id="pImage">
+											<img src="<%=ADD_PROFILE_IMAGE_ICON%>" alt="Profile image" class="profileImage set_image_big_dim" />
+										</div>
+									</span>
+									<div class="m-t-10">
+										<a href="javascript:void(0)" data-toggle="tooltip" data-placement="bottom" title="<%= __("admin.system.allowed_file_extension")+ALLOWED_IMAGE_EXTENSIONS%>" class="btn bg-teal btn-block btn-sm waves-effect changePhoto">
+											<%= __("admin.user.upload_image"); %>
+										</a>
+									</div>
+									<span id="profile_image_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="full_name" class="control-label"><%= __('admin.user.full_name'); %> <span class="required"> *</span> </label>
+										<input name="full_name" id="full_name" type="text" class="form-control"/>
+									</div>
+									<span id="full_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="email" class="control-label"><%= __('admin.user.email'); %><span class="required"> * </span> </label>
+										<input name="email" id="email" type="text" class="form-control"/>
+									</div>
+									<span id="email_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6 country-code-mask">
+								<label for="mobile_number" class="control-label"><%= __('admin.user.phone_number'); %><span class="required"> *</span> </label>
+								<div class="input-group">
+									<div class="form-line">
+										<span class="input-group-addon">
+											<%=DEFAULT_COUNTRY_CODE%>
+										</span>
+										<input name="mobile_number" id="mobile_number" type="text" class="form-control"/>
+									</div>
+									<span id="mobile_number_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-lie">
+										<label for="gender" class="control-label"><%= __('admin.user.gender'); %><span class="required">* </span> </label>
+										<br />
+										<%
+										if(typeof GENDER_DROPDOWN!== typeof undefined && Object.keys(GENDER_DROPDOWN).length > 0){
+											Object.keys(GENDER_DROPDOWN).map(genderStatus=>{%>
+												<input id="<%=genderStatus%>" name="gender"  class="with-gap" type="radio" value="<%=genderStatus%>" >
+												<label for="<%=genderStatus%>"><%= (GENDER_DROPDOWN[genderStatus]) ? GENDER_DROPDOWN[genderStatus] :""; %></label>
+										<% 	});
+										} %>
+									</div>
+									<span id="gender_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="dateofbirth" class="control-label"><%= __('admin.user.date_of_birth'); %><span class="required">* </span> </label><br />
+										<input type="text" class="datepicker form-control" name="dateofbirth" id="dateofbirth" readonly='true'>
+									</div>
+									<span id="dateofbirth_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="password" class="control-label"><%= __('admin.user.password'); %> <span class="required"> *</span>
+										</label>
+										<input name="password" id="password" type="password" class="form-control"/>
+									</div>
+									<span id="password_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="confirm_password" class="control-label"><%= __('admin.user.confirm_password'); %> <span class="required"> *</span>
+										</label>
+										<input name="confirm_password" id="confirm_password" type="password" class="form-control"/>
+									</div>
+									<span id="confirm_password_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<button type="button"  id="user-add-btn-id"  <%- ADMIN_LOADING_TEXT %> class="btn bg-pink btn-sm waves-effect btn-submit"><%= __('admin.system.submit'); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+						<a href="<%= admin_list_url %>"><button type="button" class="btn bg-brown btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			/**
+			 * Function to submit form
+			 */
+			$(".btn-submit").click(function(){
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				ajax_submit("add-user",function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			});
+
+			/**
+			 * User image Upload
+			 */
+			$(document).on("click", ".changePhoto", function(){
+				if(!$(".add-image #profile_image").hasClass("added")){
+					$(".add-image #profile_image").trigger("click");
+					$(".add-image #profile_image").addClass("added");
+					window.setTimeout(function(){
+						$(".add-image #profile_image").removeClass("added");
+					},500);
+				}
+			});
+
+			/**
+			 *Show user image after select
+			 */
+			$("#profile_image").on("change", function(){
+				var files = !!this.files ? this.files : [];
+				if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
+
+				if (/^image/.test( files[0].type)){
+					// only image file
+					var reader = new FileReader(); // instance of the FileReader
+					reader.readAsDataURL(files[0]); // read the local file
+					reader.onloadend = function(){
+
+						$("#pImage").html("<img src='"+this.result+"' class='profileImage set_image_big_dim' >");
+					}
+				}
+				$("span#profile_image_error").text("");
+			});
+
+			/**
+			 * For date of birth
+			 */
+			var options		= 	{};
+			options.locale 	=	{
+				format	: 	'<%=DATE_RANGE_DATE_FORMAT%>',
+			};
+			options.startDate		= 	moment().tz(DEFAULT_TIME_ZONE).format('<%=DATE_RANGE_DATE_FORMAT%>');
+			options.autoUpdateInput	= 	false;
+			options.singleDatePicker= 	true;
+			options.showDropdowns	= 	true;
+			options.maxDate			= 	moment().tz(DEFAULT_TIME_ZONE).format('<%=DATE_RANGE_DATE_FORMAT%>');
+			options.drops			= 	"up";
+
+			var configDemo = $('.datepicker');
+			configDemo.daterangepicker(options);
+			configDemo.on('apply.daterangepicker', function(e,picker){
+				var displayStartDate 	=	picker.startDate.format('<%=DATE_RANGE_DATE_FORMAT%>');
+				$('.datepicker').val(displayStartDate);
+			});
+		});
+	</script>

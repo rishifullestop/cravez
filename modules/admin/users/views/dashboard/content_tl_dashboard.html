@@ -1,0 +1,21 @@
+<div class="equal_spacing">
+	<div class="dashboard_page team-leader">
+		<h1><%= __("system.dashboard"); %></h1>
+		<!-- Restaurant Info  Section -->
+			<%- include dashboard_elements/restaurant_info.html %>
+
+		<!-- Tickets  Section -->
+			<%- include dashboard_elements/ticket_info.html %>
+
+		<!-- Members info Section-->
+			<%- include dashboard_elements/members_info.html %>
+
+		<!-- Login Logout Time & Upcoming week schedule Section -->
+			<%- include dashboard_elements/login_logout_and_week_schedule.html %>
+
+	</div>
+</div>
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		$(".breadcrumb").remove();
+	</script>

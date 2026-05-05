@@ -1,0 +1,250 @@
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+#receipt-content table  td b {font-weight:700;text-transform:uppercase;}
+#receipt-content table td {font-size:11px;color:#000;font-weight:400;font-family: 'Open Sans', sans-serif;line-height:14px;padding-bottom:0px;}
+#receipt-content table th{font-size:11px;color:#000;font-weight:700;font-family: 'Open Sans', sans-serif;}
+</style>
+<div class="modal-dialog"  role="document">
+	<div class="modal-content">
+		<div class="modal-header modal-header-seperator">
+			<% if(typeof auto_generate === typeof undefined || !auto_generate) { %>
+				<h4 class="modal-title"><%=__("orders.order_receipt") %></h4>
+				<span class="cursor-pointer modal-close pull-right" data-dismiss="modal"><i class="material-icons">close</i></span>
+			<% } %>
+		</div>
+		<div class="modal-body" id="receipt-content">
+			<table width="302px" cellpadding="0" align="center" cellspacing="0" style="background:#fff; padding:15px 30px 23px;margin: auto;">
+				<tbody>
+					<tr>
+						<td align="center" colspan="2" style="padding-bottom:21px;"><img src="<%= WEBSITE_IMG_URL;%>logo1.png" alt="logo" ></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<table width="245px" cellpadding="0" align="center" cellspacing="0">
+								<tbody>
+									<tr style="font-size:11px;">
+										<td valign="top" align="left" width="103px" style="padding-bottom:8px; text-align:left;"><b><%= __('orders.branch');%></b></td>
+										<td style="padding-bottom:8px;"><%= (result.branch_detail) ? result.branch_detail.name[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+									</tr>
+									<tr style="font-size:11px;">
+										<td valign="top" align="left" width="103px" style="padding-bottom:8px; text-align:left;"><b><%= __('orders.order_id');%></b></td>
+										<td style="padding-bottom:8px;"><%= (result.unique_order_id) ? result.unique_order_id :"N/A";%></td>
+									</tr>
+									<tr style="font-size:11px;">
+										<td valign="top" align="left" width="103px" style="padding-bottom:8px; text-align:left;"><b><%= __('orders.customer_name');%></b></td>
+										<td style="padding-bottom:8px;"><%= (result.customer_detail && result.customer_detail.full_name) ? result.customer_detail.full_name :"N/A";%></td>
+									</tr>
+									<tr style="font-size:11px;">
+										<td valign="top" align="left" width="103px" style="padding-bottom: 8px; text-align:left;"><b><%= __('orders.mobile');%></b></td>
+										<td style="padding-bottom: 8px;"><%= (result.customer_detail && result.customer_detail.mobile_number) ? result.customer_detail.mobile_number :"N/A";%></td>
+									</tr>
+									<tr style="font-size:11px;">
+										<td valign="top" align="left" width="103px" style="padding-bottom:8px; text-align:left;"><b><%= __('orders.delivery_by');%></b></td>
+										<td style="padding-bottom:8px;"><%= (result.delivery_type_title) ? result.delivery_type_title :"N/A";%></td>
+									</tr>
+									<tr style="font-size:11px;">
+										<td valign="top" align="left" width="103px" style="padding-bottom:8px; text-align:left;"><b><%= __('orders.payment');%></b></td>
+										<td style="padding-bottom:8px;"><%= (typeof result.payment_title !== typeof undefined) ? result.payment_title.title[DEFAULT_LANGUAGE_CODE] :"N/A";%></td>
+									</tr>
+									<tr style="font-size:11px;">
+										<td valign="top" align="left" width="103px" style="padding-bottom:8px; text-align:left;"><b><%= __('orders.order_time');%></b></td>
+										<td style="padding-bottom:8px;"><span class="setDateTimeFormat" data-date-time="<%= (result.order_date) ? result.order_date : '';%>"></span></td>
+									</tr>
+									<tr style="font-size:11px;">
+										<%
+											let minutes		=	(order_detail.delivery_duration) ? order_detail.delivery_duration/MINUTES_IN_A_HOUR : '';
+											let deliveryTime=	(minutes && result.order_date) ? addDaysToDate(minutes,result.order_date) : '';
+										%>
+										<td valign="top" align="left" width="103px" style="padding-bottom: 8px; text-align:left;"><b><%= __('orders.delivery_time');%></b></td>
+										<td style="padding-bottom:8px;"><span class="setDateTimeFormat" data-date-time="<%= deliveryTime%>"></span></td>
+									</tr><%
+									if(order_detail.delivery_area_name){ %>
+										<tr style="font-size:11px;">
+											<td valign="top" align="left" width="103px" style="padding-bottom: 8px; text-align:left;"><b><%= __('orders.delivery_area');%></b></td>
+											<td style="padding-bottom: 8px;"><%= (order_detail.delivery_area_name) ? order_detail.delivery_area_name[DEFAULT_LANGUAGE_CODE] :"";%></td>
+										</tr> <%
+									} %>
+									<tr>
+										<td colspan="2" style="border-top:2px dashed #dbdbdb;height: 2px;padding: 0;"></td>
+									</tr>
+									<tr style="font-size:11px;">
+										<td valign="top" colspan="2" style=" padding:10px 0px 14px"  width="245px"> <b><%= __('orders.address');%></b>: <%= (typeof order_detail.customer_address !== typeof undefined) ? order_detail.customer_address :"N/A";%>  </td>
+									</tr>
+									<tr>
+										<td colspan="2" style="border-top:2px dashed #dbdbdb;height: 2px;padding: 0;"></td>
+									</tr>
+									<tr style="font-size:11px;">
+										<td valign="top" width="103px" style="padding:9px 0 11px;font-size:11px;"><b><%- __('orders.additional_notes');%></td>
+										<td><%= (result.request_note) ? result.request_note :"";%></td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" style="padding:0;">
+							<table cellspacing="0" cellpadding="0" width="245px" align="center" style="white-space:nowrap;">
+								<thead style="background-color:#ddd9d9; text-transform: uppercase; font-size:11px;">
+									<tr align="left"  style="font-size:11px;font-weight:700; font-family: 'Open Sans', sans-serif;">
+										<th width="101px" align="left" style="padding:9px 0px 10px 9px; border:1px solid #ddd9d9;"><%= __('orders.item');%></th>
+										<th width="58px" align="left" style="border:1px solid #ddd9d9; padding:9px 0px 10px 9px;"><%= __('orders.qty');%></th>
+										<th width="88px"  style="border:1px solid #ddd9d9; padding:9px 0px 10px 9px;"><%= __('orders.netamount');%></th>
+									</tr>
+								</thead>
+								<tbody><%
+									if(item_detail.length > 0){
+										item_detail.map((records)=>{  %>
+											<tr>
+												<td colspan="3">
+													<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #ededed;">
+														<tbody>
+															<tr>
+																<td width="101px" style="padding:7px 9px 5px 2px ;"><b style="text-transform: capitalize; font-size:11px"><%= (records.item_name) ? records.item_name[DEFAULT_LANGUAGE_CODE] :"N/A";%></b></td>
+																<td width="58px"><b style="font-size:11px;padding-left: 7px;"><%= (records.qty) ? records.qty :"N/A";%></b></td>
+																<td width="88px" style="text-align: right;padding-right: 10px;"><b style="font-size:11px"><%= (records.net_amount) ? currencyFormat(records.net_amount) :"N/A";%></b></td>
+															</tr>
+														</tbody>
+													</table>
+												</td>
+											</tr><%
+										});
+									} %>
+									<tr>
+										<td colspan="3">
+											<table width="100%" cellpadding="0" cellspacing="0" border="0">
+												<tbody>
+													<tr>
+														<td width="159px" style=" padding:11px 9px 5px 2px; " colspan="2"><b style="text-transform: capitalize; font-size:11px;font-weight:800;"><%= __('orders.sub_total');%> </b></td>
+														<td width="88px" style="text-align: right;  padding:11px 10px 5px 0px; font-size:11px;"><b> <%= (total) ? currencyFormat(total) :"N/A";%> </b></td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<% if(order_detail.additional_tax) {%>
+										<tr>
+											<td colspan="3">
+												<table width="100%" cellpadding="0" cellspacing="0" border="0">
+													<tbody>
+														<tr>
+															<td width="159px" style=" padding:11px 9px 5px 2px; " colspan="2"><b style="text-transform: capitalize; font-size:11px;font-weight:800;"><%= __('orders.additional_tax');%> </b></td>
+															<td width="88px" style="text-align: right;  padding:11px 10px 5px 0px; font-size:11px;"><b> <%= (order_detail.additional_tax) ? currencyFormat(order_detail.additional_tax) :"N/A";%> </b></td>
+														</tr>
+													</tbody>
+												</table>
+											</td>
+										</tr>
+									<% } %>
+									<% if(order_detail.branch_extra_charge) {%>
+										<tr>
+											<td colspan="3">
+												<table width="100%" cellpadding="0" cellspacing="0" border="0">
+													<tbody>
+														<tr>
+															<td width="159px" style=" padding:11px 9px 5px 2px; " colspan="2"><b style="text-transform: capitalize; font-size:11px;font-weight:800;"><%= __('orders.extra_charges');%> </b></td>
+															<td width="88px" style="text-align: right;  padding:11px 10px 5px 0px; font-size:11px;"><b> <%= (order_detail.branch_extra_charge) ? currencyFormat(order_detail.branch_extra_charge) :"N/A";%> </b></td>
+														</tr>
+													</tbody>
+												</table>
+											</td>
+										</tr>
+									<% } %>
+									<tr>
+										<td colspan="3">
+											<table width="100%" cellpadding="0" cellspacing="0" border="0">
+												<tbody>
+													<tr>
+														<td width="159px" style=" padding:11px 9px 5px 2px; " colspan="2"><b style="text-transform: capitalize; font-size:11px;font-weight:800;"><%= __('orders.delivery_fees');%> </b></td>
+														<td width="88px" style="text-align: right;  padding:11px 10px 5px 0px; font-size:11px;"><b> <%= (result.delivery_fee) ? currencyFormat(result.delivery_fee) : currencyFormat(0);%> </b></td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="3">
+											<table width="100%" cellpadding="0" cellspacing="0" border="0">
+												<tbody>
+													<tr>
+														<td width="159px" style=" padding:11px 9px 5px 2px; " colspan="2"><b style="text-transform: capitalize; font-size:11px;font-weight:800;"><%= __('orders.discount');%> </b></td>
+														<td width="88px" style="text-align: right;  padding:11px 10px 5px 0px; font-size:11px;"><b> <%= (order_detail.discount_price) ? currencyFormat(order_detail.discount_price) : currencyFormat(0);%> </b></td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="3">
+											<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #ededed;">
+												<tbody>
+													<tr>
+														<td width="159px" style=" padding:11px 9px 5px 2px; " colspan="2"><b style="text-transform: capitalize; font-size:11px;font-weight:800;"><%= __('orders.total');%> </b></td>
+														<td width="88px" style="text-align: right;  padding:11px 10px 5px 0px; font-size:11px;"><b> <%= (order_amount) ? currencyFormat(order_amount) : currencyFormat(0);%> </b></td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="3">
+											<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #ededed;">
+												<tbody>
+													<tr>
+														<td width="159px" style=" padding:6px 9px 13px 2px; text-transform: capitalize;" colspan="2">
+														<b style="text-transform: capitalize; font-size:11px ;font-weight:800;"><%= __('orders.paid_by_wallet');%></b>
+														</td>
+														<td width="88px" style="text-align: right;padding:0px 10px 5px 0px; font-size:11px;"><b > <%= (result.amount_debited_by_wallet) ? currencyFormat(result.amount_debited_by_wallet) :currencyFormat(0);%> </b></td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="3">
+											<table width="100%" cellpadding="0" cellspacing="0" border="0">
+												<tbody>
+													<%
+														var amountDebitedByWallet = (result.amount_debited_by_wallet) ?  result.amount_debited_by_wallet :0;
+														var orderTotal = (order_amount) ?  order_amount :0;
+														var collectiable = orderTotal-amountDebitedByWallet;
+													%>
+													<tr>
+														<td width="159px" style="padding:12px 9px 13px 2px; text-transform: capitalize;" colspan="2"><b style="text-transform: capitalize; font-size:11px; font-weight:800;"><%= __('orders.collectiable_amount');%></b></td>
+														<td width="88px" style="text-align: right;padding:11px 10px 13px;"><b style="font-size:11px; " > <%= currencyFormat(collectiable);%></b></td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="modal-footer border-top">
+			<% if(typeof auto_generate === typeof undefined || !auto_generate) { %>
+				<button type="button" class="btn btn-sm bg-indigo waves-effect" onclick='printDiv();'><%= __("orders.print"); %></button>
+				<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+			<% } %>
+		</div>
+	</div>
+</div>
+</html>
+<script type="text/javascript">
+	<% if(is_print_order){ %>
+		printDiv();
+	<%}%>
+
+	/** Function to print receipt */
+	function printDiv(){
+		var divToPrint = document.getElementById('receipt-content');
+		var htmlToPrint = '';
+		htmlToPrint += divToPrint.outerHTML;
+		newWin = window.open("");
+		newWin.document.write(htmlToPrint);
+		newWin.print();
+		newWin.close();
+	}
+</script>

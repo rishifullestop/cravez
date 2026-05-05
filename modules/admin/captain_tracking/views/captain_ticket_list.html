@@ -1,0 +1,113 @@
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="modal-dialog  modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+					<h2 class="modal-title">
+						<%= __("admin.captain_tracking.tickets"); %>
+					</h2>
+				</div>
+				<div class="modal-body padding-20">
+					<div class="body">
+						<table id="datatable-listing-ticket" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+							<thead>
+								<tr>
+									<th><%= __("admin.captain_tracking.ticket_no");%></th>
+									<th><%= __("admin.captain_tracking.title");%></th>
+									<th><%= __("admin.captain_tracking.description");%></th>
+									<th><%= __("admin.captain_tracking.comment");%></th>
+									<th><%= __("admin.system.created");%></th>
+									<th><%= __("admin.system.action");%></th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var adjustInterval	=	"";
+	var ticketDataTable	=	"";
+	var categoryList	=	{};
+	$(document).ready(function() {
+		ticketDataTable = $('#datatable-listing-ticket').DataTable({
+			"order"		: 	[[4,"desc"]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":   PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{	"data"		 : "ticket_id",
+					"searchable" : false,
+					"orderable"	 : false
+				},
+				{
+					"data" 			: "title",
+					"searchable"	: false,
+					"orderable"		: false,
+					"render"		: function(title){
+						return categoryList[title];
+					}
+				},
+				{ 	"data"		: 'description',
+					"orderable"	: false,
+					"searchable": false,
+					"render"	: function(description){
+						return (description) ? "<span class='readmore'>"+description+"</span>" :"N/A";
+					}
+				},
+				{	"data"			: "comment",
+					"orderable"		: false,
+					"searchable"	: false,
+					"render"		: function(comment){
+						return (comment) ? "<span class='readmore'>"+comment+"</span>" :"N/A";
+					}
+				},
+				{
+					"data"		 : 'created',
+					"render" 	 : function(created){
+						return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+					}
+				},
+				{
+					"data"			: {},
+					"orderable"		: false,
+					"searchable"	: false,
+					"render" 		: function(result){
+						var id 		= (result._id) 	? result._id : "";
+						var comment = (result.comment) ? result.comment :"";
+						var dropDownButton 	= '<a href="<%=WEBSITE_ADMIN_URL%>tickets/view/'+id+'" target="_blank" class="btn bg-indigo waves-effect ml-5 m-t-5 <%= getPermissionClass(module_type,["ticket_details","view"]); %>""><%= __("admin.system.view"); %></a>';
+
+						if(comment == ""){
+							dropDownButton += '<a href="<%= originalUrl %>" class="btn bg-green waves-effect ml-5 m-t-5 action-btn <%= getPermissionClass(module_type,["captain_tracking","add_ticket"]); %>" data-action-url="<%=admin_list_url%>/tickets/add_comment/'+id+'" data-open-modal="true" data-modal-id="form_modal_2"><%= __("admin.captain_tracking.add_comment"); %></a>';
+						}
+						return dropDownButton;
+					}
+				},
+			],
+			"ajax":{
+				url 	:	"<%=admin_list_url%>/get_captain_ticket_list/<%=order_id%>",
+				type	: 	"POST",
+				dataSrc	: function(res){
+					adjustPermissionsClass();
+					categoryList = res.categories;
+					window.setTimeout(function(){
+						clearInterval(adjustInterval);
+					},1000);
+					return res.data;
+				}
+			},
+			"drawCallback": function( settings ) {
+				/** Description read more **/
+				readMore();
+			}
+		});
+
+		adjustInterval = setInterval(function(){
+			ticketDataTable.columns.adjust();
+		},1);
+	});
+</script>

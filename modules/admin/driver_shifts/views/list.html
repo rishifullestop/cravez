@@ -1,0 +1,171 @@
+<%
+	var fromDate	= newDate("",DATABASE_DATE_FORMAT);
+	var toDate		= newDate(addDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),DATABASE_DATE_FORMAT);
+%>
+<div class="container-fluid"  id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								 <%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by shift name -->
+									<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" autocomplete="off" value="<%=fromDate+' - '+toDate%>">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=fromDate%>">
+											<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=toDate%>">
+										</div>
+									</div> <%
+									if(auth.user_role_id == CRAVEZ){ %>
+										<!-- Search by user list -->
+										<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+											<div class="form-group">
+												<div class="form-line">
+													<select id="column_filter_user_name" name="column_filter_user_name" class="form-control show-tick" id="column_filter_3">
+														<option value=""> <%= __('admin.driver_leave_management.search_by_team'); %> </option>
+														<%- user_list %>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-2">
+											<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+												<%= __("admin.system.reset")%>
+											</button>
+										</div> <%
+									} %>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.driver_shifts.driver_shifts"); %>
+					</h2><%
+					if(auth.user_role_id != CRAVEZ){ %>
+						<ul class="header-dropdown m-r--5 btn-right-top-margin">
+							<li>
+								<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL+'driver_leave_management/driver_vacation_request/add_weekly_off'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['driver_vacation_request','add_weekly_off'])%>">
+									<button type="button" class="btn btn-sm bg-blue waves-effect">
+										<%= __("admin.driver_shifts.add_weekly_off"); %>
+									</button>
+								</a>
+							</li>
+							<li>
+								<a href="<%=WEBSITE_ADMIN_URL+'driver_shifts'%>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" target="_blank" class="action-btn <%= getPermissionClass(module_type,['driver_shifts','add']); %>">
+									<button type="button" class="btn bg-cyan waves-effect btn-sm">
+										<%= __("admin.driver_shifts.assign_shift"); %>
+									</button>
+								</a>
+							</li>
+						</ul><%
+					}%>
+				</div>
+				<div class="body">
+					<div id="team_schedule_table">
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>chosen/chosen.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>chosen/chosen.jquery.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.js"></script>
+
+<script type="text/javascript">
+	getListing();
+
+	var dataTable 		= "";
+	var configDemo 		= $('#date-range-picker');
+	var stopTableDraw   = true;
+
+	/**  function for daterange picker*/
+	configDemo.on('apply.daterangepicker', function(e,picker){
+		var startDate	= picker.startDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+		var endDate		= picker.endDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+
+		$("#from_date").val(startDate);
+		$("#to_date").val(endDate);
+
+		getListing($('#column_filter_user_name').val());
+	});
+
+	/*
+	 *	Function to get driver shifts list
+	*/
+	function getListing(userId){
+		var startDate 	= $("#from_date").val();
+		var endDate 	= $("#to_date").val();
+		var userId 		= (userId) ? userId : '';
+
+		if(endDate && startDate){
+			var options		= {
+				url 	: "<%=admin_list_url%>",
+				data    : {from_date : startDate,to_date : endDate,user_id:userId},
+				method	: "POST"
+			};
+			ajaxRequest(options,function(response){
+				if(response){
+					if(dataTable != ''){
+						$("#datatable-listing").DataTable().destroy();
+					}
+					$("#team_schedule_table").html(response);
+					dataTable = $('#datatable-listing').DataTable({
+						"order"		: 	[],
+						"sDom"		:	"ftr",
+						"bFilter"	:   true,
+						"serverSide": 	false,
+						"scrollX"	: 	true,
+						"paging"	: 	false,
+						"autoWidth" :   false,
+						"columnDefs": [
+							{ "width": "190px", "orderable" : false, "targets": "_all" }
+						]
+					});
+				}
+			});
+		}
+	}
+
+	/*
+	 *	get list on search of name
+	*/
+	$('#column_filter_user_name').on('change',function(){
+		var userId	=	$(this).val();
+		getListing(userId);
+	});
+</script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

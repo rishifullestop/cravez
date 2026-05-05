@@ -1,0 +1,190 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="search_by_notification_id" id="column_filter_0" onkeyup="searchDatatable(0)" placeholder="<%= __('admin.notification_types.search_by_notification_types'); %>">
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="search_by_title" id="column_filter_1" onkeyup="searchDatatable(1)" placeholder="<%= __('admin.notification_types.search_by_title_en'); %>">
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="search_by_title" id="column_filter_1" onkeyup="searchDatatable(1)" placeholder="<%= __('admin.notification_types.search_by_title_ar'); %>">
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<div class="form-line">
+													<input class="form-control" name="search_by_message" id="column_filter_2" onkeyup="searchDatatable(2)" placeholder="<%= __('admin.notification_types.search_by_message_en'); %>">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<div class="form-line">
+													<input class="form-control" name="search_by_message" id="column_filter_2" onkeyup="searchDatatable(2)" placeholder="<%= __('admin.notification_types.search_by_message_ar'); %>">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-3">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.notification_types.notification_types"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.notification_types.add_notification_type"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="16%"><%=__("admin.notification_types.notification_type");%></th>
+								<th width="18%"><%= __("admin.notification_types.title_en");%></th>
+								<th width="18%"><%= __("admin.notification_types.title_ar");%></th>
+								<th width="18%"><%= __("admin.notification_types.message_en");%></th>
+								<th width="18%"><%= __("admin.notification_types.message_ar");%></th>
+								<th width="10%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data */
+		var dataTable ="";
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[ 0, "desc" ]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns": [
+					{
+						"data": 'notification_type',
+						"field_type" : '<%= NUMERIC_FIELD%>'
+					},
+					{
+						"data"		: 'title.en',
+						"orderable"	: false,
+						"render"	: function(title){
+							return '<span class="readmore text-wrap">'+title+'</span>'
+						}
+					},
+					{
+						"data"		: 'title.ar',
+						"orderable"	: false,
+						"render"	: function(title){
+							return '<span class="readmore text-wrap">'+title+'</span>'
+						}
+					},
+					{
+						"data"		: 'message.en',
+						"orderable"	: false,
+						"render"	: function(message){
+							return '<span class="readmore nl2br">'+message+'</span>'
+						}
+					},
+					{
+						"data"		: 'message.ar',
+						"orderable"	: false,
+						"render"	: function(message){
+							return '<span class="readmore nl2br">'+message+'</span>'
+						}
+					},
+					{
+						"data"		: "_id",
+						"orderable"	: false,
+						"render"	: function (id) {
+							return '<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/'+id+'" data-open-modal="true" class="action-btn btn bg-indigo waves-effect ml-5 m-t-5 <%= getPermissionClass(module_type,["notification_types","edit"]); %>"><%= __("admin.system.edit"); %></a>';
+						}
+					}
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>",
+					type	: 	"POST",
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function( settings ) {
+					/** Description read more **/
+					readMore();
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

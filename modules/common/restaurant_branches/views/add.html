@@ -1,0 +1,288 @@
+<%
+var cityList 	 	= 	(typeof city_list !== typeof undefined && city_list) ? city_list :"";
+var restaurantSlug =	(typeof restaurant_slug !== typeof undefined && restaurant_slug) ? restaurant_slug :"";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-branch" action="<%= list_url+'/add' %>" data-modal-id="form_modal" data-submit-btn-id="branch-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("branch.add_branch"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_english" class="control-label">
+											<%= __("branch.name_in_english"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_english" class="form-control" name="name_in_english" />
+									</div>
+									<span id="name_in_english_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_arabic" class="control-label">
+											<%= __("branch.name_in_arabic"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_arabic" class="form-control" name="name_in_arabic"/>
+									</div>
+									<span id="name_in_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div><%
+						if(restaurantSlug == BURGER_KING || restaurantSlug == PIZZA_HUT){ %>
+							<div class="row clearfix selected">
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="form-line">
+											<label for="kfg_offer_id" class="control-label"><%= __('branch.kfg_offer_id'); %></label>
+											<input name="kfg_offer_id" id="kfg_offer_id" type="text" class="form-control"/>
+										</div>
+										<span id="kfg_offer_id_error" class="error"></span>
+									</div>
+								</div>
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="form-line">
+											<label for="kfg_offer_name" class="control-label"><%= __('branch.kfg_offer_name'); %></label>
+											<input name="kfg_offer_name" id="kfg_offer_name" type="text" class="form-control"/>
+										</div>
+										<span id="kfg_offer_name_error" class="error"></span>
+									</div>
+								</div>
+							</div><%
+						} %>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="city_id" class="control-label">
+											<%= __("branch.city"); %><span class="required"> *</span>
+										</label>
+										<select name="city_id" id="city_id" class="form-control show-tick" data-live-search="true">
+											<option value=""> <%=__("branch.select_city")%> </option>
+											<%-cityList%>
+										</select>
+									</div>
+									<span id="city_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="area_id" class="control-label">
+											<%= __("branch.area"); %><span class="required"> *</span>
+										</label>
+										<select name="area_id" id="area_id" class="form-control show-tick" data-live-search="true">
+											<option value=""> <%=__("branch.select_area")%> </option>
+										</select>
+									</div>
+									<span id="area_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="block" class="control-label">
+											<%= __("branch.block"); %>
+										</label>
+										<select name="block" id="block" class="form-control show-tick" data-live-search="true">
+											<option value=""> <%=__("branch.select_block")%> </option>
+										</select>
+									</div>
+									<span id="block_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="street" class="control-label">
+											<%= __("branch.street"); %>
+										</label>
+										<input type="text" id="street" class="form-control" name="street" />
+									</div>
+									<span id="street_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="build_no" class="control-label">
+											<%= __("branch.build_no"); %>
+										</label>
+										<input type="text" id="build_no" class="form-control" name="build_no" />
+									</div>
+									<span id="build_no_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="description" class="control-label">
+											<%= __("branch.description"); %>
+										</label>
+										<textarea id="description" class="form-control resize-none" name="description"></textarea>
+									</div>
+									<span id="description_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="latitude" class="control-label">
+											<%= __("branch.latitude"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="latitude" class="form-control" name="latitude" />
+									</div>
+									<span id="latitude_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="longitude" class="control-label">
+											<%= __("branch.longitude"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="longitude" class="form-control" name="longitude"/>
+									</div>
+									<span id="longitude_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="address" class="control-label">
+											<%= __("branch.address"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="address" class="form-control" name="address"/>
+									</div>
+									<span id="address_error" class="error"></span>
+								</div>
+							</div>
+							<% if(!isRestaurant(module_type)){ %>
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="form-line">
+											<label for="auto_assignment_start_after" class="control-label"><%= __('branch.auto_assignment_start_after'); %></label>
+											<input type="text" id="auto_assignment_start_after" class="form-control" name="auto_assignment_start_after"/>
+										</div>
+										<span id="auto_assignment_start_after_error" class="error"></span>
+									</div>
+								</div>
+								</div>
+								<div class="row clearfix">
+							<%}%>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="delivery_vehicle_type" class="control-label"><%= __('branch.delivery_vehicle_type'); %></label>
+										<br />
+										<div class="materialize_checkbox">
+											<% Object.keys(DELIVERY_VEHICLE_DROPDOWN).map(key=>{ %>
+												<input type="checkbox" id="delivery_vehicle_type<%=key%>" value="<%=key%>" name="delivery_vehicle_type[]" class="filled-in chk-col-indigo" >
+												<label class="m-r-5 font-16"  for="delivery_vehicle_type<%=key%>"><%=DELIVERY_VEHICLE_DROPDOWN[key]%></label>
+											<% 	}); %>
+										</div>
+									</div>
+									<span id="delivery_vehicle_type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="branch-add-btn-id" class="btn bg-brown btn-sm waves-effect branch-add-btn-submit" <%- ADMIN_LOADING_TEXT %> > <%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	/**
+	 * Function to submit form
+	 */
+	$('.branch-add-btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-branch',function(status,response){
+			if(status){
+				window.location.href = "<%= base_url %>pending_branches/"+response.branch_id;
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/** Get area list*/
+	$(document).on('change','#city_id',function(){
+		var cityId 				=	$(this).val();
+		var areaFirstOtpions 	= 	'<option value=""> <%=__("branch.select_area")%> </option>';
+		var blockFirstOtpions 	= 	'<option value=""> <%=__("branch.select_block")%> </option>';
+
+		$("#area_id").html(areaFirstOtpions);
+		$("#block").html(blockFirstOtpions);
+		refreshDropDownList();
+		if(cityId){
+			var options = {
+				url 	: 	"<%=list_url+'/get_area_list'%>",
+				data	: 	{city_id: cityId},
+				method	:	"post"
+			};
+			ajaxRequest(options,function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					let optionsList = (response.result)	?	response.result	:"";
+					$("#area_id").html(areaFirstOtpions+optionsList);
+					refreshDropDownList();
+				}
+			});
+		}
+	});
+
+	/** Get block list*/
+	$(document).on('change','#area_id',function(){
+		var areaId 				=	$(this).val();
+		var blockFirstOtpions 	= 	'<option value=""> <%=__("branch.select_block")%> </option>';
+
+		$("#block").html(blockFirstOtpions);
+		refreshDropDownList();
+		if(areaId){
+			var options = {
+				url 	: 	"<%=list_url+'/get_block_list'%>",
+				data	: 	{area_id: areaId},
+				method	:	"post"
+			};
+			ajaxRequest(options,function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					let optionsList = (response.result)	?	response.result	:"";
+					$("#block").html(blockFirstOtpions+optionsList);
+					refreshDropDownList();
+				}
+			});
+		}
+	});
+
+	/** Refresh select box list **/
+	refreshDropDownList();
+	function refreshDropDownList(){
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+	}
+</script>

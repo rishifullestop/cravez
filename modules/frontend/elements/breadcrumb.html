@@ -1,0 +1,31 @@
+<% if(Array.isArray(breadcrumb)){ %>
+	<ol class="breadcrumb breadcrumb-col-blank"> <%
+		breadcrumb.forEach(function(result){
+			let breadCrumbName = (result.name) ? result.name : "";
+			if(typeof dynamic_variable !== typeof undefined ){
+				breadCrumbName = breadCrumbName.replace('dynamic_variable',dynamic_variable);
+			}
+			let breadCrumbUrl = (result.url) ? result.url : "";
+			if(breadCrumbUrl && typeof dynamic_url !== typeof undefined){
+				if(dynamic_url.constructor === Array && dynamic_url.length >0){
+					dynamic_url.map(data=>{
+						breadCrumbUrl = breadCrumbUrl.replace('{dynamic_variable}',data);
+					});
+				}else{
+					breadCrumbUrl = breadCrumbUrl.replace('{dynamic_variable}',dynamic_url);
+				}
+			}
+			if(breadCrumbUrl != ""){ %>
+				<li>
+					<a href="<%= breadCrumbUrl %>">
+						<%= breadCrumbName %>
+					</a>
+				</li> <%
+			}else{ %>
+				<li class="active">
+					<%= breadCrumbName %>
+				</li><%
+			}
+		}); %>
+	</ol>
+<% } %>

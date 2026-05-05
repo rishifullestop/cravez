@@ -1,0 +1,227 @@
+<%
+	var fromDate = newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),DATABASE_DATE_FORMAT);
+	var toDate	 = newDate(subtractDate(HOURS_IN_A_DAY),DATABASE_DATE_FORMAT);
+	var tempFromDate = newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),CURRENTDATE_START_DATE_FORMAT);
+	var tempToDate	 = newDate(subtractDate(HOURS_IN_A_DAY),CURRENTDATE_END_DATE_FORMAT);
+%>
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by restaurant name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick restaurant_id" name="search_restaurant_id" id="restaurant_ids" data-live-search="true" data-title="<%= __('admin.report.search_by_restaurant_name'); %>">
+													
+													<%-restaurant_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by date -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" autocomplete="off" value="<%=fromDate+' - '+toDate%>">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=tempFromDate%>">
+											<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=tempToDate%>">
+										</div>
+									</div>
+								
+									<div class="col-sm-4">
+										<button type="button" id="search_btn" class="btn btn-sm waves-effect btn-success">
+											<%= __("admin.system.search")%>
+										</button>
+		
+										<a href="<%=admin_list_url%>/cravez_sales_invoice_report"><button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button></a>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						 <%= __("admin.report.cravez_sales_invoice_report"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['cravez_sales_invoice_report','export']); %>"">
+						<li>
+							 <a href="javascript:void(0);" id="dataExportBtn">
+								<button type="button" class="btn btn-sm bg-green waves-effect">
+									<%= __("admin.report.export")%>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="90%">
+						<thead>
+							<tr rowspan="2">
+                                <th width="25%"><%= __(''); %></th>
+								<th width="25%"><%= __(''); %></th>
+								<th width="25%" colspan="3" class="sparkline"><%= __('admin.report.cravez_delivery'); %></th>
+								<th width="25%" colspan="3"  class="sparkline"><%= __('admin.report.restaurant'); %></th>
+								<th width="25%" colspan="3"  class="sparkline"><%= __('admin.report.pickup'); %></th>
+							</tr>
+							<tr>
+								<th width="25%"><%= __(' '); %></th>
+								<th width="25%"><%= __('admin.report.payment_method'); %></th>
+								<th width="25%"><%= __('admin.report.cash'); %></th>
+								<th width="25%"><%= __('admin.report.k_net'); %></th>
+								<th width="25%"><%= __('admin.report.credit_card'); %></th>
+                                <th width="25%"><%= __('admin.report.cash'); %></th>
+								<th width="25%"><%= __('admin.report.k_net'); %></th>
+								<th width="25%"><%= __('admin.report.credit_card'); %></th>
+                                <th width="25%"><%= __('admin.report.cash'); %></th>
+								<th width="25%"><%= __('admin.report.k_net'); %></th>
+								<th width="25%"><%= __('admin.report.credit_card'); %></th>
+                                <th width="25%"><%= __('admin.report.total'); %></th>
+							</tr>
+						</thead>
+						<tbody id="table_data">
+							<tr>
+								<td colspan='12' class='dataTables_empty'>
+									<%= __('admin.report.no_data_available'); %>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor('script') %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var stopTableDraw = true;
+		$(document).ready(function() {
+			$("#search_btn").click(function () {
+				fetchData();
+			});
+		});
+		
+        
+        function fetchData() {
+            var fromDate = $("#from_date").val();
+            var toDate = $("#to_date").val();
+            var restaurantIds = $('#restaurant_ids').val();
+            $.ajax({
+                type: "POST",
+                url: "<%=admin_list_url%>/cravez_sales_invoice_report",
+                data: { from_date: fromDate, to_date: toDate, restaurant_ids: restaurantIds},
+                dataType: 'json',
+                success: function (response) {
+                    var trHTML = '';
+                    var noDataHtml = "<tr><td colspan='10' class='dataTables_empty'><%= __('admin.report.no_data_available'); %></td></tr>";
+                    var data = response.data;
+                    if (response.status == '<%=STATUS_SUCCESS%>' && data.length > 0) {
+                        trHTML += '<tr><td rowspan ="3"><%= __("admin.report.no_of_orders"); %></td><td><%= __("admin.report.no_of_orders"); %></td><td>' + ((data[0].crv_cash_orders) ? (data[0].crv_cash_orders):0) + '</td><td>' + ((data[0].crv_knet_orders)? (data[0].crv_knet_orders):0) + '</td><td>' + ((data[0].crv_credit_orders)? (data[0].crv_credit_orders):0) + '</td><td>' + ((data[0].res_cash_orders) ? (data[0].res_cash_orders):0) + '</td><td>' + ((data[0].res_knet_orders) ? (data[0].res_knet_orders):0 )+ '</td><td>' + ((data[0].res_credit_orders) ? (data[0].res_credit_orders):0 )+ '</td><td>' + ((data[0].pck_cash_orders) ? (data[0].pck_cash_orders):0) + '</td><td>' + ((data[0].pck_knet_orders)? (data[0].pck_knet_orders):0) + '</td><td>' + ((data[0].pck_credit_orders)? (data[0].pck_credit_orders):0 )+ '</td><td>' + ((data[0].total) ? (data[0].total) : 0) + '</td></tr>';
+
+						trHTML += '<tr><td><%= __("admin.report.refund_no_of_orders"); %></td><td>' + ((data[1].crv_cash_refund_orders)? (data[1].crv_cash_refund_orders):0) + '</td><td>' + ((data[1].crv_knet_refund_orders)? (data[1].crv_knet_refund_orders):0) + '</td><td>' + ((data[1].crv_credit_refund_orders)? (data[1].crv_credit_refund_orders):0) + '</td><td>' +((data[1].res_cash_refund_orders)? (data[1].res_cash_refund_orders):0) + '</td><td>' + ((data[1].res_knet_refund_orders)?(data[1].res_knet_refund_orders):0) + '</td><td>' + ((data[1].res_credit_refund_orders)? (data[1].res_credit_refund_orders):0) + '</td><td>' + ((data[1].pck_cash_refund_orders)? (data[1].pck_cash_refund_orders):0) + '</td><td>' + ((data[1].pck_knet_refund_orders)? (data[1].pck_knet_refund_orders):0) + '</td><td>' + ((data[1].pck_credit_refund_orders)? (data[1].pck_credit_refund_orders):0) + '</td><td>' + ((data[1].total) ? (data[1].total) : 0) + '</td></tr>';
+
+						trHTML += '<tr><td><%= __("admin.report.net_number_of_orders"); %></td><td>' + ((data[7].crv_cash_net_orders) ? (data[7].crv_cash_net_orders) : 0) + '</td><td>' + ((data[7].crv_knet_net_orders) ? (data[7].crv_knet_net_orders) : 0) + '</td><td>' + ((data[7].crv_credit_net_orders) ? (data[7].crv_credit_net_orders) : 0) + '</td><td>' + ((data[7].res_cash_net_orders) ? (data[7].res_cash_net_orders) : 0) + '</td><td>' + ((data[7].res_knet_net_orders) ? (data[7].res_knet_net_orders) : 0) + '</td><td>' + ((data[7].res_credit_net_orders) ? (data[7].res_credit_net_orders) : 0) + '</td><td>' + ((data[7].pck_cash_net_orders) ? (data[7].pck_cash_net_orders) : 0) + '</td><td>' + ((data[7].pck_knet_net_orders) ? (data[7].pck_knet_net_orders) : 0) + '</td><td>' + ((data[7].pck_credit_net_orders) ? (data[7].pck_credit_net_orders) : 0) + '</td><td>' + ((data[7].total) ? (data[7].total) : 0) + '</td></tr>';
+						
+                        trHTML += '<tr><td rowspan="4"><%= __("admin.report.value_of_orders"); %></td><td><%= __("admin.report.value_of_sales"); %></td><td>' + currencyFormat(data[2].crv_cash_sales_value) + '</td><td>' + currencyFormat(data[2].crv_knet_sales_value) + '</td><td>' + currencyFormat(data[2].crv_credit_sales_value) + '</td><td>' + currencyFormat(data[2].res_cash_sales_value) + '</td><td>' + currencyFormat(data[2].res_knet_sales_value) + '</td><td>' + currencyFormat(data[2].res_credit_sales_value) + '</td><td>' + currencyFormat(data[2].pck_cash_sales_value) + '</td><td>' + currencyFormat(data[2].pck_knet_sales_value) + '</td><td>' + currencyFormat(data[2].pck_credit_sales_value) + '</td><td>' + currencyFormat(data[2].total) + '</td></tr>';
+
+						trHTML += '<tr><td><%= __("admin.report.delivery_charges"); %></td><td>' + currencyFormat(data[3].crv_cash_delivery_charge) + '</td><td>' + currencyFormat(data[3].crv_knet_delivery_charge) + '</td><td>' + currencyFormat(data[3].crv_credit_delivery_charge) + '</td><td>' + currencyFormat(data[3].res_cash_delivery_charge) + '</td><td>' + currencyFormat(data[3].res_knet_delivery_charge) + '</td><td>' + currencyFormat(data[3].res_credit_delivery_charge) + '</td><td>' + currencyFormat(data[3].pck_cash_delivery_charge) + '</td><td>' + currencyFormat(data[3].pck_knet_delivery_charge) + '</td><td>' + currencyFormat(data[3].pck_credit_delivery_charge) + '</td><td>' + currencyFormat(data[3].total) + '</td></tr>';
+
+						trHTML += '<tr><td><%= __("admin.report.total_value_of_refunded_orders"); %></td><td>' + currencyFormat(data[4].crv_cash_refund_order_value) + '</td><td>' + currencyFormat(data[4].crv_knet_refund_order_value) + '</td><td>' + currencyFormat(data[4].crv_credit_refund_order_value) + '</td><td>' + currencyFormat(data[4].res_cash_refund_order_value) + '</td><td>' + currencyFormat(data[4].res_knet_refund_order_value) + '</td><td>' + currencyFormat(data[4].res_credit_refund_order_value) + '</td><td>' + currencyFormat(data[4].pck_cash_refund_order_value) + '</td><td>' + currencyFormat(data[4].pck_knet_refund_order_value) + '</td><td>' + currencyFormat(data[4].pck_credit_refund_order_value) + '</td><td>' + currencyFormat(data[4].total) + '</td></tr>';
+
+						trHTML += '<tr><td><%= __("admin.report.net_value_of_sales"); %></td><td>' + currencyFormat(data[8].crv_cash_net_value_sales) + '</td><td>' + currencyFormat(data[8].crv_knet_net_value_sales) + '</td><td>' + currencyFormat(data[8].crv_credit_net_value_sales) + '</td><td>' + currencyFormat(data[8].res_cash_net_value_sales) + '</td><td>' + currencyFormat(data[8].res_knet_net_value_sales) + '</td><td>' + currencyFormat(data[8].res_credit_net_value_sales) + '</td><td>' + currencyFormat(data[8].pck_cash_net_value_sales) + '</td><td>' + currencyFormat(data[8].pck_knet_net_value_sales) + '</td><td>' + currencyFormat(data[8].pck_credit_net_value_sales) + '</td><td>' + currencyFormat(data[8].total) + '</td></tr>';
+
+						trHTML += '<tr><td rowspan="4"><%= __("admin.report.cravez_commission_bank_charges"); %></td><td><%= __("admin.report.cravez_commisson"); %></td><td>' + currencyFormat(data[5].crv_cash_cravez_commission) + '</td><td>' + currencyFormat(data[5].crv_knet_cravez_commission) + '</td><td>' + currencyFormat(data[5].crv_credit_cravez_commission) + '</td><td>' + currencyFormat(data[5].res_cash_cravez_commission) + '</td><td>' + currencyFormat(data[5].res_knet_cravez_commission) + '</td><td>' + currencyFormat(data[5].res_credit_cravez_commission) + '</td><td>' + currencyFormat(data[5].pck_cash_cravez_commission) + '</td><td>' + currencyFormat(data[5].pck_knet_cravez_commission) + '</td><td>' + currencyFormat(data[5].pck_credit_cravez_commission) + '</td><td>' + currencyFormat(data[5].total) + '</td></tr>';
+
+						trHTML += '<tr><td><%= __("admin.report.delivery_charges"); %></td><td>' + currencyFormat(data[3].crv_cash_delivery_charge) + '</td><td>' + currencyFormat(data[3].crv_knet_delivery_charge) + '</td><td>' + currencyFormat(data[3].crv_credit_delivery_charge) + '</td><td>' + currencyFormat(data[3].res_cash_delivery_charge) + '</td><td>' + currencyFormat(data[3].res_knet_delivery_charge) + '</td><td>' + currencyFormat(data[3].res_credit_delivery_charge) + '</td><td>' + currencyFormat(data[3].pck_cash_delivery_charge) + '</td><td>' + currencyFormat(data[3].pck_knet_delivery_charge) + '</td><td>' + currencyFormat(data[3].pck_credit_delivery_charge) + '</td><td>' + currencyFormat(data[3].total) + '</td></tr>';
+
+						trHTML += '<tr><td><%= __("admin.report.bank_charge_k_net"); %></td><td>' + currencyFormat(data[6].crv_cash_knet_charges) + '</td><td>' + currencyFormat(data[6].crv_knet_knet_charges) + '</td><td>' + currencyFormat(data[6].crv_credit_knet_charges) + '</td><td>' + currencyFormat(data[6].res_cash_knet_charges) + '</td><td>' + currencyFormat(data[6].res_knet_knet_charges) + '</td><td>' + currencyFormat(data[6].res_credit_knet_charges) + '</td><td>' + currencyFormat(data[6].pck_cash_knet_charges) + '</td><td>' + currencyFormat(data[6].pck_knet_knet_charges) + '</td><td>' + currencyFormat(data[6].pck_credit_knet_charges) + '</td><td>' + currencyFormat(data[6].total) + '</td></tr>';
+
+						trHTML += '<tr><td><%= __("admin.report.net_amount_of_cravez"); %></td><td>' + currencyFormat(data[9].crv_cash_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].crv_knet_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].crv_credit_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].res_cash_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].res_knet_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].res_credit_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].pck_cash_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].pck_knet_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].pck_credit_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].total) + '</td></tr>';
+						
+						trHTML += '<tr><td rowspan="3"><%= __(" "); %></td><td><%= __("admin.report.collected_amount_by_cravez"); %></td><td>' + currencyFormat(data[8].crv_cash_net_value_sales) + '</td><td>' + currencyFormat(data[8].crv_knet_net_value_sales) + '</td><td>' + currencyFormat(data[8].crv_credit_net_value_sales) + '</td><td>' + currencyFormat(0) + '</td><td>' + currencyFormat(data[8].res_knet_net_value_sales) + '</td><td>' + currencyFormat(data[8].res_credit_net_value_sales) + '</td><td>' + currencyFormat(0) + '</td><td>' + currencyFormat(data[8].pck_knet_net_value_sales) + '</td><td>' + currencyFormat(data[8].pck_credit_net_value_sales) + '</td><td>' + currencyFormat((data[8].total-(((data[8].res_cash_net_value_sales)? data[8].res_cash_net_value_sales:0)+ ((data[8].pck_cash_net_value_sales) ? data[8].pck_cash_net_value_sales : 0)))) + '</td></tr>';
+
+						trHTML += '<tr class="col-red"><td class="col-l-black"><%= __("admin.report.cravez_commission_bank_charges"); %></td><td>' + currencyFormat(data[9].crv_cash_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].crv_knet_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].crv_credit_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].res_cash_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].res_knet_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].res_credit_net_amount_cravez) + '</td><td >' + currencyFormat(data[9].pck_cash_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].pck_knet_net_amount_cravez) + '</td><td >' + currencyFormat(data[9].pck_credit_net_amount_cravez) + '</td><td>' + currencyFormat(data[9].total) + '</td></tr>';
+
+						trHTML += '<tr><td><%= __("admin.report.net_due_amount_for_restaurant"); %></td><td>' + currencyFormat(data[10].crv_cash_net_due_amount) + '</td><td>' + currencyFormat(data[10].crv_knet_net_due_amount) + '</td><td>' + currencyFormat(data[10].crv_credit_net_due_amount) + '</td><td>' + currencyFormat(data[10].res_cash_net_due_amount) + '</td><td>' + currencyFormat(data[10].res_knet_net_due_amount) + '</td><td>' + currencyFormat(data[10].res_credit_net_due_amount) + '</td><td>' + currencyFormat(data[10].pck_cash_net_due_amount) + '</td><td>' + currencyFormat(data[10].pck_knet_net_due_amount) + '</td><td>' + currencyFormat(data[10].pck_credit_net_due_amount) + '</td><td>' + currencyFormat(data[10].total) + '</td></tr>';
+
+                        $("#table_data tr").remove();
+                        $('#table_data').append(trHTML);
+                    } else {
+                        $("#table_data tr").remove();
+                        $('#table_data').append(noDataHtml);
+                    }
+                },
+                error: function (e) {
+                    console.log("ERROR: ", e);
+                }
+            });
+        }
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("click","#dataExportBtn",function(){
+			var fromDate 		= $("#from_date").val();
+			var toDate   		= $("#to_date").val();			
+			var restaurantIds   = $("#restaurant_ids").val();			
+			
+			var startDate		= (fromDate) ? fromDate : "<%=tempFromDate%>";
+			var endDate			= (toDate) ? toDate : "<%=tempToDate%>";
+
+			if(startDate && endDate){
+				var exportURL = "<%=admin_list_url%>/cravez_sales_invoice_report/export_data?from_date=" + startDate + "&to_date=" + endDate;
+				if (restaurantIds) exportURL += "&restaurant_ids=" + restaurantIds;
+				window.location.href = exportURL;
+			}
+		});
+
+		var maxDate = new Date("<%= toDate %>");
+		var removeClearBtn = true;
+		var dateRanges = {
+			'Today': [moment(), moment()],
+			'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+			'Last 7 Days': [moment().subtract(7, 'days'), moment()],
+			'Last 30 Days': [moment().subtract(30, 'days'), moment()],
+			'This Month': [moment().startOf('month'), moment().endOf('month')],
+			'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+		};
+</script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

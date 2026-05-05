@@ -1,0 +1,45 @@
+<div class="sign_box">
+	<div class="form_section">
+		<figure><img src="<%= WEBSITE_IMG_URL %>logo.png" alt="img"></figure>
+		<form id="login" data-submit-btn-id="login-btn-id" method="post" class="on_click_submit" role="form">
+			<input type="hidden" name="_csrf" value="<%=(typeof csrf_token !== typeof undefined) ? csrf_token : "";%>">
+			<div class="form-group">
+				<label for="user_name"><%= __("user.email_placeholder");%> *</label>
+				<input type="text" class="form-control" name="user_name" id="user_name" placeholder="<%= __("user.email_placeholder");%> *" data-blank-error-message="<%= __("user.please_enter_user_name") %>" data-pattern-error-message="<%= __("user.please_enter_valid_email_mobile_number") %>" data-allowed-pattern="<%= EMAIL_AND_MOBILE_REGULAR_EXPRESSION_FOR_CLIENT_SIDE %>" >
+				<span id="user_name_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="password"><%= __("user.password"); %> *</label>
+				<input type="password" class="form-control" name="password" id="password" placeholder="<%= __("user.password"); %> *" data-blank-error-message="<%= __("user.please_enter_password") %>" />
+				<span id="password_error" class="error"></span>
+			</div>
+			<div class="submit_btn">
+				<a href="<%= WEBSITE_URL%>restaurant_on_boarding" ><%= __("user.do_not_have_account"); %></a>
+				<button type="button" id="login-btn-id" class="btn btn-default btn-submit" <%- FRONT_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+				<a href="<%= WEBSITE_URL%>forgot_password" ><%= __("user.forgot_password"); %></a>
+                <div class="clearfix"></div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+
+		/**
+		 * Function to submit form
+		 */
+		$(".btn-submit").click(function(){
+			if(client_side_validation("login")){
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				ajax_submit("login",function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			}
+		});
+	</script>

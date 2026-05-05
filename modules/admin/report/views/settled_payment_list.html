@@ -1,0 +1,339 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by order date -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="valid_till" class="form-control" placeholder="<%= __('admin.settled_payments.search_by_date'); %>"  id="date-range-picker"  name="search_by_date" autocomplete="off">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- Search by settlement method -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="settlement_method" id="settlement_method">
+													<option value=""><%= __("admin.settled_payments.search_by_settlement_method"); %></option>
+													<%-settlement_methods%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by payment method -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick search_by_payment_method" id="payment_method" name="payment_method" multiple title="<%=__('admin.unsettled_payments.search_by_payment_method');%>">
+													<%-payment_methods%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by user -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="proceed_by" id="proceed_by" data-live-search="true">
+													<option value=""><%= __("admin.settled_payments.search_by_user"); %></option>
+													<%-user_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by restaurant name -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="restaurant_id" name="restaurant_id" data-child-name="branch_id" data-live-search="true" title='<%=__("admin.unsettled_payments.search_by_restaurant_name");%>' multiple>
+													<%-restaurant_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by branch -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick branch_id disabled" id="branch_id" name="branch_id" data-live-search="true" title="<%=__('admin.orders.search_by_branch')%>" data-live-search="true" disabled multiple>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.settled_payments.settled_payments"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['settled_payments','export']); %>">
+						<li>
+							<a href="javascript:void(0);" id="dataExportBtn">
+								<button type="button" class="btn btn-sm bg-green waves-effect">
+									<%= __("admin.report.export")%>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.system.action"); %></th>
+								<th><%= __("admin.settled_payments.restaurant_name"); %></th>
+								<th><%= __("admin.settled_payments.contact_number"); %></th>
+								<th><%= __("admin.settled_payments.email_address"); %></th>
+								<th><%= __("admin.settled_payments.account_manager_name"); %></th>
+								<th><%= __("admin.settled_payments.total_branches"); %></th>
+								<th><%= __("admin.settled_payments.paid_amount"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/**
+		* Get dropdown value by local storage
+		*/
+		let tempRestaurantId = 	"";
+		let tempBranchId 	 =	"";
+		if(localStorage["search_" +window.location.pathname]){
+
+			let searchFormData = JSON.parse(localStorage["search_" +window.location.pathname]);
+			for(index in searchFormData){
+				if(searchFormData[index].name && searchFormData[index].name == "branch_id" && searchFormData[index].value){
+					tempBranchId = searchFormData[index].value;
+				}
+				if(searchFormData[index].name && searchFormData[index].name == "restaurant_id" && searchFormData[index].value){
+					tempRestaurantId = searchFormData[index].value;
+				}
+			}
+
+			if(tempRestaurantId){
+				$("#restaurant_id").val(tempRestaurantId);
+				getBranchDropDownList($("select[name='restaurant_id']"),tempRestaurantId,tempBranchId);
+			}
+		}
+
+		/** Function to initialize datatable and get server side data*/
+		var dataTable =	"";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"dom"		:	"lrtip",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+
+							/*  order details Link  */
+							var dropDownButton 	= ''+
+								'<a href="<%=admin_list_url%>/settled_payment/order_details/'+result.restaurant_id+'" target="_blank" class="btn bg-blue waves-effect m-l-5 m-t-5 <%= getPermissionClass(module_type,["settled_payments","order_details"]); %>"><%= __("admin.settled_payments.order_details");%></a>';
+
+							/*  payment history Link  */
+							dropDownButton 	+= ''+
+								'<a href="<%=admin_list_url%>/unsettled_payment/payment_history/'+result.restaurant_id+'" target="_blank" class="btn bg-indigo waves-effect m-l-5 m-t-5 <%= getPermissionClass(module_type,["unsettled_payments","payment_history"]); %>"><%= __("admin.settled_payments.payment_history");%></a>';
+
+							return dropDownButton;
+						}
+					},
+					{   "data"		 : "restaurant_name.en",
+						"searchable" : false,
+						"orderable"  : false
+					},
+					{   "data"		 : "mobile_number",
+						"searchable" : false,
+						"orderable"  : false
+					},
+					{   "data"		 : "email_address",
+						"searchable" : false,
+						"orderable"  : false
+					},
+					{   "data"		 : "account_manager_name",
+						"searchable" : false,
+						"orderable"  : false
+					},
+					{   "data"		 : "total_branches",
+						"searchable" : false,
+						"orderable"  : false
+					},
+					{   "data"		 : "restaurant_payout",
+						"searchable" : false,
+						"orderable"  : false,
+						"render" 	 : function(payAmount){
+							return (payAmount) ? currencyFormat(payAmount,true) : currencyFormat(0,true);
+						}
+					}
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>/settled_payments",
+					type	: 	"POST",
+					data    :   function(d){
+						d.from_date = $('#from_date').val();
+						d.to_date   = $('#to_date').val();
+						d.settlement_method	= $('#settlement_method').val();
+						d.proceed_by		= $('#proceed_by').val();
+						d.restaurant_id		= $('#restaurant_id').val();
+						d.branch_id			= $('#branch_id').val();
+						d.payment_method	= $('#payment_method').val();
+					},
+					dataSrc	: 	function(res){
+						setTimeout(()=>{
+							dataTable.columns.adjust();
+						},100);
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+			});
+		});
+
+		/**
+		* Function to filter by settlement method
+		*/
+		$('#settlement_method,#proceed_by,#restaurant_id,#branch_id,#payment_method').change(function(){
+			dataTable.draw();
+		});
+
+		/**
+		* Get branch list
+		*/
+		$("select[name='restaurant_id']").change(function(){
+			getBranchDropDownList($(this));
+		});
+
+		/**
+		* Get branch search dropdown list
+		*/
+		function getBranchDropDownList(currentObj,restaurantId,branchId){
+			if(currentObj){
+
+				var currentValue	=	currentObj.val();
+				var childInputName	=	currentObj.attr("data-child-name");
+				var childObj		=	(childInputName) ?  $("select[name='"+childInputName+"']") :"";
+
+				if(!currentValue && restaurantId) currentValue = restaurantId;
+
+				childObj.attr("disabled",true).removeClass("disabled");
+				if(!branchId) childObj.val("").trigger("change");
+				$(".show-tick").selectpicker('refresh');
+
+				if(currentValue){
+					/** Get dropdown list **/
+					var options = {
+						url 	: "<%=admin_list_url%>/branch_list",
+						data	: {restaurant_id : currentValue},
+						method	: "post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_SUCCESS%>"){
+							/** Append dropdown list **/
+							childObj.attr("disabled",false).removeClass("disabled").html(response.branch_list);
+							if(branchId) childObj.val(branchId).trigger("change");
+							$(".show-tick").selectpicker('refresh');
+						}else if(response.status && response.message){
+							notice(response.status,response.message);
+						}
+					});
+				}
+			}
+		}// end getBranchDropDownList()
+
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("click","#dataExportBtn",function(){
+			var fromDate 		= $("#from_date").val();
+			var toDate   		= $("#to_date").val();
+			var restaurantId	= $("#restaurant_id").val();
+			var branchId	   	= $("#branch_id").val();
+			var settlementMethod= $('#settlement_method').val();
+			var proceedBy 		= $('#proceed_by').val();
+			var paymentMethod 	= $('#payment_method').val();
+			var startDate		= (fromDate) ? fromDate : "";
+			var endDate			= (toDate) ? toDate : "";
+
+			if(startDate && endDate){
+				var exportURL = "<%=admin_list_url%>/settled_export_data/export_data?from_date="+startDate+"&to_date="+endDate;
+			} else{
+				var exportURL = "<%=admin_list_url%>/settled_export_data/export_data?from_date=" + startDate;
+			}
+			if (restaurantId) exportURL += "&restaurant_id=" + restaurantId;
+			if (branchId) exportURL += "&branch_id=" + branchId;
+			if (settlementMethod) exportURL += "&settlement_method=" + settlementMethod;
+			if (proceedBy) exportURL += "&proceed_by=" + proceedBy;
+			if (paymentMethod) exportURL += "&payment_method=" + paymentMethod;
+			window.location.href = exportURL;
+		});
+		var maxDate = new Date();
+		var removeClearBtn	= true;
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

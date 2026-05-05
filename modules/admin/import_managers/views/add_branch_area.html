@@ -1,0 +1,215 @@
+<div class="row clearfix">
+    <form id="add_branch_area" action="<%=WEBSITE_ADMIN_URL%>merchant_upload/add_branch_areas" data-submit-btn-id="branch-area-btn-id" method="post" class="on_click_submit" role="form">
+        <input type="hidden" name="restaurant_slug"  id="restaurant_slug"/>
+        <div id="branch_form_html" class="col-sm-12">
+            <div class="table-responsive">
+                <table class="row-border full-length-header hover table table-bordered dataTable fixed_header_table">
+                    <thead>
+                        <tr>
+                            <th> </th>
+                            <th> <%=__("admin.merchant_upload.branch_id")%> *</th>
+                            <th> <%=__("admin.merchant_upload.area_id")%> *</th>
+                            <th> <%=__("admin.merchant_upload.delivery_by")%> *</th>
+                            <th> <%=__("admin.merchant_upload.delivery_fess")%> </th>
+                            <th> <%=__("admin.merchant_upload.delivery_duration")%> </th>
+                            <th> <%=__("admin.merchant_upload.preparation_time")%> </th>
+                            <th> <%=__("admin.merchant_upload.minimum_order_limit")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_area_status")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_priority_in_area")%> </th>
+                            <th> <%=__("admin.merchant_upload.accept_scheduling_orders")%> </th>
+                            <th> <%=__("admin.merchant_upload.accept_pickup_orders")%> </th>
+                            <th> <%=__("admin.merchant_upload.coming_soon")%> </th>
+                            <th> <%=__("admin.merchant_upload.has_offers")%> </th>
+                            <th> <%=__("admin.merchant_upload.morning_profile")%> *</th>
+                            <th> <%=__("admin.merchant_upload.day_profile")%> *</th>
+                        </tr>
+                    </thead>
+                    <tbody class="append_branch_area_tr"> </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-sm bg-green branch_area_addmore" onclick="AppendHTML()"><%=__("admin.merchant_upload.add_more")%></button>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" id="branch-area-btn-id" class="btn bg-brown btn-sm waves-effect branch-area-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+            <a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+        </div>
+    </form>
+
+    <div class="appendable_input hide">
+        <table >
+            <tbody class="input_tr">
+                <tr id="branch_row_{index}" class="table_row">
+                    <td>
+                        <button type="button" class="btn bg-red remove_branch_area hide">x</button>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][index]"  value="{index}" >
+                        <input type="text" name="branch_area[{index}][branch_id]" class="form-control input-column" id="branch_id_{index}" >
+                        <span id="branch_id_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch_area[{index}][area_id]" class="form-control input-column" id="area_id_{index}" >
+                        <span id="area_id_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][delivery_by_id]" value="44" >
+                        <input type="text" name="branch_area[{index}][delivery_by]" class="form-control input-column" id="delivery_by_{index}" >
+                        <span id="delivery_by_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][delivery_fess_id]" value="43" >
+                        <input type="text" name="branch_area[{index}][delivery_fess]" class="form-control input-column" id="delivery_fess_{index}" >
+                        <span id="delivery_fess_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][delivery_duration_id]" value="39" >
+                        <input type="text" name="branch_area[{index}][delivery_duration]" class="form-control input-column" id="delivery_duration_{index}" >
+                        <span id="delivery_duration_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][preparation_time_id]" value="40" >
+                        <input type="text" name="branch_area[{index}][preparation_time]" class="form-control input-column" id="preparation_time_{index}" >
+                        <span id="preparation_time_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][minimum_order_limit_id]" value="41" >
+                        <input type="text" name="branch_area[{index}][minimum_order_limit]" class="form-control input-column" id="minimum_order_limit_{index}" >
+                        <span id="minimum_order_limit_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch_area[{index}][branch_area_status]" class="form-control input-column" id="branch_area_status_{index}" >
+                        <span id="branch_area_status_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][branch_priority_in_area_id]" value="15" >
+                        <input type="text" name="branch_area[{index}][branch_priority_in_area]" class="form-control input-column" id="branch_priority_in_area_{index}" >
+                        <span id="branch_priority_in_area_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][accept_scheduling_orders_id]" value="65" >
+                        <input type="text" name="branch_area[{index}][accept_scheduling_orders]" class="form-control input-column" id="accept_scheduling_orders_{index}" >
+                        <span id="accept_scheduling_orders_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][accept_pickup_orders_id]" value="60" >
+                        <input type="text" name="branch_area[{index}][accept_pickup_orders]" class="form-control input-column" id="accept_pickup_orders_{index}" >
+                        <span id="accept_pickup_orders_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][coming_soon_id]" value="58" >
+                        <input type="text" name="branch_area[{index}][coming_soon]" class="form-control input-column" id="coming_soon_{index}" >
+                        <span id="coming_soon_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][has_offers_id]" value="59" >
+                        <input type="text" name="branch_area[{index}][has_offers]" class="form-control input-column" id="has_offers_{index}" >
+                        <span id="has_offers_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][morning_profile_id]" value="81" >
+                        <input type="text" name="branch_area[{index}][morning_profile]" class="form-control input-column" id="morning_profile_{index}" >
+                        <span id="morning_profile_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch_area[{index}][day_profile_id]" value="82" >
+                        <input type="text" name="branch_area[{index}][day_profile]" class="form-control input-column" id="day_profile_{index}" >
+                        <span id="day_profile_{index}_error" class="error"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    /**
+     *  Append branch input
+    */
+    var rowCount = 0;
+    function AppendHTML(){
+        var defaultHTML     = $(".appendable_input table .input_tr").html();
+        var htmlToAppend    = defaultHTML.replace(RegExp('{index}','g'),rowCount);
+        $(".append_branch_area_tr").append(htmlToAppend);
+        rowCount++;
+
+        if($("#add_branch_area .remove_branch_area").length > 1){
+            $("#add_branch_area .remove_branch_area").removeClass("hide");
+        }
+
+        $("#add_branch_area .branch_area_addmore").addClass("hide").last().removeClass("hide");
+    }// end AppendHTML()
+
+    $(document).ready(function(){
+        AppendHTML();
+
+        /**
+        * Function to submit form
+        */
+        $(".branch-area-btn-submit").click(function(){
+            var btnId = $(this).attr("id");
+            $("#restaurant_error").text("");
+            var restaurantSlug = $("#restaurant_slug").val();
+            if(!restaurantSlug || restaurantSlug == ""){
+                display_errors([{param: "restaurant", msg: "<%= __('admin.merchant_upload.please_select_restaurant_first')%>"}],"merchant_file");
+                return false;
+            }
+
+            startTextLoading(btnId);
+            ajax_submit("add_branch_area",function(status,response){
+                if(status){
+                    if(response.redirect_url){
+                        notice(response.status,response.message);
+                        $("#upload_action").val('').trigger("change");
+                        resetMerchantForm();
+                        window.location.href = response.redirect_url;
+                    }else{
+                        window.location.reload(true);
+                    }
+                }
+                stopTextLoading(btnId);
+            });
+        });
+    });
+
+    /**
+     *  Remove branch input
+    */
+    $(document).on("click",".remove_branch_area",function(){
+        var haveValue   =   false;
+        var that        =   this;
+        $(that).parents(".table_row").find("input.input-column").each(function(){
+            if($(this).val() != ""){
+                haveValue = true;
+            }
+        });
+
+        if(!haveValue){
+            $(this).parents(".table_row").remove();
+            if($("#add_branch_area .remove_branch_area").length <= 1){
+                $("#add_branch_area .remove_branch_area").addClass("hide");
+            }
+
+            $("#add_branch_area .branch_area_addmore").addClass("hide").last().removeClass("hide");
+        }else{
+            confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.merchant_upload.branch_area_remove_comfirm_message"); %>',function(result){
+                if(result){
+                    $(that).parents(".table_row").remove();
+                    if($("#add_branch_area .remove_branch_area").length <= 1){
+                        $("#add_branch_area .remove_branch_area").addClass("hide");
+                    }
+
+                    $("#add_branch_area .branch_area_addmore").addClass("hide").last().removeClass("hide");
+                }
+                swal.close();
+            });
+        }
+    });
+</script>
+
+
+
+
+
+

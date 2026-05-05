@@ -1,0 +1,98 @@
+<%
+	var loginDetails  	= 	(result.login_details)	 	?	result.login_details	:{};
+	var getScheduleList = 	(result.get_schedule_list)	?	result.get_schedule_list:{};
+	var leaveTypeList	=	(result.leave_type_list) 	?	result.leave_type_list 	:{};
+%>
+<div class="row clearfix">
+	<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+		<div class="sales_report receive_orders">
+			<div class="heading_text">
+				<div class="col-md-9 col-sm-9 col-xs-9 text-left p-l-0">
+					<h3><%=  __("admin.dashboard.agent_time"); %></h3>
+				</div>
+				<div class="col-md-3 col-sm-3 col-xs-3 text-right">
+					<a href="<%= WEBSITE_ADMIN_URL+'dashboard/agent_login';%>" class="view_all reset_storage"><%= __("admin.dashboard.view_all");%></a>
+				</div>
+			</div>
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+						<tr>
+							<th><%=  __("admin.dashboard.date"); %></th>
+							<th><%=  __("admin.dashboard.login_time"); %></th>
+							<th><%=  __("admin.dashboard.logout_time"); %></th>
+						</tr>
+					</thead>
+					<tbody><% if(loginDetails && loginDetails.date_range && loginDetails.date_range.length > 0 ){
+							loginDetails.date_range.map((dateRecords)=>{ %>
+								<tr>
+									<td><%=newDate(dateRecords,DATABASE_DATE_FORMAT+' ('+DAY_FORMAT+')')%></td><%
+									if(loginDetails.result[dateRecords] && loginDetails.result[dateRecords]){ %>
+										<td>
+											<%= (loginDetails.result[dateRecords].login_time && newDate(dateRecords,DATABASE_DATE_FORMAT) == newDate(loginDetails.result[dateRecords].login_time,DATABASE_DATE_FORMAT)) ? newDate(loginDetails.result[dateRecords].login_time,TIME_FORMAT) : '-';%>
+										</td>
+										<td>
+											<%= (loginDetails.result[dateRecords].logout_time && newDate(dateRecords,DATABASE_DATE_FORMAT) == newDate(loginDetails.result[dateRecords].logout_time,DATABASE_DATE_FORMAT)) ? newDate(loginDetails.result[dateRecords].logout_time,TIME_FORMAT) :'-';%>
+										</td><%
+									}else{ %>
+										<td>-</td>
+										<td>-</td>
+									<% } %>
+								</tr><%
+							});
+						}else{ %>
+							<tr><td colspan="3" class="text-center"><span><%= __("admin.system.no_record_found")%></span></td></tr>
+						<% } %>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<% if(!auth.team_head){ %>
+		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+			<div class="sales_report receive_orders">
+				<div class="heading_text"><h3><%=  __("admin.dashboard.upcoming_week_schedule"); %></h3></div>
+				<div class="table-responsive">
+					<table class="table">
+						<thead>
+							<tr>
+								<th><%=  __("admin.dashboard.day"); %></th>
+								<th><%=  __("admin.dashboard.shift_time"); %></th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if(getScheduleList && getScheduleList.choose_date && getScheduleList.choose_date.length > 0 ){
+								getScheduleList.choose_date.map((dateRecords)=>{ %>
+									<tr>
+										<td><%=newDate(dateRecords,DATABASE_DATE_FORMAT+' ('+DAY_FORMAT+')')%></td><%
+
+										var shiftData = (getScheduleList.shift_availablity[dateRecords] && getScheduleList.shift_availablity[dateRecords]) ? getScheduleList.shift_availablity[dateRecords] : {};
+										var startTime = (shiftData.start_time) ? set24HourFormat(shiftData.start_time)   : "";
+										var endTime   = (shiftData.end_time)   ? set24HourFormat(shiftData.end_time)     : "";
+										var time      = (startTime && endTime) ? startTime+" - "+endTime  	:"";
+										var leaveData = (shiftData.leave_type) ? shiftData.leave_type   	:"";
+										var leaveTitle= (leaveTypeList[String(leaveData)]) ? leaveTypeList[String(leaveData)] :"";
+
+										var leaveType = "";
+										if(leaveData){
+											leaveType  = '<span class="label label-success">'+leaveTitle+'</span>';
+											time = "";
+										}
+										if(time || leaveType){ %>
+											<td><%=time%> <%- leaveType%></td><%
+										}else{ %>
+											<td>-</td><%
+										} %>
+									</tr><%
+								}); %>
+								<tr><td colspan="2" class="border-none">&nbsp;</td></tr>
+							<% } else{ %>
+								<tr><td colspan="2" class="text-center"><span><%= __("admin.system.no_record_found")%></span></td></tr>
+							<% } %>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	<% } %>
+</div>

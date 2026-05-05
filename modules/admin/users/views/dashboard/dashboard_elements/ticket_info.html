@@ -1,0 +1,39 @@
+<%	var ticketCounts  = (result.ticket_counts)	 ?	result.ticket_counts	:{}; %>
+
+<div class="number_box">
+	<h3><span><%= __("admin.dashboard.tickets_info")%></span></h3>
+	<div class="dashboard_number menu_box">
+		<ul>
+			<li>
+				<div class="number_bg_box blue_border">
+					<strong><%= (ticketCounts.total_tickets) ? ticketCounts.total_tickets :0; %></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>tickets/all_tickets" target="_blank" class="text-decoration-none reset_storage"><span><%= __("admin.dashboard.total_tickets_raised")%></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box blue_border">
+					<strong><%= (ticketCounts.total_created_tickets) ? ticketCounts.total_created_tickets : 0 %></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>tickets/my_tickets" target="_blank" class="text-decoration-none reset_storage"><span><%= __("admin.dashboard.total_created_tickets")%></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box blue_border">
+					<strong><%= (ticketCounts.total_reopened_tickets) ? ticketCounts.total_reopened_tickets : 0 %></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>tickets/reopen_tickets" target="_blank" class="text-decoration-none reset_storage"><span><%= __("admin.dashboard.total_reopened_tickets")%></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box blue_border">
+					<strong><%= (ticketCounts.total_closed_tickets) ? ticketCounts.total_closed_tickets : 0 %></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>tickets/close_tickets" target="_blank" class="text-decoration-none reset_storage"><span><%= __("admin.dashboard.total_closed_tickets")%></span></a>
+				</div>
+			</li>
+			<li>
+				<div class="number_bg_box blue_border">
+					<strong><%= (ticketCounts.total_qa_commented_tickets) ? ticketCounts.total_qa_commented_tickets : 0 %></strong>
+					<a href="<%= WEBSITE_ADMIN_URL %>tickets/qa_comment_tickets" target="_blank" class="text-decoration-none reset_storage"><span><%= __("admin.dashboard.total_qa_commented_tickets")%></span></a>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>

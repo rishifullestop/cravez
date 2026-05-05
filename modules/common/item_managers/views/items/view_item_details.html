@@ -1,0 +1,384 @@
+<%	var itemDetails		= item_details;
+    var itemUnitDetails	= item_unit_details;
+    var categoryNames	= category_names;
+    var menuNames		= menu_names;
+    var itemId		    = item_id;
+    var slug		    = slug;
+	var itemAvailabilityDetails	= item_availability_details;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2><%= __('items.item_details'); %></h2>
+				<ul class="header-dropdown m-r--5 btn-right-top-margin">
+					<li class="<%= getPermissionClass(module_type,["item","list"]); %>">
+						<a href="<%= originalUrl %>" data-action-url="<%=list_url%><%- finalQuery %>" data-restaurant-url="<%=base_url%>item<%- finalQuery %>" class="action-btn">
+							<button type="button" class="btn btn-sm bg-cyan waves-effect" >
+								<%= __("system.back"); %>
+							</button>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="body table-responsive" id="aniimated-thumbnials">
+				<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+					<tr>
+						<th class="text-left" width="25%"><%= __('items.image'); %></th>
+						<td>
+							<% if(itemDetails.image){ %>
+								<a href="<%=itemDetails.main_image%>" class="items-image" data-lightbox="roadtrip<%=itemDetails._id%>">
+									<img class="thumbnail display-inline set_image_dim" src="<%=itemDetails.main_image%>" alt="listing image">
+								</a>
+							<% } %>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.grid_image'); %></th>
+						<td>
+							<% if(itemDetails.grid_image){ %>
+								<a href="<%=itemDetails.grid_image_path%>" class="items-image" data-lightbox="roadtrip<%=itemDetails._id%>">
+									<img class="thumbnail display-inline set_image_dim" src="<%=itemDetails.grid_image_path%>" alt="grid image">
+								</a>
+							<% } %>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.detail_image'); %></th>
+						<td>
+							<% if(itemDetails.detail_image){ %>
+								<a href="<%=itemDetails.detail_image_path%>" class="items-image" data-lightbox="roadtrip<%=itemDetails._id%>">
+									<img class="thumbnail display-inline set_image_dim" src="<%=itemDetails.detail_image_path%>" alt="detail image">
+								</a>
+							<% } %>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.item_id'); %></th>
+						<td><%=(itemDetails.item_id) ? itemDetails.item_id : '';%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.name_in_english'); %></th>
+						<td><%=(itemDetails.name) ? itemDetails.name.en : '';%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.name_in_arabic'); %></th>
+						<td><%=(itemDetails.name) ? itemDetails.name.ar : '';%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.description_in_english'); %></th>
+						<td><span class='readmore nl2br'><%=(itemDetails.description) ? itemDetails.description.en : '';%></span></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.description_in_arabic'); %></th>
+						<td><span class='readmore nl2br'><%=(itemDetails.description) ? itemDetails.description.ar : '';%></span></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.price'); %></th>
+						<td><%=(itemDetails.item_price) ? currencyFormat(itemDetails.item_price) : currencyFormat(0);%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.discount_by_percentage'); %></th>
+						<td><%=(itemDetails.discount_percentage) ? itemDetails.discount_percentage : 0;%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.discount_by_value'); %></th>
+						<td><%=(itemDetails.discount_value) ? itemDetails.discount_value : 0;%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.menu'); %></th>
+						<td>
+							<% if(menuNames.length > 0) { %>
+								<ul class="menu-class">
+									<% menuNames.map(records=>{ %>
+										<li type="none"><%=(records.name) ? records.name.en : '';%></li>
+									<% }); %>
+								</ul>
+							<% }else{ %>
+								<%= __('items.all_menu_selected');%>
+							<% } %>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.category'); %></th>
+						<td>
+							<% if(categoryNames.length > 0) { %>
+								<ul class="menu-class">
+									<% categoryNames.map(records=>{ %>
+										<li type="none"><%=(records.name) ? records.name.en :  '';%></li>
+									<% }); %>
+								</ul>
+							<% }else{ %>
+								<%= __('items.all_category_selected') %>
+							<% } %>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.cuisine'); %></th>
+						<td><%=(itemDetails.cuisine) ? itemDetails.cuisine : "" %></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('system.status'); %></th>
+						<% if(itemDetails.is_active) { %>
+							<td><span class="label label-success"><%=__("system.active")%></span></td>
+						<% }else{ %>
+							<td><span class="label label-danger"><%=__("system.inactive")%></span></td>
+						<% }%>
+					</tr>
+					<tr>
+						<th class="text-center" colspan="2"><%= __('items.pricing'); %></th>
+					</tr>
+					<% if(itemUnitDetails.length > 0) {
+						itemUnitDetails.map((records,key)=>{
+							if(key >0){ %>
+								<tr>
+									<td colspan="2" class="padding-1"> </td>
+								</tr> <%
+							} %>
+							<tr>
+								<th class="text-left"><%= __('items.item_unit'); %></th>
+								<td><%=(records.item_unit) ? records.item_unit : '';%></td>
+							</tr>
+							<tr>
+								<th class="text-left"><%= __('items.price'); %></th>
+								<td><%=(records.price) ? currencyFormat(records.price) : currencyFormat(0);%></td>
+							</tr>
+							<tr>
+								<th class="text-left"><%= __('items.discount_type'); %></th>
+								<td>
+									<% Object.keys(ITEM_DISCOUNT_TYPE).map(key=>{ %>
+										<%= (ITEM_DISCOUNT_TYPE[key] == ITEM_DISCOUNT_TYPE[records.discount_type]) ? ITEM_DISCOUNT_TYPE[records.discount_type]  : '';%>
+									<% }); %>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-left"><%= __('items.discount_by_value'); %></th>
+								<td><%=(records.discount_value) ? records.discount_value : 0;%></td>
+							</tr> <%
+					 	});
+					} else{ %>
+						<tr>
+							<td colspan="2" class="text-center"> <%= __("system.no_records.found")%></td>
+						</tr>
+					<% } %>
+
+					<tr>
+						<th class="text-center" colspan="2"><%= __('items.availability'); %></th>
+					</tr>
+					<% if(itemDetails.availability_status == AVAILABLE && itemAvailabilityDetails.length > 0) {
+						itemAvailabilityDetails.map((records,key)=>{
+							if(key >0){ %>
+								<tr>
+									<td colspan="2" class="padding-1"> </td>
+								</tr> <%
+							} %>
+							<tr>
+								<th class="text-left"><%= __('items.from_time'); %></th>
+								<td><%=(records.from_time) ? set24HourFormat(records.from_time)  : DEFAULT_DAY_INITIAL_START_TIME_24_FORMAT;%></td>
+							</tr>
+							<tr>
+								<th class="text-left"><%= __('items.to_time'); %></th>
+								<td><%=(records.to_time) ? set24HourFormat(records.to_time) : DEFAULT_DAY_INITIAL_START_TIME_24_FORMAT;%></td>
+							</tr>
+							<tr>
+								<th class="text-left"><%= __('items.comment'); %></th>
+								<td><span class="nl2br"><%=(records.comment) ? records.comment : '';%></span></td>
+							</tr> <%
+						});
+					} else{ %>
+						<tr>
+							<td colspan="2" class="text-center"> <%= __("system.no_records.found")%></td>
+						</tr>
+					<% } %>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Choice group list -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%=  __("choice_group.choice_group"); %>
+				</h2>
+			</div>
+			<div class="body">
+				<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="25%"><%= __("choice_group.group_name_in_english");%></th>
+							<th width="25%"><%= __("choice_group.group_name_in_arabic");%></th>
+                            <th width="10%"><%= __("choice_group.group_min_quantity");%></th>
+                            <th width="10%"><%= __("choice_group.group_max_quantity");%></th>
+                            <th width="15%"><%= __("choice_group.item_unit_id");%></th>
+                            <th width="15%"><%= __("system.action");%></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Extra items List -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%=  __("extra_items.extra_items"); %>
+				</h2>
+			</div>
+			<div class="body">
+				<table id="datatable-listing1" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="20%"><%= __("extra_items.name_in_english");%></th>
+							<th width="20%"><%= __("extra_items.name_in_arabic");%></th>
+                            <th width="10%"><%= __("extra_items.extra_fees");%></th>
+                            <th width="15%"><%= __("extra_items.item_unit");%></th>
+                            <th width="15%"><%= __("system.status");%></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<link rel="stylesheet" href="<%=WEBSITE_CSS_PATH%>jquery.mCustomScrollbar.min.css">
+<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>jquery.mCustomScrollbar.js"></script>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data */
+	var choiceGroupDataTable = "";
+	var extraItemsDataTable  = "";
+	$(document).ready(function() {
+		/** Description read more **/
+		readMore();
+		$(".show-tick").selectpicker('refresh');
+
+		/** Get choice group list  */
+		choiceGroupDataTable = $('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ 	"data"		 : 'name.en',
+					"orderable"	 : false,
+					"searchable" : false
+				},
+                {	"data"	     : 'name.ar',
+					"orderable"	 : false,
+					"searchable" : false
+				},
+                { 	"data"		 : 'min_quantity',
+					"orderable"	 : false,
+					"searchable" : false
+				},
+				{	"data"		 : 'max_quantity',
+					"orderable"	 : false,
+					"searchable" : false
+				},
+				{	"data"		 : 'item_unit',
+					"searchable" : false,
+					"orderable"	 : false
+				},
+				{
+					"data"			: {},
+					"orderable"		: false,
+					"searchable"	: false,
+					"render" 		: function(result){
+						var id 	= (result._id)	? result._id :"";
+						return '<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_RESTAURANT_URL+slug%>/choice_group/<%=itemId%>/add_extra/'+id+'/?flag=true" data-open-modal="true" class="action-btn waves-effect waves-block display-inline <%= getPermissionClass(module_type,["item","choice_group"]); %>">'+
+							'<button type="button" class="btn btn-sm bg-indigo waves-effect">'+
+								'<%= __("items.extras"); %>'+
+							'</button>'+
+						'</a>';
+					}
+				}
+
+			],
+			"ajax":{
+				url 	:	"<%=WEBSITE_RESTAURANT_URL+slug%>/choice_group/<%=itemId%>",
+				type	: 	"POST",
+				dataSrc	: 	function(result){
+					setTimeout(()=>{
+						choiceGroupDataTable.columns.adjust();
+					},100);
+					adjustPermissionsClass();
+					return result.data;
+				}
+			},
+		});
+
+		/** Get extra items list  */
+		extraItemsDataTable = $('#datatable-listing1').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ 	"data"		 : 'name.en',
+					"orderable"	 : false,
+					"searchable" : false
+				},
+                {	"data"		 : 'name.ar',
+					"orderable"	 : false,
+					"searchable" : false
+				},
+				{	"data"		 : 'extra_fees',
+					"searchable" : false,
+					"orderable"	 : false,
+					"render"     : function(extra_fees){
+						return  currencyFormat(extra_fees)
+					}
+				},
+				{	"data"		 : 'item_unit',
+					"searchable" : false,
+					"orderable"	 : false
+				},
+				{
+					"data"		 : {},
+					"orderable"	 : false,
+					"searchable" : false,
+					"render"     : function(result){
+						var status	= (result.is_active) ? result.is_active :'';
+						return  (status == "<%=ACTIVE%>") ? '<span class="label label-success m-r-5"><%=__("system.active")%></span>' :'<span class="label label-danger m-r-5"><%=__("system.inactive")%></span>';
+					}
+				}
+			],
+			"ajax":{
+				url 	:	"<%=WEBSITE_RESTAURANT_URL+slug%>/extra_items/<%=itemId%>",
+				type	: 	"POST",
+				dataSrc	: 	function(result){
+					setTimeout(()=>{
+						extraItemsDataTable.columns.adjust();
+					},100);
+					adjustPermissionsClass();
+					return result.data;
+				}
+			},
+		});
+	});
+
+</script>

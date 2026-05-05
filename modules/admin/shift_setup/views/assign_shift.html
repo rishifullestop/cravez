@@ -1,0 +1,134 @@
+
+<%
+var shiftId 	= shift_id;
+var fromDate	= newDate("",DATABASE_DATE_FORMAT);
+var toDate		= newDate("",DATABASE_DATE_FORMAT);
+
+if(team_availabilities_detail.length >0) {
+	var date 		= "";
+	team_availabilities_detail.map((teamResult)=>{
+		date = newDate(teamResult.date,DATABASE_DATE_FORMAT);
+	});
+	fromDate = date;
+	toDate = date;
+} %>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form data-modal-id="form_modal" id="assign_and_shift_form" data-submit-btn-id="assign_and_shift_btn" method="post" action="<%=admin_list_url%>/assign_shift/<%=shiftId%>"class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.shift_setup.assign_shifts"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="start_time" class="control-label"><%= __('admin.shift_setup.shift_date_time'); %><span class="required"> * </span> </label>
+										<input class="form-control" id="date-range"  autocomplete="off">
+									</div>
+									<span id="date_time_error" class="error model_select_error"></span>
+									<input class="form-control hide" id="start_date" type="text" name="from_date" value="<%=fromDate%>">
+									<input class="form-control hide" id="end_date" type="text" name="to_date" value="<%=toDate%>">
+								</div>
+							</div>
+							<%
+								if(team_availabilities_detail.length > 0){%>
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="form-line">
+												<label for="frequency" class="control-label">
+													<%= __("admin.shift_setup.shift_name"); %>
+													<span class="required"> *</span>
+												</label>
+												<select name="shift_id" id="shift_id"  data-placeholder="<%=__('admin.shift_setup.select_shift') %>"class="form-control show-tick">
+													<%
+														if(shift_detail.length > 0){
+															shift_detail.map((shiftRecords)=>{
+																var shiftName   = shiftRecords.shift_name;
+																var startTime   = shiftRecords.start_time;
+																var endTime	    = shiftRecords.end_time;
+																var selected    = (String(shiftId) == String(shiftRecords._id)) ? "selected" : "";
+																%>
+																<option value="<%=shiftRecords._id%>"<%=selected%>><%=shiftName+" ("+startTime+"-"+endTime+")"%></option>
+																<%
+															});
+														}
+													%>
+												</select>
+											</div>
+											<span id="shift_id_error" class="error"></span>
+										</div>
+									</div><%
+								}
+							%>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+                                <div class="form-group model_select_div">
+                                    <div class="form-line">
+											<label for="frequency" class="control-label">
+												<%= __("admin.shift_setup.users"); %>
+												<span class="required"> *</span>
+											</label>
+										<select name="shift_user" id="shift_user" multiple
+											data-placeholder="<%=__('admin.shift_setup.select_user') %>"class="form-control model_select_box chosen">
+											<%-result%>
+										</select>
+                                    </div>
+                                    <span id="shift_user_error" class="error model_select_error"></span>
+                                </div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="assign_and_shift_btn" class="btn bg-brown btn-sm waves-effect btn-submit" <%- ADMIN_LOADING_TEXT %> > <%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+	
+	/** set variable for daterangepicker */
+	var fromDateInput      = "#start_date";
+	var toDateInput	       = "#end_date";
+	var datePickerInput    = "#date-range";
+	var stopTableDraw 	   = true;
+
+	/** check for teamDeatil */
+	var teamDetail 	   = '<%=team_availabilities_detail%>';
+	$("#date-range").val('<%=fromDate%>'+" - "+'<%=toDate%>');
+
+	$(document).ready(function () {
+		$(".chosen").chosen();
+		initDateRangePicker();
+	});
+
+	/*
+	 *	Function to submit form
+	 */
+	$(".btn-submit").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+		ajax_submit("assign_and_shift_form",function(status,response){
+			if(status){
+				$('#form_modal').modal("hide");
+				if(response.status && response.message) notice(response.status,response.message);
+				if(teamDetail.length > 0){
+					getListing();
+				}
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+</script>

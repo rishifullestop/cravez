@@ -1,0 +1,522 @@
+<%	var itemDetails		= item_details;
+    var itemUnitDetails	= item_unit_details;
+    var categoryNames	= category_names;
+    var menuNames		= menu_names;
+    var itemId		    = item_id;
+    var slug		    = slug;
+    var status 		  	= itemDetails.status;
+	var statusTitle	    = (STATUS_LABELS[status] && STATUS_LABELS[status].status_name) ? STATUS_LABELS[status].status_name :"";
+	var statusClass     = (STATUS_LABELS[status] && STATUS_LABELS[status].class)	   ? STATUS_LABELS[status].class       :"";
+	var itemAvailabilityDetails	= item_availability_details;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2><%= __('items.item_details'); %></h2>
+				<ul class="header-dropdown m-r--5 btn-right-top-margin">
+					<li class="<%= getPermissionClass(module_type,["item","list"]); %>">
+						<a href="<%= originalUrl %>" data-action-url="<%=list_url%>" data-restaurant-url="<%=base_url%>pending_item" class="action-btn">
+							<button type="button" class="btn btn-sm bg-cyan waves-effect" >
+								<%= __("system.back"); %>
+							</button>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="body table-responsive" id="aniimated-thumbnials">
+				<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+					<tr>
+						<th class="text-left" width="25%"><%= __('items.image'); %></th>
+						<td>
+							<% if(itemDetails.image){ %>
+								<a href="<%=itemDetails.main_image%>" class="items-image" data-lightbox="roadtrip<%=itemDetails._id%>">
+									<img class="thumbnail display-inline set_image_dim" src="<%=itemDetails.main_image%>" alt="listing image">
+								</a>
+							<% } %>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.grid_image'); %></th>
+						<td>
+							<% if(itemDetails.grid_image){ %>
+								<a href="<%=itemDetails.grid_image_path%>" class="items-image" data-lightbox="roadtrip<%=itemDetails._id%>">
+									<img class="thumbnail display-inline set_image_dim" src="<%=itemDetails.grid_image_path%>" alt="grid image">
+								</a>
+							<% } %>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.detail_image'); %></th>
+						<td>
+							<% if(itemDetails.detail_image){ %>
+								<a href="<%=itemDetails.detail_image_path%>" class="items-image" data-lightbox="roadtrip<%=itemDetails._id%>">
+									<img class="thumbnail display-inline set_image_dim" src="<%=itemDetails.detail_image_path%>" alt="detail image">
+								</a>
+							<% } %>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.item_id'); %></th>
+						<td><%=(itemDetails.item_id) ? itemDetails.item_id : '';%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.name_in_english'); %></th>
+						<td><%=(itemDetails.name) ? itemDetails.name.en : '';%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.name_in_arabic'); %></th>
+						<td><%=(itemDetails.name) ? itemDetails.name.ar : '';%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.description_in_english'); %></th>
+						<td><span class='readmore nl2br'><%=(itemDetails.description) ? itemDetails.description.en : '';%></span></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.description_in_arabic'); %></th>
+						<td><span class='readmore nl2br'><%=(itemDetails.description) ? itemDetails.description.ar : '';%></span></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.price'); %></th>
+						<td><%=(itemDetails.item_price) ?  currencyFormat(itemDetails.item_price) : currencyFormat(0);%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.discount_by_percentage'); %></th>
+						<td><%=(itemDetails.discount_percentage) ? itemDetails.discount_percentage : 0;%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.discount_by_value'); %></th>
+						<td><%=(itemDetails.discount_value) ? itemDetails.discount_value : 0;%></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.menu'); %></th>
+						<td>
+							<% if(menuNames.length > 0) { %>
+								<ul class="menu-class">
+									<% menuNames.map(records=>{ %>
+										<li type="none"><%=(records.name) ? records.name.en : '';%></li>
+									<% }); %>
+								</ul>
+							<% }else{ %>
+								<%= __('items.all_menu_selected');%>
+							<% } %>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.category'); %></th>
+						<td>
+							<% if(categoryNames.length > 0) { %>
+								<ul class="menu-class">
+									<% categoryNames.map(records=>{ %>
+										<li type="none"><%=(records.name) ? records.name.en :  '';%></li>
+									<% }); %>
+								</ul>
+							<% }else{ %>
+								<%= __('items.all_category_selected') %>
+							<% } %>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('items.cuisine'); %></th>
+						<td><%=(itemDetails.cuisine) ? itemDetails.cuisine : "" %></td>
+					</tr>
+					<tr>
+						<th class="text-left"><%= __('system.status'); %></th>
+						<td><span class="label col-white font-14 <%=statusClass%>"><%= statusTitle %></span>
+							<% if(isRestaurant(module_type)){ %>
+								<% if(itemDetails.submit_for_approval) { %>
+									<span class="label label-success m-l-5"><%=__("items.submitted_for_approval")%></span>
+								<% }else{ %>
+									<span class="label label-danger m-l-5"><%=__("items.not_submitted_for_approval")%></span>
+								<% }%>
+							<% }%>
+						</td>
+					</tr>
+					<% if(status == REJECTED) { %>
+						<tr>
+							<th class="text-left"><%= __('items.rejection_reason'); %></th>
+							<td><span  class="nl2br rejection-class"><%= itemDetails.reject_reason%></span></td>
+						</tr>
+					<% } %>
+					<tr>
+						<th class="text-center" colspan="2"><%= __('items.pricing'); %></th>
+					</tr> <%
+					if(itemUnitDetails.length >0){
+						itemUnitDetails.map((records,key)=>{
+							if(key >0){ %>
+								<tr>
+									<td colspan="2" class="padding-1"> </td>
+								</tr> <%
+							} %>
+							<tr>
+								<th class="text-left"><%= __('items.item_unit'); %></th>
+								<td><%=(records.item_unit) ? records.item_unit : '';%></td>
+							</tr>
+							<tr>
+								<th class="text-left"><%= __('items.price'); %></th>
+								<td><%=(records.price) ? currencyFormat(records.price) : currencyFormat(0);%></td>
+							</tr>
+							<tr>
+								<th class="text-left"><%= __('items.discount_type'); %></th>
+								<td>
+									<% Object.keys(ITEM_DISCOUNT_TYPE).map(key=>{ %>
+										<%= (ITEM_DISCOUNT_TYPE[key] == ITEM_DISCOUNT_TYPE[records.discount_type]) ? ITEM_DISCOUNT_TYPE[records.discount_type]  : '';%>
+									<% }); %>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-left"><%= __('items.discount_by_value'); %></th>
+								<td><%=(records.discount_value) ? records.discount_value : 0;%></td>
+							</tr>
+							<%
+						});
+					} else{ %>
+						<tr>
+							<td colspan="2" class="text-center"> <%= __("system.no_records.found")%></td>
+						</tr>
+					<% } %>
+					<tr>
+						<th class="text-center" colspan="2"><%= __('items.availability'); %></th>
+					</tr><%
+					if(itemDetails.availability_status == AVAILABLE && itemAvailabilityDetails.length >0){
+						itemAvailabilityDetails.map((records,key)=>{
+							if(key >0){ %>
+								<tr>
+									<td colspan="2" class="padding-1"> </td>
+								</tr> <%
+							} %>
+							<tr>
+								<th class="text-left"><%= __('items.from_time'); %></th>
+								<td><%=(records.from_time) ? set24HourFormat(records.from_time)  : DEFAULT_DAY_INITIAL_START_TIME_24_FORMAT;%></td>
+							</tr>
+							<tr>
+								<th class="text-left"><%= __('items.to_time'); %></th>
+								<td><%=(records.to_time) ? set24HourFormat(records.to_time) : DEFAULT_DAY_INITIAL_START_TIME_24_FORMAT;%></td>
+							</tr>
+							<tr>
+								<th class="text-left"><%= __('items.comment'); %></th>
+								<td><span  class="nl2br"><%=(records.comment) ? records.comment : '';%></span></td>
+							</tr> <%
+						});
+					} else{ %>
+						<tr>
+							<td colspan="2" class="text-center"> <%= __("system.no_records.found")%></td>
+						</tr>
+					<% } %>
+					<% if(!isRestaurant(module_type)){ %>
+						<tr>
+							<th class="text-center" colspan="2">
+								<% if(status != IN_REVIEW) { %>
+									<a href="javascript:void(0);" class="waves-effect item_action_btn <%= getPermissionClass(module_type,["item","admin_action"]); %>" data-id="<%=itemDetails._id%>" data-status="<%=IN_REVIEW%>"  data-confirm-message="<%= __("items.do_you_want_to_review_this_item"); %>">
+										<button type="button" class="btn btn-sm bg-orange waves-effect">
+											<%= __("items.in_review"); %>
+										</button>
+									</a>
+								<% } %>
+								<% if(status != APPROVED) { %>
+									<a href="javascript:void(0);" class=" waves-effect item_action_btn <%= getPermissionClass(module_type,["item","admin_action"]); %>" data-id="<%=itemDetails._id%>" data-status="<%=APPROVED%>"  data-confirm-message="<%= __("items.you_want_to_approve_this_item"); %>">
+										<button type="button" class="btn btn-sm bg-indigo waves-effect">
+											<%= __("items.approve_items"); %>
+										</button>
+									</a>
+								<% } %>
+								<% if(status != REJECTED) { %>
+									<a href="javascript:void(0);" class=" waves-effect item_action_btn <%= getPermissionClass(module_type,["item","admin_action"]); %>" data-id="<%=itemDetails._id%>" data-status="<%= REJECTED %>">
+										<button type="button" class="btn btn-sm bg-red waves-effect">
+											<%= __("items.reject_items"); %>
+										</button>
+									</a>
+								<% } %>
+							</th>
+						</tr>
+					<% } %>
+					<% if(isRestaurant(module_type)){ %>
+						<% if(!itemDetails.submit_for_approval){ %>
+						<tr>
+							<th class="text-center" colspan="2">
+								<a href="javascript:void(0);" data-href="<%=list_url%>/send_for_approval/<%=itemDetails._id%>" class="confirm_box <%= getPermissionClass(module_type,['item','send_for_approval']); %>" data-confirm-message="<%= __('items.you_want_to_submit_new_changes_for_approval'); %>" data-confirm-heading="<%= __("system.are_you_sure") %>" >
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("items.send_for_approval"); %>
+									</button>
+								</a>
+							</th>
+						</tr>
+						<% } %>
+					<% } %>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Choice group list -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%=  __("choice_group.pending_choice_group"); %>
+				</h2>
+			</div>
+			<div class="body">
+				<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="25%"><%= __("choice_group.group_name_in_english");%></th>
+							<th width="25%"><%= __("choice_group.group_name_in_arabic");%></th>
+                            <th width="10%"><%= __("choice_group.group_min_quantity");%></th>
+                            <th width="10%"><%= __("choice_group.group_max_quantity");%></th>
+                            <th width="15%"><%= __("choice_group.item_unit_id");%></th>
+                            <th width="15%"><%= __("system.action");%></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Extra items List -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%=  __("extra_items.pending_extra_items"); %>
+				</h2>
+			</div>
+			<div class="body">
+				<table id="datatable-listing1" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th  width="25%"><%= __("extra_items.name_in_english");%></th>
+							<th  width="25%"><%= __("extra_items.name_in_arabic");%></th>
+                            <th  width="15%"><%= __("extra_items.extra_fees");%></th>
+                            <th  width="15%"><%= __("extra_items.item_unit");%></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal for reject item request-->
+	<div class="modal fade" id="reject-item" tabindex="-1" role="dialog" aria-labelledby="reject_enquiry" aria-hidden="true">
+		<div class="modal-dialog"  role="document">
+			<div class="modal-content">
+				<div class="modal-header modal-header-seperator">
+					<h4 class="modal-title"><%=__("items.reject_item_title") %></h4>
+				</div>
+				<form id="reject-item" data-submit-btn-id="reject-item-btn" method="post" class="on_click_submit" role="form" action='<%=WEBSITE_RESTAURANT_URL%>pending_item/item_action'>
+					<input type="hidden" name="item_id" id="item_id">
+					<input type="hidden" name="status" id="status" value="<%= REJECTED%>">
+					<input type="hidden" name="slug" id="slug" value="<%=slug%>">
+					<div class="modal-body">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-grop">
+									<div class="form-lin no-bottom-border">
+										<label for="rejection_message" class="control-label"><%= __('items.rejection_field'); %><span class="required"> *</span>  </label>
+										<div class="form-grop margin-0">
+											<div class="form-line">
+												<textarea id="rejection_reason" rows="6" class="resize-none form-control" name="rejection_reason"></textarea>
+											</div>
+											<span id="rejection_reason_error" class="error"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer border-top">
+						<button type="button"  id="reject-item-btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect reject-item-btn-submit noHover margin-0"><%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+<!--modal close-->
+
+<link rel="stylesheet" href="<%=WEBSITE_CSS_PATH%>jquery.mCustomScrollbar.min.css">
+<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>jquery.mCustomScrollbar.js"></script>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data */
+	var choiceGroupDataTable ="";
+	var extraItemsDataTable  ="";
+	$(document).ready(function() {
+		/** Description read more **/
+		readMore();
+		$(".show-tick").selectpicker('refresh');
+
+		/** Get choice group list  */
+		choiceGroupDataTable = $('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ 	"data"		  : 'name.en',
+					"searchable"  : false,
+					"orderable"	  : false,
+				},
+                {	"data"		 : 'name.ar',
+					"searchable" : false,
+					"orderable"	 : false,
+				},
+                { 	"data"		 : 'min_quantity',
+					"searchable" : false,
+					"orderable"	 : false,
+				},
+				{	"data"		 : 'max_quantity',
+					"searchable" : false,
+					"orderable"	 : false
+				},
+				{	"data"		 : 'item_unit',
+					"searchable" : false,
+					"orderable"	 : false
+				},
+				{
+					"data"		: {},
+					"orderable"	: false,
+					"searchable": false,
+					"render" 	: function(result){
+						var id 	= (result._id)	? result._id :"";
+						return '<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_RESTAURANT_URL+slug%>/pending_choice_group/<%=itemId%>/add_extra/'+id+'/?flag=true" data-open-modal="true" class="action-btn waves-effect waves-block display-inline <%= getPermissionClass(module_type,["item","choice_group"]); %>">'+
+							'<button type="button" class="btn btn-sm bg-indigo waves-effect">'+
+								'<%= __("items.extras"); %>'+
+							'</button>'+
+						'</a>';
+					}
+				}
+
+			],
+			"ajax":{
+				url 	: "<%=WEBSITE_RESTAURANT_URL+slug%>/pending_choice_group/<%=itemId%>",
+				type	: "POST",
+				dataSrc	: function(result){
+					setTimeout(()=>{
+						choiceGroupDataTable.columns.adjust();
+					},100);
+					adjustPermissionsClass();
+					return result.data;
+				}
+			},
+		});
+
+		/** Get extra items list  */
+		extraItemsDataTable = $('#datatable-listing1').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ 	"data"		 : 'name.en',
+					"searchable" : false,
+					"orderable"	 : false
+				},
+                {	"data"		 : 'name.ar',
+					"searchable" : false,
+					"orderable"	 : false
+				},
+				{	"data"		 : 'extra_fees',
+					"searchable" : false,
+					"orderable"	 : false,
+					"render"     : function(extra_fees){
+						return  currencyFormat(extra_fees)
+					}
+				},
+				{	"data"		 : 'item_unit',
+					"searchable" : false,
+					"orderable"	 : false
+				},
+			],
+			"ajax":{
+				url 	: "<%=WEBSITE_RESTAURANT_URL+slug%>/pending_extra_items/<%=itemId%>",
+				type	: "POST",
+				dataSrc	: function(result){
+					setTimeout(()=>{
+						extraItemsDataTable.columns.adjust();
+					},100);
+					adjustPermissionsClass();
+					return result.data;
+				}
+			},
+		});
+	});
+
+	/**
+	* Function to submit  modal form
+	*/
+	$(".reject-item-btn-submit").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+		ajax_submit("reject-item",function(status,response){
+			if(status){
+				$('#reject-item').modal('hide');
+				window.location.href = response.redirect_url;
+			}
+			stopTextLoading(btnId);
+		});
+	});
+
+	/** Function to change item status */
+	$(".item_action_btn").click(function(){
+		var itemId = $(this).attr('data-id');
+		var status = $(this).attr('data-status');
+		updateItemStatus(status,itemId);
+	});
+
+	/** Javascript function to update item status */
+	function updateItemStatus(status,itemId){
+		var itemIdArray = (itemId) ? [itemId] : {};
+
+		if(status == "<%=IN_REVIEW%>" || status == "<%=APPROVED%>" || status=="<%=REJECTED%>"){
+			if(itemIdArray.length < 1){
+				notice("<%= STATUS_ERROR %>","<%= __('items.please_select_atleast_one_item')%>");
+				return false;
+			}
+			if(status == "<%=REJECTED%>"){
+				$('#item_id').val(itemIdArray.join(","));
+				$("#rejection_reason_error").text('');
+				$('#rejection_reason').val("");
+				$('#status').val(status);
+				$('#slug').val();
+				$("#reject-item .modal-title").html('<%=__("items.reject_item_title") %>');
+				$('#reject-item').modal('show');
+			}else{
+				/** Confirm  box **/
+				confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("item.do_you_want_to_update_this_status"); %>',function(result){
+					var options = {
+						url 	: 	"<%=WEBSITE_RESTAURANT_URL%>pending_item/item_action",
+						data	: 	{item_id: itemIdArray.join(","), status: status, slug: '<%=slug%>'},
+						method	:	"post"
+					};
+					ajaxRequest(options,function(response){
+						window.location.href = response.redirect_url;
+						swal.close();
+					});
+				});
+			}
+		}
+	}// end updateItemStatus()
+</script>
+<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>

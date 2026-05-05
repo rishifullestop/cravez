@@ -1,0 +1,85 @@
+<%
+    var fromDate  = newDate(from_date,DATABASE_DATE_FORMAT);
+    var toDate    = newDate(to_date,DATABASE_DATE_FORMAT);
+
+%>
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="header">
+                <h2>
+                    <%= __("admin.report.restaurant_order_report"); %>
+                </h2>
+                <ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['restaurant_orders_report','export']); %>">
+                    <li>
+                        <a href="javascript:void(0);" id="dataExportBtn">
+                            <button type="button" class="btn btn-sm bg-green waves-effect">
+                                <%= __("admin.report.export")%>
+                            </button>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="body">
+                <table id="datatable-listing" class="row-border fixed-width-table hover table full-length-header table-bordered" cellspacing="0" width="100%" >
+                    <thead>
+                        <tr>
+                            <th width="50%"><%= __('admin.report.restaurant_name'); %></th>
+                            <th width="50%"><%= __('admin.report.total_orders'); %></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data */
+	var dataTable =	"";
+	$(document).ready(function() {
+		dataTable = $('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: [[1,"desc"]],
+			"sDom"		: "ltipr",
+			"serverSide": true,
+			"scrollX"	: true,
+			"lengthMenu": PAGING_LENGTH_MENU,
+			"columns"	: [
+                {   "data"       : "restaurant_name.en",
+                    "serachable" : false,
+                    "orderable"  : false
+                },
+                {   "data"       : "total_orders",
+                    "serachable" : false
+                },
+			],
+			"ajax":{
+				url 	: "<%=admin_list_url%>/append_restaurant_orders_report/<%=from_date%>/<%=to_date%>/<%=restaurant_id%>/<%=branch_id%>",
+				type	: "POST",
+				dataSrc	: function(res){
+					adjustPermissionsClass();
+					return res.data;
+				}
+			}
+        });
+        
+        /**
+        * Export Details action
+        *
+        * @param  null
+        *
+        * @return void
+        */
+        $(document).on("click", "#dataExportBtn", function () {
+            var exportURL = "<%=admin_list_url%>/restaurant_orders_report/export_data/<%=fromDate%>/<%=toDate%>/<%=restaurant_id%>/<%=branch_id%>";
+            window.location.href = exportURL;
+        });
+	});
+	
+</script>

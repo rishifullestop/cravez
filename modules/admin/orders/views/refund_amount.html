@@ -1,0 +1,110 @@
+<%
+	var orderAmount		= (typeof order_amount !== typeof undefined && order_amount)	?	order_amount	: "";
+	var orderStatus		= (typeof order_status !== typeof undefined && order_status)	?	order_status	: "";
+%>
+<div class="modal-dialog"  role="document">
+	<div class="modal-content">
+		<div class="modal-header modal-header-seperator">
+			<h4 class="modal-title"><%=__("admin.orders.refund_amount_heading") %></h4>
+		</div>
+		<form id="refund-form" data-submit-btn-id="refund-amount_btn" method="post" class="on_click_submit" role="form" action="<%=admin_list_url%>/refund_amount/<%= order_id%>">
+			<div class="modal-body">
+				<div class="row clearfix">
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="total_order_amount" class="control-label">
+									<%= __('admin.orders.total_order_amount'); %></span>
+								</label>
+								<span class="refund_amount"><%= currencyFormat(orderAmount) %></span>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="refund_type" class="control-label">
+									<%= __('admin.orders.refund_type'); %><span class="required"> *</span>
+								</label>
+								<select class="form-control show-tick" id="refund_type" name="refund_type">	
+									<option value=""><%=__("admin.orders.select_refund_type");%></option>
+									<% Object.keys(REFUND_TYPE).map(key=>{ 
+										if(orderStatus == ORDER_CANCELLED || key == COMPENSATION) {
+										%>
+										<option value="<%=key%>"><%= REFUND_TYPE[key]%></option> 
+									<% } 
+									}); %>
+								</select>
+								<span id="refund_type_error" class="error"></span>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="caused_by" class="control-label">
+									<%= __('admin.orders.caused_by'); %><span class="required"> *</span>
+								</label>
+								<select class="form-control show-tick" id="caused_by" name="caused_by">	
+									<option value=""><%=__("admin.orders.select_caused_by");%></option>
+									<% Object.keys(CAUSED_BY_OBJECT).map(key=>{ %>
+										<option value="<%=key%>"><%= CAUSED_BY_OBJECT[key]%></option> 
+									<% }); %>
+								</select>
+								<span id="caused_by_error" class="error"></span>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="refund_amount" class="control-label">
+									<%= __('admin.orders.refund_amount'); %><span class="required"> *</span>
+								</label>
+								<input type="text" name="refund_amount" class="form-control amount_refund" id="refund_amount">
+								<input type="hidden" name="order_amount" class="form-control" id="order_amount" value="<%= orderAmount%>">
+							</div>
+							<span id="refund_amount_error" class="error"></span>
+						</div>
+					</div>
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="refund_reason" class="control-label">
+									<%= __('admin.orders.refund_reason'); %>
+								</label>
+								<textarea id="refund_reason" rows="6" class="resize-none height-100 form-control" name="refund_reason"></textarea>
+							</div>
+							<span id="refund_reason_error" class="error"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer border-top">
+				<button type="button"  id="refund-amount_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-refund noHover margin-0"><%= __("admin.system.submit"); %>
+				</button>
+				<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	/**
+	* Function to submit refund amount form
+	*/
+	$(".btn-submit-refund").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+
+		ajax_submit("refund-form",function(status,response){
+			if(status){
+				window.location.reload();
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+</script>

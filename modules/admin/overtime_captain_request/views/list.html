@@ -1,0 +1,257 @@
+<%
+	let isCravez    = (auth.user_role_id == CRAVEZ) ? true : false;
+	var fromDate  	= (is_today) ? newDate("",CURRENTDATE_START_DATE_FORMAT) : "";
+	var toDate  	= (is_today) ? newDate("",CURRENTDATE_END_DATE_FORMAT) :"";
+	var finalDate  	= (fromDate != "" && toDate != "") ? newDate("",DATABASE_DATE_FORMAT)+' - '+newDate("",DATABASE_DATE_FORMAT) : "";
+%>
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm"  data-listing-url="<%=admin_list_url%>">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by captain -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select id="column_filter_0"  onchange="searchDatatable(0)" class="form-control show-tick" name="user_id" data-live-search="true">
+													<option value=""><%- __('admin.captain_overtime_request.search_by_captain')%></option>
+													<%-users_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<% if(isCravez) { %>
+										<!-- Search by Team Member -->
+										<div class="col-xs-12 col-sm-3">
+											<div class="form-group">
+												<div class="form-line">
+													<select id="column_filter_4"  onchange="searchDatatable(4)" class="form-control show-tick" name="member_user_id" data-live-search="true">
+														<option value=""><%- __('admin.captain_overtime_request.search_by_member')%></option>
+														<%-team_member_list%>
+													</select>
+												</div>
+											</div>
+										</div> <%
+									} %>
+									<!-- Search by Request Date -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.captain_overtime_request.search_by_request_date'); %>" value="<%=finalDate%>" >
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=fromDate%>">
+											<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=toDate%>">
+										</div>
+									</div>
+									<!-- Reset button -->
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" data-href="<%= admin_list_url%>" >
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.captain_overtime_request.captain_overtime_request"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<li class="export-list <%= getPermissionClass(module_type,['overtime_captain_request','export']); %>">
+							<select class="export-details form-control border-bottom m-t--8">
+								<option value=""><%= __("admin.system.select_export_type"); %></option>
+								<option value="<%=EXPORT_ALL%>"><%= __("admin.system.export_all"); %></option>
+								<option value="<%=EXPORT_FILTERED%>"><%= __("admin.system.export_filtered"); %></option>
+							</select>
+						</li>
+						<% if(!isCravez) { %>
+							<li>
+								<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['overtime_captain_request','add'])%>">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("admin.captain_overtime_request.add_captain_overtime_request"); %>
+									</button>
+								</a>
+							</li>
+						<% } %>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								<i class="material-icons">more_vert</i>
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li class="<%= getPermissionClass(module_type,['overtime_captain_request','export']); %>">
+									<a href="<%=admin_list_url+'/export_data/'+export_count+'/'+EXPORT_ALL%>"> <%= __('admin.system.export_all'); %></a>
+								</li>
+								<li class="<%= getPermissionClass(module_type,['overtime_captain_request','export']); %>">
+									<a href="<%=admin_list_url+'/export_data/'+export_count+'/'+EXPORT_FILTERED%>"> <%= __('admin.system.export_filtered'); %></a>
+								</li>
+								<% if(!isCravez) { %>
+									<li>
+										<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['overtime_captain_request','add'])%>">
+											<%= __("admin.captain_overtime_request.add_captain_overtime_request"); %>
+										</a>
+									</li>
+								<% } %>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="20%"><%= __("admin.captain_overtime_request.captain");%></th>
+								<th width="15%"><%= __("admin.captain_overtime_request.request_date");%></th>
+								<th width="15%"><%= __("admin.captain_overtime_request.hours");%></th>
+								<th width="20%"><%= __("admin.captain_overtime_request.purpose");%></th>
+								<th><%= __("admin.captain_overtime_request.added_by");%></th>
+								<% if(!isCravez) { %>
+									<th><%= __("admin.system.action"); %></th>
+								<% } %>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+
+		/** Function to initialize datatable and get server side data*/
+		var dateFormatHtml	= 	'<%=DATE_FORMAT_HTML%>';
+		var isCravez		= 	<%=isCravez%>;
+		var dataTable	   	=	"";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[1, "desc" ]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ 	"data"		 : 'captain_name',
+						"field_type" : "<%=OBJECT_ID_FIELD %>",
+						"field_name" : "user_id",
+					},
+					{
+						"data"	 : 	'request_date',
+						"render" : 	function(request_date){
+							return moment(request_date).tz(DEFAULT_TIME_ZONE).format(dateFormatHtml) ;
+						}
+					},
+					{
+						"data"	: 'hours',
+						"render": function(hours){
+							return set24HourFormat(hours);
+						}
+					},
+					{ 	"data"	: 'purpose',
+						"orderable"	 : false,
+						"render": function(purpose){
+							return (purpose) ? "<span class='readmore'>"+purpose+"</span>" :"N/A";
+						}
+					},
+					{ 	"data"		 : 'added_by',
+						"field_type" : "<%=OBJECT_ID_FIELD %>",
+						"field_name" : "added_by",
+					},
+					<% if(!isCravez) { %>
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+							var id 	=	(result._id) ? 	result._id :'';
+
+							var dropDownButton	= '<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/'+id+'" data-open-modal="true" class="btn btn-primary btn-sm noHover waves-effect action-btn <%= getPermissionClass(module_type,["overtime_captain_request","edit"]); %>" ><%= __("admin.system.edit"); %></a>';
+
+							dropDownButton	+= ' <a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete/'+id+'" class="btn btn-danger btn-sm waves-effect confirm_box <%= getPermissionClass(module_type,["overtime_captain_request","delete"]); %>" data-confirm-message="<%= __("admin.overtime_request.you_want_to_delete_this_overtime_request"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>"><%= __("admin.system.delete"); %></a>';
+
+							return dropDownButton;
+						}
+					}
+					<% } %>
+				],
+				"ajax":{
+					url  :	"<%=admin_list_url%>",
+					type : 	"POST",
+					data : 	function (d) {
+				        d.fromDate 		= $('#from_date').val();
+				        d.toDate   	 	= $('#to_date').val();
+						d.export_count  = <%= export_count %>;
+				    },
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function( settings ) {
+					/** Description read more **/
+					readMore();
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("change",".export-details",function(){
+			var type = $(this).val();
+			if(type && type!=""){
+				$(this).val("");
+				window.location.href = "<%=admin_list_url%>/export_data/<%= export_count %>/"+type;
+			}
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

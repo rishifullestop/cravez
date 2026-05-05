@@ -1,0 +1,209 @@
+<%
+	var fromDate = newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),DATABASE_DATE_FORMAT);
+	var toDate	 = newDate(subtractDate(HOURS_IN_A_DAY),DATABASE_DATE_FORMAT);
+	var tempFromDate = newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),CURRENTDATE_START_DATE_FORMAT);
+	var tempToDate	 = newDate("",CURRENTDATE_END_DATE_FORMAT);
+%>
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by date -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker"  autocomplete="off" value="<%=fromDate+' - '+toDate%>">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=tempFromDate%>">
+											<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=tempToDate%>">
+										</div>
+									</div>
+									<!-- Search by area name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick area_id" id="search_area_id" name="search_area_id" data-live-search="true">
+													<option value="" ><%= __("admin.report.search_by_area")%></option>
+													<%-area_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									
+									<!-- reset button -->
+									<div class="col-sm-4">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.report.favourite_restaurant_report"); %>
+					</h2>
+					<ul
+						class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['favourite_restaurant_report','export']); %>">
+						<li>
+							<a href="javascript:void(0);" id="dataExportBtn">
+								<button type="button" class="btn btn-sm bg-green waves-effect">
+									<%= __("admin.report.export")%>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="25%"><%= __("admin.report.restaurant_name"); %></th>
+								<th width="25%"><%= __("admin.report.branch"); %></th>
+								<th width="25%"><%= __("admin.report.area"); %></th>
+								<th width="25%"><%= __("admin.report.order_amount"); %></th>							
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable		 =	"";
+		$(document).ready(function() {			
+			
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[3,"desc"]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{   "data"		 : "restaurant_name",
+						"orderable"	 :  false,
+						"searchable" :  false,
+					},
+					{   "data"		 : "branch_name",
+						"orderable"	 :  false,
+						"searchable" :  false,
+					},
+					{   "data"		 : "area_name",
+						"orderable"	 :  false,
+						"searchable" :  false,
+					},					
+					{   "data"		 : "order_amount",
+						"searchable" :  false,
+					    "render"     : function(order_amount){
+							return  (order_amount) ? currencyFormat(order_amount) : "";
+						}
+					},					
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>/favourite_restaurant_report",
+					type	: "POST",
+					data    : function(d){
+						d.from_date = $('#from_date').val();
+						d.to_date   = $('#to_date').val();
+						d.area_id	= $('#search_area_id').val();					
+					},
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+
+			/** To get value */
+			$('#search_area_id').change(function(){
+				dataTable.draw();
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+		
+		var maxDate	= new Date("<%= toDate %>");
+		var removeClearBtn  = true;
+		var dateRanges = {
+			'Today'			: [moment(), moment()],
+			'Yesterday'		: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+			'Last 7 Days'	: [moment().subtract(7, 'days'), moment()],
+			'Last 30 Days'	: [moment().subtract(30, 'days'), moment()],
+			'This Month'	: [moment().startOf('month'), moment().endOf('month')],
+			'Last Month'	: [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]			
+		};	
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("click","#dataExportBtn",function(){
+			var fromDate = $("#from_date").val();
+			var toDate 	= $("#to_date").val();
+			var areaId = $("#search_area_id").val();
+			
+			var startDate 	= (fromDate) ? fromDate : "<%=tempFromDate%>";
+			var endDate 	= (toDate) ? toDate : "<%=tempToDate%>";
+			var sortedCol 	= dataTable.order()[0][0];
+			var sortedDir	= dataTable.order()[0][1];
+			var columns 	= dataTable.settings().init().columns;
+			var sortedColName = columns[sortedCol].data;
+			
+			if (startDate && endDate) {
+				var exportURL = "<%=admin_list_url%>/favourite_restaurant_report/export_data?from_date=" + startDate + "&to_date=" + endDate + "&sort_field=" + sortedColName + "&sort_dir=" + sortedDir;
+				if (areaId) exportURL += "&area_id=" + areaId;
+				window.location.href = exportURL;
+			}
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+

@@ -1,0 +1,98 @@
+<%
+	let userDetails = user_details;
+	let branchList 	= branch_list;
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('user.edit_profile'); %>
+					</h2>
+				</div>
+				<div class="body">
+					<form id="update-profile" data-submit-btn-id="update-profile-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="first_name" class="control-label">
+											<%= __("user.first_name"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="first_name" class="form-control" name="first_name" value="<%= userDetails.first_name %>" data-blank-error-message="<%= __('user.please_enter_first_name') %>"/>
+										<input type="hidden" name="_csrf" value="<%= (csrf_token ) ? csrf_token :''; %>" />
+									</div>
+									<span id="first_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="last_name" class="control-label">
+											<%= __("user.last_name"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="last_name" class="form-control" name="last_name" value="<%= userDetails.last_name %>" data-blank-error-message="<%= __('user.please_enter_last_name') %>"/>
+									</div>
+									<span id="last_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line  cursor-not-allowed">
+										<label for="email" class="control-label"><%= __('user.email'); %><span class="required"> *</span> </label>
+										<input name="email_address" id="email_address" type="text" class="form-control readonly" value="<%= userDetails.email %>" readonly="true" />
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line  cursor-not-allowed">
+										<label for="email" class="control-label"> <%= __('user.branches'); %> </label>
+										<select class="form-control chosen" id="searchTeamLeader" placeholder="<%= __('admin.admin_permissions.search_by_teams'); %>" name="teams" multiple disabled>
+											<% branchList.map(branchListRecord=>{ %>
+												<option selected><%= branchListRecord.name[DEFAULT_LANGUAGE_CODE] %></option>
+											<% }); %>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<button type="button"  id="update-profile-btn-id"  <%- FRONT_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit"><%= __('system.submit'); %></button>
+
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>chosen/chosen.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>chosen/chosen.jquery.js"></script>
+	<script type="text/javascript">
+
+		/** here initialize the chosen library */
+		$(".chosen").chosen();
+
+		/**
+		 * Function to submit form
+		 */
+		$(".btn-submit").click(function(){
+			if(client_side_validation("update-profile")){
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				ajax_submit("update-profile",function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			}
+		});
+	</script>

@@ -1,0 +1,206 @@
+<!--Search Start -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-col-pink">
+				<div class="panel-heading" role="tab" id="panel-heading-id">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false" aria-controls="panel-collapse-id">
+							<%= __("system.search"); %>
+							<span class="pull-right collapse-toggle-icon"></span>
+						</a>
+					</h4>
+				</div>
+				<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+					<div class="panel-body">
+						<form id="searchForm" name="searchForm" >
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by name in english -->
+								<div class="col-xs-12 col-sm-5">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_2" onkeyup="searchDatatable(2)" placeholder="<%= __('menu_manager.search_by_name_in_english'); %>" name="name_in_english">
+										</div>
+									</div>
+								</div>
+								<!-- Search by name in arabic-->
+								<div class="col-xs-12 col-sm-5">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_3" onkeyup="searchDatatable(3)" placeholder="<%= __('menu_manager.search_by_name_in_arabic'); %>" name="name_in_arabic">
+										</div>
+									</div>
+								</div>
+								<!-- reset button -->
+								<div class="col-md-2">
+									<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+										<%= __("system.reset")%>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Search End -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%=  __("menu_manager.menu_management"); %>
+				</h2>
+				<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm">
+					<li class="<%= getPermissionClass(module_type,['menu','add']); %>">
+						<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/add" data-open-modal="true" class="action-btn">
+							<button type="button" class="btn btn-sm bg-indigo waves-effect" >
+								<%= __("menu_manager.menu_add"); %>
+							</button>
+						</a>
+					</li>
+				</ul>
+
+				<!-- Only For Mobile View-->
+				<ul class="header-dropdown m-r--5 visible-xs">
+					<li class="dropdown">
+						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							<i class="material-icons">more_vert</i>
+						</a>
+						<ul class="dropdown-menu pull-right m-w-200">
+							<li class="<%= getPermissionClass(module_type,['menu','add']); %>">
+								<a href="<%=list_url%>/add">
+									<%= __("menu_manager.menu_add"); %>
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div class="body">
+				<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="20%"><%= __("menu_manager.image");%></th>
+							<th width="20%"><%= __("Menu Id");%></th>
+							<th width="20%"><%= __("menu_manager.name_in_english");%></th>
+							<th width="20%"><%= __("menu_manager.name_in_arabic");%></th>
+							<th width="20%"><%= __("menu_manager.from_to_date_time");%></th>
+							<th width="20%"><%= __("system.action"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>chosen/chosen.css">
+<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>chosen/chosen.jquery.js"></script>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data */
+	var dataTable	=	"";
+	$(document).ready(function() {
+		$(".show-tick").selectpicker('refresh');
+		dataTable = $('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ 	"data"		 : 'full_image_path',
+					"orderable"	 : false,
+					"searchable" : false,
+					"render"    : function(full_image_path){
+						var imageSrc = ( typeof full_image_path != typeof undefined) ? full_image_path : '' ;
+						return  ('<a href="'+imageSrc+'" class="items-image waves-effect" data-lightbox="roadtrip'+imageSrc+'"><img src="'+imageSrc+'" alt="Menu Image" class="thumbnail set_image_med_dim" /></a>');
+					}
+				},
+				{ 	"data": 'menu_id' },
+				{ 	"data": 'name.en' },
+				{
+					"data": 'name.ar',
+				},
+				{
+					"data"		 : {},
+					"orderable"	 : false,
+					"searchable" : false,
+					"render"    : function(result){
+						if(result.is_default) return "<%= __('menu_manager.deafult_option'); %>";
+						var startDate	= (result.start_date)	? result.start_date : "";
+						var endDate		= (result.end_date)		? result.end_date : "";
+						var startTime	= (result.start_time)	? set24HourFormat(parseFloat(result.start_time)) : "";
+						var endTime		= (result.end_time)		? set24HourFormat(parseFloat(result.end_time)) : "";
+						var dateHtml 	= "<table class='borderless-table full-length-header-td'>";
+						dateHtml += '<tr><td><%= __("menu_manager.start_date")%></td><td>: '+ startDate +"</td></tr>";
+						dateHtml += '<tr><td><%= __("menu_manager.end_date")%></td> <td>: '+ endDate +"</td></tr>";
+						dateHtml += '<tr><td><%= __("menu_manager.start_time")%></td><td>: '+startTime +"</td></tr>";
+						dateHtml += '<tr><td><%= __("menu_manager.end_time")%> </td><td>: '+ endTime +"</td></tr></table>";
+						return  dateHtml;
+					}
+				},
+				{
+					"data"			: {},
+					"orderable"		: false,
+					"searchable"	: false,
+					"render" 		: function(result){
+						var id 		= (result._id)		? result._id 	: "";
+						var status 	= (result.status)	? result.status : "";
+
+						<% if(isRestaurant(module_type)){ %>
+							let itemUrl = "<%= WEBSITE_URL %>restaurants/<%= slug %>/item?menu="+id;
+						<% }else{ %>
+							let itemUrl = "<%= WEBSITE_ADMIN_URL %>restaurants/<%= slug %>/item?menu="+id;
+						<% } %>
+
+
+						var dropDownButton ='';
+						dropDownButton += (status != "<%= IN_REVIEW%>" || <%= !isRestaurant(module_type) %>) ? '<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/edit/'+id+'" data-open-modal="true" class="action-btn m-l-5 m-t-5 btn bg-indigo waves-effect <%= getPermissionClass(module_type,["menu","edit"]); %> "><%= __("system.edit"); %></a>' : '';
+
+
+
+						dropDownButton += '<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/assign_branches/'+id+'" data-open-modal="true" class="m-l-5 btn bg-blue-grey waves-effect m-t-5 action-btn <%= getPermissionClass(module_type,["menu","assign_branches"]); %>">'+
+							' <%= __("menu_manager.assign_branches"); %>'+
+						'</a>';
+
+						dropDownButton += '<a href="'+itemUrl+'" target="_blank" class="m-l-5 btn bg-primary waves-effect m-t-5 <%= getPermissionClass(module_type,["menu","edit"]); %>">'+
+						' <%= __("menu_manager.view_item"); %>'+
+						'</a>';
+
+
+
+						return dropDownButton;
+					}
+				}
+			],
+			"ajax":{
+				url 	:	"<%=list_url%>",
+				type	: 	"POST",
+				dataSrc	: 	function(result){
+					setTimeout(()=>{
+						dataTable.columns.adjust();
+					},100);
+					adjustPermissionsClass();
+					return result.data;
+				}
+			}
+		});
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+</script>
+<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>

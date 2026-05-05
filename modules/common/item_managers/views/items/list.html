@@ -1,0 +1,451 @@
+<%
+ var cuisineId 		=	cuisine_id;
+ var branchId  		= 	branch_id;
+ var categoryList  	=	category_list;
+ var menuList  		=	menu_list;
+
+%>
+<% if(isRestaurant(module_type)){ %>
+	<div class="alert bg-grey alert-dismissible submit-for-approval" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<%= __("items.once_you_made_any_changes_those_updated_items_will_be_listed"); %>
+	</div>
+<% } %>
+
+<!--Search Start -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-col-pink">
+				<div class="panel-heading" role="tab" id="panel-heading-id">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false" aria-controls="panel-collapse-id">
+							<%= __("system.search"); %>
+							<span class="pull-right collapse-toggle-icon"></span>
+						</a>
+					</h4>
+				</div>
+				<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+					<div class="panel-body">
+						<form id="searchForm" name="searchForm" >
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by name in english -->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_3" onkeyup="searchDatatable(3)" placeholder="<%= __('menu_manager.search_by_name_in_english'); %>" name="name_in_english">
+										</div>
+									</div>
+								</div>
+								<!-- Search by name in arabic-->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_4" onkeyup="searchDatatable(4)" placeholder="<%= __('menu_manager.search_by_name_in_arabic'); %>" name="name_in_arabic">
+										</div>
+									</div>
+								</div>
+								<!-- Search by category -->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" name="search_by_category" id="category_id" data-live-search="true" onchange="searchTable()">
+												<option value=""><%= __("items.search_by_category"); %></option>
+												<%-categoryList%>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- Search by menu -->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" name="search_by_menu" id="menu_id" data-live-search="true" onchange="searchTable()">
+												<option value=""><%= __("items.search_by_menu"); %></option>
+												<%-menuList%>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- reset button -->
+								<div class="col-xs-12 col-sm-3">
+									<button type="button" id="reset" data-href="<%=base_url%>item" class="btn btn-sm waves-effect btn-danger">
+										<%= __("system.reset")%>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Search End -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%=  __("item_managers.item_management"); %>
+				</h2>
+				<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm">
+					<li class="<%= getPermissionClass(module_type,['size_category','list']); %>">
+						<a target="_blank" href="<%=base_url%>size_category">
+							<button type="button" class="btn btn-sm bg-cyan waves-effect">
+								<%= __("items.item_units"); %>
+							</button>
+						</a>
+					</li>
+					<% if(!branchId && slug != BURGER_KING && slug != PIZZA_HUT){ %>
+						<li class="<%= getPermissionClass(module_type,['item','add']); %>">
+							<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/add" data-open-modal="true" class="action-btn">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect" >
+									<%= __("item_manager.add_item"); %>
+								</button>
+							</a>
+						</li>
+					<% } %>
+					<li>
+						<select class="perform_action show-tick form-control border-bottom <%= getPermissionClass(module_type,['item','active_deactive']); %>  m-t--10">
+							<option value=""><%= __("system.select_action"); %></option>
+							<option value="<%=ACTIVE%>">
+								<%= __("items.mark_as_active"); %>
+							</option>
+							<option value="<%=DEACTIVE%>" >
+								<%= __("items.mark_as_deactive"); %>
+							</option>
+						</select>
+					</li>
+				</ul>
+
+				<!-- Only For Mobile View-->
+				<ul class="header-dropdown m-r--5 visible-xs">
+					<li class="dropdown">
+						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							<i class="material-icons">more_vert</i>
+						</a>
+						<ul class="dropdown-menu pull-right m-w-200">
+							<li class="<%= getPermissionClass(module_type,['item','add']); %>">
+								<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/add" data-open-modal="true" class="action-btn">
+									<%= __("item_manager.add_item"); %>
+								</a>
+							</li>
+							<li class="<%= getPermissionClass(module_type,['item','active_deactive']); %>">
+								<a href="javascript:void(0)" onClick="updateItemStatus(<%=ACTIVE%>)">
+									<%= __("items.mark_as_active"); %>
+								</a>
+							</li>
+							<li class="<%= getPermissionClass(module_type,['item','active_deactive']); %>">
+								<a href="javascript:void(0)" onClick="updateItemStatus(<%=DEACTIVE%>)">
+									<%= __("items.mark_as_deactive"); %>
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div class="body">
+				<table id="datatable-item" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="3%" class="p-r-10 text-center" >
+								<div class="materialize_checkbox">
+									<input type="checkbox" class="filled-in chk-col-indigo" id="item_select_all">
+									<label for="item_select_all" class="select_all p-l-20 v-align-bottom m-b-0"></label>
+								</div>
+							</th>
+							<th width="10%"><%= __("items.image");%></th>
+							<th width="10%"><%= __("items.item_id");%></th>
+							<th width="15%"><%= __("items.name_in_english");%></th>
+							<th width="15%"><%= __("items.name_in_arabic");%></th>
+							<th width="15%"><%= __("items.description_in_english");%></th>
+							<th width="15%"><%= __("items.description_in_arabic");%></th>
+							<th width="15%"><%= __("items.branches");%></th>
+							<th width="10%"><%= __("system.status");%></th>
+							<th width="7%"><%= __("system.action"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>chosen/chosen.css">
+<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>chosen/chosen.jquery.js"></script>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data */
+	var dataTable 			= "";
+	var itemCheckboxArray 	= {};
+	var linkedItems			= {};
+	$(document).ready(function() {
+		$(".show-tick").selectpicker('refresh');
+		dataTable = $('#datatable-item').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{ 	"data"		: {},
+					"orderable" : false,
+					"render" 	: function(result){
+						let itemId 	=	(result._id) ? 	result._id 	:"";
+
+						return '<div class=" materialize_checkbox m-t-25 p-r-25">'+
+							'<div class="checkbox_wrapper">'+
+								'<input type="checkbox" class="filled-in chk-col-indigo" id="'+itemId+'" >'+
+								'<label for="'+itemId+'" class="checkbox data"></label>'+
+							'</div>'+
+						'</div>';
+					}
+				},
+				{ 	"data"		 : 'full_image_path',
+					"orderable"	 : false,
+					"searchable" : false,
+					"render"     : function(full_image_path){
+						var imageSrc = ( typeof full_image_path != typeof undefined) ? full_image_path : '' ;
+						return  ('<a href="'+imageSrc+'" class="items-image waves-effect" data-lightbox="roadtrip'+imageSrc+'"><img src="'+imageSrc+'" alt="Item Image" class="thumbnail set_image_dim" /></a>');
+					}
+				},
+				{ 	"data"		 : 'item_id',
+					"searchable" : false
+				},
+				{ 	"data": 'name.en' },
+				{	"data": 'name.ar' },
+				{
+					"data"		 : 'description.en',
+					"orderable"	 : false,
+					"render"	 : function(description){
+						return (description) ? "<span class='readmore nl2br'>"+description+"</span>" :"";
+					}
+				},
+				{
+					"data"		 : 'description.ar',
+					"orderable"	 : false,
+					"render"	 : function(description){
+						return (description) ? "<span class='readmore nl2br'>"+description+"</span>" :"";
+					}
+				},
+				{
+					"data"		 : {},
+					"orderable"	 : false,
+					"render"	 : function(result){
+						let itemId 			= result._id;
+						let allBranchMapped = result.all_branch_mapped;
+						let branchNotMapped = result.branch_not_mapped;
+						let branchList 		= result.branch_list;
+
+						let htmlData 		= "";
+						let htmlLabelData 	= "";
+						let htmlContentClass= "";
+						if(allBranchMapped){
+							htmlData = "<%=__('items.all_branch_mapped')%>"
+						}else if(branchList && branchList.length >0){
+							branchList.map((records,index)=>{
+								htmlData += (index >0) ? ", " :"";
+								htmlData += records.name["<%=DEFAULT_LANGUAGE_CODE%>"];
+								htmlLabelData += '<label class="label display-inline-block label-info m-r-5">'+records.name["<%=DEFAULT_LANGUAGE_CODE%>"]+'</label>';
+							});
+							htmlContentClass = "read_more_content_"+itemId;
+							htmlLabelData = '<div class="hide '+htmlContentClass+'"> <div class="clearfix">'+htmlLabelData+'</div></div>';
+						}else if(branchNotMapped){
+							htmlData = "<%=__('items.no_branch_mapped')%>"
+						}
+
+						return (htmlData) ? "<span class='readmore nl2br' data-content-class="+htmlContentClass+">"+htmlData+"</span>"+htmlLabelData :"";
+					}
+				},
+				{
+					"data"		 : {},
+					"orderable"	 : false,
+					"searchable" : false,
+					"render"     : function(result){
+						var status				= 	(result.is_active)				? 	result.is_active 			:'';
+						var availabilityStatus 	=	(result.availability_status)	? 	result.availability_status	:'';
+
+						var statusLabel =  (status == "<%=ACTIVE%>")	? '<span class="label label-success m-r-5"><%=__("system.active")%></span>' :'<span class="label label-danger m-r-5"><%=__("system.inactive")%></span>';
+						statusLabel +=  (availabilityStatus == "<%=AVAILABLE%>")	? '<span class="label label-success"><%=__("items.available")%></span>' :'';
+						return statusLabel;
+					}
+				},
+				{
+					"data"			: {},
+					"orderable"		: false,
+					"searchable"	: false,
+					"render" 		: function(result){
+						var id 		= (result._id)			? result._id 		:"";
+						var status 	= (result.status)		? result.status 	:"";
+						var isActive= (result.is_active)	? result.is_active 	:"<%=DEACTIVE%>";
+
+						var itemStatus		=	(isActive != "<%=ACTIVE%>")	?	"<%=ACTIVE%>" 							:"<%=DEACTIVE%>";
+						var statusLinkText  = 	(isActive != "<%=ACTIVE%>") ?	"<%= __('system.activate'); %>"			:"<%= __('system.deactive'); %>" ;
+						var statusLinkTitle = 	(isActive != "<%=ACTIVE%>")	? 	"<%= __('system.click_to_activate'); %>":"<%= __('system.click_to_deactivate'); %>";
+
+						var dropDownButton = ''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %> '+
+									'<span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">';
+									if("<%=slug%>" != "<%=BURGER_KING%>" && "<%=slug%>" != "<%=PIZZA_HUT%>" && (status != "<%= IN_REVIEW%>" || <%= !isRestaurant(module_type) %>)){
+										/** Edit Link **/
+										dropDownButton +='<li>'+
+											'<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/edit/'+id+'" data-open-modal="true"  class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,["item","edit"]); %>">'+' <%= __("admin.system.edit"); %>'+
+											'</a>'+
+										'</li>';
+									}
+
+									/** Status Link **/
+									<% if(slug != BURGER_KING && slug != PIZZA_HUT){ %>
+										dropDownButton +='<li>'+
+											'<a href="javascript:void(0)" class="waves-effect waves-block <%= getPermissionClass(module_type,["item","active_deactive"]); %>" title="'+statusLinkTitle+'" onclick="updateItemStatus('+itemStatus+',\''+id+'\')">'+
+												statusLinkText+
+											'</a>'+
+										'</li>'+
+										'<li>'+
+											'<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/recommended_item/'+id+'" data-open-modal="true"  class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,["item","recommended_item"]); %>">'+' <%= __("items.recommended_item"); %>'+
+											'</a>'+
+										'</li>'+
+										'<li>'+
+											'<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/overriding/'+id+'" data-open-modal="true"  class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,["item","overriding"]); %>">'+' <%= __("item_manager.item_overriding"); %>'+
+											'</a>'+
+										'</li>'+
+										'<li>'+
+											'<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/upselling_item/'+id+'" data-open-modal="true"  class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,["item","upselling_item"]); %>">'+' <%= __("items.upselling_item"); %>'+
+											'</a>'+
+										'</li>';
+
+										if(linkedItems.indexOf(id) !== -1){
+											dropDownButton += '<li>'+
+												'<a href="javascript:void(0)" data-href="<%=list_url%>/rollback/'+id+'<%- finalQuery %>" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["item","rollback"]); %>" data-confirm-message="<%= __("items.do_you_want_to_rollback"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+													'<%= __("item_manager.item_rollback"); %>'+
+												'</a>'+
+											'</li>';
+										}
+
+										dropDownButton +='<li>'+
+											'<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/clone/'+id+'" data-open-modal="true"  class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,["item","clone"]); %>">'+' <%= __("item_manager.item_clone"); %>'+
+											'</a>'+
+										'</li>'+
+										'<li>'+
+											'<a href="<%=base_url%>choice_group/'+id+'<%- finalQuery %>" class="waves-effect waves-block <%= getPermissionClass(module_type,["item","choice_group"]); %>">'+' <%= __("item_manager.choice_group"); %>'+
+											'</a>'+
+										'</li>'+
+										'<li>'+
+											'<a href="<%=base_url%>extra_items/'+id+'<%- finalQuery %>" class="waves-effect waves-block <%= getPermissionClass(module_type,["item","extra_items"]); %>">'+' <%= __("item_manager.extra_items"); %>'+
+											'</a>'+
+										'</li>';
+									<% } %>
+									dropDownButton +='<li>'+
+										'<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/view/'+id+'<%- finalQuery %>" data-restaurant-url="<%=base_url%>item/'+id+'<%- finalQuery %>" class="waves-effect waves-block action-btn scroll-to-top <%= getPermissionClass(module_type,["item","view"]); %>">'+
+											'<%= __("items.item_details"); %>'+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+						return dropDownButton;
+					}
+				},
+			],
+			"ajax":{
+				url 	:	"<%=list_url%>%><%- finalQuery %>",
+				type	: 	"POST",
+				data :function(d){
+					d.cuisine_id	= 	'<%=cuisineId%>';
+					d.category_id 	=	$("#category_id").val();
+					d.menu_id 		=	$("#menu_id").val();
+				},
+				dataSrc	: 	function(result){
+					linkedItems = result.linked_items;
+					setTimeout(()=>{
+						dataTable.columns.adjust();
+					},100);
+					adjustPermissionsClass();
+					return result.data;
+				}
+			},
+			"drawCallback": function( settings ) {
+				/** Description read more **/
+				readMore();
+			}
+		});
+
+		/**check/uncheck checkbox select all check/uncheck*/
+		$(document).on('change','#item_select_all',function(){
+			var isChecked	= $(this).is(':checked');
+			$('.checkbox_wrapper input[type="checkbox"]').not(":disabled").prop("checked",isChecked).trigger("change");
+		});
+
+		/**Check/Uncheck checkbox*/
+		$(document).on('change','.checkbox_wrapper input[type="checkbox"]',function(){
+			var id          = $(this).attr('id');
+			var isChecked	= $(this).is(':checked');
+			if(isChecked){
+				itemCheckboxArray[id] = true;
+			}else{
+				delete itemCheckboxArray[id];
+			}
+			var totalCheckBox = $('.checkbox_wrapper input[type="checkbox"]').not(":disabled").length;
+			var checkedBox = $('.checkbox_wrapper input[type="checkbox"]:checked').length;
+			let selectAll = (totalCheckBox == checkedBox) ? true : false;
+			$("#item_select_all").prop("checked",selectAll);
+		});
+
+		/** To update status for all selected item */
+		$(".perform_action").change(function(){
+			updateItemStatus($(this).val());
+		});
+	});
+
+	/** javascript function for get data according to item units*/
+	function searchTable(){
+		dataTable.draw()
+	}//end searchTable
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+
+	/** Javascript function to update item status */
+	function updateItemStatus(status,itemId){
+		var itemIdArray = (itemId) ? [itemId] : Object.keys(itemCheckboxArray);
+
+		if(status == "<%=ACTIVE%>" || status=="<%=DEACTIVE%>"){
+			if(itemIdArray.length < 1){
+				notice("<%= STATUS_ERROR %>","<%= __('items.please_select_atleast_one_item')%>");
+				return false;
+			}
+
+			/** Confirm  box **/
+			confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("item.do_you_want_to_update_status"); %>',function(result){
+				if(result){
+					var options = {
+						url 	: 	"<%=list_url%>/update-status",
+						data	: 	{item_ids: itemIdArray.join(","), status: status},
+						method	:	"post"
+					};
+					ajaxRequest(options,function(response){
+						if(response.status && response.message) notice(response.status,response.message);
+						dataTable.ajax.reload(null, false);
+						itemCheckboxArray = {};
+						$("#item_select_all").prop("checked",false);
+					});
+				}
+				swal.close();
+			});
+		}
+	}// end updateItemStatus()
+</script>
+<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>

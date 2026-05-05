@@ -1,0 +1,268 @@
+<%
+	var result 		 = (slider_result) ? slider_result :{};
+	var sliderType  = slider_type;
+	var isEditable 	= is_editable;
+	var sliderId 	= result._id;
+	var formUrl 	= (result && isEditable) ? admin_list_url+"/"+sliderType+"/edit/"+sliderId : admin_list_url+"/"+sliderType+"/add";
+	var timeDetails	= (result.time_details) ? result.time_details : [];
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form data-modal-id="form_modal" id="add-slider" data-submit-btn-id="slider-add-btn-id" method="post" action="<%=formUrl%>" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.system.edit")+" "+display_type : __("admin.system.add")+" "+display_type; %>
+						</h2>
+					</div>
+
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="description_in_english" class="control-label">
+											<%= __("admin.slider_management.description_in_english"); %>
+										</label>
+									    <textarea name="description_in_english" id="description_in_english" class="form-control height-100 resize-none"><%=(result.description) ? result.description.en :''%></textarea>
+                                    </div>
+									<span id="description_in_english_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="description_in_arabic" class="control-label">
+											<%= __("admin.slider_management.description_in_arabic"); %>
+										</label>
+									    <textarea name="description_in_arabic" id="description_in_arabic" class="form-control height-100 resize-none"><%=(result.description) ? result.description.ar :''%></textarea>
+                                    </div>
+									<span id="description_in_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="<%= (isEditable) ? 'col-sm-4' : 'col-sm-6';%>">
+								<div class="form-group">
+									<div class="form-lie">
+										<label for="image" class="control-label">
+											<%= __("admin.slider_management.image"); %>
+											<% if(!isEditable) { %>
+												<span class="required"> *</span>
+											<% } %>
+										</label>
+										<input type="file" data-input="false" name="image" class="form-control cfilestyle" id="image" />
+										<span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('system.extension_and_size_suggestion_message',ALLOWED_IMAGE_EXTENSIONS.join(', '),SLIDER_IMAGE_RESOLUTION)%>">
+											<i class="material-icons">info</i>
+										</span>
+										<input type="hidden" name="old_image" value="<%=result.image%>">
+									</div>
+									<span id="image_error" class="error"></span>
+								</div>
+							</div>
+							<% if(isEditable) { %>
+								<div class="col-sm-2">
+									<div class="form-group">
+										<a href="<%=result.full_image_path%>" class="item-image" data-lightbox="roadtrip">
+											<img class="img-thumbnail float-right set_image_dim" src="<%=result.full_image_path%>" alt="image">
+										</a>
+									</div>
+								</div>
+							<% } %>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<%
+										var selected = (isEditable && (typeof result.is_default != typeof undefined && result.is_default)) ? "selected" : "";
+										%>
+										<label for="default"><%= __('admin.slider_management.deafult'); %></label>
+										<select name="default_checked" id="default_checked" class="form-control show-tick">
+											<option value=''><%= __('admin.slider_management.select_to_make_deafult'); %></option>
+											<option value="<%= DEFAULT%>" <%=selected%> ><%= __('admin.slider_management.deafult_option'); %></option>
+										</select>
+									</div>
+									<span id="default_checked_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="splash-form-fields m-t-10"> </div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="slider-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="hide">
+	<div class="splash-extra-fields hide">
+		<div class="splash-input  splash-{index}">
+			<div class="row clearfix seperator-line field-seperator menu-date-time-fields seperator-{index}">
+				<b class="m-l-10"><%= __("admin.slider_management.select_time"); %></b>
+				<hr class="m-t-0"/>
+			</div>
+			<div class="row clearfix m-t-10 menu-time-fields menu-date-time-fields">
+				<div class="col-sm-4">
+					<div class="form-group">
+						<div class="form-line">
+							<select id="splash_day_{index}" name="splash[{index}][day]"  class="form-control" data-blank-error="<%=__('admin.slider_management.please_select_day')%>">
+								<option value="" ><%= __("admin.slider_management.select_day") %></option>
+								<% Object.keys(DAY_LIST).map(dayKey=>{ %>
+									<option value="<%=dayKey%>" ><%= DAY_LIST[dayKey] %></option>
+								<% }); %>
+							</select>
+						</div>
+						<span id="splash_day_{index}_error" class="error"></span>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="form-group">
+						<div class="form-line">
+							<input type="text" id="splash_start_time_{index}" name="splash[{index}][start_time]"  class="form-control time" placeholder="<%= __('admin.slider_management.start_time')%>"  data-blank-error="<%=__('admin.slider_management.please_select_start_time')%>" value={start_time} readonly/>
+						</div>
+						<span id="splash_start_time_{index}_error" class="error"></span>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="form-group">
+						<div class="form-line">
+							<input type="text" id="splash_end_time_{index}" name="splash[{index}][end_time]"  class="form-control time" placeholder="<%= __('admin.slider_management.end_time')%>" data-blank-error="<%=__('admin.slider_management.please_select_end_time')%>" value="{end_time}"  readonly/>
+						</div>
+						<span id="splash_end_time_{index}_error" class="error"></span>
+					</div>
+				</div>
+			</div>
+			<div class="row clearfix">
+				<div class="col-sm-7"></div>
+				<div class="col-sm-5 text-right">
+					<button type="button" id="delete_splash_{index}" class="btn bg-red waves-effect m-r-5 col-white delete_splash" <%- FRONT_LOADING_TEXT %> data-rel="splash-{index}"> <%= __("system.delete")%> </button>
+					<button type="button" class="btn bg-green waves-effect col-white addmore_splash" onclick="appendSplashInput()"> <%= __("system.add_more")%> </button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(".show-tick").selectpicker('refresh');
+	$(document).ready(function(){
+		
+		customFileStyle();
+		
+		/**
+		 * Function to submit form
+		*/
+		var isEditable = <%=isEditable%>;
+
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			submit_multipart_form('add-slider',function(status,response){
+				if(status){
+					if(isEditable){
+						if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+						if(response.status && response.message) notice(response.status,response.message);
+						$('#form_modal').modal("hide");
+					}else{
+						$("#reset").trigger("click");
+					}
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+		
+		$(document).on("click",".delete_splash",function(){
+			var buttonId 	= 	$(this).attr("id");
+			var divClass 	= 	$(this).attr("data-rel");
+			var message		=	'<%= __("admin.slider_management.splash_delete_confirm_message"); %>';
+			confirmBox("warning",'<%= __("admin.system.are_you_sure") %>',message,function(result){
+				if(result){
+					startTextLoading(buttonId);
+					
+					$("."+divClass).html('');
+					$(".splash-form-fields .addmore_splash").hide().last(".addmore_splash").show();
+					stopTextLoading(buttonId);
+					
+				}
+				swal.close();
+			});
+		});
+	});
+	
+	function appendSplashInput(data){   
+		data	=	(data) ? JSON.parse(data) : [];
+		var errorsArray  =  [];
+
+		$(".splash-form-fields span.error").html('');
+		$(".splash-form-fields input, .splash-form-fields select").each(function(){
+			if(!$(this).val() && $(this).attr("data-blank-error")){
+				errorsArray.push({param: $(this).attr("id"), msg: $(this).attr("data-blank-error") });
+			}
+		});
+		
+		if(errorsArray.length > 0){ 
+			display_errors(errorsArray,'add-slider');
+		}else{ 
+			var html 		=	$(".splash-extra-fields").html();
+			if(data.length > 0){
+				var day			=	"<%=SUNDAY%>";
+				var startTime 	=	"";
+				var endTime 	=	"";
+				$.each(data, function(key,value) { 
+					day 		=	(value && value.day)			?	value.day			:"<%=SUNDAY%>";
+					startTime 	=	(value && value.start_time)		?	value.start_time	:"";
+					endTime 	=	(value && value.end_time)		?	value.end_time		:"";
+					html 		=	$(".splash-extra-fields").html();
+					html 		= 	html.replace(/{index}/g,key).replace(/{start_time}/g,startTime).replace(/end_time}/g,endTime);
+					
+					$(".splash-form-fields").append(html);
+					if(key > 0){ 
+						$(".seperator-"+key).remove();
+					}
+					
+					if($("#splash_day_"+key+" option[value="+day+"]").length > 0) $("#splash_day_"+key).val(day);
+					if(key ==0) $(".splash-form-fields .delete_splash").remove();
+				});
+			}else{
+				var index		= 	$(".splash-form-fields .splash-input").length;
+				html 			= 	html.replace(/{index}/g,index).replace(/{start_time}/g,startTime).replace(/end_time}/g,endTime);
+				$(".splash-form-fields").append(html);
+
+				if(index ==0) $(".splash-form-fields .delete_splash").remove();
+				
+				if(index > 0){ 
+					$(".seperator-"+index).remove();
+				}
+
+				if(data){
+					if($("#splash_day_"+index+" option[value="+day+"]").length > 0) $("#splash_day_"+index).val(day);
+				}
+			}
+			$(".splash-form-fields .addmore_splash").hide().last(".addmore_splash").show();
+
+			/** For tiime picker **/
+			$('.time').datetimepicker({
+				format			: '<%=DATEPICKER_TIME_FORMAT%>',
+				ignoreReadonly	: true,
+			});
+		}
+	}; // end appendSplashInput()
+	
+	var defaultchecked	= <%- (result.is_default) ? result.is_default : false; %>;
+	if(!defaultchecked){  
+		appendSplashInput('<%- JSON.stringify(result.time_details);%>')
+	};
+
+	$("#default_checked").change(function(){
+		$(".splash-form-fields").html(" ");
+		var defaultStatus = $("#default_checked").val();
+		if(!defaultStatus){
+			appendSplashInput();
+		}
+	});
+</script>

@@ -1,0 +1,233 @@
+<%
+	let authRoleId = auth.user_role_id;
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.admin_permissions.add_admin_permissions'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" ><button type="button" class="btn btn-sm bg-indigo waves-effect"> <%= __("admin.system.back"); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="add-admin-permissions" data-submit-btn-id="admin-permissions-add-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="first_name" class="control-label"><%= __('admin.admin_permissions.first_name'); %><span class="required">*</span> :</label>
+										<input name="first_name" id="first_name" type="text" class="form-control"/>
+									</div>
+									<span id="first_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="last_name" class="control-label"><%= __('admin.admin_permissions.last_name'); %><span class="required">*</span> :</label>
+										<input name="last_name" id="last_name" type="text" class="form-control"/>
+									</div>
+									<span id="last_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="email" class="control-label"><%= __('admin.admin_permissions.email'); %><span class="required">*</span> :</label>
+										<input name="email" id="email" type="text" class="form-control"/>
+									</div>
+									<span id="email_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="user_role" class="control-label"><%= __('admin.admin_permissions.user_role'); %><span class="required"> *</span> :</label>
+										<select class="form-control show-tick"  name="user_role" id="user_role">
+											<option value=""><%=__("admin.admin_permissions.select_user_role");%></option><%
+											if(adminRoles && adminRoles.length > 0){
+												adminRoles.map(function(adminRoles,index){%>
+													<option value="<%=adminRoles._id%>"><%=adminRoles.role_name%></option>
+											<% 	});
+											} %>
+								        </select>
+									</div>
+									<span id="user_role_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="password" class="control-label"><%= __('admin.admin_permissions.password'); %><span class="required">*</span> :</label>
+										<input name="password" id="password" type="password" class="form-control"/>
+									</div>
+									<span id="password_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="confirm_password" class="control-label"><%= __('admin.admin_permissions.confirm_password'); %><span class="required">*</span> :</label>
+										<input name="confirm_password" id="confirm_password" type="password" class="form-control"/>
+									</div>
+									<span id="confirm_password_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix ">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="code" class="control-label"><%=  __('admin.admin_permissions.code'); %><span class="required"></span> :</label>
+										<input name="code" id="code" type="text" class="form-control"/>
+									</div>
+									<span id="code_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6 hide">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="ticket_category" class="control-label"><%=  __('admin.admin_permissions.ticket_category'); %> :</label>
+										<select id="ticket_category" class="form-control show-tick" name="ticket_category" title="<%=  __('admin.admin_permissions.select_ticket_category'); %>"  multiple>
+											<%-ticket_category_list%>
+										</select>
+									</div>
+									<span id="ticket_category_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix <%= (authRoleId == CRAVEZ) ? '' : 'hide' %>">
+							<div class="col-sm-6">
+								<div class="form-group materialize_checkbox">
+									<div class="form-lie checkbox_wrapper">
+										<input name="team_head" id="team_head" class="filled-in chk-col-pink" type="checkbox" value="true"/>
+										<label for="team_head" class="materialize-chekbox-label font-14"><%= __('admin.admin_permissions.mark_as_team_head'); %></label>
+									</div>
+									<span id="team_head_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div id="check_unckeck_row" class="row clearfix hide">
+							<div class="col-sm-6">
+								<span id="role_info_text"><%= __("admin.admin_permissions.role_info_text")%><span class="required">*</span> :</span>
+							</div>
+							<div class="col-sm-6">
+								<button type="button" id="expandAllBtn" class="btn bg-green btn-sm waves-effect">
+									<%= __('admin.admin_role.expand_all'); %>
+								</button>
+								<button type="button" id="collapseAllBtn" class="btn bg-red btn-sm waves-effect">
+									<%= __('admin.admin_role.collapse_all'); %>
+								</button>
+								<button type="button" id="checkAllBtn" class="btn bg-green btn-sm waves-effect">
+									<%= __('admin.admin_permissions.check_all'); %>
+								</button>
+								<button type="button" id="unCheckAllBtn" class="btn bg-red btn-sm waves-effect">
+									<%= __('admin.admin_permissions.un_check_all'); %>
+								</button>
+							</div>
+							<hr/>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-2"></div>
+							<div class="col-sm-10">
+								<div id="role-menu" class="tree"></div>
+								<span id="module_ids_error" class="error hide"></span>
+							</div>
+						</div>
+
+						<button type="button" id="admin-permissions-add-btn-id" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit" >
+							<%= __('admin.system.submit'); %>
+						</button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PAGE_PATH%>admin_roles/module_tree.js"></script>
+	<script type="text/javascript">
+	var permissions	= <%- JSON.stringify(ADMIN_PERMISSIONS); %>;
+	$(document).ready(function(){
+		var treeArray 	= <%- (typeof admin_modules !== typeof undefined ) ? JSON.stringify(admin_modules) : {} %>;
+
+		/**
+		 * Function to submit form
+		 */
+		$(".btn-submit").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("add-admin-permissions",function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/**
+		 * Function to get admin modules of a role
+		 */
+		var allowedUser = <%-JSON.stringify(TICKET_CATEGORY_ALLOWED_ROLES);%>;
+		$(document).on("change","select#user_role",function(){
+			$("#role-menu").html("");
+			$('#check_unckeck_row').addClass("hide");
+			$('#module_ids_error').addClass("hide");
+			$("#ticket_category").closest(".col-sm-6").addClass("hide");
+			var roleId = $(this).val();
+
+			/** Show ticket category list **/
+			if(allowedUser.indexOf(roleId) != -1){
+				$("#ticket_category").closest(".col-sm-6").removeClass("hide");
+				$("#ticket_category").selectpicker('refresh');
+			}
+
+			if(roleId && roleId != ""){
+				var data = {id : roleId};
+
+				var options = {
+					url 	: "<%=admin_list_url%>/get_role_modules",
+					data	:	data,
+					method	:	"post"
+				}
+				ajaxRequest(options,function(response){
+					if(response.status == "<%=STATUS_SUCCESS%>"){
+						var roleData = response.result;
+						if(roleData && roleData.module_ids){
+							var selectedModules = (roleData.module_ids) ? roleData.module_ids : [];
+							var moduleIdsArray  = [];
+							if(selectedModules){
+								/**create selected ids array*/
+								selectedModules.map(function(item){
+									moduleIdsArray.push({
+										id: item._id,
+										sub_modules : item.sub_modules
+									});
+								});
+								printTree(treeArray,0,"#role-menu",moduleIdsArray);	// draw tree
+							}
+						}
+					}else{
+						notice(response.status,response.message);
+					}
+				});
+			}
+		});
+	});
+</script>

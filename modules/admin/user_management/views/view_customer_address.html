@@ -1,0 +1,86 @@
+<div class="modal-dialog"  role="document">
+	<div class="modal-content">
+		<div class="modal-header modal-header-seperator">
+			<h4 class="modal-title"><%=__("admin.user_management.address_detail") %></h4>
+			<span class="cursor-pointer modal-close pull-right" data-dismiss="modal"><i class="material-icons">close</i></span>
+		</div>
+		<div class="modal-body" id="receipt-content">
+			<div class="body table-responsive" id="aniimated-thumbnials">
+				<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+					<tr>
+						<th class="text-right" width="35%"><%= __('admin.user_management.full_name'); %></th>
+						<td><%= (result.first_name) ? result.first_name :'';%> <%= (result.last_name) ? result.last_name :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.mobile_number'); %></th>
+						<td><%= (result.mobile_number) ? result.mobile_number :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.landline_number'); %></th>
+						<td><%= (result.landline_number) ? result.landline_number :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.address_title'); %></th>
+						<td><%= (result.address_title) ? result.address_title :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.city'); %></th>
+						<td><%= (result.city_name) ? result.city_name[DEFAULT_LANGUAGE_CODE] :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.area'); %></th>
+						<td><%= (result.area_name) ? result.area_name[DEFAULT_LANGUAGE_CODE] :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.block'); %></th>
+						<td><%= (result.block_name) ? result.block_name[DEFAULT_LANGUAGE_CODE] :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.street'); %></th>
+						<td><%= (result.street) ? result.street :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.address_type'); %></th>
+						<td><%= (result.address_type) ? result.address_type :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.building_number'); %></th>
+						<td><%= (result.building_number) ? result.building_number :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.floor_number'); %></th>
+						<td><%= (result.floor_number) ? result.floor_number :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.flat_number'); %></th>
+						<td><%= (result.flat_number) ? result.flat_number :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.jadda'); %></th>
+						<td><%= (result.jadda) ? result.jadda :'';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.venue'); %></th>
+						<td><%= (result.venue) ? result.venue : '';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.country'); %></th>
+						<td><%= (result.country) ? result.country[DEFAULT_LANGUAGE_CODE] : '';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.delivery_latitude'); %></th>
+						<td><%= (result.latitude) ? result.latitude : '';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.delivery_longitude'); %></th>
+						<td><%= (result.longitude) ? result.longitude : '';%></td>
+					</tr>
+					<tr>
+						<th class="text-right" ><%= __('admin.user_management.additional_directions'); %></th>
+						<td><%= (result.additional_directions) ? result.additional_directions : '';%></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

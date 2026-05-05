@@ -1,0 +1,304 @@
+<%
+	var userId		= (typeof user_id !== typeof undefined && user_id)	?	user_id	: "";
+	var fromDate  	= (from_date != "" ) ? from_date+" "+START_DATE_TIME_FORMAT: "";
+	var toDate  	= (to_date != "") ? to_date+" "+END_DATE_TIME_FORMAT : "";
+	var finalDate  	= (from_date != "" && to_date != "") ? from_date+' - '+to_date : "";
+%>
+<!--Search Start -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-col-pink">
+				<div class="panel-heading" role="tab" id="panel-heading-id">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+						   aria-controls="panel-collapse-id">
+							<%= __("admin.system.search"); %>
+							<span class="pull-right collapse-toggle-icon"></span>
+						</a>
+					</h4>
+				</div>
+				<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+					<div class="panel-body">
+						<form id="searchForm" name="searchForm" >
+							<div class="row clearfix dataTables_wrapper">
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" name="unique_order_id" id="column_filter_2"  onkeyup="searchDatatable(2)" placeholder="<%= __('admin.orders.search_by_order_id'); %>">
+										</div>
+									</div>
+								</div>
+								<!-- Search by Status -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" id="column_filter_9"  onChange="searchDatatable(9)" name="order_status">
+												<option value=""><%=__("admin.orders.search_by_order_status");%></option>
+												<%
+													Object.keys(ORDER_STATUS_TYPES).map(key=>{
+														%>
+														<option value="<%=key%>">
+															<%= ORDER_STATUS_TYPES[key].status_name%>
+														</option> <%
+													}); %>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- Search by order Date -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.orders.search_by_order_date'); %>" value="<%= finalDate %>" name="date-range-picker">
+										</div>
+										<input class="form-control hide" id="from_date" value="<%= fromDate %>" type="text" name="from_date">
+										<input class="form-control hide" id="to_date" value="<%= toDate %>" type="text" name="to_date">
+									</div>
+								</div>
+								<!-- Search by restaurant name -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick restaurant_id" id="column_filter_5"  onChange="searchDatatable(5)" name="search_restaurant_id" data-child-name="search_branch_id" data-live-search="true">
+												<option value=""><%=__("admin.orders.search_by_restaurant_name");%></option>
+												<%- restaurant_list%>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-2">
+									<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+										<%= __("admin.system.reset")%>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Search End -->
+
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%= __("admin.orders.orders"); %>
+				</h2>
+			</div>
+			<div class="body">
+				<table id="datatable-customer-order" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th><%= __("admin.system.action"); %></th>
+							<th><%= __("admin.orders.invoice_number"); %></th>
+							<th><%= __("admin.orders.order_id"); %></th>
+							<th><%= __("admin.orders.order_date"); %></th>
+							<th><%= __("admin.orders.last_status_updated_on"); %></th>
+							<th><%= __("admin.orders.restaurant_name"); %></th>
+							<th><%= __("admin.orders.net_order_amount"); %></th>
+							<th><%= __("admin.orders.discount_value"); %></th>
+							<th><%= __("admin.orders.total_order_amount"); %></th>
+							<th width="10%"><%= __("admin.system.status"); %></th>
+							<th width="2%"></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data */
+	var dataTable 			=	"";
+	var ORDER_STATUS_TYPES	= 	<%- JSON.stringify(ORDER_STATUS_TYPES)%>;
+	var CURRENCY_SYMBOL		=	'<%= CURRENCY_SYMBOL%>';
+	var DELIVERY_BY			= 	<%- JSON.stringify(DELIVERY_BY)%>;
+	var PAYMENT_METHODS		= 	<%- JSON.stringify(PAYMENT_METHODS)%>;
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-customer-order').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[[ 3, "desc" ]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{
+					"data": "_id",
+					"orderable" : 	false,
+					"render" 	: function(id){
+						return '<a href="<%=WEBSITE_ADMIN_URL%>orders/view/'+id+'" class="btn bg-indigo waves-effect waves-block <%= getPermissionClass(module_type,["order_detail","view"]); %>" target="_blank">'+
+							'<%= __("admin.orders.view");%>'+
+						'</a>';
+					}
+				},
+				{ "data": 'invoice_number', "visible" : false, },
+				{ "data": 'unique_order_id' },
+				{
+					"data"		 : 'order_date',
+					"searchable" : 	false,
+					"render" 	 : 	function(order_date){
+						return moment(order_date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+					}
+				},
+				{
+					"data"		 : 'last_status_updated_on',
+					"visible"	 : false,
+					"searchable" : 	false,
+					"render" 	 : 	function(last_status_updated_on){
+						return moment(last_status_updated_on).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+					}
+				},
+				{
+					"data"		 : 'restaurant_name',
+					"field_type" : "<%=OBJECT_ID_FIELD%>",
+					"field_name" : "restaurant_id",
+					"orderable"  : 	false,
+					"render" 	 : 	function(restaurant_name){
+						return  (restaurant_name) ? restaurant_name[DEFAULT_LANGUAGE_CODE] : '';
+					}
+				},
+				{
+					"data"		 : 'net_amount',
+					"searchable" : 	false,
+					"visible" 	 : 	false,
+					"render" 	 : 	function(netAmount){
+						return  (typeof netAmount !== typeof undefined) ? currencyFormat(netAmount) :'';
+					}
+				},
+				{
+					"data"		: 'discount_price',
+					"orderable" : 	false,
+					"visible" 	: 	false,
+					"render"	: function(discount_price){
+						return  (typeof discount_price !== typeof undefined) ? currencyFormat(discount_price) : '';
+					}
+				},
+				{
+					"data"		 : 'order_price',
+					"searchable" : 	false,
+					"orderable" : 	false,
+					"render" 	 : 	function(orderPrice){
+						return (typeof orderPrice !== typeof undefined) ? currencyFormat(orderPrice) :'';
+					}
+				},
+				{
+					"data": {},
+					"orderable" : 	false,
+					"field_type" : "<%=EXACT_FIELD%>",
+					"field_name" : "admin_status",
+					"render" : function(result){
+						var  tmpStatus  =  (result.admin_status) ? result.admin_status :"";
+						var statusLabel = (tmpStatus && ORDER_STATUS_TYPES[tmpStatus]) ? '<span class="label '+ORDER_STATUS_TYPES[tmpStatus].label_class+'">'+ORDER_STATUS_TYPES[tmpStatus].status_name+'</span>' : '';
+						var confirmStatus 	= (result.is_confirm == false)	? '<span class="label label-danger m-l-5 m-t-5"><%=__("admin.orders.not_confirmed")%></span>' : '';
+						var modifiedStatus 	= (result.is_modified && result.order_status == '<%= ORDER_PENDING %>')	? '<span class="label label-warning m-l-5 m-t-5"><%=__("admin.orders.modified_order")%></span>' : '';
+
+						return statusLabel+confirmStatus+modifiedStatus;
+					}
+				},
+				{
+					"class":          "details-control",
+					"orderable":      false,
+					"data":           null,
+					"defaultContent": ""
+				},
+			],
+			"ajax":{
+				url 	:	"<%=admin_list_url%>/customer_order_list/<%= userId%>",
+				type	: 	"POST",
+				data	: 	function (d) {
+					d.fromDate 	   = $('#from_date').val();
+					d.toDate 	   = $('#to_date').val();
+				},
+				dataSrc	: 	function(res){
+					adjustPermissionsClass();
+					return res.data;
+				}
+			}
+		});
+
+		// Array to track the ids of the details displayed rows
+		var detailRows = [];
+		$('#datatable-customer-order tbody').on( 'click', 'tr td.details-control', function () {
+			var tr = $(this).closest('tr');
+			var row = dataTable.row( tr );
+			var idx = $.inArray( tr.attr('id'), detailRows );
+			var table = $('#datatable-customer-order').DataTable();
+			// DO SOMETHING HERE TO UPDATE fixedHeader.headerOffset
+			// table.fixedHeader.headerOffset($('.navbar').height());   // apply new value
+			// above fails, as there so no such method to update headerOffset (yet)
+			// table.fixedHeader.adjust();
+
+			if ( row.child.isShown() ) {
+				tr.removeClass( 'details' );
+				row.child.hide();
+				// Remove from the 'open' array
+				detailRows.splice( idx, 1 );
+			}else{
+				tr.addClass( 'details' );
+				row.child( format( row.data() ) ).show();
+				// Add to the 'open' array
+				if ( idx === -1 ) {
+					detailRows.push( tr.attr('id') );
+				}
+			}
+		} );
+		// On each draw, loop over the `detailRows` array and show any child rows
+		dataTable.on( 'draw', function () {
+			$.each( detailRows, function ( i, id ) {
+				$('#'+id+' td.details-control').trigger( 'click' );
+			} );
+		} );
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+
+	function format(d){
+		var lastUpdatedOn		=	(d.last_status_updated_on ) ? d.last_status_updated_on 				:"";
+		var invoiceNumber		=	(d.invoice_number ) 		? 	d.invoice_number 					:"";
+		var netAmount			=	(d.net_amount ) 			? 	d.net_amount 						:0;
+		var discountPrice		=	(d.discount_price ) 		?	d.discount_price 					:0;
+		var orderPrice			=	(d.order_price ) 			?	d.order_price 						:0;
+		var deliveryDuration	=	(d.delivery_duration )		? 	d.delivery_duration+" "+'<%=__("admin.orders.minutes")%>' :"";
+		var customerLatitude	=	(d.customer_latitude )		? 	d.customer_latitude 				:"";
+		var customerLongitude 	=	(d.customer_longitude ) 	?	d.customer_longitude				:"";
+		var deliveryType		=	(d.delivery_type ) 			?	DELIVERY_BY[d.delivery_type]	  	:"";
+		var paymentMethod		=	(d.payment_method ) 		? 	PAYMENT_METHODS[d.payment_method]	:"";
+		var amountDebitedByWallet 	=	(d.amount_debited_by_wallet ) ? currencyFormat(d.amount_debited_by_wallet) :currencyFormat(0);
+
+			// var html	='<div class="row clearfix">';
+			var html	='<div class="col-sm-12">';
+				html	+='<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.invoice_number"); %>:</strong> '+invoiceNumber+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.last_status_updated_on"); %>:</strong> '+moment(lastUpdatedOn).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT)+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.delivery_duration"); %>:</strong> '+deliveryDuration+'</p></div>';
+
+				html	+='<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.net_amount"); %>:</strong> '+currencyFormat(netAmount)+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.discount_value"); %>:</strong> '+currencyFormat(discountPrice)+'</p></div><div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.total_order_amount"); %>:</strong> '+currencyFormat(orderPrice)+'</p></div>';
+
+				html	+='<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.delivery_by"); %>:</strong> '+deliveryType+'</p></div>'+'<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.delivery_latitude"); %>:</strong> '+customerLatitude+'</p></div>';
+
+				html	+= '<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.delivery_longitude"); %>:</strong> '+customerLongitude+'</p></div> <div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.payment_method"); %>:</strong> '+paymentMethod+'</p></div>';
+
+				html 	+= '<div class="col-sm-4 mb0"><p><strong><%= __("admin.orders.amount_debited_by_wallet"); %>:</strong> '+amountDebitedByWallet+'</p></div>';
+
+				html	+='</div></div>';
+			return html;
+		}
+</script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

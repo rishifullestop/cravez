@@ -1,0 +1,67 @@
+<%
+    var dates            = choose_date;
+    var parentId         = parent_id;
+    var fleetAvailablity = fleet_availablity;
+    var fromDate	     = newDate(from_date,DATABASE_DATE_FORMAT);
+    var toDate		     = newDate(to_date,DATABASE_DATE_FORMAT);
+%>
+<table id="datatable-listing" class="row-border fixed-width-table hover table full-length-header table-bordered" cellspacing="0" width="100%" >
+    <thead>
+        <tr>
+            <th><%= __('admin.fleet_area_assignment.user_name'); %></th>
+            <%
+                dates.map((dateRecords)=>{%>
+                    <th><%=dateRecords%></th>
+                <%
+                });
+            %>
+        </tr>
+    </thead>
+    <tbody>
+        <%
+			Object.keys(fleetAvailablity).map((userRecords)=>{
+                let userName = (fleetAvailablity[userRecords] && fleetAvailablity[userRecords].name)   ?  fleetAvailablity[userRecords].name : "";
+                let userId   = (userRecords) ?  userRecords : "";
+                %>
+                <tr>
+                    <td><%=userName%></td>
+                    <%
+                        dates.map((dateRecords)=>{
+                            var fleetData = (fleetAvailablity[userId] && fleetAvailablity[userId][dateRecords]) ? fleetAvailablity[userId][dateRecords] : {};
+                            var cityName  = (fleetData.city) ? fleetData.city   :"";
+                            var areaName  = (fleetData.area) ? fleetData.area   :"";
+                            var id        = (fleetData.id)   ? fleetData.id     :"";
+                            %>
+							<td>
+								<table class="borderless-table full-length-header-td shift-table" width="100%">
+									<% if(cityName && areaName){ %>
+										<tr>
+										
+											<td width="10%"><%=  __('admin.fleet_area_assignment.city'); %></td>
+											<td>:</td>
+											<td><%= cityName%></td>
+											<td>
+												<% if(auth.user_role_id != CRAVEZ){ %>
+													<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/<%=id%>" data-open-modal="true" class="float-right waves-effect waves-block action-btn <%= getPermissionClass(module_type,['fleet_area_assignment','edit']); %>">
+														<i class="material-icons font-14">mode_edit</i>
+													</a>
+												<% } %>
+											</td>
+										
+										</tr>
+										<tr>
+											<td><%=  __('admin.fleet_area_assignment.areas'); %></td>
+											<td>:</td>
+											<td colspan=2><%= areaName%></td>
+										</tr>
+									<% } %>
+								</table>
+							</td><%
+						});
+                    %>
+                </tr>
+                <%
+            });
+        %>
+    </tbody>
+</table>

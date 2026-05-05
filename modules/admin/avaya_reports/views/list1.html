@@ -1,0 +1,473 @@
+<%
+	var categoryDetails		= (typeof category_details !== typeof undefined && category_details)	?	category_details	: {};
+%>
+<div class="container-fluid" id="main-container">
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.quality_monitor.quality_monitor_form"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<form id="add-quality" data-submit-btn-id="quality-add-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row">
+							<div class="col-xs-12 col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="agent_id" class="control-label"><%= __('admin.quality_monitor.select_agent'); %><span class="required">*</span> :</label>
+										<select id="agent_id" class="form-control" data-live-search="true" name="agent_id" data-child-name="search_user_id">
+											<option value=""><%= __('admin.quality_monitor.select_agent'); %></option>
+											<%- team_list %>
+										</select>
+									</div>
+									<span id="agent_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-xs-12 col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="team_leader_id" class="control-label"><%= __('admin.quality_monitor.select_team_leader'); %><span class="required">*</span> :</label>
+										<select id="team_leader_id" class="form-control user_list disabled" data-live-search="true" name="team_leader_id" data-child-name="search_team_leader">
+											<option value=""><%= __('admin.quality_monitor.select_team_leader'); %></option>
+										</select>
+									</div>
+									<span id="team_leader_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-xs-12 col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="customer_name" class="control-label"><%= __('admin.quality_monitor.customer_name'); %><span class="required">*</span> :</label>
+										<input name="customer_name" id="customer_name" type="text" class="form-control"/>
+									</div>
+									<span id="customer_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-xs-12 col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="phone_number" class="control-label"><%= __('admin.quality_monitor.phone_number'); %><span class="required">*</span> :</label>
+										<input name="phone_number" id="phone_number" type="text" class="form-control"/>
+									</div>
+									<span id="phone_number_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-12 col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="type_of_call" class="control-label"><%= __('admin.quality_monitor.type_of_call'); %><span class="required">*</span> :</label>
+										<select id="type_of_call" class="form-control" data-live-search="true" name="type_of_call">
+											<option value=""><%= __('admin.quality_monitor.select_type_of_call'); %></option><%
+											if(Object.keys(TYPE_OF_CALL).length > 0){
+												Object.keys(TYPE_OF_CALL).map(data=>{ %>
+													<option value="<%= data%>"><%= TYPE_OF_CALL[data]; %></option><%
+												});
+											} %>
+										</select>
+									</div>
+									<span id="type_of_call_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-xs-12 col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="type_of_call_enquiry" class="control-label"><%= __('admin.quality_monitor.type_of_call_enquiry'); %><span class="required">*</span> :</label>
+										<select id="type_of_call_enquiry" class="form-control" data-live-search="true" name="type_of_call_enquiry">
+											<option value=""><%= __('admin.quality_monitor.select_type_of_call_enquiry'); %></option><%
+											if(Object.keys(TYPE_OF_CALL_ENQUIRY_LIST).length > 0){
+												Object.keys(TYPE_OF_CALL_ENQUIRY_LIST).map(data=>{ %>
+													<option value="<%= data%>"><%= TYPE_OF_CALL_ENQUIRY_LIST[data]; %></option><%
+												});
+											} %>
+										</select>
+									</div>
+									<span id="type_of_call_enquiry_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-xs-12 col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="date_time" class="control-label"><%= __('admin.quality_monitor.date_time'); %><span class="required">*</span> :</label>
+										<input name="date_time" id="date_time" type="text" class="form-control" readonly/>
+									</div>
+									<span id="date_time_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-xs-12 col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="call_date_time" class="control-label"><%= __('admin.quality_monitor.call_date_time'); %><span class="required">*</span> :</label>
+										<input name="call_date_time" id="call_date_time" type="text" class="form-control" readonly/>
+									</div>
+									<span id="call_date_time_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-12 col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="monitored_by" class="control-label"><%= __('admin.quality_monitor.monitored_by'); %><span class="required">*</span> :</label>
+										<select id="monitored_by" class="form-control" data-live-search="true" name="monitored_by" >
+											<option value=""><%= __('admin.quality_monitor.select_monitored_by'); %></option>
+											<%- qa_list %>
+										</select>
+									</div>
+									<span id="monitored_by_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-xs-12 col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="team" class="control-label"><%= __('admin.quality_monitor.team'); %><span class="required">*</span> :</label>
+										<select id="team" class="form-control" data-live-search="true" name="team">
+											<option value=""><%= __('admin.quality_monitor.select_team'); %></option><%
+											if(Object.keys(TEAM_QUALITY_MONITOR_LIST).length > 0){
+												Object.keys(TEAM_QUALITY_MONITOR_LIST).map(data=>{ %>
+													<option value="<%= data%>"><%= TEAM_QUALITY_MONITOR_LIST[data]; %></option><%
+												});
+											} %>
+										</select>
+									</div>
+									<span id="team_error" class="error"></span>
+								</div>
+							</div>
+							
+						</div>
+						<table class="row-border fixed-width-table hover table full-length-header table-bordered dataTable" cellspacing="0" width="100%">
+							<thead>
+								<tr>
+									<th width="50%" class="text-center"><%= __("admin.quality_monitor.attribute"); %></th>
+									<th width="10%" class="text-center"><%= __("admin.quality_monitor.percentage"); %></th>
+									<th width="10%" class="text-center"><%= __("admin.quality_monitor.c/n"); %></th>
+									<th width="30%" class="text-center"><%= __("admin.quality_monitor.reason"); %></th>
+								</tr>
+							</thead>
+							<tbody>
+								<% 
+								if(Object.keys(categoryDetails).length > 0){	
+									Object.keys(categoryDetails).map((categoryRecords,key)=>{ %>
+										<input type="hidden" name="data[<%= key%>][first_level_category_id]" value="<%= categoryRecords%>">
+										<input type="hidden" name="data[<%= key%>][type]" value="<%= categoryDetails[categoryRecords].type%>">
+										<%
+										var categorySecondData = (categoryDetails[categoryRecords] && categoryDetails[categoryRecords].data) ? categoryDetails[categoryRecords].data: [];
+										var mainCategoryClass  = categoryRecords+'_category';
+										if(categorySecondData.length > 0){	
+											categorySecondData.map((categorySecondRecords,subKey)=>{ 
+												if(categorySecondRecords){
+													var secondLevelId		=	(categorySecondRecords._id) ? categorySecondRecords._id:'';
+													var cnPercenatgeClass  	= 	categoryRecords+'_'+secondLevelId+'_cn_percenatge';
+													
+													var secondLevelParentId	=	(categorySecondRecords.parent_category_id) ? categorySecondRecords.parent_category_id:'';
+													
+													var parentCategoryName	=	(categorySecondRecords.category_name) ? categorySecondRecords.category_name:'';
+													
+													var parentIsNonCritical	=	(categorySecondRecords.is_non_critical) ? categorySecondRecords.is_non_critical:false;
+													
+													var parentCategoryPercentage	=	(categorySecondRecords.category_percentage) ? categorySecondRecords.category_percentage:0;
+													
+													var subCategoryDetails	=	(categorySecondRecords.sub_category_details) ? categorySecondRecords.sub_category_details:0;
+													
+													var subCategoryLength	=	subCategoryDetails.length;
+													%>
+
+													<input type="hidden" name="data[<%= key%>][attribute_detail][<%= subKey%>][second_level_category_id]" value="<%= secondLevelId%>">
+
+													<input type="hidden" class="main_percentage_input_<%= secondLevelId%>" name="data[<%= key%>][attribute_detail][<%= subKey%>][second_level_percentage]" value="<%= parentCategoryPercentage%>">
+													<input type="hidden" class="<%= cnPercenatgeClass%>_input" name="data[<%= key%>][attribute_detail][<%= subKey%>][cn_percentage]" value="100">
+													<tr>
+														<th class="text-center" width="50%">
+															<strong><%= parentCategoryName %> <%= (parentIsNonCritical) ? "(Non-Critical)" : '' %></strong>
+														</th>
+														<th width="10%" class="text-center">
+															<span class="main_percentage_<%= secondLevelId%> <%= mainCategoryClass%> secondpercent" data-count="0" data-length="<%= subCategoryLength%>">
+																<%= parentCategoryPercentage %>
+															</span>
+														</th>
+														<th width="10%" class="text-center <%= cnPercenatgeClass%>"><strong><%= "100%"; %></strong></th>
+														<th width="30%"></th>
+													</tr>	
+													<%	
+													if(subCategoryLength > 0){
+														subCategoryDetails.map((subCategoryRecords,thirdKey)=>{
+															var thirdId			=	(subCategoryRecords._id) ? subCategoryRecords._id:'';	
+															var subCategoryName	=	(subCategoryRecords.category_name) ? subCategoryRecords.category_name:'';
+															var childCategoryPercentage	=	(subCategoryRecords.category_percentage) ? subCategoryRecords.category_percentage:0;	
+															%>
+
+															<input type="hidden" name="data[<%= key%>][attribute_detail][<%= subKey%>][third_level_detail][<%= thirdKey%>][third_level_category_id]" value="<%= thirdId%>">
+															<input type="hidden" class="<%= secondLevelId %>_<%= secondLevelParentId %>_<%= thirdId %>_third_percentage_input" name="data[<%= key%>][attribute_detail][<%= subKey%>][third_level_detail][<%= thirdKey%>][third_level_percentage]" value="<%= childCategoryPercentage;%>">
+
+															<tr>
+																<td width="50%"><%= subCategoryName %></td>
+																<td width="10%" class="text-center category_child child_<%= secondLevelId %> <%= secondLevelId %>_<%= secondLevelParentId %>_third_percentage" data-value="<%= childCategoryPercentage;%>" data-parent="<%= secondLevelId %>">
+																	<%= childCategoryPercentage;%>
+																</td>
+																<td width="10%"></td>
+																<td width="30%">
+																	<input type="text" class="category_comment" name="data[<%= key%>][attribute_detail][<%= subKey%>][third_level_detail][<%= thirdKey%>][comment]" data-id="<%= secondLevelId %>" data-parent-id="<%= secondLevelParentId %>" data-main-id="<%= thirdId%>" style="width:100%;"/>
+																</td>
+															</tr>	
+														<%	
+														});
+													}
+
+												}
+											});
+										}
+									});
+									Object.keys(categoryDetails).map((categoryRecords,key)=>{ 
+										var categoryFirstName = (categoryDetails[categoryRecords] && categoryDetails[categoryRecords].name) ? categoryDetails[categoryRecords].name: ''; 
+										var errorOfClass  = categoryRecords+'_error';%>
+										<tr class="text-center">
+											<td width="50%" colspan="3"><%= 'Number of '+categoryFirstName+' error'%></td>
+											<td width="30%">
+												<input type="text" name="data[<%= key%>][totel_error]" class="input_span <%= errorOfClass %>">
+											</td>
+										</tr><%
+									});
+								}
+								%>	
+								<tr class="text-center">
+									<td width="50%" colspan="3">Type of sheet</td>
+									<td width="30%">
+										<strong>
+											<input type="text" class="input_span type_of_sheet" name="type_of_sheet" value="Pass"/>
+										</strong>
+									</td>
+								</tr>	<%
+								if(Object.keys(categoryDetails).length > 0){	
+									Object.keys(categoryDetails).map((categoryRecords,key)=>{  
+										var categoryFirstName = (categoryDetails[categoryRecords] && categoryDetails[categoryRecords].name) ? categoryDetails[categoryRecords].name: '';
+										var percenatgeOfClass  = categoryRecords+'_percentage';%>
+										<tr class="text-center">
+											<td width="50%" colspan="3"><%='% of '+categoryFirstName%> </td>
+											<td width="30%">
+												<input type="text" class="input_span <%= percenatgeOfClass %>" name="data[<%= key%>][percentage_of]">
+											</td>
+										</tr><%
+									});
+								} %>
+								<tr class="text-center">
+									<td width="50%" colspan="3">Over all percentage</td>
+									<td width="30%">
+										<input type="text" class="input_span over_all_percenatge" name="over_all_percenatge">
+									</td>
+								</tr>	
+							</tbody>
+						</table>
+						<button type="button" id="quality-add-btn-id" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit" >
+							<%= __('admin.system.submit'); %>
+						</button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>	
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		/**
+		* Get User list
+		*/
+		$("select[name='agent_id']").change(function(){
+			getUserDropDownList($(this));
+		});
+
+		/**
+		* To calculate percentage on load
+		*/
+		var categoryDetails	=	<%- JSON.stringify(categoryDetails) %>;
+		if(Object.keys(categoryDetails).length > 0){	
+			var totalPercentage	   = 0;
+			Object.keys(categoryDetails).map((categoryRecords)=>{ 
+				categoryDetails[categoryRecords].data.map(data=>{ 
+					var categoryPercent	   = calculateInitial(data._id,categoryRecords);
+				});
+				var categoryPercent	   = calculatePercentage(categoryRecords);
+			});
+		}
+		/**
+		* on comment in textarea
+		*/
+		$('.category_comment').keyup(function(e){
+			var mainId			=	$(this).attr('data-main-id');
+			var id				=	$(this).attr('data-id');
+			var catlength		=	$(this).attr('data-length');
+			var parentId		=	$(this).attr('data-parent-id');
+			var percentageValue	=	$(this).parent().siblings('.category_child').attr('data-value');
+			var commentValue	=	$(this).val().length;
+			var cnPercenatgeOfClass= parentId+'_'+id+'_cn_percenatge';
+			var count			=	0;
+			var cnPercentage	= 	0;
+			var cnlength		=	$('.main_percentage_'+id).attr('data-length');
+			if(commentValue > 0){ 
+				$(this).parent().siblings('.category_child').html('0.00');
+				$("."+id+"_"+parentId+"_"+mainId+"_third_percentage_input").val('0');
+			}else{
+				$(this).parent().siblings('.category_child').html(percentageValue);
+				$("."+id+"_"+parentId+"_"+mainId+"_third_percentage_input").val(percentageValue);
+			}
+			var secondCategorySum		   = 0;
+			$("."+id+"_"+parentId+"_third_percentage").each(function() {
+				var percentage	=	$(this).text(); 
+				if(percentage <= 0){
+					count++;
+				}
+				secondCategorySum += parseFloat(percentage);
+			});
+			cnPercentage = ((cnlength-count)/cnlength)*100; 
+			$('.'+cnPercenatgeOfClass).text(customRound(cnPercentage)+'%');
+			$('.'+cnPercenatgeOfClass+'_input').val(customRound(cnPercentage));
+			$('.main_percentage_'+id).attr('data-count',count);
+			$('.main_percentage_'+id).text(secondCategorySum.toFixed(2));
+			$('.main_percentage_input_'+id).val(secondCategorySum.toFixed(2));
+			calculatePercentage(parentId);
+		});
+		/**
+		* Function to submit form
+		*/
+		$(".btn-submit").click(function(){
+			var btnId = $(this).attr("id");
+			//~ startTextLoading(btnId);
+			submit_multipart_form("add-quality",function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/**
+		 * For Date and time
+		 */
+		 var options		= 	{};
+		options.locale 	=	{
+			format	: 	'<%=DATE_RANGE_DATE_TIME_FORMAT%>',
+		};
+		options.timePicker		= 	true;
+		options.startDate		= 	moment().tz(DEFAULT_TIME_ZONE).format('<%=DATE_RANGE_DATE_TIME_FORMAT%>');
+		options.autoUpdateInput	= 	false;
+		options.singleDatePicker= 	true;
+		options.showDropdowns	= 	true;
+		options.maxDate			= 	moment().tz(DEFAULT_TIME_ZONE).format('<%=DATE_RANGE_DATE_TIME_FORMAT%>');
+		options.drops			= 	"up";
+		var configDemo = $('#date_time');
+		configDemo.daterangepicker(options);
+		configDemo.on('apply.daterangepicker', function(e,picker){
+			var displayStartDate 	=	picker.startDate.format('<%=DATE_RANGE_DATE_TIME_FORMAT%>');
+			$('#date_time').val(displayStartDate);
+		});
+		/**
+		 * For Call Date and time
+		 */
+		 var options		= 	{};
+		options.locale 	=	{
+			format	: 	'<%=DATE_RANGE_DATE_TIME_FORMAT%>',
+		};
+		options.timePicker		= 	true;
+		options.startDate		= 	moment().tz(DEFAULT_TIME_ZONE).format('<%=DATE_RANGE_DATE_TIME_FORMAT%>');
+		options.autoUpdateInput	= 	false;
+		options.singleDatePicker= 	true;
+		options.showDropdowns	= 	true;
+		options.maxDate			= 	moment().tz(DEFAULT_TIME_ZONE).format('<%=DATE_RANGE_DATE_TIME_FORMAT%>');
+		options.drops			= 	"up";
+		var configDemo = $('#call_date_time');
+		configDemo.daterangepicker(options);
+		configDemo.on('apply.daterangepicker', function(e,picker){
+			var displayStartDate 	=	picker.startDate.format('<%=DATE_RANGE_DATE_TIME_FORMAT%>');
+			$('#call_date_time').val(displayStartDate);
+		});
+	});
+	
+	/**
+	* Global function to calculate percentage
+	*/
+	function calculatePercentage(catId){
+		var mainCategoryClass  = catId+'_category';
+		var percentageOfClass  = catId+'_percentage';
+		var errorOfClass  	   = catId+'_error';
+		/*Set Category Wise Percentage*/
+		var categorySum		   = 0;
+		var countSum		   = 0;
+		$("."+mainCategoryClass).each(function() { 
+			var percentage	=	$(this).text();
+			var count		=	$(this).attr('data-count');
+			categorySum += parseFloat(percentage);
+			countSum    += parseInt(count);
+		});
+		$('.'+percentageOfClass).val(customRound(categorySum));
+		$('.'+errorOfClass).val(countSum);
+		/*Set Over All Percentage*/
+		var overallCategorySum		   = 0;
+		$(".secondpercent").each(function() {
+			var overallPercentage	=	$(this).text();
+			overallCategorySum += parseFloat(overallPercentage);
+		});
+		if(overallCategorySum >= 95){
+			$('.type_of_sheet').val("Pass");
+			$('.type_of_sheet').css("color","green");
+		}else{
+			$('.type_of_sheet').val("Fail");
+			$('.type_of_sheet').css("color","red");
+		}
+		$('.over_all_percenatge').val(customRound(overallCategorySum));
+	}// end calculatePercentage()
+	
+	/**
+	* Global function to calculate percentage
+	*/
+	function calculateInitial(catId,mainId){ 
+		var categorySum		   = 0;
+		var mainCategoryClass  = 'child_'+catId;
+		var percentageOfClass  = mainId+'_percentage';
+		$(".child_"+catId).each(function() { 
+			var percentage	=	$(this).text();
+			categorySum += parseFloat(percentage);
+		});
+		$('.main_percentage_'+catId).html(categorySum);
+	}//end calculatePercentage()
+	
+	
+
+	/**
+	* Get User Search dropdown list
+	*/
+	function getUserDropDownList(currentObj){
+		if(currentObj){
+			var currentValue	=	currentObj.val();
+			var childInputName	=	currentObj.attr("data-child-name");
+			var childObj		=	(childInputName) ?  $("select[name='"+childInputName+"']") :"";
+			var placeholder		=	childObj.attr("data-placeholder");
+			var childFirstOption=	'<option value="">'+placeholder+'</option>';
+
+			if(currentValue){
+				/** Get dropdown list **/
+				var options = {
+					url 	: "<%=admin_list_url%>/get_user_list",
+					data	: {agent_id : currentValue},
+					method	: "post"
+				}
+				ajaxRequest(options,function(response){
+					if(response.status == "<%=STATUS_SUCCESS%>"){
+						/** Append dropdown list **/
+						$('.user_list').attr("disabled",false).removeClass("disabled").html(response.user_list);
+					}else if(response.status && response.message){
+						notice(response.status,response.message);
+					}
+				});
+			}
+		}
+	}// end getUserDropDownList()
+</script>

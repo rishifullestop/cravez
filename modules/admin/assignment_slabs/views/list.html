@@ -1,0 +1,81 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<form id="add-slab" data-submit-btn-id="slab-add-btn-id" method="post" class="on_click_submit" role="form">
+					<div class="header">
+						<h2>
+							<%=  __("admin.assignment_slabs.assignment_slabs"); %>
+						</h2>
+					</div>
+					<div class="body">
+						<div class="row clearfix assignment_slab">
+							<div class="col-sm-2"></div>
+							<div class="col-sm-8">
+								<table class="table align-items-center table-flush">
+									<thead>
+										<tr>
+											<th class="align-center" width="25%"><%= __("admin.assignment_slabs.min"); %></th>
+											<th class="align-center" width="25%"><%= __("admin.assignment_slabs.max"); %></th>
+										</tr>
+									</thead>
+									<tbody>	
+										<%
+											for(i = 0;i < ASSIGNMENT_SLAB_LIMIT;i++){	%>
+
+												<input name="slab_data[<%= i %>][order]" type="hidden" class="form-control" value="<%= i %>"/>
+
+												<tr>
+													<td>
+														<div class="form-group">
+															<div class="form-line">
+																<input name="slab_data[<%= i%>][min_distance]" type="text" class="form-control" value="<%= (result && result[i]) ? result[i].min_distance : ''%>"/>
+															</div>
+															<span id="slab_data_<%= i%>_min_distance_error" class="error"></span>
+														</div>
+													</td>
+													<td>
+														<div class="form-group">
+															<div class="form-line">
+																<input name="slab_data[<%= i%>][max_distance]" type="text" class="form-control" value="<%= (result && result[i] && result[i].max_distance) ? result[i].max_distance : ''%>"/>
+															</div>
+															<span id="slab_data_<%= i%>_max_distance_error" class="error"></span>
+														</div>
+													</td>
+												</tr><%
+											} 
+										%>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-sm-2"></div>
+						</div>
+						<div class="text-center">
+							<button type="button"  id="slab-add-btn-id"  <%- ADMIN_LOADING_TEXT %> class="btn bg-pink btn-sm waves-effect btn-submit"><%= __('admin.system.submit'); %></button>
+							<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-brown btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+						</div>
+					</div>
+				</form>	
+			</div>
+	    </div>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+<script type="text/javascript">
+    $(document).ready(function () {	
+		
+	   /* Function to submit form */	   
+        $(".btn-submit").click(function () {
+            var btnId = $(this).attr("id");
+            startTextLoading(btnId);		
+            ajax_submit("add-slab", function (status, response) {
+                if (status) {
+                    window.location.href = response.redirect_url;
+                } else {
+                    stopTextLoading(btnId);
+                }
+            });
+        });
+    });
+</script>

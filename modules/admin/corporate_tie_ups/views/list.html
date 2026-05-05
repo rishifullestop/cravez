@@ -1,0 +1,186 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm">
+								<div class="row clearfix dataTables_wrapper">
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="corporate_name_in_english" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.corporate_tie_ups.search_by_corporate_name_in_english'); %>">
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="corporate_name_in_arabic" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('admin.corporate_tie_ups.search_by_corporate_name_in_arabic'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Reset button -->
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.corporate_tie_ups.corporate_tie_ups"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<li>
+							<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['corporate_tie_ups','add'])%>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.corporate_tie_ups.add"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="25%"><%= __("admin.corporate_tie_ups.corporate_name_in_english");%></th>
+								<th width="25%"><%= __("admin.corporate_tie_ups.corporate_name_in_arabic");%></th>
+								<th width="25%"><%= __("admin.corporate_tie_ups.free_delivery");%></th>
+								<th width="25%"><%= __("admin.corporate_tie_ups.min_order_amount");%></th>
+								<th><%= __("admin.system.action"); %></th>
+								<th></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable	   	=	"";
+		$(document).ready(function() {
+			
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[5, "desc" ]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ 	"data"		 : 'corporate_name.en' 	},
+					{ 	"data"		 : 'corporate_name.ar' 	},
+					{
+						"data"			: 'free_delivery',
+						"searchable"	: false,
+						"render" 		: function(free_delivery){
+							let freeDelivery	=	(free_delivery) ? '<%= __('admin.corporate_tie_ups.yes') %>' : '<%= __('admin.corporate_tie_ups.no') %>';
+							return freeDelivery;
+						}
+					},
+					{
+						"data"			: 'minimum_order_amount',
+						"searchable"	: false,
+						"render" 		: function(minimum_order_amount){
+							return  (typeof minimum_order_amount !== typeof undefined) ? currencyFormat(minimum_order_amount) : 0;
+						}
+					},
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+
+							var id     		   = result._id;
+							var dropDownButton 		= ''+
+							'<div class="btn-group m-l-5 m-t-5">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %>'+
+									' <span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									'<li>'+
+										'<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit/'+id+'" data-open-modal="true" class="waves-effect waves-block action-btn <%= getPermissionClass(module_type,["corporate_tie_ups","edit"])%>"><%= __("admin.system.edit"); %></a>'+
+									'</li>'+
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["corporate_tie_ups","delete"])%>" data-confirm-message="<%= __("admin.corporate_tie_ups.you_want_to_delete_this_corporate_tie_ups"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>"><%= __("admin.system.delete"); %></a>'+
+									'</li>'+
+									'<li>'+
+										'<a href="<%=admin_list_url%>/import_user/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["corporate_tie_ups","import_user"])%>"><%= __("admin.corporate_tie_ups.import_user"); %></a>'+
+									'</li>'+
+									/** View user Link  */
+									'<li>'+
+										'<a href="<%= WEBSITE_ADMIN_URL %>user_management/list_customer?corporate_id='+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["customer_management","list"])%>" target="_blank"><%= __("admin.corporate_tie_ups.view_users"); %></a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+									
+							return dropDownButton;
+						}
+					},
+					{
+						"data"		 : 'created',
+						"visible"	 :  false,
+						"searchable" : 	false,
+						"render" 	 : 	function(created){
+							return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>",
+					type	: 	"POST",
+					data	: 	function (d) {
+				    },
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

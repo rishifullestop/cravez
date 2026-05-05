@@ -1,0 +1,19 @@
+<!-- Nav tabs -->
+<% if(typeof language_list !== typeof undefined && Array.isArray(language_list) && language_list.length > 1){ %>
+	<div class="wizard">
+		<div class="steps clearfix">
+			<ul class="multilanguage_tabs" role="tablist">
+				<% language_list.forEach(function(languages,languageKey){ %>
+					<li role="tab" class="multilanguage_tab_<%= (languages.lang_code) ? languages.lang_code : '' %> multilanguage_tab <%= (languages.lang_code && languages.lang_code == DEFAULT_LANGUAGE_CODE) ? 'current' : 'done' %> col-sm-6 col-md-3 col-xs-12 m-b-0">
+						<a href="javascript:void(0)" class="m-l-0" data-toggle="tab" onClick="changeTab('<%= (languages.lang_code) ? languages.lang_code : '' %>');" >
+							<span class="font-16"><%= (languages.title) ? languages.title : '' %></span>
+						</a>
+					</li>
+				<% }); %>
+			</ul>
+		</div>
+	</div>
+	<div class="row clearfix seperator-line">
+		<hr class="m-t-0 m-b-0"/>
+	</div>
+<% } %>

@@ -1,0 +1,72 @@
+<div class="row clearfix" >
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-wallet" action="<%=admin_list_url+"/add_wallet_amount/"+customer_id%>" data-submit-btn-id="wallet-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.user_management.add_wallet_amount"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="wallet_type" class="control-label"><%= __('admin.user_management.wallet_type'); %><span class="required">*</span> :</label>
+										
+										<select id="wallet_type" class="form-control show-tick"  name="wallet_type">
+												<option value=""> <%= __("admin.user_management.select_wallet_type"); %> </option>
+											<% Object.keys(WALLET_TYPE).map(key=>{ %>
+												<option value="<%=key%>"><%=WALLET_TYPE[key]%></option>
+											<% 	}); %>
+										</select>
+									</div>
+									<span id="wallet_type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="amount" class="control-label"><%= __('admin.user_management.wallet_amount'); %><span class="required">*</span> :</label>
+										<input name="amount" id="amount" type="text" class="form-control"/>
+									</div>
+									<span id="amount_error" class="error"></span>
+								</div>
+							</div>
+						</div>		
+					</div>		
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="wallet-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(".show-tick").selectpicker('refresh');
+
+	/**
+	 * Function to submit form
+	 */
+	$(".btn-submit").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+		ajax_submit("add-wallet",function(status,response){
+			if(status){
+				window.location.reload();
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+</script>

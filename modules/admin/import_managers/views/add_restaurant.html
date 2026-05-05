@@ -1,0 +1,457 @@
+<div class="row clearfix">
+    <form id="add_restaurant" action="<%=WEBSITE_ADMIN_URL%>merchant_upload/add_restaurant" data-submit-btn-id="restaurant-btn-id" method="post" class="on_click_submit" role="form">
+        <div id="restaurant_form_html" class="col-sm-12">
+            <div class="table-responsive">
+                <table id="datatable-listing" class="row-border full-length-header hover table table-bordered dataTable fixed_header_table">
+                    <thead>
+                        <tr>
+                            <th> </th>
+                            <th> <%=__("admin.merchant_upload.restaurant_old_id")%> *</th>
+                            <th> <%=__("admin.merchant_upload.restaurant_logo")%></th>
+                            <th> <%=__("admin.merchant_upload.restaurant_landing_image")%></th>
+                            <th> <%=__("admin.merchant_upload.restaurant_name_in_english")%> *</th>
+                            <th> <%=__("admin.merchant_upload.restaurant_name_in_arabic")%> *</th>
+                            <th> <%=__("admin.merchant_upload.contact_person")%> *</th>
+                            <th> <%=__("admin.merchant_upload.account_manager")%> *</th>
+                            <th> <%=__("admin.merchant_upload.phone_number")%> *</th>
+                            <th> <%=__("admin.merchant_upload.email")%> *</th>
+                            <th> <%=__("admin.merchant_upload.address")%> *</th>
+                            <th> <%=__("admin.merchant_upload.description")%> </th>
+                            <th> <%=__("admin.merchant_upload.delivery_by_one")%> *</th>
+                            <th> <%=__("admin.merchant_upload.delivery_by_two")%> </th>
+                            <th> <%=__("admin.merchant_upload.delivery_by_three")%> </th>
+                            <th> <%=__("admin.merchant_upload.commission_type")%> *</th>
+                            <th> <%=__("admin.merchant_upload.commission_one")%> </th>
+                            <th> <%=__("admin.merchant_upload.amount_from_one")%> </th>
+                            <th> <%=__("admin.merchant_upload.amount_to_one")%> </th>
+                            <th> <%=__("admin.merchant_upload.commission_two")%> </th>
+                            <th> <%=__("admin.merchant_upload.amount_from_two")%> </th>
+                            <th> <%=__("admin.merchant_upload.amount_to_two")%> </th>
+                            <th> <%=__("admin.merchant_upload.commission_three")%> </th>
+                            <th> <%=__("admin.merchant_upload.amount_from_three")%> </th>
+                            <th> <%=__("admin.merchant_upload.amount_to_three")%> </th>
+                            <th> <%=__("admin.merchant_upload.commission_four")%> </th>
+                            <th> <%=__("admin.merchant_upload.amount_from_four")%> </th>
+                            <th> <%=__("admin.merchant_upload.amount_to_four")%> </th>
+                            <th> <%=__("admin.merchant_upload.commission_five")%> </th>
+                            <th> <%=__("admin.merchant_upload.amount_from_five")%> </th>
+                            <th> <%=__("admin.merchant_upload.amount_to_five")%> </th>
+                            <th> <%=__("admin.merchant_upload.commission_criteria")%> *</th>
+                            <th> <%=__("admin.merchant_upload.payment_method_one")%> *</th>
+                            <th> <%=__("admin.merchant_upload.cash_commission_one")%> </th>
+                            <th> <%=__("admin.merchant_upload.payment_method_two")%> </th>
+                            <th> <%=__("admin.merchant_upload.cash_commission_two")%> </th>
+                            <th> <%=__("admin.merchant_upload.payment_method_three")%> </th>
+                            <th> <%=__("admin.merchant_upload.cash_commission_three")%> </th>
+                            <th> <%=__("admin.merchant_upload.payment_method_four")%> </th>
+                            <th> <%=__("admin.merchant_upload.cash_commission_four")%> </th>
+                            <th> <%=__("admin.merchant_upload.payment_method_five")%> </th>
+                            <th> <%=__("admin.merchant_upload.cash_commission_five")%> </th>
+                            <th> <%=__("admin.merchant_upload.payment_method_six")%> </th>
+                            <th> <%=__("admin.merchant_upload.cash_commission_six")%> </th>
+                            <th> <%=__("admin.merchant_upload.payment_method_seven")%> </th>
+                            <th> <%=__("admin.merchant_upload.cash_commission_seven")%> </th>
+                            <th> <%=__("admin.merchant_upload.settlement_method_one")%> *</th>
+                            <th> <%=__("admin.merchant_upload.settlement_method_two")%> </th>
+                            <th> <%=__("admin.merchant_upload.settlement_method_three")%> </th>
+                            <th> <%=__("admin.merchant_upload.beneficiary")%> *</th>
+                            <th> <%=__("admin.merchant_upload.iban")%> *</th>
+                            <th> <%=__("admin.merchant_upload.bank_account")%> *</th>
+                            <th> <%=__("admin.merchant_upload.settlement_type")%> *</th>
+                            <th> <%=__("admin.merchant_upload.caused_by_whom_one")%> *</th>
+                            <th> <%=__("admin.merchant_upload.percentage")%> </th>
+                            <th> <%=__("admin.merchant_upload.caused_by_whom_two")%> </th>
+                            <th> <%=__("admin.merchant_upload.percentage")%> </th>
+                            <th> <%=__("admin.merchant_upload.caused_by_whom_three")%> </th>
+                            <th> <%=__("admin.merchant_upload.percentage")%> </th>
+                            <th> <%=__("admin.merchant_upload.contract_number")%> *</th>
+                            <th> <%=__("admin.merchant_upload.contract_date")%> *</th>
+                            <th> <%=__("admin.merchant_upload.effective_date")%> *</th>
+                            <th> <%=__("admin.merchant_upload.valid_from")%> *</th>
+                            <th> <%=__("admin.merchant_upload.expire_date")%> *</th>
+                        </tr>
+                    </thead>
+                    <tbody class="append_restaurant_tr fixed_body"> </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-sm bg-green restaurant_addmore" onclick="AppendHTML()"><%=__("admin.merchant_upload.add_more")%></button>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" id="restaurant-btn-id" class="btn bg-brown btn-sm waves-effect restaurant-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+            <a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+        </div>
+    </form>
+
+    <div class="appendable_input hide">
+        <table >
+            <tbody class="input_tr">
+                <tr id="restaurant_row_{index}" class="table_row">
+                    <td>
+                        <button type="button" class="btn bg-red remove_restaurant hide">x</button>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][restaurant_old_id]" class="form-control input-column" id="restaurant_old_id_{index}" >
+                        <span id="restaurant_old_id_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][restaurant_logo]" class="form-control input-column" id="restaurant_logo_{index}" >
+                        <span id="restaurant_logo_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][restaurant_landing_image]" class="form-control input-column" id="restaurant_landing_image_{index}" >
+                        <span id="restaurant_landing_image_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][name_in_english]" class="form-control input-column" id="name_in_english_{index}" >
+                        <span id="name_in_english_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][name_in_arabic]" class="form-control input-column" id="name_in_arabic_{index}">
+                        <span id="name_in_arabic_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][contact_person]" class="form-control input-column" id="contact_person_number_{index}" >
+                        <span id="contact_person_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="restaurants[{index}][index]"  value="{index}" >
+                        <input type="text" name="restaurants[{index}][account_manager]" class="form-control input-column" id="account_manager_{index}" >
+                        <span id="account_manager_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][phone_number]" class="form-control input-column" id="phone_number_{index}" >
+                        <span id="phone_number_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][email]" class="form-control input-column" id="email_{index}">
+                        <span id="email_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][address]" class="form-control input-column" id="address_{index}">
+                        <span id="address_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][description]" class="form-control input-column" id="description_{index}">
+                        <span id="description_{index}_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][delivery_by][0]" class="form-control input-column" id="delivery_by_{index}" >
+                        <span id="delivery_by_{index}_0_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][delivery_by][1]" class="form-control input-column" id="delivery_by_{index}" >
+                        <span id="delivery_by_{index}_1_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][delivery_by][2]" class="form-control input-column" id="delivery_by_{index}" >
+                        <span id="delivery_by_{index}_2_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_type]" class="form-control input-column" id="commission_type_{index}" >
+                        <span id="commission_type_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][0][commission]" class="form-control input-column" id="ommission_value_{index}_0_commission" >
+                        <span id="commission_value_{index}_0_commission_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][0][amount_from]" class="form-control input-column" id="commission_value_{index}_0_amount_from" >
+                        <span id="commission_value_{index}_0_amount_from_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][0][amount_to]" class="form-control input-column" id="commission_value_{index}_0_amount_to" >
+                        <span id="commission_value_{index}_0_amount_to_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][1][commission]" class="form-control input-column" id="ommission_value_{index}_1_commission" >
+                        <span id="commission_value_{index}_1_commission_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][1][amount_from]" class="form-control input-column" id="commission_value_{index}_1_amount_from" >
+                        <span id="commission_value_{index}_1_amount_from_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][1][amount_to]" class="form-control input-column" id="commission_value_{index}_1_amount_to" >
+                        <span id="commission_value_{index}_1_amount_to_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][2][commission]" class="form-control input-column" id="ommission_value_{index}_2_commission" >
+                        <span id="commission_value_{index}_2_commission_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][2][amount_from]" class="form-control input-column" id="commission_value_{index}_2_amount_from" >
+                        <span id="commission_value_{index}_2_amount_from_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][2][amount_to]" class="form-control input-column" id="commission_value_{index}_2_amount_to">
+                        <span id="commission_value_{index}_2_amount_to_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][3][commission]" class="form-control input-column" id="ommission_value_{index}_3_commission">
+                        <span id="commission_value_{index}_3_commission_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][3][amount_from]" class="form-control input-column" id="commission_value_{index}_3_amount_from">
+                        <span id="commission_value_{index}_3_amount_from_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][3][amount_to]" class="form-control input-column" id="commission_value_{index}_3_amount_to">
+                        <span id="commission_value_{index}_3_amount_to_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][4][commission]" class="form-control input-column" id="ommission_value_{index}_4_commission">
+                        <span id="commission_value_{index}_4_commission_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][4][amount_from]" class="form-control input-column" id="commission_value_{index}_4_amount_from">
+                        <span id="commission_value_{index}_4_amount_from_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_value][4][amount_to]" class="form-control input-column" id="commission_value_{index}_4_amount_to">
+                        <span id="commission_value_{index}_4_amount_to_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][commission_criteria]" class="form-control input-column" id="commission_criteria_{index}" >
+                        <span id="commission_criteria_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][0][method]" class="form-control input-column" id="payment_method_{index}_0_method" >
+                        <span id="payment_method_{index}_0_method_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][0][cash_commission]" class="form-control input-column" id="payment_method_{index}_0_cash_commission" >
+                        <span id="payment_method_{index}_0_cash_commission_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][1][method]" class="form-control input-column" id="payment_method_{index}_1_method" >
+                        <span id="payment_method_{index}_1_method_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][1][cash_commission]" class="form-control input-column" id="payment_method_{index}_1_cash_commission" >
+                        <span id="payment_method_{index}_1_cash_commission_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][2][method]" class="form-control input-column" id="payment_method_{index}_2_method" >
+                        <span id="payment_method_{index}_2_method_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][2][cash_commission]" class="form-control input-column" id="payment_method_{index}_2_cash_commission" >
+                        <span id="payment_method_{index}_2_cash_commission_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][3][method]" class="form-control input-column" id="payment_method_{index}_3_method" >
+                        <span id="payment_method_{index}_3_method_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][3][cash_commission]" class="form-control input-column" id="payment_method_{index}_3_cash_commission" >
+                        <span id="payment_method_{index}_3_cash_commission_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][4][method]" class="form-control input-column" id="payment_method_{index}_4_method" >
+                        <span id="payment_method_{index}_4_method_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][4][cash_commission]" class="form-control input-column" id="payment_method_{index}_4_cash_commission" >
+                        <span id="payment_method_{index}_4_cash_commission_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][5][method]" class="form-control input-column" id="payment_method_{index}_5_method" >
+                        <span id="payment_method_{index}_5_method_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][5][cash_commission]" class="form-control input-column" id="payment_method_{index}_5_cash_commission" >
+                        <span id="payment_method_{index}_5_cash_commission_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][6][method]" class="form-control input-column" id="payment_method_{index}_6_method" >
+                        <span id="payment_method_{index}_6_method_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][payment_method][6][cash_commission]" class="form-control input-column" id="payment_method_{index}_6_cash_commission" >
+                        <span id="payment_method_{index}_6_cash_commission_error" class="error"></span>
+                    </td>
+
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][settlement_method][0]" class="form-control input-column" id="settlement_method_{index}_0" >
+                        <span id="settlement_method_{index}_0_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][settlement_method][1]" class="form-control input-column" id="settlement_method_{index}_1" >
+                        <span id="settlement_method_{index}_1_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][settlement_method][2]" class="form-control input-column" id="settlement_method_{index}_2" >
+                        <span id="settlement_method_{index}_2_error" class="error"></span>
+                    </td>
+
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][beneficiary]" class="form-control input-column" id="beneficiary_{index}" >
+                        <span id="beneficiary_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][iban]" class="form-control input-column" id="iban_{index}" >
+                        <span id="iban_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][bank_account]" class="form-control input-column" id="bank_account_{index}" >
+                        <span id="bank_account_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][settlement_type]" class="form-control input-column" id="settlement_type_{index}" >
+                        <span id="settlement_type_{index}_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][caused_by_whom][0][whom]" class="form-control input-column" id="caused_by_whom_{index}_0_whom" >
+                        <span id="caused_by_whom_{index}_0_whom_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][caused_by_whom][0][percentage]" class="form-control input-column" id="caused_by_whom_{index}_0_percentage" >
+                        <span id="caused_by_whom_{index}_0_percentage_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][caused_by_whom][1][whom]" class="form-control input-column" id="caused_by_whom_{index}_1_whom" >
+                        <span id="caused_by_whom_{index}_1_whom_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][caused_by_whom][1][percentage]" class="form-control input-column" id="caused_by_whom_{index}_1_percentage" >
+                        <span id="caused_by_whom_{index}_1_percentage_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][caused_by_whom][2][whom]" class="form-control input-column" id="caused_by_whom_{index}_2_whom" >
+                        <span id="caused_by_whom_{index}_2_whom_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][caused_by_whom][2][percentage]" class="form-control input-column" id="caused_by_whom_{index}_2_percentage" >
+                        <span id="caused_by_whom_{index}_2_percentage_error" class="error"></span>
+                    </td>
+
+                    <td>
+                        <input type="text" name="restaurants[{index}][contract_number]" class="form-control input-column" id="contract_number_{index}" >
+                        <span id="contract_number_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][contract_date]" class="form-control input-column" id="contract_date_{index}" >
+                        <span id="contract_date_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][effective_date]" class="form-control input-column" id="effective_date_{index}" >
+                        <span id="effective_date_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][valid_from]" class="form-control input-column" id="valid_from_{index}" >
+                        <span id="valid_from_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="restaurants[{index}][expire_date]" class="form-control input-column" id="expire_date_{index}" >
+                        <span id="expire_date_{index}_error" class="error"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    /**
+     *  Append restaurant input
+    */
+    var rowCount = 0;
+    function AppendHTML(){
+        var defaultHTML     = $(".appendable_input table .input_tr").html();
+        var htmlToAppend    = defaultHTML.replace(RegExp('{index}','g'),rowCount);
+        $(".append_restaurant_tr").append(htmlToAppend);
+        rowCount++;
+
+        if($("#add_restaurant .remove_restaurant").length > 1){
+            $("#add_restaurant .remove_restaurant").removeClass("hide");
+        }
+
+        $("#add_restaurant .restaurant_addmore").addClass("hide").last().removeClass("hide");
+		if(dataTable) dataTable.columns.adjust();
+    }// end AppendHTML()
+
+    $(document).ready(function(){
+        AppendHTML();
+
+        /**
+        * Function to submit form
+        */
+        $(".restaurant-btn-submit").click(function(){
+            var btnId = $(this).attr("id");
+            startTextLoading(btnId);
+            ajax_submit("add_restaurant",function(status,response){
+                stopTextLoading(btnId);
+                if(status){
+                    if(response.redirect_url){
+                        notice(response.status,response.message);
+                        $("#upload_action").val('').trigger("change");
+                        resetMerchantForm();
+                        window.location.href = response.redirect_url;
+                    }else{
+                        window.location.reload(true);
+                    }
+                }
+            });
+        });
+    });
+
+    /**
+     *  Remove restaurant input
+    */
+    $(document).on("click",".remove_restaurant",function(){
+        var haveValue   =   false;
+        var that        =   this;
+        $(that).parents(".table_row").find("input.input-column").each(function(){
+            if($(this).val() != ""){
+                haveValue = true;
+            }
+        });
+
+        if(!haveValue){
+            $(this).parents(".table_row").remove();
+            if($("#add_restaurant .remove_restaurant").length <= 1){
+                $("#add_restaurant .remove_restaurant").addClass("hide");
+            }
+
+            $("#add_restaurant .restaurant_addmore").addClass("hide").last().removeClass("hide");
+        }else{
+            confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.merchant_upload.restaurant_remove_comfirm_message"); %>',function(result){
+                if(result){
+                    $(that).parents(".table_row").remove();
+                    if($("#add_restaurant .remove_restaurant").length <= 1){
+                        $("#add_restaurant .remove_restaurant").addClass("hide");
+                    }
+
+                    $("#add_restaurant .restaurant_addmore").addClass("hide").last().removeClass("hide");
+                }
+                swal.close();
+            });
+        }
+    });
+</script>
+
+
+
+
+
+

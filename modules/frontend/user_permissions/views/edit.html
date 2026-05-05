@@ -1,0 +1,298 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('user_permissions.edit_user_permissions'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=list_url%>" >
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("system.back"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="edit-user_permissions" data-submit-btn-id="user_permissions-edit-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="first_name" class="control-label"><%= __('user_permissions.first_name'); %><span class="required">*</span> :</label>
+										<input name="first_name" value="<%=(result.first_name) ? result.first_name : '';%>" id="first_name" type="text" class="form-control"/>
+									</div>
+									<span id="first_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="last_name" class="control-label"><%= __('user_permissions.last_name'); %><span class="required">*</span> :</label>
+										<input name="last_name" value="<%=(result.last_name) ? result.last_name :'';%>" id="last_name" type="text" class="form-control"/>
+									</div>
+									<span id="last_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="email" class="control-label"><%= __('user_permissions.email'); %><span class="required">*</span> :</label>
+										<input name="email" value="<%=(result.email) ? result.email	:'';%>" id="email" type="text" class="form-control" readonly="true"/>
+									</div>
+									<span id="email_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="user_role" class="control-label"><%= __('user_permissions.user_role'); %><span class="required"> *</span> :</label>
+										<select class="form-control show-tick"  name="user_role" id="user_role">
+											<option value=""><%=__("user_permissions.select_user_role");%></option><%
+											if(role_list && role_list.length > 0){
+												role_list.map((roleRecords,index)=>{%>
+													<option value="<%=roleRecords._id%>" <%= String(roleRecords._id) == String(result.user_role_id) ? 'selected' : ''%> >
+														<%=roleRecords.role_name%>
+													</option>
+											<% 	});
+											} %>
+										</select>
+									</div>
+									<span id="user_role_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="branches" class="control-label"><%= __('user_permissions.branches'); %> :</label>
+										<select class="form-control"  name="branches" id="branches" data-live-search="true">
+											<option value=""> <%=__('user_permissions.select_branch');%> </option>
+											<%-branch_list%>
+										</select>
+									</div>
+									<span class="message demo-image-copyright" id="message_city"><%=__("system.leave_blank_select_all")%></span>
+									<span id="branches_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="alert alert-info">
+									 <%= __('user_permissions.please_leave_blank_if_you_do_not_want_to_change_password'); %>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="password" class="control-label"><%= __('user_permissions.password'); %> :</label>
+										<input name="password"  id="password" type="password" class="form-control"/>
+									</div>
+									<span id="password_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="confirm_password" class="control-label"><%= __('user_permissions.confirm_password'); %> :</label>
+										<input name="confirm_password" id="confirm_password" type="password" class="form-control"/>
+									</div>
+									<span id="confirm_password_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div id="check_unckeck_row" class="row clearfix hide">
+							<div class="col-sm-6">
+								<label  class="control-label"><%= __("user_permissions.role_info_text")%><span class="required">*</span> :</label>
+							</div>
+							<div class="col-sm-6 float-left">
+<!--
+								<button type="button" id="expandAllBtn" class="btn bg-green btn-sm waves-effect">
+									<%= __('user_permissions.expand_all'); %>
+								</button>
+								<button type="button" id="collapseAllBtn" class="btn bg-red btn-sm waves-effect">
+									<%= __('user_permissions.collapse_all'); %>
+								</button>
+-->
+								<button type="button" id="checkAllBtn" class="btn bg-green btn-sm waves-effect">
+									<%= __('user_permissions.check_all'); %>
+								</button>
+								<button type="button" id="unCheckAllBtn" class="btn bg-red btn-sm waves-effect">
+									<%= __('user_permissions.uncheck_all'); %>
+								</button>
+							</div>
+							<hr/>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-2"></div>
+							<div class="col-sm-10">
+								<div id="role-menu" class="tree"></div>
+								<span id="module_ids_error" class="error hide"></span>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<button type="button"  id="user_permissions-edit-btn-id"  <%- FRONT_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit"> <%= __('system.submit'); %></button>
+								<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("system.reset"); %></button></a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PAGE_PATH%>user_roles/module_tree.js"></script>
+	<script type="text/javascript">
+		var permissions	= <%- JSON.stringify(PERMISSIONS); %>;
+		$(document).ready(function(){
+			
+			var selectedRoleId		=	'<%= result.user_role_id%>';
+			var branchPermission	=	<%- (branch_permission.length > 0) ? JSON.stringify(branch_permission) : '""'%>; 
+			var employeePermission	=	<%- (employee_permission.length > 0 ) ? JSON.stringify(employee_permission) : '""'%>;
+			var selectedBranch		=	[];
+			var selectedEmployee	=	[];
+			if(branchPermission){
+				branchPermission.map(data=>{ 
+					selectedBranch.push({ '_id' : data , 'sub_modules' : []});
+				})
+			}
+			if(employeePermission){
+				employeePermission.map(data=>{
+					selectedEmployee.push({ '_id' : data , 'sub_modules' : []});
+				})
+			}
+		
+			/**
+			 * Function to submit form
+			 */
+			$(".btn-submit").click(function(){
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				ajax_submit("edit-user_permissions",function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			});
+
+			var treeArray 			= 	<%- (typeof modules_list !== typeof undefined ) ? JSON.stringify(modules_list) : {} %>;
+			
+			var removeBranchIds	=	[];
+			var removeemployeeIds	= [];
+			if(treeArray.length > 0){
+				treeArray.map((record,key)=>{
+					if(branchPermission.indexOf(record._id) < 0) removeBranchIds.push('#AdminRoleModuleId'+record._id+'Allow');
+				});
+			}
+			if(treeArray.length > 0){
+				treeArray.map(record=>{
+					if(employeePermission.indexOf(record._id) < 0) removeemployeeIds.push('#AdminRoleModuleId'+record._id+'Allow');
+				});
+			}
+			
+			
+			var permissionModule 	= 	<%-(result.module_ids)	? JSON.stringify(result.module_ids)	: JSON.stringify([]) %>;
+			var selectedIdsArray  	=	[];
+
+			if(permissionModule){
+				/**create selected ids array*/
+				permissionModule.map(function(item){
+					selectedIdsArray.push({
+						id: item._id,
+						sub_modules : item.sub_modules
+					});
+				});
+				printTree(treeArray,0,"#role-menu",selectedIdsArray);	// draw tree
+				$('.expend-btn').css('display','none');
+				if(selectedRoleId == '<%= BRANCH_MANAGER_ROLE_ID %>' && removeBranchIds.length > 0 && branchPermission){
+					$(removeBranchIds.join(',')).parent().parent().remove();
+				}
+				if(selectedRoleId == '<%= EMPLOYEE_ROLE_ID %>' && removeemployeeIds.length > 0 && employeePermission){
+					$(removeemployeeIds.join(',')).parent().parent().remove();
+				}
+				
+			}
+
+			/**
+			 * Function to get restaurant modules of a role
+			 */
+			$(document).on("change","select#user_role",function(){
+				$("#role-menu").html("");
+				$('#check_unckeck_row').addClass("hide");
+				$('#module_ids_error').addClass("hide");
+				var roleId = $(this).val();
+
+				if(roleId && roleId != ""){
+					var data = {id : roleId};
+
+					var options = {
+						url 	: "<%=list_url%>/get_role_modules",
+						data	:	data,
+						method	:	"post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status !=  "<%=STATUS_SUCCESS%>"){
+							notice(response.status, response.message);
+						}else{
+							var roleData = response.result;
+							if(roleData && roleData.module_ids){
+								var selectedModules = (roleData.module_ids) ? roleData.module_ids : [];
+								if(roleId == '<%= BRANCH_MANAGER_ROLE_ID %>' && branchPermission){ 
+									selectedModules	=	selectedBranch;
+								}else if(roleId == '<%= EMPLOYEE_ROLE_ID %>' && employeePermission){
+									selectedModules	=	selectedEmployee;
+								}
+								var moduleIdsArray = [];
+								if(selectedModules){
+									/**create selected ids array*/
+									selectedModules.map(item=>{
+										moduleIdsArray.push({
+											id			: item._id,
+											sub_modules : item.sub_modules
+										});
+									});
+									printTree(treeArray,0,"#role-menu");	// draw tree
+									
+									if(roleId == '<%= BRANCH_MANAGER_ROLE_ID %>' && removeBranchIds.length > 0 && branchPermission){
+										$(removeBranchIds.join(',')).parent().parent().remove();
+									}
+									if(roleId == '<%= EMPLOYEE_ROLE_ID %>' && removeemployeeIds.length > 0 && employeePermission){
+										$(removeemployeeIds.join(',')).parent().parent().remove();
+									}
+									moduleIdsArray.map(item=>{  
+										$('#AdminRoleModuleId'+item.id+'Allow').trigger('click');
+									});
+									$('.expend-btn').css('display','none');
+									
+									if(roleId == "<%= RESTAURANT_ADMIN_ROLE_ID %>"){
+										$("#checkAllBtn").trigger('click');
+										$("#role-menu").addClass("hide");
+										$("#check_unckeck_row").addClass("hide");
+									}else{
+										$("#role-menu").removeClass("hide");
+									}
+								}
+							}
+						}
+					});
+				}
+			});
+		});
+	</script>

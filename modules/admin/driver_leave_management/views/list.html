@@ -1,0 +1,558 @@
+<%
+	let isCravez   	= (auth.user_role_id == CRAVEZ) ? true : false;
+	var fromDate  	= (from_date != "" ) ? from_date+" "+START_DATE_TIME_FORMAT: "";
+	var toDate  	= (to_date != "") ? to_date+" "+END_DATE_TIME_FORMAT : "";
+	var finalDate  	= (from_date != "" && to_date != "") ? from_date+' - '+to_date : "";
+	var leaveTypeList = leave_type_list;
+%>
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by Driver -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select id="column_filter_2"  onchange="searchDatatable(2)" class="form-control show-tick" name="user_id"  data-live-search="true">
+													<option value=""><%- __('admin.driver_leave_management.search_by_driver')%></option>
+													<%-users_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by Leave Date -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.driver_leave_management.search_by_leave_date'); %>" value="<%= finalDate %>" name="date-range-picker">
+											</div>
+											<input class="form-control hide" id="from_date" value="<%= fromDate %>" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" value="<%= toDate %>" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- Search by Leave Status -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select id="column_filter_5"  onchange="searchDatatable(5)" class="form-control show-tick" name="leave-status">
+													<option value=""><%=__("admin.driver_leave_management.search_by_leave_status");%></option>
+													<% Object.keys(COMMAN_STATUS_SEARCH_DROPDOWN).map(key=>{ %>
+														<option value="<%=key%>">
+															<%=(COMMAN_STATUS_SEARCH_DROPDOWN[key].status_name) ? COMMAN_STATUS_SEARCH_DROPDOWN[key].status_name :"";%>
+														</option>
+													<% }); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Reset button -->
+									<div class="col-xs-12 col-sm-3">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" data-href="<%=WEBSITE_ADMIN_URL+'driver_leave_management/driver_vacation_request'%>">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<div class="row clearfix hide" id="user_leave_info">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header p-t-40">
+					<h2 id="user_name"> <%= __("admin.tickets.add_a_review"); %> </h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a id="exportBalanceBtn" href="javascript:void(0);" target="_blank" class="<%= getPermissionClass(module_type,['driver_vacation_request','export']); %>">
+								<button type="button" class="btn bg-indigo waves-effect btn-sm">
+									<%= __("admin.driver_leave_management.export_leave_balance"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table class="row-border full-length-header hover table table-bordered dataTable" cellspacing="0" width="100%">
+						<thead></thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.driver_leave_management.vacation_requests"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<% if(!isCravez) { %>
+							<li>
+								<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/driver_vacation_request/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['driver_vacation_request','add'])%>">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("admin.driver_leave_management.add_vacation_request"); %>
+									</button>
+								</a>
+							</li>
+						<% } %>
+						<li class="export-list">
+							<select class="export-details form-control border-bottom m-t--8 <%= getPermissionClass(module_type,['driver_vacation_request','export'])%>">
+								<option value=""><%= __("admin.system.select_export_type"); %></option>
+								<option value="<%=EXPORT_ALL%>"><%= __("admin.driver_leave_management.export_all_vacation_request"); %></option>
+								<option value="<%=EXPORT_FILTERED%>"><%= __("admin.driver_leave_management.export_vacation_filtered_request"); %></option>
+								<option value="leave_balance"><%= __("admin.driver_leave_management.export_leave_balance"); %></option>
+							</select>
+						</li>
+						<li class="<%= getPermissionClass(module_type,['driver_vacation_request','update_status']); %>">
+							<select class="form-control show-tick m-t--8" id="update_req_status">
+								<option value="">
+									<%= __("admin.system.select_action"); %>
+								</option>
+								<option value="<%=IN_REVIEW%>">
+									<%= __("admin.driver_leave_management.mark_in_review"); %>
+								</option>
+								<option value="<%=APPROVED%>">
+									<%= __("admin.driver_leave_management.mark_approve_enquiry"); %>
+								</option>
+								<option value="<%=REJECTED%>">
+									<%= __("admin.driver_leave_management.mark_reject_enquiry"); %>
+								</option>
+							</select>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								<i class="material-icons">more_vert</i>
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200 ">
+								<li class="export-list <%= (isCravez) ? 'hide' : ''; %>">
+									<a href="<%=admin_list_url+'/driver_vacation_request/export_data/'+export_count+'/'+EXPORT_ALL%>" class="<%= getPermissionClass(module_type,['driver_vacation_request','export'])%>" data-test="<%=admin_list_url+'/driver_vacation_request/export_data/'+export_count+'/'+EXPORT_ALL%>">
+										<%= __('admin.driver_leave_management.export_all_vacation_request'); %>
+									</a>
+								</li>
+								<li class="export-list <%= (isCravez) ? 'hide' : ''; %>">
+									<a href="<%=admin_list_url+'/driver_vacation_request/export_data/'+export_count+'/'+EXPORT_FILTERED%>" class="<%= getPermissionClass(module_type,['driver_vacation_request','export'])%>" >
+										<%= __('admin.driver_leave_management.export_vacation_filtered_request'); %>
+									</a>
+								</li>
+								<li class="export-list <%= (isCravez) ? 'hide' : ''; %>">
+									<a href="<%=admin_list_url+'/driver_vacation_request/export_data/'+export_count+'/leave_balance'%>" class="<%= getPermissionClass(module_type,['driver_vacation_request','export'])%>" >
+										<%= __('admin.driver_leave_management.export_leave_balance'); %>
+									</a>
+								</li>
+								<% if(!isCravez) { %>
+									<li>
+										<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/driver_vacation_request/add'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['driver_vacation_request','add'])%>">
+											<%= __("admin.driver_leave_management.add_vacation_request"); %>
+										</a>
+									</li>
+								<% } %>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="2%" class="p-r-10 text-center">
+									<div class="materialize_checkbox">
+										<input type="checkbox" class="filled-in chk-col-indigo" id="req_select_all">
+										<label for="req_select_all" class="p-l-20 v-align-bottom m-b-0"></label>
+									</div>
+								</th>
+								<th width="10%"><%= __("admin.driver_leave_management.driver_id");%></th>
+								<th width="20%"><%= __("admin.driver_leave_management.driver");%></th>
+								<th width="15%"><%= __("admin.driver_leave_management.leave_date");%></th>
+								<th width="15%"><%= __("admin.driver_leave_management.leave_type");%></th>
+								<th width="15%"><%= __("admin.driver_leave_management.leave_status");%></th>
+								<th><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal for reject request-->
+<div class="modal fade" id="reject_req" tabindex="-1" role="dialog" aria-labelledby="reject_req" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title">
+					<%=__("admin.driver_leave_management.reject_vacation_request") %>
+				</h4>
+			</div>
+			<form id="reject-form" data-submit-btn-id="reject-req_btn" method="post" class="on_click_submit" role="form"
+				action=''>
+				<input type="hidden" name="req_id" id="req_id">
+				<input type="hidden" name="req_ids" id="req_ids">
+				<input type="hidden" name="status" id="req_status">
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-grop">
+								<div class="form-lin no-bottom-border">
+									<label for="rejection_reason" class="control-label">
+										<%= __('admin.driver_leave_management.rejection_field'); %><span
+												class="required"> *</span>
+									</label>
+									<div class="form-grop margin-0">
+										<div class="form-line">
+											<textarea id="rejection_reason" rows="6" class="resize-none form-control"
+												name="rejection_reason"></textarea>
+										</div>
+										<span id="rejection_reason_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button" id="reject-req_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm
+						waves-effect btn-submit-reject noHover margin-0"><%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover"
+						data-dismiss="modal">
+						<%= __("admin.system.cancel"); %>
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<!--modal close-->
+
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dateFormatHtml	= 	'<%=DATE_FORMAT_HTML%>';
+		var isCravez		= 	<%=isCravez%>;
+		var leaveType 		= 	<%- JSON.stringify(leaveTypeList)%>;
+		var dataTable	   	=	"";
+		var statusObject    =  <%- JSON.stringify(COMMAN_STATUS_SEARCH_DROPDOWN)%>;
+		var branchCheckboxArray = {};
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[3, "desc" ]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{
+						"data": {},
+						"orderable": false,
+						"render": function (result) {
+							var reqId 	= 	(result._id)	?	result._id :"";
+							var status	=	result.leave_status;
+
+							let disabledText = (status == <%= APPROVED %> || status == <%= REJECTED %> ) ? 'disabled' : "";
+							return (result.leave_type != <%= WEEKLY_OFF %>) ? '<div class=" materialize_checkbox p-l-15">' +
+								'<div class="branchCheckbox_wrapper">' +
+								'<input type="checkbox" class="filled-in chk-col-indigo" id="' + reqId + '" ' + disabledText + '>' +
+								'<label for="' + reqId + '" class="checkbox data"></label>' +
+								'</div>' +
+								'</div>': "";
+						}
+					},
+					{ 	"data"		 : 'driver_id',
+						"searchable" : false
+					},
+					{ 	"data"		 : 'driver_name',
+						"field_type" : "<%=OBJECT_ID_FIELD %>",
+						"field_name" : "user_id",
+						"orderable"	 : false
+					},
+					{
+						"data"	 : 	'date',
+						"render" : 	function(date){
+							return moment(date).tz(DEFAULT_TIME_ZONE).format(dateFormatHtml) ;
+						}
+					},
+					{ 	"data"	 	: 	'leave_type',
+						"orderable"	:	false,
+						"searchable": 	false,
+						"render"    : 	function(leave_type){
+							return leaveType[leave_type];
+						}
+					},
+					{
+						"data"		 : {},
+						"orderable"	 : false,
+						"field_name" : "leave_status",
+						"field_type" : "<%= NUMERIC_FIELD %>",
+						"render"     : function(result){
+							var leaveStatus 	 = (result.leave_status)     ? result.leave_status 		:'<%= PENDING %>';
+							var rejectionReason	 = (result.rejection_reason) ? result.rejection_reason	:"";
+							var statusTitle = (statusObject[leaveStatus] && statusObject[leaveStatus].status_name) ? statusObject[leaveStatus].status_name :"";
+							var statusClass = (statusObject[leaveStatus] && statusObject[leaveStatus].class)	   ? statusObject[leaveStatus].class 	   :"";
+							var statusTab   = '<span class="label '+statusClass+'">'+statusTitle+'</span>';
+
+							if(rejectionReason && leaveStatus == "<%= REJECTED %>"){
+								statusTab +=  '<i class="material-icons font-20 rejection-info-icon display-inline" title="'+rejectionReason+'" data-toggle="tooltip" data-placement="left" >info</i>';
+							}
+							return statusTab;
+						}
+					},
+					{
+						"data"			: 	{},
+						"orderable"		:   false,
+						"searchable"	: 	false,
+						"render" 		: 	function(result){
+							var id     		   = result._id;
+							var userId 		   = result.user_id;
+							var status         = result.status;
+							var leaveType      = result.leave_type;
+							var dropDownButton = "";
+
+							/** Edit Link  */
+							if(!isCravez && (status == '<%=PENDING%>' || leaveType == '<%= WEEKLY_OFF %>') ){
+								if(leaveType == '<%= WEEKLY_OFF %>'){
+									dropDownButton	+= '<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/driver_vacation_request/edit_weekly_off/'+id+'" data-open-modal="true" class="btn bg-blue waves-effect ml-5 m-t-5 action-btn <%= getPermissionClass(module_type,["driver_vacation_request","edit_weekly_off"])%>"><%= __("admin.system.edit"); %></a>';
+								}else{
+									dropDownButton	+= '<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/driver_vacation_request/edit/'+id+'" data-open-modal="true" class="btn bg-blue waves-effect ml-5 m-t-5 action-btn <%= getPermissionClass(module_type,["driver_vacation_request","edit"])%>"><%= __("admin.system.edit"); %></a>';
+								}
+							}
+
+							/** View Leave Balance Link  */
+							dropDownButton	+= '<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/driver_vacation_request/view_leave_balance/'+userId+'" data-open-modal="true" class="btn bg-cyan waves-effect ml-5 m-t-5 action-btn <%= getPermissionClass(module_type,["driver_vacation_request","view"])%>"><%= __("admin.driver_leave_management.view_leave_balance"); %></a>';
+
+							/** Delete Link  */
+							if(!isCravez && (status == '<%=PENDING%>' || leaveType == '<%= WEEKLY_OFF %>')){
+								dropDownButton	+= '<a href="javascript:void(0)" data-href="<%=admin_list_url%>/driver_vacation_request/delete/'+id+'" class="btn bg-indigo waves-effect ml-5 m-t-5 confirm_box <%= getPermissionClass(module_type,["driver_vacation_request","delete"])%>" data-confirm-message="<%= __("admin.driver_leave_management.you_want_to_delete_this_vacation_request"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>"><%= __("admin.system.delete"); %></a>';
+							}
+							return dropDownButton;
+						}
+					},
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>/driver_vacation_request",
+					type	: 	"POST",
+					data	: 	function (d) {
+				        d.fromDate 	   = $('#from_date').val();
+				        d.toDate 	   = $('#to_date').val();
+				        d.export_count = <%= export_count %>;
+				    },
+					dataSrc	: 	function(res){
+						if(isCravez) addMembers(res.drivers);
+						showLeaveInfo(res.leave_details);
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+			/**check/uncheck checkbox select all check/uncheck*/
+			$(document).on('change', '#req_select_all', function () {
+				var isChecked = $(this).is(':checked');
+				$('.branchCheckbox_wrapper input[type="checkbox"]').not(":disabled").prop("checked", isChecked).trigger("change");
+			});
+
+			/**Check/Uncheck checkbox*/
+			$(document).on('change', '.branchCheckbox_wrapper input[type="checkbox"]', function () {
+				var id = $(this).attr('id');
+				var isChecked = $(this).is(':checked');
+				if (isChecked) {
+					branchCheckboxArray[id] = true;
+				} else {
+					delete branchCheckboxArray[id];
+				}
+				var totalCheckBox = $('.branchCheckbox_wrapper input[type="checkbox"]').not(":disabled").length;
+				var checkedBox = $('.branchCheckbox_wrapper input[type="checkbox"]:checked').length;
+				let selectAll = (totalCheckBox == checkedBox) ? true : false;
+				$("#req_select_all").prop("checked", selectAll);
+			});
+
+			/**Check/Uncheck checkbox*/
+			$(document).on('change', '#update_req_status', function () {
+				var status = $(this).val();
+				if (status) {
+					updateRequestStatus(status);
+				}
+			});
+		});
+
+		/** Function to show members*/
+		function addMembers(teamMembers){
+			$("#column_filter_0").html("");
+			$("#column_filter_0").append('<option value=""><%- __("admin.driver_leave_management.search_by_driver")%></option>');
+			if(teamMembers){
+				$("#column_filter_0").append(teamMembers);
+				if(localStorage["search_" +window.location.pathname]){
+					let searchFormData = JSON.parse(localStorage["search_" +window.location.pathname]);
+					for(index in searchFormData){
+						if(searchFormData[index].name && searchFormData[index].name == "user_id" && searchFormData[index].value){
+							$("#column_filter_0").val(searchFormData[index].value);
+						}
+					}
+				}
+			}
+			$("#column_filter_0").selectpicker("refresh");
+		}
+
+		/** Function to show user leave info*/
+		function showLeaveInfo(leaveDetail){
+			if(leaveDetail && Object.keys(leaveDetail).length > 0 && leaveDetail.leaves.length > 0){
+				var userName 	= $("#column_filter_2").children("option:selected").text();
+				var dataId		= $("#column_filter_2").val();
+				var teamHead	= $("#column_filter_4").val();
+
+				$("#user_leave_info #user_name").html("");
+				$("#user_leave_info table thead").html("");
+				$("#user_leave_info table tbody").html("");
+
+				var cardHeading = (userName && dataId) ? userName+"<%= __('admin.driver_leave_management.users_leave_heading'); %>" : "";
+				$("#user_leave_info #user_name").html(cardHeading);
+
+				$("#user_leave_info table thead").append("<tr><th><%= __('admin.driver_leave_management.total_leave'); %></th></tr>");
+				$("#user_leave_info table tbody").append("<tr><td>"+((leaveDetail.total_leave) ? leaveDetail.total_leave : 0)+"</td></tr>");
+
+				leaveDetail.leaves.map(function(record){
+					$("#user_leave_info table thead tr").append("<th>"+leaveType[record.leave_type]+"</th>");
+					$("#user_leave_info table tbody tr").append("<td>"+record.leaves+"</td>");
+				});
+
+				var exportUrl = "<%=admin_list_url%>/driver_vacation_request/export_data/<%= export_count %>/leave_balance?member="+dataId;
+				if(teamHead) exportUrl += "&parent="+teamHead;
+				$("#exportBalanceBtn").attr("href",exportUrl);
+
+				$("#user_leave_info").removeClass("hide");
+			}else{
+				$("#user_leave_info").addClass("hide");
+			}
+		}
+
+		$("#column_filter_4").change(function(){
+			$("#column_filter_0").val("");
+			$("#column_filter_0").trigger("change");
+			if($(this).val()){
+				$(".export-list").removeClass("hide");
+			}else{
+				$(".export-list").addClass("hide");
+			}
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Function to submit  modal form
+		*/
+		$(".btn-submit-reject").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("reject-form",function(status,response){
+				stopTextLoading(btnId);
+				if(status){
+					window.location.reload();
+				}
+			});
+		});
+
+		/** Javascript function to update branch status */
+		function updateRequestStatus(status){
+			var reqIdArray = Object.keys(branchCheckboxArray);
+
+			if(reqIdArray.length < 1){
+				notice("<%= STATUS_ERROR %>","<%= __('admin.driver_leave_management.please_select_atleast_one_request')%>");
+				return false;
+			}
+
+			if(status == "<%=REJECTED %>"){
+				$('#req_ids').val(reqIdArray);
+				$('#req_status').val(status);
+				$("#rejection_reason_error").text('');
+				$('#rejection_reason').val("");
+				$('#reject-form').attr("action","<%=admin_list_url%>/update_request_status");
+
+				$('#reject_req').modal({
+					backdrop: 'static',
+					keyboard: false
+				});
+				$('#reject_req').modal('show');
+			}else{
+				/** Confirm  box **/
+				confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.driver_leave_management.do_you_want_to_update_vacation_request_status"); %>',function(result){
+					if(result){
+						var options = {
+							url 	: 	"<%=admin_list_url%>/update_request_status",
+							data	: 	{req_ids: reqIdArray.join(","), status: status},
+							method	:	"post"
+						}
+						ajaxRequest(options,function(response){
+							if(response.status && response.message) notice(response.status,response.message);
+							dataTable.ajax.reload(null, false);
+							swal.close();
+							branchCheckboxArray = {};
+							$("#req_select_all").prop("checked",false);
+						});
+					}
+				});
+			}
+		}//end updateRequestStatus()
+
+		/**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("change",".export-details",function(){
+			var type = $(this).val();
+			if(type && type!=""){
+				$(this).val("");
+				var exportURL = "<%=admin_list_url%>/driver_vacation_request/export_data/<%= export_count %>/"+type;
+				if(type == "leave_balance") {
+					exportURL += "?parent="+ $("#column_filter_4").val();
+				}
+				window.location.href = exportURL;
+			}
+		});
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

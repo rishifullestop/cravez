@@ -1,0 +1,331 @@
+<%
+	var branchDetails 	 	= branch_details;
+	var restaurantDetails 	= restaurant_details;
+	var cuisineCount	    = cuisine_count;
+	var pendingCuisineCount = pending_cuisine_count;
+	var status       	    = (typeof branchDetails.cuisine_request_status !== typeof undefined) 				? branchDetails.cuisine_request_status 		    : (cuisineCount > 0) ? CUISINE_REQUEST_ACCEPT : "";
+	var statusClass   	    = (CUISINE_REQUEST_STATUS[status] && CUISINE_REQUEST_STATUS[status]["class"])   	? CUISINE_REQUEST_STATUS[status]["class"]       :"";
+	var statusLabel	 	    = (CUISINE_REQUEST_STATUS[status] && CUISINE_REQUEST_STATUS[status]["status_name"]) ? CUISINE_REQUEST_STATUS[status]["status_name"] :"";
+%>
+
+<div class="container-fluid" id="main-container">
+	<!-- Branch Details Section -->
+		<div class="row m-b-20">
+			<div class="col-sm-12 dashboard_page ">
+				<div class="marchant_file">
+					<% if(CUISINE_REQUEST_STATUS[status]){ %>
+						<div class="restaurant_left">
+							<div class="heading_text clearfix">
+								<h3 class="width-70 float-left"><%= __('admin.cuisine_priorities.cuisine_request_details'); %></h3>
+							</div>
+							<div class="all_restaurant cuisine-class">
+								<ul>
+									<li>
+										<label><%= __('admin.cuisine_priorities.restaurant_en_name'); %></label>
+										<span><%= restaurantDetails.name.en %></span>
+									</li>
+									<li>
+										<label><%= __('admin.cuisine_priorities.restaurant_ar_name'); %></label>
+										<span><%= restaurantDetails.name.ar %></span>
+									</li>
+									<li>
+										<label><%= __('admin.cuisine_priorities.cuisine_request_status'); %></label>
+										<span class="label m-l-15 col-white p-l-10 font-14 <%=statusClass%>"><%=statusLabel%></span>
+									</li>
+									<% if(status == CUISINE_REQUEST_REJECT) { %>
+										<li>
+											<label><%= __('admin.cuisine_priorities.reject_reason'); %></label>
+											<span class="nl2br rejection-class"><%= branchDetails.rejection_reason%></span>
+										</li>
+									<% } %>
+								</ul>
+							</div>
+						</div>
+					<% } %>
+					<div class="restaurant_right p-l-0">
+						<div class="heading_text">
+							<h3><%= __('admin.cuisine_priorities.branch_details'); %></h3>
+						</div>
+						<div class="all_restaurant cuisine-class">
+							<ul>
+								<li>
+									<label><%= __('admin.cuisine_priorities.branch_id'); %></label>
+									<span><%= branchDetails.branch_number%></span>
+								</li>
+								<li>
+									<label><%= __('admin.cuisine_priorities.en_name'); %></label>
+									<span><%= branchDetails.name.en %></span>
+								</li>
+								<li>
+									<label><%= __('admin.cuisine_priorities.ar_name'); %></label>
+									<span><%= branchDetails.name.ar %></span>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	<!-- Branch Details Section -->
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by cuisine priority name in english -->
+									<div class="col-xs-12 col-sm-5">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0" name="cuisine_priority_en_name" onkeyup="searchDatatable(0)" placeholder="<%= __('admin.cuisine_priorities.search_by_cuisine_priority_name_in_english'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by cuisine priority name in arabic -->
+									<div class="col-xs-12 col-sm-5">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_1" name="cuisine_priority_ar_name" onkeyup="searchDatatable(1)" placeholder="<%= __('admin.cuisine_priorities.search_by_cuisine_priority_name_in_arabic'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Reset button -->
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<% if(pendingCuisineCount > 0 || cuisineCount <= 0){ %>
+		<!-- Pending Cuisine priorities table -->
+		<div class="row clearfix">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="card">
+					<div class="header">
+						<h2>
+							<%= __("admin.cuisine_priorities.pending_cuisine_priorities"); %>
+						</h2>
+						<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm">
+							<li>
+								<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/'+restaurant_id+'/'+branch_id+'/select_cuisine_priority'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['branches','cuisine_priorities']); %>">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("admin.cuisine_priorities.select_cuisine_priority"); %>
+									</button>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="body">
+						<table id="datatable-pending-cuisine-priorities-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+							<thead>
+								<tr>
+									<th width="30%"><%= __("admin.cuisine_priorities.cuisine_priority_en_name");%></th>
+									<th><%= __("admin.cuisine_priorities.cuisine_priority_ar_name");%></th>
+									<th><%= __("admin.cuisine_priorities.order");%></th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Pending Cuisine priorities table -->
+	<% } %>
+	<% if(cuisineCount > 0){ %>
+		<!-- Cuisine priorities table -->
+			<div class="row clearfix">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __("admin.cuisine_priorities.cuisine_priorities"); %>
+							</h2>
+							<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm approved-class">
+							<li>
+								<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url+'/'+restaurant_id+'/'+branch_id+'/select_cuisine_priority'%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['branches','cuisine_priorities']); %>">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("admin.cuisine_priorities.select_cuisine_priority"); %>
+									</button>
+								</a>
+							</li>
+						</ul>
+						</div>
+						<div class="body">
+							<table id="datatable-cuisine-priorities-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+								<thead>
+									<tr>
+										<th width="30%"><%= __("admin.cuisine_priorities.cuisine_priority_en_name");%></th>
+										<th><%= __("admin.cuisine_priorities.cuisine_priority_ar_name");%></th>
+										<th><%= __("admin.cuisine_priorities.order");%></th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		<!-- Cuisine priorities table -->
+	<% } %>
+</div>
+
+<%- contentFor("css") %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery.mCustomScrollbar.min.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>jquery.mCustomScrollbar.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data */
+		var dataTable  		  = "";
+		var approvedDataTable = "";
+		$(document).ready(function() {
+			dataTable = $('#datatable-pending-cuisine-priorities-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: [[2,"asc"]],
+				"sDom"		: "ltipr",
+				"serverSide": true,
+				"scrollX"	: true,
+				"lengthMenu": PAGING_LENGTH_MENU,
+				"columns"	: [
+					{
+						"data"	     : {},
+						"field_name" : "cuisine_name.en",
+						"render"     : function(result){
+							return (result.cuisine_name && result.cuisine_name.en) ? result.cuisine_name.en : "";
+						}
+					},
+					{
+						"data"	     : {},
+						"field_name" : "cuisine_name.ar",
+						"render"     : function(result){
+							return (result.cuisine_name && result.cuisine_name.ar) ? result.cuisine_name.ar : "";
+						}
+					},
+					{
+						"data" 		 : "order",
+						"searchable" : false
+					}
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url+'/'+restaurant_id+'/'+branch_id%>",
+					type	: "POST",
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+
+			/** Get approved cuisine priorities datatable */
+			approvedDataTable = $('#datatable-cuisine-priorities-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: [[2,"asc"]],
+				"sDom"		: "ltipr",
+				"serverSide": true,
+				"scrollX"	: true,
+				"lengthMenu": PAGING_LENGTH_MENU,
+				"columns"	: [
+					{
+						"data"	     : {},
+						"field_name" : "cuisine_name.en",
+						"render"     : function(result){
+							return (result.cuisine_name && result.cuisine_name.en) ? result.cuisine_name.en : "";
+						}
+					},
+					{
+						"data"	     : {},
+						"field_name" : "cuisine_name.ar",
+						"render"     : function(result){
+							return (result.cuisine_name && result.cuisine_name.ar) ? result.cuisine_name.ar : "";
+						}
+					},
+					{
+						"data" 		 : "order",
+						"searchable" : false
+					}
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url+'/'+restaurant_id+'/'+branch_id+'/get_approve_list'%>",
+					type	: "POST",
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+
+			/*** Call Function to equal height for div */
+			setTimeout(function(){
+				setHeight('.marchant_file');
+			});
+
+			/*** Show select cuisine priority button if pending cuisine priorities count is zero */
+			<% if(pendingCuisineCount > 0){ %>
+				$(".approved-class").addClass("hideMe");
+			<% } %>
+
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+			approvedDataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Function to clear state for approved datatable
+		*/
+		$(document).on('click','#reset',function(){
+			approvedDataTable.state.clear();
+		});
+
+		/**
+		 * Function to equal height for div
+		 */
+		function setHeight(divId){
+			var highestBox = 0;
+			$(divId+' .cuisine-class').each(function(){
+				var height = ($(this).height()) ? $(this).height() : "135";
+				/** Select and loop the elements you want to equalise */
+				if(height > highestBox) {
+					highestBox = height;
+				}
+			});
+			/** Set the height of all those children to whichever was highest */
+			$(divId+' .cuisine-class').height(highestBox);
+		}// End setHeight();
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

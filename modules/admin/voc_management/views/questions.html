@@ -1,0 +1,42 @@
+<% var i = 0;%>
+<%if(questions && questions.length > 0) {%>
+    <% questions.map((records,index)=>{  %>
+        <% let optionNumbers = index+1;  %>
+            <div id="add_questions_<%= optionNumbers %>" class="question-pointer" data-val="<%= optionNumbers %>">
+                <div class="col-sm-12">
+                    <hr/>
+                    <div class="form-group">
+                        <label for="question" class="control-label label_index_question">
+                            <%=records.question ? records.question : "";%>
+                        </label>
+                        <input type="hidden" name="question_list[<%= optionNumbers %>][question]" value="<%= records.question %>" />
+                        <input type="hidden" name="question_list[<%= optionNumbers %>][question_id]" value="<%= records._id %>" />
+                        <input type="hidden" name="question_list[<%= optionNumbers %>][type]" value="<%= records.type %>" />
+                        <input type="hidden" name="question_list[<%= optionNumbers %>][question_index]" value="<%= optionNumbers %>"/>
+                        <% if(records.type == SINGLE_VOC_QUESTION_TYPE) {%>
+                            <div class="answer-class">
+                                <% var k = 0; %>
+                                <% if(records.options && records.options.length>0){   %>
+                                    <% records.options.map((optionRecords,optionIndex)=>{   
+                                        %>
+                                        <% let optionNumbersVal = optionIndex+1;  %>
+                                        <input class="with-gap radio-col-cyan <%= optionNumbersVal %>" type="radio" name="question_list[<%= optionNumbers %>][answer_id]" id="answer_<%= optionNumbersVal %><%= optionNumbers %>" value="<%=optionRecords.option_id ? optionRecords.option_id : '';%>"/>
+                                        <label for="answer_<%= optionNumbersVal %><%= optionNumbers %>">
+                                            <%=optionRecords.option ? optionRecords.option : '';%>
+                                        </label>
+                                    <% k++;  }); %>
+                                <% } %>
+                            </div>
+                        <% } else if (records.type == INPUT_VOC_QUESTION_TYPE ) { %>
+                            <textarea id="question_list[<%= optionNumbers %>][answer]" class="form-control height-50 resize-none" name="question_list[<%= optionNumbers %>][answer]" rows="2" cols="50"></textarea>
+                        <% }%>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% i++; }); %>
+<% }else{ %>
+    <div class="col-sm-12">
+        <div class="text-center"><%=__("admin.voc_management.no_questions_found");%></div>
+    </div>
+<% } %>

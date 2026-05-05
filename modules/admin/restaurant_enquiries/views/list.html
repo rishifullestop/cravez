@@ -1,0 +1,496 @@
+<%
+	var userRoleId 		= auth.user_role_id;
+	var isContentTeam	= (userRoleId == CONTENT_TEAM ||  userRoleId == CRAVEZ) ? true :false;
+	let searchStaus = (typeof search_status !== typeof undefined && search_status) ? search_status : "";
+%>
+<div class="container-fluid">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by name in english -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="name_in_english" class="form-control" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('admin.restaurant_enquiry.search_by_name_in_english'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by name in arabic -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="name_in_arabic" class="form-control" id="column_filter_2"  onkeyup="searchDatatable(2)" placeholder="<%= __('admin.restaurant_enquiry.search_by_name_in_arabic'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by contact number -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="contact_number" class="form-control" id="column_filter_4"  onkeyup="searchDatatable(4)" placeholder="<%= __('admin.restaurant_enquiry.search_by_contact_number'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by status -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="status_search"   name="status_search">
+													<option value=""><%=__("admin.restaurant_enquiry.search_by_status");%></option>
+														<%
+														Object.keys(COMMAN_STATUS_SEARCH_DROPDOWN).map(key=>{
+														let isSelected = (searchStaus == key) ?"selected" : "";
+														%>
+															<option value="<%=key%>" <%=isSelected%>>
+																<%=(COMMAN_STATUS_SEARCH_DROPDOWN[key].status_name) ? COMMAN_STATUS_SEARCH_DROPDOWN[key].status_name :"";%>
+															</option> <%
+														}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by Date Range -->
+									<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="date-range-picker" id="date-range-picker" placeholder="<%= __('admin.restaurant_enquiry.search_by_requested_date'); %>" autocomplete="off">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-md-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger" data-href="<%=admin_list_url%>">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.restaurant_enquiry.restaurant_enquiry"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<li>
+							<select class="perform-action m-t--10 form-control border-bottom <%= getPermissionClass(module_type,['restaurant_enquiries','approve_reject']); %>">
+								<option value=""><%= __("admin.restaurant_enquiry.select_action"); %></option>
+								<option value="<%=IN_REVIEW%>"> <%= __("admin.restaurant_enquiry.mark_as_in_review"); %></option>
+								<option value="<%=REJECTED%>"><%= __("admin.restaurant_enquiry.mark_as_disapproved"); %></option>
+							</select>
+						</li>
+						<li>
+							<a href="<%=admin_list_url%>/add" class="<%= getPermissionClass(module_type,['restaurant_enquiries','add']); %>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __('admin.restaurant_enquiry.add_restaurant_enquiry'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs <%= getPermissionClass(module_type,['restaurant_enquiries','approve_reject']); %>">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li>
+									<a href="javascript:void(0)" onClick="updateMultipleStatus(<%=IN_REVIEW%>)">
+										<%= __("admin.restaurant_enquiry.mark_as_in_review"); %>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:void(0)" onClick="updateMultipleStatus(<%=REJECTED%>)">
+										<%= __("admin.restaurant_enquiry.mark_as_disapproved"); %>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="3%" class="p-r-10 text-center" >
+									<div class="materialize_checkbox">
+										<input type="checkbox" class="filled-in chk-col-indigo" id="select_all">
+										<label for="select_all" class="select_all p-l-20 v-align-bottom m-b-0"></label>
+									</div>
+								</th>
+								<th><%= __("admin.restaurant_enquiry.restaurant_english_name");%></th>
+								<th><%= __("admin.restaurant_enquiry.restaurant_arabic_name");%></th>
+								<th width="20%"><%= __("admin.restaurant_enquiry.restaurant_description");%></th>
+								<th><%= __("admin.restaurant_enquiry.contact_number");%></th>
+								<th><%= __("admin.restaurant_enquiry.email_address");%></th>
+								<th><%= __("admin.system.status");%></th>
+								<th><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal for reject restaurant enquiry request-->
+<div class="modal fade" id="reject_enquiry" tabindex="-1" role="dialog" aria-labelledby="reject_enquiry" aria-hidden="true">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("admin.restaurant_enquiry.reject_enquiry_title") %></h4>
+			</div>
+			<form id="reject-enquiry" data-submit-btn-id="reject-enquiry_btn" method="post" class="on_click_submit" role="form" action='<%=admin_list_url%>/reject_enquiry'>
+				<input type="hidden" name="enquiry_id" id="enquiry_id">
+				<input type="hidden" name="status" id="enquiry_status">
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-grop">
+								<div class="form-lin no-bottom-border">
+									<label for="rejection_message" class="control-label"><%= __('admin.restaurant_enquiry.rejection_field'); %><span class="required"> *</span>  </label>
+									<div class="form-grop margin-0">
+										<div class="form-line">
+											<textarea id="rejection_message" rows="6" class="resize-none form-control" name="reject_msg"></textarea>
+										</div>
+										<span id="reject_msg_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="reject-enquiry_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown reject-btn-sm waves-effect btn-submit noHover margin-0"><%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div><!--modal close-->
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+
+		/** Function to initialize datatable and get server side data*/
+		var statusObject  = <%- JSON.stringify(COMMAN_STATUS_SEARCH_DROPDOWN)%>;
+		var dataTable 	  =	"";
+		var checkboxArray = {};
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ 	"data"		: {},
+						"orderable" : false,
+						"render" 	: function(result){
+							let queryId 	= 	(result._id) 			? 	result._id 				:"";
+							let approved	=	(result.approval_status)?	result.approval_status	:"<%=PENDING%>";
+							var disabledText = (approved != "<%=PENDING%>" && approved != "<%=IN_REVIEW%>") ? "disabled" : "";
+
+							return '<div class=" materialize_checkbox  p-r-25">'+
+								'<div class="checkbox_wrapper">'+
+									'<input type="checkbox" class="filled-in chk-col-indigo" id="'+queryId+'" '+disabledText+'>'+
+									'<label for="'+queryId+'" class="checkbox data"></label>'+
+								'</div>'+
+							'</div>';
+						}
+					},
+					{ 	"data"		 : 'name.en',
+						"orderable"	 : false,
+					},
+					{ 	"data"		 : 'name.ar',
+						"orderable"	 : false,
+					},
+					{ 	"data"		 : 'restaurant_description',
+						"orderable"	 : false,
+						"render" 	 : function(description){
+							return (description) ? "<span class='readmore'>"+description+"</span>" :"N/A";
+						}
+					},
+					{ 	"data"		 : 'mobile_number',
+						"orderable"	 : false,
+					},
+					{ 	"data"		 : 'email',
+						"orderable"	 : false,
+					},
+					{
+						"data"		: 	{},
+						"orderable"	:   false,
+						"field_type": 	"<%=NUMERIC_FIELD%>",
+						"render" 	:	function(result){
+							var status = (result.approval_status)	? 	result.approval_status 	:"<%=PENDING%>";
+							var teamApprovalStatus 	= (result.team_approval_status) ? 	result.team_approval_status :"<%=PENDING%>";
+
+							<% if(!isContentTeam){ %>
+								if(teamApprovalStatus == "<%=APPROVED%>" && status != "<%=REJECTED%>"){
+									status  = teamApprovalStatus;
+								}
+							<% } %>
+
+							var statusTitle = (statusObject[status] && statusObject[status].status_name) ?	statusObject[status].status_name:"";
+							var statusClass = (statusObject[status] && statusObject[status].class)	     ?	statusObject[status].class 		:"";
+							return '<span class="label '+statusClass+'">'+statusTitle+'</span>';
+						}
+					},
+					{
+						"data"		: 	{},
+						"orderable"	:   false,
+						"render" 	: 	function(result){
+							var id 			  		= (result._id) 			 		?	result._id 			 		:"";
+							var restaurantId  		= (result.restaurant_id) 		? 	result.restaurant_id  		:"";
+							var approved 	  		= (result.approval_status)		? 	result.approval_status 		:"<%=PENDING%>";
+							var teamApprovalStatus 	= (result.team_approval_status) ? 	result.team_approval_status :"";
+							var hideCondition  		= (approved == '<%= REJECTED %>' || approved == '<%= APPROVED%>') ? "hidden" : "";
+							var reviewCondition		= (approved == '<%= IN_REVIEW %>') ? "hidden" :hideCondition;
+							var hideEditButton 		=  (!restaurantId || approved != '<%= APPROVED%>')  ? "hidden" : "";
+
+							<% if(!isContentTeam){ %>
+								hideCondition 	= (teamApprovalStatus == '<%= APPROVED%>') ? 'hidden' :hideCondition;
+								reviewCondition = (teamApprovalStatus == '<%= APPROVED%>') ? 'hidden' :reviewCondition;
+							<% } %>
+
+							var dropDownButton 	=	''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %>'+
+									' <span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									/** Edit Link */
+									'<li>'+
+										'<a href="<%=admin_list_url%>/update-restaurant/'+restaurantId+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["restaurant_enquiries","update"]); %> '+hideEditButton+'">'+
+										'<%= __("admin.system.edit"); %>'+
+									'</li>'+
+									/** View Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/view/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["restaurant_enquiries","view"]); %>">'+
+											'<%= __("admin.system.view"); %>'+
+										'</a>'+
+									'</li>'+
+									/** In-Review Link */
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/update-status/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["restaurant_enquiries","approve_reject"]); %> '+reviewCondition	+'" data-confirm-message="<%= __("admin.restaurant_enquiry.do_you_want_to_update_status"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+										'<%= __("admin.restaurant_enquiry.in_review"); %>'+
+									'</li>'+
+									/** Approve Link */
+									'<li>'+
+										'<a href="<%=admin_list_url%>/approve/'+id+'/'+restaurantId+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["restaurant_enquiries","approve_reject"]); %> '+hideCondition+'" data-confirm-message="<%= __("admin.restaurant_enquiry.do_you_want_to_approve_it"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+										'<%= __("admin.restaurant_enquiry.approve_enquiry"); %>'+
+									'</li>'+
+									/** Disapprove Link */
+									'<li>'+
+										'<a href="javascript:void(0)" class="waves-effect waves-block open-modal <%= getPermissionClass(module_type,["restaurant_enquiries","approve_reject"]); %> '+hideCondition+'" data-id="'+id+'">'+
+										' <%= __("admin.restaurant_enquiry.reject_enquiry"); %>'+
+									'</li>'+
+									/** Delete Link */
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete-enquiry/'+id+'" class="waves-effect waves-block confirm_box  <%= getPermissionClass(module_type,["restaurant_enquiries","delete"]); %> " data-confirm-message="<%= __("admin.restaurant_enquiry.do_you_want_to_delete"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+											'<%= __("admin.system.delete"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Download Link */
+									'<li>'+
+										'<a href="<%=admin_list_url%>/download-file/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["restaurant_enquiries","download"]); %> ">'+
+											'<%= __("admin.restaurant_enquiry.download"); %>'+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+
+						}
+					}
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>",
+					type	: "POST",
+					data 	: function(d){
+						d.fromDate 	= $('#from_date').val();
+				        d.toDate 	= $('#to_date').val();
+				        d.status    = $('#status_search').val();
+					},
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function( settings ) {
+					/** Description read more **/
+					readMore();
+				}
+			});
+
+			/** Status search */
+			$(document).on('change','#status_search',function(){
+				dataTable.draw();
+			});
+
+			/**check/uncheck checkbox select all check/uncheck*/
+			$(document).on('change','#select_all',function(){
+				var isChecked	= $(this).is(':checked');
+				$('.checkbox_wrapper input[type="checkbox"]').not(":disabled").prop("checked",isChecked).trigger("change");
+			});
+
+			/**Check/Uncheck checkbox*/
+			$(document).on('change','.checkbox_wrapper input[type="checkbox"]',function(){
+				var id          = $(this).attr('id');
+				var isChecked	= $(this).is(':checked');
+				if(isChecked){
+					checkboxArray[id] = true;
+				}else{
+					delete checkboxArray[id];
+				}
+				var totalCheckBox = $('.checkbox_wrapper input[type="checkbox"]').not(":disabled").length;
+				var checkedBox = $('.checkbox_wrapper input[type="checkbox"]:checked').length;
+				let selectAll = (totalCheckBox == checkedBox) ? true : false;
+				$("#select_all").prop("checked",selectAll);
+			});
+
+			/** To update status for all selected enquiry */
+			$(document).on("change",".perform-action",function(){
+				var currentStatus = $(this).val();
+				$(".perform-action").val("");
+				updateMultipleStatus(currentStatus);
+			});
+
+		});
+
+		function updateMultipleStatus(currentStatus){
+			if(currentStatus && (currentStatus == "<%=IN_REVIEW%>" || currentStatus=="<%=REJECTED%>")){
+				var enquiryIds = Object.keys(checkboxArray);
+
+				if(enquiryIds.length < 1){
+					notice("<%= STATUS_ERROR %>","<%= __('admin.restaurant_enquiry.please_select_atleast_one_restaurant_enquiry')%>");
+					return false;
+				}
+
+				if(currentStatus == "<%=REJECTED%>"){
+					$('#reject-enquiry').attr("action","<%=admin_list_url%>/update-multiple-status");
+					$('#enquiry_id').val(enquiryIds.join(","));
+					$('#rejection_message').val("");
+					$('#enquiry_status').val(currentStatus);
+					$("#reject_enquiry .modal-title").html('<%=__("admin.restaurant_enquiry.restaurant_enquiry_reject_title") %>');
+
+
+					$('#reject_enquiry').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					$('#reject_enquiry').modal('show');
+				}else{
+					confirmBox("warning",'<%= __("admin.system.are_you_sure") %>','<%= __("admin.restaurant_enquiry.do_you_want_to_update_multiple_status"); %>',function(result){
+						if(result){
+							var options = {
+								url 	: 	"<%=admin_list_url%>/update-multiple-status",
+								data	: 	{enquiry_id: enquiryIds.join(","), status: currentStatus},
+								method	:	"post"
+							}
+							ajaxRequest(options,function(response){
+								if(response.status && response.message) notice(response.status,response.message);
+								dataTable.draw();
+								swal.close();
+								$("#select_all").prop("checked",false);
+							});
+						}
+						swal.close();
+					});
+				}
+			}
+		}// end updateMultipleStatus()
+
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Search by status
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(".search_by_status").change(function(){
+			dataTable.draw();
+		});
+
+		/**
+		* Function to show modal
+		*/
+		$(document).on('click','.open-modal',function(){
+			var enquiryId = $(this).attr('data-id');
+			$('#enquiry_id').val(enquiryId);
+			$("#reject_msg_error").text('');
+			$('#rejection_message').val("");
+			$('#reject-enquiry').attr("action","<%=admin_list_url%>/reject_enquiry");
+			$("#reject_enquiry .modal-title").html('<%=__("admin.restaurant_enquiry.reject_enquiry_title") %>');
+
+			$('#reject_enquiry').modal({
+				backdrop: 'static',
+				keyboard: false
+			});
+			$('#reject_enquiry').modal('show');
+		});
+
+		/**
+		* Function to submit  modal form
+		*/
+		$(".btn-submit").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("reject-enquiry",function(status,response){
+				stopTextLoading(btnId);
+				if(status){
+					if(response.status && response.message) notice(response.status,response.message);
+					dataTable.draw();
+					$('#reject_enquiry').modal("hide");
+					$("#select_all").prop("checked",false);
+				}
+			});
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

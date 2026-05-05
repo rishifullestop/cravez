@@ -1,0 +1,1147 @@
+<%
+	var result 			= 	(typeof result !== typeof undefined && result)			 	?	result 		:{};
+	var isEditable 		= 	(typeof is_editable !== typeof undefined && is_editable) 	?	is_editable :false;
+	var offerItemList	= 	(typeof offer_item_list !== typeof undefined && offer_item_list) 	?	offer_item_list :null;
+	var offerId			=	(result._id)	?	result._id	:"";
+	var formUrl 		=	(isEditable)	?	admin_list_url+"/edit/"+offerId :admin_list_url+"/add";
+	var fromDate 		= 	(result.valid_from) ? newDate(result.valid_from,DATABASE_DATE_FORMAT) : "";
+	var toDate 	 		= 	(result.valid_to)   ? newDate(result.valid_to,DATABASE_DATE_FORMAT)   : "";
+	var offerType 		=	(result.offer_type)	? result.offer_type	   :"";
+	var itemOfferType 	= 	(result.item_offer_type)? result.item_offer_type: "";
+	var restaurantList	=	restaurant_list;
+	var branchList		=	branch_list;
+	var cuisineList		= 	cuisine_list;
+	var itemList		= 	item_list;
+	var categoryList	= 	category_list;
+	var allItemList 	=	itemList;
+	var corporateList 	=	corporate_list;
+	var applicableFor	=   (result.applicable_for && result.applicable_for.constructor === Array) ? result.applicable_for : [result.applicable_for];
+
+	if(offerType == COMBO_OFFER && itemOfferType ==ITEM_WISE_OFFER) itemList = "";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-offer" action="<%=formUrl%>" data-submit-btn-id="offer-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog  modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.offer_management.edit_offer") : __("admin.offer_management.add_offer"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="title_in_english" class="control-label">
+											<%= __("admin.offer_management.title_in_english"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="title_in_english" class="form-control" name="title_in_english" value="<%=result.title ? result.title.en :''%>"/>
+									</div>
+									<span id="title_in_english_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="title_in_arabic" class="control-label">
+											<%= __("admin.offer_management.title_in_arabic"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="title_in_arabic" class="form-control" name="title_in_arabic" value="<%=result.title ? result.title.ar :''%>"/>
+									</div>
+									<span id="title_in_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix selected">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="kfg_offer_id" class="control-label"><%= __('admin.corporate_tie_ups.kfg_offer_id'); %></label>
+										<input name="kfg_offer_id" id="kfg_offer_id" type="text" value="<%=result.kfg_offer_id ? result.kfg_offer_id : ''%>" class="form-control"/>
+									</div>
+									<span id="kfg_offer_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="kfg_offer_name" class="control-label"><%= __('admin.corporate_tie_ups.kfg_offer_name'); %></label>
+										<input name="kfg_offer_name" id="kfg_offer_name" type="text" value="<%=result.kfg_offer_name ? result.kfg_offer_name : ''%>" class="form-control"/>
+									</div>
+									<span id="kfg_offer_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="description_in_english" class="control-label">
+											<%= __("admin.offer_management.description_in_english"); %><span class="required"> *</span>
+										</label>
+										<textarea type="text" id="description_in_english" class="form-control height-100" name="description_in_english"><%=result.description ? result.description.en :''%></textarea>
+									</div>
+									<span id="description_in_english_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="description_in_arabic" class="control-label">
+											<%= __("admin.offer_management.description_in_arabic"); %><span class="required"> *</span>
+										</label>
+										<textarea type="text" id="description_in_arabic" class="form-control height-100" name="description_in_arabic"><%=result.description ? result.description.ar :''%></textarea>
+									</div>
+									<span id="description_in_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="<%= (isEditable && result.image_in_english) ? 'col-sm-4' : 'col-sm-6';%>">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="image_in_english" class="control-label">
+											<%= __("admin.offer_management.image_in_english"); %>
+										</label>
+										<input type="file" data-input="false" name="image_in_english" class="form-control cfilestyle" id="image_in_english" />
+										<span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('system.extension_and_size_suggestion_message',ALLOWED_IMAGE_EXTENSIONS.join(', '),OFFER_MANAGEMENT_FILE_RESOLUTION)%>">
+											<i class="material-icons">info</i>
+										</span>
+										<input type="hidden" name="old_image_in_english" value="<%=(result.image_in_english) ? result.image_in_english :'';%>">
+									</div>
+									<span id="image_in_english_error" class="error"></span>
+								</div>
+							</div>
+							<% if(isEditable && result.image_in_english) { %>
+								<div class="col-sm-2">
+									<a href="<%=result.en_image%>" class="item-image" data-lightbox="roadtrip">
+										<img class="img-thumbnail pull-right set_image_dim" src="<%=result.en_image%>" alt="image"/>
+									</a>
+								</div>
+							<% } %>
+							<div class="<%= (isEditable && result.image_in_arabic) ? 'col-sm-4' : 'col-sm-6';%>">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="image_in_arabic" class="control-label">
+											<%= __("admin.offer_management.image_in_arabic"); %>
+										</label>
+										<input type="file" data-input="false" name="image_in_arabic" class="form-control cfilestyle" id="image_in_arabic" />
+										<span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('system.extension_and_size_suggestion_message',ALLOWED_IMAGE_EXTENSIONS.join(', '),OFFER_MANAGEMENT_FILE_RESOLUTION)%>">
+											<i class="material-icons">info</i>
+										</span>
+										<input type="hidden" name="old_image_in_arabic" value="<%=(result.image_in_arabic) ? result.image_in_arabic :'';%>">
+									</div>
+									<span id="image_in_arabic_error" class="error"></span>
+								</div>
+							</div>
+							<% if(isEditable && result.image_in_arabic) { %>
+								<div class="col-sm-2">
+									<a href="<%=result.ar_image%>" class="item-image" data-lightbox="roadtrip">
+										<img class="img-thumbnail pull-right set_image_dim" src="<%=result.ar_image%>" alt="image"/>
+									</a>
+								</div>
+							<% } %>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="offer_sub_type" class="control-label">
+											<%= __("admin.offer_management.offer_sub_type"); %><span class="required"> *</span>
+										</label>
+										<select id="offer_sub_type" class="form-control show-tick"  name="offer_sub_type">
+												<option value=""> <%= __("admin.offer_management.select_offer_sub_type"); %> </option>
+											<% Object.keys(OFFER_SUB_TYPES).map(key=>{ %>
+												<option value="<%=key%>" <%= (result.offer_sub_type == key)  ? 'selected' :'' %>><%=OFFER_SUB_TYPES[key]%></option>
+											<% 	}); %>
+										</select>
+									</div>
+									<span id="offer_sub_type_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="valid_till" class="control-label">
+											<%=  __('admin.offer_management.valid_till'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control" name="valid_till" id="date-range-picker-one" value="<%=(fromDate && toDate) ? fromDate+' - '+toDate : ''%>">
+									</div>
+									<input class="form-control hide" id="start_date" type="text" name="start_date" value="<%=result.valid_from%>">
+									<input class="form-control hide" id="end_date" type="text" name="end_date" value="<%=result.valid_to%>">
+									<span id="valid_till_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="offer_code" class="control-label">
+											<%= __("admin.offer_management.offer_code"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="offer_code" class="form-control" name="offer_code" value="<%= (!isEditable) ? offer_code : result.offer_code%>" <%= (isEditable) ? 'readonly' :'' %>  />
+									</div>
+									<span id="offer_code_error" class="error"></span>
+								</div>
+							</div>
+							<% if(!isEditable) { %>
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="form-line">
+											<label for="number_of_offers" class="control-label">
+												<%= __("admin.offer_management.number_of_offers"); %>
+											</label>
+											<input type="text" id="number_of_offers" class="form-control" name="number_of_offers"/>
+										</div>
+										<span id="number_of_offers_error" class="error"></span>
+									</div>
+								</div>
+							<% } %>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="offer_discount_for_restaurant" class="control-label">
+											<%= __("admin.offer_management.offer_discount_for_restaurant"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="offer_discount_for_restaurant" class="form-control" name="offer_discount_for_restaurant" value="<%= (typeof result.restaurant_discount_ratio != typeof undefined) ? result.restaurant_discount_ratio : ''%>"/>
+									</div>
+									<span id="offer_discount_for_restaurant_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="total_redeem" class="control-label">
+											<%= __("admin.offer_management.total_redeem"); %>
+										</label>
+										<input type="text" id="total_redeem" class="form-control" name="total_redeem" value="<%= (result.total_redeem) ? result.total_redeem :''%>"   />
+									</div>
+									<span id="total_redeem_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="total_unique_redeem" class="control-label">
+											<%= __("admin.offer_management.total_unique_redeem"); %>
+										</label>
+										<input type="text" id="total_unique_redeem" class="form-control" name="total_unique_redeem" value="<%= (result.total_unique_redeem) ? result.total_unique_redeem :''%>"   />
+									</div>
+									<span id="total_unique_redeem_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="offer_type" class="control-label">
+											<%= __("admin.offer_management.offer_type"); %><span class="required"> *</span>
+										</label>
+										<select id="offer_type" class="form-control show-tick"  name="offer_type">
+												<option value=""> <%= __("admin.offer_management.select_offer_type"); %> </option>
+											<% Object.keys(OFFER_TYPES).map(key=>{ %>
+												<option value="<%=key%>" <%= (result.offer_type == key)  ? 'selected' :'' %>><%=OFFER_TYPES[key]%></option>
+											<% 	}); %>
+										</select>
+									</div>
+									<span id="offer_type_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_type" class="control-label">
+											<%= __("admin.offer_management.restaurant_type"); %><span class="required"> *</span>
+										</label>
+										<select id="restaurant_type" class="form-control show-tick"  name="restaurant_type">
+											<% Object.keys(RESTAURANT_TYPES).map(key=>{ %>
+												<option value="<%=key%>"  <%= (result.restaurant_type == key) ? 'selected' :'' %>><%=RESTAURANT_TYPES[key]%></option>
+											<% 	}); %>
+										</select>
+									</div>
+									<span id="restaurant_type_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6 combo-offer-fields hide reset-form">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="minimum_items " class="control-label">
+											<%= __("admin.offer_management.minimum_items"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="minimum_items" class="form-control" name="minimum_items" value="<%=result.minimum_items%>"/>
+									</div>
+									<span id="minimum_items_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix combo-offer-fields reset-form">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="item_offer_type" class="control-label">
+											<%= __("admin.offer_management.item_offer_type"); %><span class="required"> *</span>
+										</label>
+										<select id="item_offer_type" class="form-control show-tick"  name="item_offer_type">
+											<option value=""> <%= __("admin.offer_management.select_item_offer_type"); %> </option>
+											<% Object.keys(ITEM_OFFEER_TYPE).map(key=>{ %>
+												<option value="<%=key%>" <%= (itemOfferType == key)  ? 'selected' :'' %>><%=ITEM_OFFEER_TYPE[key]%></option>
+											<% 	}); %>
+										</select>
+									</div>
+									<span id="item_offer_type_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6 combo-offer-fields hide">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="discount_price" class="control-label">
+											<%= __("admin.offer_management.discount_price"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="discount_price" class="form-control" name="discount_price" value="<%=result.discount_price%>"/>
+									</div>
+									<span id="discount_price_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix combo-non-item reset-form">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="discount_type" class="control-label">
+											<%= __("admin.offer_management.discount_type"); %><span class="required"> *</span>
+										</label>
+										<select id="discount_type" class="form-control show-tick"  name="discount_type">
+											<option value=""> <%= __("admin.offer_management.select_discount_type"); %> </option>
+											<% Object.keys(DISCOUNT_TYPE).map(key=>{ %>
+												<option value="<%=key%>"  <%= (result.discount_type == key) ? 'selected' :'' %>><%=DISCOUNT_TYPE[key]%></option>
+											<% 	}); %>
+										</select>
+									</div>
+									<span id="discount_type_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="offer_value" class="control-label offer-value">
+										</label>
+										<input type="text" id="offer_value" class="form-control" name="offer_value" value="<%=result.offer_value%>"/>
+									</div>
+									<span id="offer_value_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6 percentage-offer-type hide">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="offer_max_amount" class="control-label">
+											<%= __("admin.offer_management.offer_max_amount"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="offer_max_amount" class="form-control" name="offer_max_amount" value="<%=result.offer_max_amount%>"/>
+									</div>
+									<span id="offer_max_amount_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix combo-non-item reset-form">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="min_amount" class="control-label">
+											<%= __("admin.offer_management.min_amount"); %>
+										</label>
+										<input type="text" id="min_amount" class="form-control" name="min_amount" value="<%=result.min_amount%>"/>
+									</div>
+									<span id="min_amount_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="max_amount" class="control-label">
+											<%= __("admin.offer_management.max_amount"); %>
+										</label>
+										<input type="text" id="max_amount" class="form-control" name="max_amount" value="<%=result.max_amount%>"/>
+									</div>
+									<span id="max_amount_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix reset-form corporate-list">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="corporate_ids" class="control-label">
+											<%= __("admin.offer_management.corporate_tie_ups"); %><span class="required"> *</span>
+										</label>
+										<select id="corporate_ids" class="form-control show-tick"  name="corporate_ids" data-live-search="true" multiple>
+											<%-corporateList%>
+										</select>
+										<span class="message demo-image-copyright"> <%=__("admin.offer_management.leave_blank_to_select_all")%> </span>
+									</div>
+									<span id="corporate_ids_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix reset-form">
+							<div class="col-sm-6 m-t-30">
+								<div class="form-group materialize_checkbox">
+									<div class="form-lie checkbox_wrapper">
+										<input name="free_delivery" id="free_delivery" class="filled-in chk-col-indigo" type="checkbox" <%=(result.is_free_delivery == true) ? "checked" : ""%>/>
+										<label for="free_delivery" class="materialize-chekbox-label font-14"><%=  __('admin.offer_management.free_delivery'); %></label>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-6 m-t-30">
+								<div class="form-group materialize_checkbox">
+									<div class="form-lie checkbox_wrapper">
+										<input name="listed_on_my_offer" id="listed_on_my_offer" class="filled-in chk-col-indigo" type="checkbox" <%=(result.listed_on_myoffer == true) ? "checked" : ""%>/>
+										<label for="listed_on_my_offer" class="materialize-chekbox-label font-14"><%=  __('admin.offer_management.listed_on_my_offer'); %></label>
+									</div>
+									<span class="message demo-image-copyright"> <%=__("admin.offer_management.you_can_select_only_single_restaurant_barnch_category")%> </span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix reset-form redirect_div <%=(result.listed_on_myoffer != true) ? 'hide' :''; %>">
+							<div class="col-sm-6 m-t-30">
+								<div class="form-group materialize_checkbox">
+									<div class="form-lie checkbox_wrapper">
+										<input name="redirect_to_details" id="redirect_to_details" class="filled-in chk-col-indigo" type="checkbox" <%=(result.redirect_to_detail_page == true) ? "checked" : ""%>/>
+										<label for="redirect_to_details" class="materialize-chekbox-label font-14"><%=  __('admin.offer_management.redirect_to_details'); %></label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix user-applicable-list reset-form">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="applicable_for" class="control-label">
+											<%= __("admin.offer_management.applicable_for"); %>
+										</label>
+										<select id="applicable_for" class="form-control show-tick"  name="applicable_for[]" multiple="" title='<%= __("admin.offer_management.select_applicable_for"); %>'>
+											<% Object.keys(APPLICABLE_FOR).map(key=>{ %>
+												<option value="<%=key%>" <%= (applicableFor.indexOf(key) !== -1)  ? 'selected' :'' %>><%=APPLICABLE_FOR[key]%></option>
+											<% 	}); %>
+										</select>
+										<span class="message demo-image-copyright"> <%=__("admin.offer_management.leave_blank_to_select_all")%> </span>
+									</div>
+									<span id="applicable_for_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6  applicable-for-new-user hide">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="number_of_members" class="control-label">
+											<%= __("admin.offer_management.number_of_members"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="number_of_members" class="form-control" name="number_of_members" value="<%=result.number_of_members%>"/>
+									</div>
+									<span id="number_of_members_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix selected reset-form">
+							<div class="col-sm-6 user-list hide">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="user_ids" class="control-label">
+											<%= __("admin.offer_management.users"); %>
+										</label>
+										<select id="user_ids" class="form-control user_ids"  name="user_ids[]" multiple>
+											<%
+											if(selected_user && selected_user.length >0){
+												selected_user.map(record=>{ %>
+													<option value="<%=record._id%>" selected> <%=record.full_name+((record.mobile_number) ? "("+record.mobile_number+")" :"") %> </option>
+												<% });
+											}%>
+										</select>
+										<span class="message demo-image-copyright"> <%=__("admin.offer_management.leave_blank_to_select_all")%> </span>
+									</div>
+									<span id="user_ids_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_ids" class="control-label">
+											<%= __("admin.offer_management.restaurants"); %><span class="required combo-offer-fields hide"> *</span>
+										</label>
+										<select id="restaurant_ids" class="form-control show-tick"  name="restaurant_ids[]" data-live-search="true" title='<%= __("admin.offer_management.select_restaurant"); %>' multiple>
+											<%-restaurantList%>
+										</select>
+										<span class="input-group-addon restaurant-loading-btn hide">
+											<%= __("admin.system.loading_txt") %> <br/>
+										</span>
+										<span class="message demo-image-copyright  combo-non-item"> <%=__("admin.offer_management.leave_blank_to_select_all")%> </span>
+									</div>
+									<span id="restaurant_ids_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix selected reset-form">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="branch_ids" class="control-label">
+											<%= __("admin.offer_management.branches"); %><span class="required combo-offer-fields hide"> *</span>
+										</label>
+										<select id="branch_ids" class="form-control show-tick"  name="branch_ids[]"  data-live-search="true" multiple title='<%= __("admin.offer_management.select_branch"); %>'>
+											<%-branchList%>
+										</select>
+										<span class="input-group-addon loading-btn hide">
+											<%= __("admin.system.loading_txt") %> <br/>
+										</span>
+										<span class="message demo-image-copyright combo-non-item"> <%=__("admin.offer_management.leave_blank_to_select_all")%> </span>
+									</div>
+									<span id="branch_ids_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="category_ids" class="control-label">
+											<%= __("admin.offer_management.category_ids"); %><span class="required combo-offer-fields hide"> *</span>
+										</label>
+										<select id="category_ids" class="form-control show-tick"  name="category_ids[]" data-live-search="true" multiple title='<%= __("admin.offer_management.select_category"); %>'>
+											<%- categoryList%>
+										</select>
+										<span class="input-group-addon loading-btn hide">
+											<%= __("admin.system.loading_txt") %> <br/>
+										</span>
+										<span class="message demo-image-copyright combo-non-item"> <%=__("admin.offer_management.leave_blank_to_select_all")%> </span>
+									</div>
+									<span id="category_ids_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="combo-item-list table-responsive hide">
+							<div class="form-group m-b-0">
+								<div class="form-line">
+									<label for="cuisine_ids" class="control-label">
+										<%= __("admin.offer_management.items"); %><span class="required"> *</span>
+									</label>
+								</div>
+							</div>
+							<table class="table table-bordered dataTable materialize_checkbox ">
+								<thead>
+									<tr>
+										<th width="5%"><%= __("admin.offer_management.select"); %></th>
+										<th><%= __("admin.offer_management.item_name"); %></th>
+										<th><%= __("admin.offer_management.discount_percentage"); %></th>
+									</tr>
+								</thead>
+								<tbody> </tbody>
+							</table>
+						</div>
+						<div class="row clearfix selected reset-form">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="item_ids" class="control-label">
+											<%= __("admin.offer_management.items"); %><span class="required combo-offer-fields hide"> *</span>
+										</label>
+										<select id="item_ids" class="form-control show-tick"  name="item_ids[]" data-live-search="true"  title='<%= __("admin.offer_management.select_item"); %>' multiple>
+											<%- itemList%>
+										</select>
+										<span class="input-group-addon item-loading-btn hide">
+											<%= __("admin.system.loading_txt") %> <br/>
+										</span>
+										<span class="message demo-image-copyright combo-non-item"> <%=__("admin.offer_management.leave_blank_to_select_all")%> </span>
+									</div>
+									<span id="item_ids_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="cuisine_ids" class="control-label">
+											<%= __("admin.offer_management.cuisines"); %>
+										</label>
+										<select id="cuisine_ids" class="form-control show-tick"  name="cuisine_ids[]" title='<%= __("admin.offer_management.select_cuisine"); %>' data-live-search="true" multiple>
+											<%- cuisineList%>
+										</select>
+										<span class="input-group-addon loading-btn hide">
+											<%= __("admin.system.loading_txt") %> <br/>
+										</span>
+										<span class="message demo-image-copyright"> <%=__("admin.offer_management.leave_blank_to_select_all")%> </span>
+									</div>
+									<span id="cuisine_ids_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6 m-t-30">
+								<div class="form-group materialize_checkbox">
+									<div class="form-lie checkbox_wrapper">
+										<input name="display_offer" id="display_offer" class="filled-in chk-col-indigo" type="checkbox" <%=(result.display_offer == true) ? "checked" : ""%>/>
+										<label for="display_offer" class="materialize-chekbox-label font-14"><%=  __('admin.offer_management.display_offer'); %></label>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-6  display-order hide">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="display_order" class="control-label">
+											<%= __("admin.offer_management.display_order"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="display_order" class="form-control" name="display_order" value="<%=result.display_order%>"/>
+									</div>
+									<span class="message demo-image-copyright"> <%=__("admin.offer_management.you_make_the_two_offer_orders_same")%> </span>
+									<span id="display_order_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="offer-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="combo-item-html hide">
+		<table class="restaurant">
+			<tbody>
+				<tr>
+					<td colspan="3" class="text-center font-bold">{restaurant_name} </td>
+				</tr>
+			<tbody>
+		</table>
+		<table class="item">
+			<tbody>
+				<tr>
+					<td>
+						<div class="form-group  m-b-0">
+							<div class="form-line">
+								<input type="checkbox"  id="item_{index}_select" class="form-control filled-in chk-col-indigo " name="items[{index}][is_selected]" value="<%=ACTIVE%>" {checked}>
+								<label for="item_{index}_select" class="checkbox data"></label>
+							</div>
+							<span id="items_select_{index}_error" class="error"></span>
+						</div>
+					</td>
+					<td> {ITEM_NAME} </td>
+					<td>
+						<div class="form-group m-b-0">
+							<div class="form-line">
+								<input type="hidden" name="items[{index}][item_id]" value="{item_id}">
+								<input type="hidden" name="items[{index}][restaurant_id]" value="{restaurant_id}">
+								<input type="text" class="form-control" name="items[{index}][price]" value="{price}">
+							</div>
+							<span id="items_{index}_error" class="error"></span>
+						</div>
+					</td>
+				</tr>
+			<tbody>
+		</table>
+		<table class="item_not_found">
+			<tbody>
+				<tr>
+					<td colspan="3" class="text-center"> <%=__("admin.system.no_record_found")%> </td>
+				</tr>
+			<tbody>
+		</table>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	 var isEditable = <%=isEditable%>;
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		var disabledSelectors = [];
+		$("#add-offer select,input").each(function(){
+			if($(this).attr("disabled")){
+				disabledSelectors.push($(this));
+				$(this).attr("disabled",false);
+			}
+		});
+		submit_multipart_form('add-offer',function(status,response){
+			if(status){
+				if(isEditable){
+					if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+					if(response.status && response.message) notice(response.status,response.message);
+					$('#form_modal').modal("hide");
+				}else{
+					$("#reset").trigger("click");
+				}
+			}else{
+				stopTextLoading(btnId);
+			}
+			disabledSelectors.map(function(disabledSelector){
+				disabledSelector.attr("disabled",true);
+			});
+			disabledSelector = [];
+		});
+	});
+
+	var lastType 		 	 = "";
+	var lastValue 			 = "";
+	var applicapableFor 	 = "";
+	var usersListClass  	 = "";
+	function offerChangeValue(value){
+		if(value == '<%=COMBO_OFFER%>'){
+			$(".combo-offer-fields").removeClass("hide").show();
+			$(".combo-non-item").addClass("hide").hide();
+			$(".redirect_div").addClass("hide").hide();
+			$("#redirect_to_details").prop("chekced",false);
+			$("#item_ids").attr("disabled",false).val("");
+		}else{
+			$(".combo-offer-fields").addClass("hide").hide();
+			$(".combo-non-item").removeClass("hide").show();
+
+			if($('#listed_on_my_offer').prop("checked")){
+				$(".redirect_div").removeClass("hide").show();
+			}
+		}
+
+		if(value == '<%=CORPORATE_OFFER%>'){
+			$(".corporate-list").removeClass("hide").show();
+			$(".user-applicable-list").addClass("hide").hide();
+			$(".show-tick").selectpicker('refresh');
+		}else{
+			$(".corporate-list").addClass("hide").hide();
+			$(".user-applicable-list").removeClass("hide").show();
+			$(".show-tick").selectpicker('refresh');
+		}
+
+		if(value == '<%=MEMBER_GUEST_OFFER%>'){
+			applicapableFor = $("#applicable_for").val();
+			$("#applicable_for").val("<%=APPLICABLE_FOR_GUEST%>");
+			$("#applicable_for").attr("disabled", true);
+			$(".show-tick").selectpicker('refresh');
+		}else{
+			applicapableFor = $("#applicable_for").val();
+			$("#applicable_for").val(applicapableFor);
+			$("#applicable_for").attr("disabled", false);
+			$(".show-tick").selectpicker('refresh');
+		}
+
+		if(value == '<%=REGISTRATION_OFFER%>'){
+			applicapableFor = $("#applicable_for").val();
+			usersListClass  = $(".user-list").attr("class");
+			$(".user-list").addClass("hide");
+			$("#applicable_for").val("<%=APPLICABLE_FOR_NEW_USERS%>");
+			$("#applicable_for").attr("disabled", true);
+			$(".show-tick").selectpicker('refresh');
+			$(".applicable-for-new-user").removeClass("hide");
+		}else if(lastType == '<%=REGISTRATION_OFFER%>'){
+			$("#applicable_for").val(applicapableFor);
+			if(usersListClass) $(".user-list").attr("class",usersListClass);
+			$("#applicable_for").attr("disabled", false);
+			$(".show-tick").selectpicker('refresh');
+			$(".applicable-for-new-user").addClass("hide");
+		}
+
+		lastType = value;
+	}
+
+	/** Manage redirect check box conditions  **/
+	function manageRedirectPage(){
+		$("#item_ids").attr("disabled",false);
+		if($("#redirect_to_details").prop("checked")){
+			$("#item_ids").attr("disabled",true).val("");
+		}
+		$(".show-tick").selectpicker('refresh');
+	}// end manageRedirectPage()
+
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+
+	var datePickerInput    = '#date-range-picker-one';
+	var fromDateInput      = '#start_date';
+	var toDateInput	       = '#end_date';
+	var stopTableDraw 	   = true;
+	var minDate			   = new Date();
+	$(document).ready(function(){
+		$("#user_ids").selectpicker('destroy');
+		$(".user_ids").select2({
+			placeholder		: "<%= __('admin.offer_management.select_user'); %>",
+			multiple		: true,
+			closeOnSelect	: false,
+			width			: "417px",
+			ajax: {
+				url		: "<%=admin_list_url%>/get_users",
+				dataType: "json",
+				type	: "POST",
+				delay	: 500,
+				data	: function (params) {
+					return {
+						q: params.term,
+						page: params.page || 1,
+						limit: 10,
+						user_ids: "<%-(result.user_ids) ? result.user_ids.join(',') :''%>"
+					};
+				},
+				processResults: function (data, params) {
+					params.page = params.page || 1;
+
+					return {
+						results: data.result,
+						pagination: {
+							more: (params.page * 10) < data.total_count
+						}
+					};
+				},
+				cache: true
+			},
+		});
+
+		customFileStyle();
+		initDateRangePicker();
+		manageRedirectPage();
+
+		/** Set offer value text **/
+		$(".offer-value").html('<%= __("admin.offer_management.offer_value"); %><span class="required"> *</span>');
+
+		/** If display offer is true then display order field show **/
+		<% if(result.display_offer == true){ %>
+			$(".display-order").removeClass("hide");
+		<% } %>
+
+		/** If applicable for is registered/both then show user list **/
+		<% if(applicableFor.indexOf(APPLICABLE_FOR_REGISTERED_MEMBER) !== -1){ %>
+			$(".user-list").removeClass("hide");
+		<% } if(applicableFor.indexOf(APPLICABLE_FOR_NEW_USERS) !== -1){ %>
+			$(".applicable-for-new-user").removeClass("hide");
+		<% } %>
+
+		/** If  discount type is percentage then show offer maximum amount **/
+		<% if(result.discount_type == DISCOUNT_TYPE_PERCENTAGE ){ %>
+			$(".percentage-offer-type").removeClass("hide");
+			$(".offer-value").html('<%= __("admin.offer_management.offer_percentage"); %><span class="required"> *</span>');
+		<% } %>
+		offerChangeValue("<%= result.offer_type %>");
+
+		<% if(offerType == COMBO_OFFER && itemOfferType ==ITEM_WISE_OFFER){ %>
+			var allItemList = <%-JSON.stringify(allItemList)%>
+			var offerItemList = <%-JSON.stringify(offerItemList)%>
+			appendComboItemList(allItemList,offerItemList);
+			$("#item_ids").closest(".col-sm-6").hide();
+			$("#discount_price").closest(".col-sm-6").hide();
+		<% }%>
+		<% if(itemOfferType !=ITEM_WISE_OFFER){ %>
+			$('#item_ids').html("<%-itemList%>");
+			$('#item_ids').selectpicker('refresh');
+		<% }%>
+	});
+
+	/**
+	 * Function to show offer maximum amount
+	 */
+	$('#discount_type').on('change', function() {
+		var type =  $(this).val();
+		$(".percentage-offer-type").addClass("hide");
+		if(type == '<%=DISCOUNT_TYPE_PERCENTAGE%>'){
+			$(".offer-value").html('<%= __("admin.offer_management.offer_percentage"); %><span class="required"> *</span>');
+			$(".percentage-offer-type").removeClass("hide");
+		}else{
+			$(".offer-value").html('<%= __("admin.offer_management.offer_value"); %><span class="required"> *</span>');
+		}
+	});
+
+	/**
+	 * Function to redirect to details
+	 */
+	$('#redirect_to_details').on('change', function() {
+		manageRedirectPage();
+	});
+
+	/**
+	 * Function to redirect to details
+	 */
+	$('#listed_on_my_offer').on('change', function() {
+		$(".redirect_div").addClass("hide").hide();
+		if($(this).prop("checked") && $("#offer_type").val() != '<%=COMBO_OFFER%>'){
+			$(".redirect_div").removeClass("hide").show();
+		}
+	});
+
+	/**
+	 * Function to show user list
+	 */
+	 $('#applicable_for').on('change', function() {
+		var value =  $(this).val();
+		if(!value) value = [];
+		value = (value.constructor === Array) ? value : [value];
+
+		$(".user-list").addClass("hide");
+		$(".applicable-for-new-user").addClass("hide");
+		if(value.indexOf('<%=APPLICABLE_FOR_REGISTERED_MEMBER%>') !== -1){
+			$(".user-list").removeClass("hide");
+		}
+		if(value.indexOf('<%=APPLICABLE_FOR_NEW_USERS%>') !== -1){
+			$(".applicable-for-new-user").removeClass("hide");
+		}
+	});
+
+	/**
+	 * Function to on change offer type
+	 */
+	$('#offer_type').on('change', function() {
+		var value 		=  $(this).val();
+		var formValue 	=	0;
+		$(".reset-form").find("input, select").each(function(html,i){
+			var inputType = $(this).attr("type");
+			if(($(this).val() && inputType != "checkbox") || ($(this).prop("checked") && inputType == "checkbox")){
+				var currentValue	=	$(this).val();
+				var markRead 		= 	true;
+
+				if(lastType == "<%=CASH_VOUCHERS%>" && currentValue == "<%=DISCOUNT_TYPE_VALUE%>"){
+					markRead = false;
+				}
+				if(lastType == "<%=MEMBER_GUEST_OFFER%>" && currentValue == "<%=APPLICABLE_FOR_GUEST%>"){
+					markRead = false;
+				}
+				if(lastType == "<%=REGISTRATION_OFFER%>" && (currentValue == "<%=APPLICABLE_FOR_NEW_USERS%>" || currentValue == "<%=SINGLE%>")){
+					markRead = false;
+				}
+
+				if(markRead) formValue++;
+			}
+		});
+
+		if(formValue >0){
+			confirmBox("warning",'<%=__("admin.system.are_you_sure")%>','<%= __("admin.offer_management.offer_type_change_msg"); %>',function(result){
+				if(result){
+					/** Reset Form **/
+					$(".reset-form").find("input[type !='checkbox'], select").val('');
+					$(".reset-form").find("input[type='checkbox']").prop('checked',false);
+					$("#branch_ids, #category_ids, #cuisine_ids,#item_ids").html("");
+					$(".show-tick").selectpicker('refresh');
+					$(".combo-item-list table tbody").html('');
+					$(".user-list, .combo-offer-fields, .applicable-for-new-user,.combo-item-list,.percentage-offer-type").addClass("hide");
+					$("#item_ids").closest(".col-sm-6").show();
+					$(".offer-value").html('<%= __("admin.offer_management.offer_value"); %><span class="required"> *</span>');
+					$(".combo-non-item").removeClass("hide");
+					$(".redirect_div").addClass("hide").hide();
+
+					offerChangeValue(value);
+					swal.close();
+				}else{
+					$('#offer_type').val(lastType);
+					$(".show-tick").selectpicker('refresh');
+					return false;
+				}
+			});
+		}else{
+			offerChangeValue(value);
+		}
+	});
+
+	/**
+	 * Function to show display order if display offer is checked
+	 */
+	$('#display_offer').on('change', function() {
+		var value = $(this).prop("checked");
+		$(".display-order").addClass("hide");
+		$("#display_order").val("");
+		if(value){
+			$(".display-order").removeClass("hide");
+		}
+	});
+
+	/**
+	 * Function to get branch list
+	 */
+	$('#branch_ids').on('change', function() {
+		$(".combo-item-list").addClass("hide").hide();
+		$(".combo-item-list table tbody").html('');
+		$('#category_ids').trigger("change");
+	});
+
+	/**
+	 * Function to get branch list
+	 */
+	$('#restaurant_ids').on('change', function() {
+		var restaurantIds = $(this).val();
+		$("#branch_ids, #category_ids, #cuisine_ids,#item_ids").html("");
+		$(".show-tick").selectpicker('refresh');
+		if(restaurantIds){
+			$(".show-tick").selectpicker('refresh');
+			$(".loading-btn").removeClass('hide');
+			var options = {
+				url 	: "<%=admin_list_url%>/branch_list",
+				data	: {restaurant_ids : restaurantIds},
+				method	: "post"
+			};
+			ajaxRequest(options,function(response){
+				$("#branch_ids").closest(".col-sm-6").find(".loading-btn").addClass('hide');
+				if(response.status == "success"){
+					$("#branch_ids").html(response.branch_list);
+					$(".show-tick").selectpicker('refresh');
+				}
+			});
+			var categoryOptions = {
+				url 	: "<%=admin_list_url%>/category_list",
+				data	: {restaurant_ids : restaurantIds},
+				method	: "post"
+			};
+			ajaxRequest(categoryOptions,function(response){
+				$("#category_ids").closest(".col-sm-6").find(".loading-btn").addClass('hide');
+				if(response.status == "success"){
+					$("#category_ids").html(response.category_list);
+					$(".combo-item-list").addClass("hide").hide();
+					$(".combo-item-list table tbody").html('');
+					$(".show-tick").selectpicker('refresh');
+				}
+			});
+			var options = {
+				url 	: "<%=admin_list_url%>/cuisine_list",
+				data	: {restaurant_ids : restaurantIds},
+				method	: "post"
+			};
+			ajaxRequest(options,function(response){
+				$("#cuisine_ids").closest(".col-sm-6").find(".loading-btn").addClass('hide');
+				if(response.status == "success"){
+					$("#cuisine_ids").html(response.cuisine_list);
+					$(".show-tick").selectpicker('refresh');
+				}
+			});
+		}
+	});
+
+	/**
+	 * Function to get item list
+	 */
+	$('#category_ids').on('change', function() {
+		var categoryIds 	= $(this).val();
+		var restaurantIds 	= $("#restaurant_ids").val();
+		var branchIds 		= $("#branch_ids").val();
+
+		$("#item_ids").html("");
+		$(".show-tick").selectpicker('refresh');
+		if(categoryIds && restaurantIds){
+			var onlyList = false;
+			if($("#offer_type").val() == "<%=COMBO_OFFER%>" && $("#item_offer_type").val() == "<%=ITEM_WISE_OFFER%>") onlyList = true;
+
+			if(!onlyList){
+				$(".item-loading-btn").removeClass('hide');
+			}
+			var itemOptions = {
+				url 	: "<%=admin_list_url%>/item_list",
+				data	: {category_ids: categoryIds,restaurant_ids: restaurantIds,branch_ids: branchIds,only_list: onlyList},
+				method	: "post"
+			};
+			ajaxRequest(itemOptions,function(response){
+				$("#item_ids").closest(".col-sm-6").find(".item-loading-btn").addClass('hide');
+				if(response.status == "success"){
+					if(onlyList){
+						appendComboItemList(response.item_list);
+					}else{
+						$("#item_ids").html(response.item_list);
+						$(".show-tick").selectpicker('refresh');
+						manageRedirectPage();
+					}
+				}
+			});
+		}
+	});
+
+	/**
+	 * Function to get item list
+	 */
+	$('#item_offer_type').on('change', function() {
+		var comboDiscountType = $(this).val();
+		$("#item_ids").closest(".col-sm-6").show();
+		$("#discount_price").closest(".col-sm-6").show();
+		$('#category_ids').trigger("change");
+		if(comboDiscountType != "<%=ITEM_WISE_OFFER%>"){
+			$(".combo-item-list").addClass("hide").hide();
+			$(".combo-item-list table tbody").html('');
+		}else{
+			$("#item_ids").closest(".col-sm-6").hide();
+			$("#discount_price").closest(".col-sm-6").hide();
+		}
+	});
+
+	/**
+	 * Function to append item list
+	 */
+	function appendComboItemList(itemList,selectedItemList){
+		if(itemList && itemList.constructor === Array && itemList.length>0){
+			var finalHtml = "";
+			var index = 0;
+			$.each(itemList, function( key, records ) {
+				var restaurantHtml = $(".combo-item-html table.restaurant tbody").html();
+				let restaurantId =	records.restaurant_id;
+				restaurantHtml 	 =	restaurantHtml.replace(/{restaurant_name}/g,records.restaurant_name);
+
+				if(records.item_list && itemList.constructor === Array && itemList.length>0){
+					$.each(records.item_list, function( dataKey, data ) {
+						var itemHtml = $(".combo-item-html table.item tbody").html();
+						var itemId   = data._id;
+						var price    = "";
+						var checked  = "";
+
+						if(selectedItemList && selectedItemList.constructor === Array && selectedItemList.length>0){
+							$.each(selectedItemList, function( dataIndex, itemData ) {
+								if(itemData.item_id == itemId){
+									price 	= itemData.price;
+									checked = "checked";
+								}
+							});
+						}
+
+						itemHtml = itemHtml.replace(/{item_id}/g,itemId).replace(/{restaurant_id}/g,restaurantId).replace(/{price}/g,price).replace(/{ITEM_PRICE}/g,currencyFormat(data.item_price)).replace(/{index}/g,index).replace(/{checked}/g,checked).replace(/{ITEM_NAME}/g,data.name["<%=DEFAULT_LANGUAGE_CODE%>"]);
+
+						if(dataKey ==0) itemHtml = restaurantHtml+itemHtml;
+
+						finalHtml += itemHtml;
+						index++;
+					});
+				}
+			});
+			$(".combo-item-list").removeClass("hide").show();
+			$(".combo-item-list table tbody").html(finalHtml);
+		}else{
+			var itemHtml = $(".combo-item-html table.item_not_found tbody").html();
+			$(".combo-item-list").removeClass("hide").show();
+			$(".combo-item-list table tbody").html(itemHtml);
+		}
+	}// end appendComboItemList()
+
+	/**
+	 * Function to get restaurant list
+	 */
+	 $('#restaurant_type').on('change', function() {
+		var restaurantType = $(this).val();
+		if(restaurantType && (restaurantType == "<%=REDEEMED_FOR_ALL_RESTAURANTS_DELIVERED_BY_CRAVEZ%>" || restaurantType == "<%=REDEEMED_FOR_ALL_RESTAURANTS_DELIVERED_BY_RESTAURANT%>")){
+			$(".restaurant-loading-btn").removeClass('hide');
+			$("#restaurant_ids,#branch_ids, #category_ids,#cuisine_ids,#item_ids").find("option").remove();
+
+			if($('#item_offer_type').val() == "<%=ITEM_WISE_OFFER%>"){
+				var itemHtml = $(".combo-item-html table.item_not_found tbody").html();
+				$(".combo-item-list").removeClass("hide").show();
+				$(".combo-item-list table tbody").html(itemHtml);
+			}
+			$(".show-tick").selectpicker('refresh');
+			ajaxRequest({
+				url 	: "<%=admin_list_url%>/restaurant_list",
+				data	: {restaurant_type : restaurantType},
+				method	: "post"
+			},function(response){
+				$("#restaurant_ids").closest(".col-sm-6").find(".restaurant-loading-btn").addClass('hide');
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					$("#restaurant_ids").html(response.restaurant_list);
+					$(".show-tick").selectpicker('refresh');
+				}else if(response.status && response.message){
+					notice(response.status,response.message);
+				}
+			});
+		}
+	});
+</script>

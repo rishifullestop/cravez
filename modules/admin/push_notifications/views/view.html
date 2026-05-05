@@ -1,0 +1,74 @@
+
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.push_notifications.pn_details'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" ><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __('admin.system.back'); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body table-responsive" id="aniimated-thumbnials">
+						
+					<table id="pn-table" class="row-border hover table table-bordered" cellspacing="0" width="100%">
+						<tr>
+							<th class="text-right"  width="25%"><%= __('admin.push_notifications.image'); %></th>
+							<td><span><a href="<%=result.full_image_path%>" class="item-image" data-lightbox="roadtrip">
+								<img class="img-thumbnail set_image_dim" src="<%=result.full_image_path%>?dim=80x60&type=resize" alt="Image"></td>
+							</a></span></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.push_notifications.title'); %></th>
+							<td><span><%= (typeof result.title !== typeof undefined) ? result.title :"";%></span></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.push_notifications.message'); %></th>
+							<td><%= (typeof result.message !== typeof undefined) ? result.message :"";%></td>
+						</tr>
+											
+						<tr>
+							<th class="text-right"><%= __('admin.push_notifications.users'); %></th>
+							<td><%= (typeof result.user_names !== typeof undefined) ? result.user_names :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.push_notifications.payload_type'); %></th>
+							<td><%= (typeof result.payload_type !== typeof undefined) ? PN_PAYLOAD_TYPES[result.payload_type] :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.push_notifications.payload_value'); %></th>
+							<td><%= (typeof result.payload_value !== typeof undefined) ? result.payload_value :"N/A";%></td>
+						</tr>
+						<%
+							var status 		= (typeof result !== typeof undefined && result.status) ? 	result.status : PN_SCHEDULED;
+							var statusClass	= (status	==	PN_SENT)? "label-success"		:"label-warning";
+							var statusText	= (status	==	PN_SENT)? PN_STATUSES[PN_SENT]	: PN_STATUSES[PN_SCHEDULED];
+						%>
+						<tr>
+							<th class="text-right"><%= __('admin.system.status'); %></th>
+							<td>
+								<span class="label <%= statusClass %>"><%= statusText %></span>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.push_notifications.scheduled_time'); %></th>
+							<td><span class="setDateTimeFormat" data-date-time="<%= (typeof result !== typeof undefined &&  result.scheduled_time) ? result.scheduled_time : 'N/A';%>"></span></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.system.created'); %></th>
+							<td><span class="setDateTimeFormat" data-date-time="<%= (typeof result !== typeof undefined &&  result.created) ? result.created : 'N/A';%>"></span></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>

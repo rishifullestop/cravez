@@ -1,0 +1,101 @@
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-overtime-request" action="<%=(is_editable) ? admin_list_url+'/edit/'+result._id : admin_list_url+'/add'%>" data-submit-btn-id="overtime-request-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (is_editable) ?  __("admin.captain_overtime_request.edit_captain_overtime_request")  : __("admin.captain_overtime_request.add_captain_overtime_request"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix selected">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="team_member" class="control-label">
+											<%=  __('admin.captain_overtime_request.captain'); %><span class="required"> *</span>
+										</label>
+										<select id="team_member" class="form-control show-tick" name="agent_id"  data-live-search="<%-is_editable ? 'false':'true'%>">
+											<% if(!is_editable){ %>
+												<option value=""><%- __('admin.captain_overtime_request.select_captain')%></option>
+											<% } %>
+											<%-users_list%>
+										</select>
+									</div>
+									<span id="agent_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6 <%-(is_editable) ? 'hide' :'';%>">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="request_date" class="control-label">
+											<%=  __('admin.captain_overtime_request.request_date'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control" name="request_date" id="request_date" value="<%= (is_editable) ?newDate(result.request_date,DATABASE_DATE_FORMAT) : newDate('',DATABASE_DATE_FORMAT)%>" readonly>
+									</div>
+									<span id="request_date_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="overtime_hours" class="control-label">
+											<%=  __('admin.captain_overtime_request.overtime_hours'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control" id="overtime_hours" name="overtime_hours" value="<%=(result.hours) ? result.hours :'';%>" placeholder="<%=  __('admin.captain_overtime_request.hours_example'); %>">
+									</div>
+									<span id="overtime_hours_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix <%-(is_editable) ? 'hide' :'';%>">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="overtime_purpose" class="control-label">
+											<%=  __('admin.captain_overtime_request.overtime_purpose'); %><span class="required"> *</span>
+										</label>
+										<textarea class="form-control resize-none" id="overtime_purpose" name="overtime_purpose" rows="4" ><%-(result.purpose) ? result.purpose :""%></textarea>
+									</div>
+									<span id="overtime_purpose_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="overtime-request-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-blue-grey btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-overtime-request',function(status,response){
+			if(status){
+				window.location.href = response.redirect_url;
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	$(document).ready(function() {
+	  $(".show-tick").selectpicker('refresh');
+	});
+</script>

@@ -1,0 +1,154 @@
+<%
+var result 		= (result) ? result   : {};
+var fromDate	= (result.date) ? newDate(result.date,DATABASE_DATE_FORMAT) : newDate("",DATABASE_DATE_FORMAT);
+var toDate		= (result.date) ? newDate(result.date,DATABASE_DATE_FORMAT) : newDate("",DATABASE_DATE_FORMAT);
+var leaveTypeList= leave_type_list;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-vacation-request" action="<%=(is_editable) ? admin_list_url+'/vacation_request/edit/'+result._id : admin_list_url+'/vacation_request/add'%>" data-submit-btn-id="vacation-request-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (is_editable) ?  __("admin.leave_management.edit_vacation_request")  : __("admin.leave_management.add_vacation_request"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix selected">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="team_member" class="control-label">
+											<%=  __('admin.leave_management.team_member'); %><span class="required"> *</span>
+										</label>
+										<select id="team_member" class="form-control show-tick" name="team_member"  data-live-search="true">
+											<option value=""><%- __('admin.leave_management.select_team_member')%></option>
+											<%-users_list%>
+										</select>
+									</div>
+									<span id="team_member_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="leave_type" class="control-label">
+											<%= __("admin.leave_management.leave_type"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" name="leave_type" id="leave_type">
+											<option value=""><%- __('admin.leave_management.select_leave_type')%></option>
+											<%-leaveTypeList%>
+										</select>
+									</div>
+									<span id="leave_type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="leave_date" class="control-label">
+											<%=  __('admin.leave_management.leave_date'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control" id="leave-date-range-picker" value="<%=fromDate+' - '+toDate%>">
+									</div>
+									<input class="form-control hide" id="leave_from_date" type="text" name="from_date" value="<%=fromDate%>">
+									<input class="form-control hide" id="leave_to_date" type="text" name="to_date" value="<%=toDate%>">
+									<span id="leave_date_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="leave_status" class="control-label">
+											<%= __("admin.leave_management.leave_status"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" id="leave_status"   name="leave_status">
+											<option value=""><%=__("admin.leave_management.select_leave_status");%></option>
+											<% Object.keys(COMMAN_STATUS_SEARCH_DROPDOWN).map(key=>{ %>
+												<option value="<%=key%>" <%= (key == result.leave_status) ? "selected" :""%>>
+													<%=(COMMAN_STATUS_SEARCH_DROPDOWN[key].status_name) ? COMMAN_STATUS_SEARCH_DROPDOWN[key].status_name :"";%>
+												</option> 
+											<% }); %>
+										</select>
+									</div>
+									<span id="leave_status_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix reject-class hide">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="rejection_reason" class="control-label">
+											<%= __("admin.leave_management.rejection_reason"); %><span class="required"> *</span>
+										</label>
+										<textarea id="rejection_reason" rows="6" class="resize-none height-100 form-control notSubmitOnEnter" name="rejection_reason"><%=result.rejection_reason%></textarea>
+									</div>
+									<span id="rejection_reason_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="vacation-request-add-btn-id" class="btn  bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-vacation-request',function(status,response){
+			if(status){
+				window.location.href = response.redirect_url;
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/**
+	 * Function for date range picker
+	 */
+	var fromDateInput 	= '#leave_from_date';
+	var toDateInput 	= '#leave_to_date';
+	var datePickerInput = '#leave-date-range-picker';
+	var stopTableDraw   = true;
+	var minDate			= new Date();
+	$(document).ready(function(){
+		initDateRangePicker();
+	});
+	
+	$(".show-tick").selectpicker('refresh');
+	
+	/**
+	 * Function for show textarea
+	 */
+	$("#leave_status").change(function(){
+		var status = $("#leave_status").val();
+		$(".reject-class").addClass("hide");
+		if(status == '<%=REJECTED%>'){
+			$(".reject-class").removeClass("hide");
+		}
+	});
+	
+	/** Show reject reason textarea */
+	<% if(result.leave_status == REJECTED){ %>
+		$(".reject-class").removeClass("hide");
+	<% } %>
+</script>

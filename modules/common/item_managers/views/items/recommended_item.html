@@ -1,0 +1,58 @@
+<% var itemId   = item_id;%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-item" action="<%=list_url%>/recommended_item/<%=itemId%>" data-modal-id="form_modal" data-submit-btn-id="item-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title"><%= __("items.recommended_item"); %></h2>
+					</div>
+					<div class="modal-body">
+						<div class="row clearfix">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="recommended" class="control-label">
+                                            <%= __("items.items"); %><span class="required"> *</span>
+                                        </label>
+                                        <select id="recommended" class="form-control show-tick" name="recommended" data-live-search="true" multiple>
+                                            <!-- <option><%=__("items.please_select_items")%></option> -->
+                                            <%-item_list%>
+                                        </select>
+                                    </div>
+                                    <span id="recommended_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div> 
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="item-add-btn-id" class="btn bg-brown btn-sm waves-effect item-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        /** For selectpicker*/
+        $("#add-item .show-tick").selectpicker('refresh');
+
+        /** For submit form */
+        $('.item-btn-submit').click(function(){
+            var btnId = $(this).attr('id');
+            startTextLoading(btnId);
+            ajax_submit('add-item',function(status,response){
+                if(status){
+                    if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+                    if(response.status && response.message) notice(response.status,response.message);
+                    $('#form_modal').modal("hide");
+                }else{
+                    stopTextLoading(btnId);
+                }
+            });
+        });
+	});
+</script>

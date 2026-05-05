@@ -1,0 +1,613 @@
+<%
+    var totalPendingOrderPercentage         = (result.total_pending_orders)          ? round((result.total_pending_orders/result.total_orders)*100,ROUND_PRECISION)          : 0;
+    var totalSubmittedOrderPercentage       = (result.total_submitted_orders)        ? round((result.total_submitted_orders/result.total_orders)*100,ROUND_PRECISION)        : 0;
+    var totalPreparingOrderPercentage       = (result.total_preparing_orders)        ? round((result.total_preparing_orders/result.total_orders)*100,ROUND_PRECISION)        : 0
+    var totalRejectedOrderPercentage        = (result.total_rejected_orders)         ? round((result.total_rejected_orders/result.total_orders)*100,ROUND_PRECISION)         : 0;
+    var totalOutForDeliveryPercentage       = (result.total_out_for_delivery_orders) ? round((result.total_out_for_delivery_orders/result.total_orders)*100,ROUND_PRECISION) : 0;
+    var totalDeliveredOrderPercentage       = (result.total_delivered_orders)        ? round((result.total_delivered_orders/result.total_orders)*100,ROUND_PRECISION)        : 0;
+    var totalReadyToPickUpOrderPercentage   = (result.total_ready_to_pickup_orders)  ? round((result.total_ready_to_pickup_orders/result.total_orders)*100,ROUND_PRECISION)  : 0;
+    var totalCancelledOrderPercenatge       = (result.total_cancelled_orders)        ? round((result.total_cancelled_orders/result.total_orders)*100,ROUND_PRECISION)        : 0;
+    var totalClosedTicketsPercentage        = (result.total_closed_tickets )         ? round((result.total_closed_tickets/result.total_tickets)*100,ROUND_PRECISION)         : 0;
+    var totalOpenTicketsPercentage          = (result.total_open_tickets )           ? round((result.total_open_tickets/result.total_tickets)*100,ROUND_PRECISION)           : 0;
+    var totalReopenTicketsPercentage        = (result.total_reopen_tickets )         ? round((result.total_reopen_tickets/result.total_tickets)*100,ROUND_PRECISION)         : 0;
+    var totalPendingTicketsPercentage       = (result.total_pending_tickets )        ? round((result.total_pending_tickets/result.total_tickets)*100,ROUND_PRECISION)        : 0;
+    var totalActiveBranch                   = (result.total_active_branch )          ? result.total_active_branch         : 0;
+    var totalOpenBranch                     = (result.total_open_branch )            ? result.total_open_branch           : 0;
+    var totalBusyBranch                     = (result.total_busy_branch )            ? result.total_busy_branch           : 0;
+    var totalAvailableDrivers               = (result.total_available_drivers)       ? result.total_available_drivers     : 0;
+    var totalAssignedDrivers                = (result.total_assigned_drivers)        ? result.total_assigned_drivers      : 0;
+    var totalFreeDrivers                    = (result.total_free_drivers)            ? result.total_free_drivers          : 0;
+    var totalDrivers                        = (result.total_drivers)                 ? result.total_drivers               : 0;
+    var totalDeliveredOrders                = (result.total_delivered_orders)        ? result.total_delivered_orders      : 0;
+    var totalPreparingOrders                = (result.total_preparing_orders)        ? result.total_preparing_orders      : 0;
+    var totalSucceededMyfatoorah            = (result.total_succeeded_myfatoorah)    ? result.total_succeeded_myfatoorah  : 0;
+    var totalCancelledMyfatoorah            = (result.total_cancelled_myfatoorah)    ? result.total_cancelled_myfatoorah  : 0;
+    var totalSucceededCredit                = (result.total_succeeded_credit)        ? result.total_succeeded_credit      : 0;
+    var totalCancelledCredit                = (result.total_cancelled_credit)        ? result.total_cancelled_credit      : 0;
+
+    let ordersData 	=	[];
+
+	if(result.sales_chart){
+		for(var i=0; i < result.sales_chart.length; i++) {
+			let day = (result.sales_chart[i]["_id"]) ? result.sales_chart[i]["_id"] :"";
+			ordersData[i]       = 	{};
+			ordersData[i][day]	=	{};
+
+            ordersData[i][day]["total_cravez_delivery"]	= (result.sales_chart[i]["total_cravez_delivery"]) ? result.sales_chart[i]["total_cravez_delivery"] :0;
+            ordersData[i][day]["total_restaurant_delivery"]= (result.sales_chart[i]["total_restaurant_delivery"]) ? result.sales_chart[i]["total_restaurant_delivery"] :0;
+            ordersData[i][day]["total_pickup_delivery"]	= (result.sales_chart[i]["total_pickup_delivery"]) ? result.sales_chart[i]["total_pickup_delivery"] :0;
+
+		}
+	}
+%>
+<div class="equal_spacing supervisor_user home_page">
+    <div class="dashboard_page">
+        <h1><%= __('admin.dashboard.dashboard')%></h1>
+        <div class="separate_box">
+            <div class="box_height">
+                <div class="white_bg_left">
+                    <div class="sales_report">
+                        <div class="heading_text">
+                            <h3><%= __('admin.dashboard.sales_report')%></h3>
+                            <ul class="supervisor__sales_legends">
+                                <li><small class="sales-report-cravez"></small><span class="m-l-5 m-r-10"><%= __('admin.dashboard.cravez')%></span></li>
+
+								<li><small class="sales-report-restaurant"></small><span class="m-l-5 m-r-10"><%= __('admin.dashboard.restaurant')%></span></li>
+
+								<li><small class="sales-report-pickup"></small><span class="m-l-5"><%= __('admin.dashboard.pickup')%></span></li>
+                            </ul>
+                        </div>
+                        <a href="javascript:void(0)">
+                            <div id="chart_div" style="width: 100%; height: 430px;"></div>
+                        </a>
+                    </div>
+                </div>
+                <div class="white_bg_right order_status_box">
+                    <div class="order_status">
+                        <div class="heading_text">
+                            <h3><%= __('admin.dashboard.order_status')%></h3>
+                        </div>
+                        <div class="order_status_section">
+                            <div class="order_progress_bar">
+                                <div class="progress">
+                                    <div class="order-progress blue_bg" role="progressbar" style="width: <%=totalPendingOrderPercentage%>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="order-progress green_bg" role="progressbar" style="width: <%=totalSubmittedOrderPercentage%>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="order-progress yello_bg"  role="progressbar" style="width: <%=totalPreparingOrderPercentage %>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="order-progress darkred_bg" role="progressbar" style="width: <%=totalRejectedOrderPercentage%>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="order-progress skyblue_bg" role="progressbar" style="width: <%=totalOutForDeliveryPercentage%>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="order-progress pink_bg" role="progressbar" style="width: <%=totalDeliveredOrderPercentage %>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="order-progress brwn_bg" role="progressbar" style="width: <%=totalReadyToPickUpOrderPercentage %>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="order-progress red_bg" role="progressbar" style="width: <%=totalCancelledOrderPercenatge %>%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td><small class="bluedots"></small><span><a href="<%= WEBSITE_ADMIN_URL+'orders?status=pending&is_confirm=false'%>" target="_blank" class="reset_storage"><%= __('admin.dashboard.pending_for_processing')%></a></span></td>
+                                            <td><%=(result.total_pending_orders) ? result.total_pending_orders : 0;%></td>
+                                            <td><%=totalPendingOrderPercentage%>%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><small class="greenedots"></small><span><a href="<%= WEBSITE_ADMIN_URL+'orders?status=pending&is_confirm=true'%>" target="_blank" class="reset_storage"><%= __('admin.dashboard.submitted')%></a></span></td>
+                                            <td><%=(result.total_submitted_orders) ? result.total_submitted_orders : 0;%></td>
+                                            <td><%=totalSubmittedOrderPercentage%>%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><small class="yellowdots"></small><span><a href="<%= WEBSITE_ADMIN_URL+'orders?status=preparing'%>" target="_blank" class="reset_storage"><%= __('admin.dashboard.preparing')%></a></span></td>
+                                            <td><%=totalPreparingOrders%></td>
+                                            <td><%=totalPreparingOrderPercentage%>%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><small class="brwndots"></small><span><a href="<%= WEBSITE_ADMIN_URL+'orders?status=ready_to_pick_up'%>" target="_blank" class="reset_storage"><%= __('admin.dashboard.ready_to_pick_up')%></a></span></td>
+                                            <td><%=(result.total_ready_to_pickup_orders) ? result.total_ready_to_pickup_orders : 0;%></td>
+                                            <td><%=totalReadyToPickUpOrderPercentage%>%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><small class="skyblyedots"></small><span><a href="<%= WEBSITE_ADMIN_URL+'orders?status=on_the_way'%>" target="_blank" class="reset_storage"><%= __('admin.dashboard.out_for_delivery')%></a></span></td>
+                                            <td><%=(result.total_out_for_delivery_orders) ? result.total_out_for_delivery_orders : 0;%></td>
+                                            <td><%=totalOutForDeliveryPercentage%>%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><small class="pinkdots"></small><span><a href="<%= WEBSITE_ADMIN_URL+'orders?status=delivered'%>" target="_blank" class="reset_storage"><%= __('admin.dashboard.delivered_orders')%></a></span></td>
+                                            <td><%=totalDeliveredOrders%></td>
+                                            <td><%=totalDeliveredOrderPercentage%>%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><small class="lightbrwnedots"></small><span><a href="<%= WEBSITE_ADMIN_URL+'orders?status=rejected'%>" target="_blank" class="reset_storage"><%= __('admin.dashboard.reject_order')%></a></span></td>
+                                            <td><%=(result.total_rejected_orders) ? result.total_rejected_orders : 0;%></td>
+                                            <td><%=totalRejectedOrderPercentage%>%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><small class="reddots"></small><span><a href="<%= WEBSITE_ADMIN_URL+'orders?status=cancelled'%>" target="_blank" class="reset_storage"><%= __('admin.dashboard.cancelled')%></a></span></td>
+                                            <td><%=(result.total_cancelled_orders) ? result.total_cancelled_orders : 0;%></td>
+                                            <td><%=totalCancelledOrderPercenatge%>%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="separate_box supervisor_separate_box">
+        <div class="status_section">
+            <div class="status_detail">
+                <div class="status_box">
+                    <div class="heading_text supervisor_heading_class">
+                        <h3><%= __('admin.dashboard.captains_status')%></h3>
+                    </div>
+                    <div class="captains_detail">
+                        <ul>
+                            <li>
+                                <a href="<%= WEBSITE_ADMIN_URL+'user_management/list_driver?user_type=available_drivers'%>" target="_blank" class="reset_storage">
+                                    <div class="captains_left"><small class="bluedots"></small> <span><%= __('admin.dashboard.total_available_drivers')%></span> </div>
+                                    <div class="progress_number"><strong><%=totalAvailableDrivers%></strong></div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<%= WEBSITE_ADMIN_URL+'user_management/list_driver?user_type=assign_drivers'%>" target="_blank" class="reset_storage">
+                                    <div class="captains_left"><small class="greenedots"></small> <span><%= __('admin.dashboard.assign_drivers')%></span> </div>
+                                    <div class="progress_number"><strong><%=totalAssignedDrivers%></strong></div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<%= WEBSITE_ADMIN_URL+'user_management/list_driver?user_type=free_drivers'%>" target="_blank" class="reset_storage">
+                                    <div class="captains_left"><small class="yellowdots"></small> <span><%= __('admin.dashboard.free_drivers')%></span> </div>
+                                    <div class="progress_number"><strong><%=totalFreeDrivers%></strong></div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="progress_circle">
+                        <div id="donutchart_captain" style="width: 100%; height: 150px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="status_detail">
+                <a href="javascript:void(0)">
+                    <div class="status_box">
+                        <div class="heading_text supervisor_heading_class">
+                            <h3><%= __('admin.dashboard.restaurant_status')%></h3>
+                        </div>
+                        <div class="captains_detail">
+                            <ul>
+                                <li>
+                                    <div class="captains_left"><small class="bluedots"></small> <span><%= __('admin.dashboard.active_restaurant')%></span></div>
+                                    <div class="progress_number"><strong><%=totalActiveBranch%></strong></div>
+                                </li>
+                                <li>
+                                    <div class="captains_left"><small class="greenedots"></small> <span><%= __('admin.dashboard.open_restaurant')%></span></div>
+                                    <div class="progress_number"><strong><%=totalOpenBranch%></strong></div>
+                                </li>
+                                <li>
+                                    <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.busy_restaurant')%></span></div>
+                                    <div class="progress_number"><strong><%=totalBusyBranch%></strong></div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="progress_circle">
+                            <div id="donutchart_branch" style="width: 100%; height: 150px;"></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="status_detail">
+                <a href="javascript:void(0)">
+                    <div class="status_box payment_status">
+                        <div class="heading_text supervisor_heading_class">
+                            <h3><%= __('admin.dashboard.knet')%></h3>
+                        </div>
+                        <div class="captains_detail">
+                            <ul>
+                                <li>
+                                    <a href="<%= WEBSITE_ADMIN_URL+'payment_transaction/?payment_method='+KNET+'&payment_status=success'%>" target="_blank" class="reset_storage">
+                                        <div class="captains_left"><small class="greenedots"></small> <span><%= __('admin.dashboard.succeeded')%></span> </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<%= WEBSITE_ADMIN_URL+'payment_transaction/?payment_method='+KNET+'&payment_status=canceled'%>" target="_blank" class="reset_storage">
+                                        <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.cancelled')%></span></div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="progress_circle">
+                            <div id="chart_myfatoorah" style="width: 100%; height: 150px;"></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="monitoring_ticket">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="ticket_status">
+                    <div class="status_box">
+						<a href="<%= WEBSITE_ADMIN_URL+'tickets/all_tickets'%>" target="_blank" class="reset_storage">
+							<div class="heading_text supervisor_heading_class">
+								<h3><%= __('admin.dashboard.tickets_status')%></h3>
+								<strong><%=(result.total_tickets) ? result.total_tickets : 0;%></strong>
+							</div>
+						</a>
+                        <ul class="captains_detail delivery_status">
+                            <li>
+                                <div class="captains_left">
+                                    <a href="<%= WEBSITE_ADMIN_URL+'tickets/all_tickets?status=2'%>" target="_blank" class="reset_storage">
+                                        <strong><%=(result.total_closed_tickets) ? result.total_closed_tickets : 0;%> <span><%= __('admin.dashboard.closed_ticket')%></span></strong> <small><%=totalClosedTicketsPercentage %>%</small>
+                                    </a>
+                                </div>
+                                <div class="progress_bar">
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: <%=totalClosedTicketsPercentage%>%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="captains_left">
+                                    <a href="<%= WEBSITE_ADMIN_URL+'tickets/all_tickets?status=1'%>" target="_blank" class="reset_storage">
+                                        <strong><%=(result.total_open_tickets) ? result.total_open_tickets : 0;%> <span><%= __('admin.dashboard.open_ticket')%></span></strong> <small><%=totalOpenTicketsPercentage %>%</small>
+                                    </a>
+                                </div>
+                                <div class="progress_bar orange_progress">
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: <%=totalOpenTicketsPercentage%>%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="captains_left">
+                                    <a href="<%= WEBSITE_ADMIN_URL+'tickets/all_tickets?status=3'%>" target="_blank" class="reset_storage">
+                                        <strong><%=(result.total_reopen_tickets) ? result.total_reopen_tickets : 0;%> <span><%= __('admin.dashboard.reopen_ticket')%></span></strong> <small><%= totalReopenTicketsPercentage%>%</small>
+                                    </a>
+                                </div>
+                                <div class="progress_bar blue_progress">
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: <%=totalReopenTicketsPercentage %>%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="captains_left">
+                                    <a href="<%= WEBSITE_ADMIN_URL+'tickets/all_tickets?status=0'%>" target="_blank" class="reset_storage">
+                                        <strong><%=(result.total_pending_tickets) ? result.total_pending_tickets : 0;%> <span><%= __('admin.dashboard.pending_ticket')%></span></strong> <small><%= totalPendingTicketsPercentage%>%</small>
+                                    </a>
+                                </div>
+                                <div class="progress_bar skyblue_progress">
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: <%=totalPendingTicketsPercentage %>%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="credit_card">
+                    <div class="status_detail orders">
+                        <div class="status_box">
+                            <div class="heading_text supervisor_heading_class">
+                                <h3><%= __('admin.dashboard.monitoring_status')%></h3>
+                            </div>
+                            <div class="captains_detail monitoring_status">
+                                <ul>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=first_orders'%>" target="_blank" class="reset_storage">
+                                            <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.first_orders')%></span></div>
+                                            <div class="progress_number p-l-20"><strong><%=(result.first_orders) ? result.first_orders : 0;%></strong></div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=duplicate_orders'%>" target="_blank" class="reset_storage">
+                                            <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.duplicated_orders')%></span></div>
+                                            <div class="progress_number  p-l-20"><strong><%=(result.duplicate_orders) ? result.duplicate_orders : 0;%></strong></div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=big_orders'%>" target="_blank" class="reset_storage">
+                                        <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.big_orders')%></span></div>
+                                        <div class="progress_number  p-l-20"><strong><%=(result.big_orders) ? result.big_orders : 0;%></strong></div>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=order_rejected'%>" target="_blank" class="reset_storage">
+                                            <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.rejected_orders')%></span></div>
+                                            <div class="progress_number  p-l-20"><strong><%=(result.rejected_orders_monitoring) ? result.rejected_orders_monitoring : 0;%></strong></div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_acceptance'%>" target="_blank" class="reset_storage">
+                                            <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.delayed_acceptance')%></span></div>
+                                            <div class="progress_number  p-l-20"><strong><%=(result.delayed_acceptance) ? result.delayed_acceptance : 0;%></strong></div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_preparation'%>" target="_blank" class="reset_storage">
+                                            <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.delayed_preparation')%></span></div>
+                                            <div class="progress_number  p-l-20"><strong><%=(result.delayed_preparation) ? result.delayed_preparation : 0;%></strong></div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_pickup_by_captain'%>" target="_blank" class="reset_storage">
+                                            <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.delayed_pickup_by_captain')%></span></div>
+                                            <div class="progress_number  p-l-20"><strong><%=(result.delayed_pickup_by_captain) ? result.delayed_pickup_by_captain : 0;%></strong></div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_pickup_by_customer'%>" target="_blank" class="reset_storage">
+                                            <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.delayed_pickup_by_customer')%></span></div>
+                                            <div class="progress_number  p-l-20"><strong><%=(result.delayed_pickup_by_customer) ? result.delayed_pickup_by_customer : 0;%></strong></div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=vip_orders'%>" target="_blank" class="reset_storage">
+                                            <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.vip_orders')%></span></div>
+                                            <div class="progress_number  p-l-20"><strong><%=(result.vip_orders) ? result.vip_orders : 0;%></strong></div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delayed_delivery'%>" target="_blank" class="reset_storage">
+                                            <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.delayed_in_delivery')%></span></div>
+                                            <div class="progress_number  p-l-20"><strong><%=(result.delayed_delivery) ? result.delayed_delivery : 0;%></strong></div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delivery_cravez'%>" target="_blank" class="reset_storage">
+                                            <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.cravez_delivery_monitoring')%></span></div>
+                                            <div class="progress_number  p-l-20"><strong><%=(result.delivery_cravez) ? result.delivery_cravez : 0;%></strong></div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status_detail">
+                        <a href="javascript:void(0)">
+                            <div class="status_box">
+                                <div class="heading_text supervisor_heading_class">
+                                    <h3><%= __('admin.dashboard.credit')%></h3>
+                                </div>
+                                <div class="captains_detail">
+                                    <ul>
+                                        <li>
+                                            <a href="<%= WEBSITE_ADMIN_URL+'payment_transaction/?payment_method=credit&payment_status=success'%>" target="_blank" class="reset_storage">
+                                                <div class="captains_left"><small class="greenedots"></small> <span><%= __('admin.dashboard.succeeded')%></span> </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="<%= WEBSITE_ADMIN_URL+'payment_transaction/?payment_method=credit&payment_status=canceled'%>" target="_blank" class="reset_storage">
+                                                <div class="captains_left"><small class="graydots"></small> <span><%= __('admin.dashboard.cancelled')%></span></div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="progress_circle">
+                                    <div id="chart_credit" style="width: 100%; height: 150px;"></div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="delay_status">
+                            <div class="status_box">
+                                <div class="heading_text supervisor_heading_class">
+                                    <h3><%= __('admin.dashboard.delay_status')%></h3>
+                                </div>
+                                <ul>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delay_delivery_by_cravez'%>" target="_blank" class="reset_storage">
+                                            <strong><%=(result.delay_in_delivery_by_cravez) ? result.delay_in_delivery_by_cravez : 0;%></strong> <span><%= __('admin.dashboard.delay_in_delivery_by')%> <b><%= __('admin.dashboard.cravez')%></b></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delay_delivery_by_restaurant'%>" target="_blank" class="reset_storage">
+                                            <strong><%=(result.delay_in_delivery_by_restaurant) ? result.delay_in_delivery_by_restaurant : 0;%></strong>
+                                            <span><%= __('admin.dashboard.delay_in_delivery_by')%> <b><%= __('admin.dashboard.restaurant')%></b></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delay_pickup_by_cravez_captain'%>" target="_blank" class="reset_storage">
+                                            <strong><%=(result.delay_pickup_by_captain_cravez_order) ? result.delay_pickup_by_captain_cravez_order : 0;%></strong>
+                                            <span><%= __('admin.dashboard.delay_pickup_by')%> <b><%= __('admin.dashboard.captain')%></b> <%= __('admin.dashboard.cravez_order')%></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<%= WEBSITE_ADMIN_URL+'orders?order_type=delay_prepartion_by_cravez'%>" target="_blank" class="reset_storage">
+                                            <strong><%=(result.delay_in_preparation_cravez_order) ? result.delay_in_preparation_cravez_order : 0;%></strong>
+                                            <span><%= __('admin.dashboard.delay_in_preparation')%> <b><%= __('admin.dashboard.cravez_order')%></b></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- contentFor('css') %>
+    <link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>new_dashboard/style.css">
+
+<%- contentFor("script") %>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript">
+        $(".breadcrumb").remove();
+
+        google.charts.load('current', {'packages':['bar']});
+        google.charts.setOnLoadCallback(drawChart);
+        var totalDeliveredOrder =	<%- JSON.stringify(ordersData); %>;
+        var daysArray =  getDays();
+		daysArray.reverse();
+        function drawChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Day');
+            data.addColumn('number', 'Cravez');
+            data.addColumn('number', 'Restaurant');
+            data.addColumn('number', 'Pickup');
+            $.each(totalDeliveredOrder, function(index,html){
+				for(var i=0; i < daysArray.length; i++) {
+					if(typeof html[daysArray[i]['day']] !== typeof undefined){
+						daysArray[i]['total_cravez_delivery']      = (html[daysArray[i]['day']]['total_cravez_delivery'])     ? html[daysArray[i]['day']]['total_cravez_delivery']      : 0;
+                        daysArray[i]['total_restaurant_delivery']  = (html[daysArray[i]['day']]['total_restaurant_delivery']) ? html[daysArray[i]['day']]['total_restaurant_delivery']  : 0;
+                        daysArray[i]['total_pickup_delivery']      = (html[daysArray[i]['day']]['total_pickup_delivery'])     ? html[daysArray[i]['day']]['total_pickup_delivery']      : 0;
+                    }
+				}
+			});
+
+			for(var i=0; i < daysArray.length; i++) {
+                let totalCravezDelivery     = (daysArray[i].total_cravez_delivery)      ? daysArray[i].total_cravez_delivery     :0;
+                let totalRestaurantDelivery = (daysArray[i].total_restaurant_delivery)  ? daysArray[i].total_restaurant_delivery :0;
+                let totalPickupDelivery     = (daysArray[i].total_pickup_delivery)      ? daysArray[i].total_pickup_delivery     :0;
+
+                if(daysArray[i].day){
+                    data.addRows([
+                        [String(daysArray[i].date),totalCravezDelivery,totalRestaurantDelivery,totalPickupDelivery],
+                    ]);
+				}
+			}
+
+			var viewWindow = { min: 0};
+            var options = {
+                colors: ['#7E7EEE', '#FAB80E','#C9CBCF'],
+                legend: { position: 'none'},
+                bars: 'vertical', // Required for Material Bar Charts.
+                pieSliceText: 'percentage',
+                chartArea: {
+                    height: "100%",
+                    width: "100%"
+                },
+                bar: {groupWidth: "90%"},
+				vAxis: {viewWindowMode: "explicit",viewWindow:viewWindow,format: 0}
+            };
+            var chart = new google.charts.Bar(document.getElementById('chart_div'));
+            chart.draw(data, google.charts.Bar.convertOptions(options));
+        }
+
+        google.charts.load("current", {packages:["corechart"]});
+        google.charts.setOnLoadCallback(drawPieChart);
+        function drawPieChart() {
+            var captainData = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['<%= __("admin.dashboard.total_available_drivers")%>',<%=totalAvailableDrivers%>],
+                ['<%= __("admin.dashboard.assign_drivers")%>', <%=totalAssignedDrivers%>],
+                ['<%= __("admin.dashboard.free_drivers")%>',<%=totalFreeDrivers%>],
+            ]);
+
+            var branchData = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['<%= __("admin.dashboard.active_restaurant")%>',<%=totalActiveBranch%>],
+                ['<%= __("admin.dashboard.open_restaurant")%>', <%=totalOpenBranch%>],
+                ['<%= __("admin.dashboard.busy_restaurant")%>',<%=totalBusyBranch%>],
+            ]);
+
+            var captainOptions = {
+                pieHole: 0.7,
+                colors: ['#7E7EEE', '#00CD98','#F6B900'],
+                chartArea: {
+                    height: "100%",
+					width : "91%"
+                },
+                pieSliceText: 'none',
+                legend: {
+                    position: 'none',
+                },
+            };
+
+            var branchOptions = {
+                pieHole: 0.7,
+                legend: { position: "none" },
+                colors: ['#7E7EEE', '#00CD98','#C9CBCF'],
+                pieSliceText: 'none',
+                chartArea: {
+                    height: "100%",
+					width : "91%"
+                },
+            };
+
+            var captainChart = new google.visualization.PieChart(document.getElementById('donutchart_captain'));
+            captainChart.draw(captainData, captainOptions);
+            var branchChart = new google.visualization.PieChart(document.getElementById('donutchart_branch'));
+            branchChart.draw(branchData, branchOptions);
+        }
+
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawCreditChart);
+
+        function drawCreditChart() {
+
+            var MyfatoorahData = new google.visualization.DataTable();
+            MyfatoorahData.addColumn('string', 'Label');
+            MyfatoorahData.addColumn('number', 'Value');
+            MyfatoorahData.addRows([
+                ['<%= __("admin.dashboard.succeeded")%>', <%=totalSucceededMyfatoorah%>],
+                ['<%= __("admin.dashboard.cancelled")%>', <%=totalCancelledMyfatoorah%>],
+            ]);
+
+            var MyfatoorahOptions = {
+                sliceVisibilityThreshold: .2,
+                colors: ['#00CD98','#7E7EEE','#C9CBCF','#F6B900'],
+                legend: { position: "none" },
+                chartArea: {
+                    height: "100%",
+					width : "90%"
+                },
+                pieSliceTextStyle:{bold:true}
+            };
+
+            var CreditData = new google.visualization.DataTable();
+            CreditData.addColumn('string', 'Label');
+            CreditData.addColumn('number', 'Value');
+            CreditData.addRows([
+                ['<%= __("admin.dashboard.succeeded")%>', <%=totalSucceededCredit%>],
+                ['<%= __("admin.dashboard.cancelled")%>', <%=totalCancelledCredit%>],
+            ]);
+
+            var CreditOptions = {
+                sliceVisibilityThreshold: .2,
+                colors: ['#00CD98','#7E7EEE','#C9CBCF','#F6B900'],
+                legend: { position: "none" },
+                chartArea: {
+                    height: "100%",
+					width : "90%"
+                },
+                pieSliceTextStyle:{bold:true}
+            };
+
+            var chartMyfatoorah = new google.visualization.PieChart(document.getElementById('chart_myfatoorah'));
+            chartMyfatoorah.draw(MyfatoorahData, MyfatoorahOptions);
+            var chartCredit = new google.visualization.PieChart(document.getElementById('chart_credit'));
+            chartCredit.draw(CreditData, CreditOptions);
+        }
+
+        var width =  $(document).width();
+        $(window).resize(function(){
+            drawChart();
+            drawPieChart();
+            drawCreditChart();
+        });
+
+        function getDays(){
+            var dayList 	 =	new Array();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+			for (var i=0; i<7; i++) {
+                dayList[i]  = {};
+				var today 	= new Date();
+				today.setDate(today.getDate() - i);
+				var date 	= today.getDate();
+				var month   = today.getMonth();
+				var aYear 	= today.getFullYear()
+                dayList[i]['day'] = date;
+				dayList[i]['date'] = date + "-" + monthNames[month] + "-" + aYear;
+            }
+
+			return dayList;
+        }// end getDays()
+
+    </script>
+

@@ -1,0 +1,71 @@
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.email_logs.details');%>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" >
+								<button type="button" class="btn bg-indigo waves-effect">
+									<%= __('admin.system.back'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body table-responsive" id="aniimated-thumbnials">
+					<table  class="row-border hover table table-bordered" cellspacing="0" >
+						<tr>
+							<th  width="15%"><%= __('admin.email_logs.from'); %></th>
+							<td ><span><%=(typeof result !== typeof undefined && result.from) ? result.from :''; %></span></td>
+						</tr>
+						<tr>
+							<th><%= __('admin.email_logs.to'); %></th>
+							<td><%=(typeof result !== typeof undefined && result.to) ? result.to :''; %></td>
+						</tr>
+						<tr>
+							<th><%= __('admin.email_logs.subject'); %></th>
+							<td><%=(typeof result !== typeof undefined && result.subject) ? result.subject	:''; %></td>
+						</tr>
+						<tr>
+							<th><%= __('admin.system.status'); %></th>
+							<td><%
+								if(typeof result !== typeof undefined && result.is_sent){ %>
+									<span class="label label-success m-l-5 m-t-5"><%=__("admin.email_logs.sent")%></span>
+								<% }else{ %>
+									<span class="label label-danger m-l-5 m-t-5"><%=__("admin.email_logs.not_sent")%></span>
+								<% } %>
+							</td>
+						</tr><%
+						if(typeof result !== typeof undefined && result.error){ %>
+							<tr>
+								<th><%= __('admin.email_logs.error'); %></th>
+								<td><%-(result.error.response) ? result.error.response :""; %></td>
+							</tr><%
+						}
+						if(typeof result !== typeof undefined && result.attachments && result.attachments.href){
+							var fileName = (result.attachments.filename) ? result.attachments.filename :result.attachments.href; %>
+							<tr>
+								<th><%= __('Attachments'); %></th>
+								<td><a href="<%=result.attachments.href%>" target="_blank"><%=fileName%></a></td>
+							</tr><%
+						} %>
+						<tr>
+							<th><%= __('admin.email_logs.html'); %></th>
+							<td>
+								<span><%-(typeof result !== typeof undefined && result.html) ? result.html :''; %></span>
+							</td>
+						</tr>
+						<tr>
+							<th><%= __('admin.system.created'); %></th>
+							<td><span class="setDateTimeFormat" data-date-time="<%= (typeof result !== typeof undefined &&  result.created) ? result.created : 'N/A';%>"></span></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

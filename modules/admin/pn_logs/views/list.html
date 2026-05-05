@@ -1,0 +1,177 @@
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<i class="material-icons">search</i> <%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by body-->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_0" onkeyup="searchDatatable(0)" placeholder="<%= __('admin.pn_logs.search_by_body'); %>" name="body">
+										</div>
+									</div>
+								</div>
+								<!-- Search by device token -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_2" onkeyup="searchDatatable(2)" placeholder="<%= __('admin.pn_logs.search_by_device_token'); %>" name="device_token">
+										</div>
+									</div>
+								</div>
+								<!-- Search by device type -->
+								<div class="col-xs-12 col-sm-4">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" id="device_type_search" name="device_type">
+												<option value=""><%=__("admin.pn_logs.search_by_device_type");%></option>
+												<%
+												if(PN_LOGS_DEVICE_TYPE_SEARCH_DROPDOWN && PN_LOGS_DEVICE_TYPE_SEARCH_DROPDOWN.length > 0){
+													PN_LOGS_DEVICE_TYPE_SEARCH_DROPDOWN.forEach(function(searchDevice,index){%>
+														<option value="<%=searchDevice.device_id%>"><%=searchDevice.device_name%></option>
+												<% 	});
+												} %>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.pn_logs.pn_logs"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover full-length-header table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="20%"><%= __("admin.pn_logs.body"); %></th>
+								<th width="15%"><%= __("admin.pn_logs.user_name");%></th>
+								<th width="10%"><%= __("admin.pn_logs.device_type");%></th>
+								<th width="20%"><%= __("admin.pn_logs.device_token"); %></th>
+								<th width="10%"><%= __("admin.pn_logs.status"); %></th>
+								<th width="15%"><%= __("admin.system.created"); %></th>
+								<th width="10%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable ="";
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"order"		: [[5, "desc"]],
+				"lengthMenu": PAGING_LENGTH_MENU,
+				"sDom"		: "ltipr",
+				"serverSide": true,
+				"scrollX"	: true,
+				"columns"	: [
+					{
+						"data": 'body',
+						"render" 		: function(body){
+							return body;
+						}
+					},
+					{
+						"data"		: 'user_name',
+						"orderable"	: false
+					},
+					{ "data": 'device_type' },
+					{
+						"data"          : 'device_token',
+						"orderable"		: false,
+						"render" 		: function(device_token){
+							return '<span class="break_word" >'+device_token+'</span>';
+						}
+					},
+					{
+						"data"			: {},
+						"orderable"		: false,
+						"searchable"	: false,
+						"render": function(result){
+							var type 		=	(result && result.device_type)		?	result.device_type		:"";
+							if (type.toLowerCase() == 'android') {
+								var resultResponse = (typeof result.response !== typeof undefined && result.response) ?	JSON.parse(result.response)	:{};
+
+								var sentTab	= (typeof resultResponse["success"] !== typeof undefined &&resultResponse["success"] == 1 ) ? '<span class="label label-success m-l-5 m-t-5"><%=__("admin.pn_logs.sent")%></span>': '<span class="label label-danger m-l-5 m-t-5"><%=__("admin.pn_logs.failed")%></span>';
+								return sentTab;
+							}
+							else if(type.toLowerCase() == 'iphone') {
+								var sent	= (result && result.response.sent) ? result.response : "";
+								var sentTab	= (typeof result.response !== typeof undefined && result.response.sent && result.response.sent.length == 1) ? '<span class="label label-success m-l-5 m-t-5"><%=__("admin.pn_logs.sent")%></span>': '<span class="label label-danger m-l-5 m-t-5"><%=__("admin.pn_logs.failed")%></span>';
+								return sentTab;
+							}
+						}
+					},
+					{
+						"data"			: 'created',
+						"searchable"	: false,
+						"render" 		: function(created){
+							return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+						}
+					},
+					{
+						"data"			: "_id",
+						"orderable"		: false,
+						"searchable"	: false,
+						"render" 		: function(id){
+							return '<a href="<%=admin_list_url%>/view/'+id+'" class="btn bg-teal btn-sm waves-effect"><i class="material-icons font-14">find_in_page</i><%= __("admin.system.view"); %></a>'
+						}
+					}
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>",
+					type	: "POST",
+					data	: function (d) {
+						d.device_type_search = $('#device_type_search').val();
+					},
+					dataSrc	: 	function(res){
+						return res.data;
+					}
+				}
+			});
+			/** Search by Device Type*/
+			$("#device_type_search").change(function(){
+				dataTable.draw();
+			});
+		});
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>

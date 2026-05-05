@@ -1,0 +1,69 @@
+<%
+	var result 		= 	(typeof result !== typeof undefined && result)				?	result 			: "";
+	var userId 		= 	(typeof user_id !== typeof undefined && user_id)			?	user_id 		: "";
+	var roleId 		= 	(typeof role_id !== typeof undefined && role_id)			?	role_id 		: "";
+	var isTeamHead 	=	(typeof is_team_head !== typeof undefined && is_team_head === true)	?	1		: 0;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form action="<%=admin_list_url%>/get_role_users_and_update/<%=isTeamHead%>/<%=roleId%>/<%=userId%>" data-modal-id="form_modal" id="assign_and_shift_form" data-submit-btn-id="assign_and_shift_btn" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isTeamHead) ? __("admin.admin_permissions.assign_teams") : __("admin.admin_permissions.assign_team"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<% if (isTeamHead) { %>
+									<div class="form-group model_select_div">
+										<div class="form-line">
+											<select name="assign_users" id="assign_users" data-placeholder="<%=__('admin.admin_permissions.select_users') %>" multiple class="form-control model_select_box chosen"><%-result%></select>
+										</div>
+										<span id="assign_users_error" class="error model_select_error"></span>
+									</div>
+								<%} else {%>
+									<div class="form-group model_select_div">
+										<div class="form-line">
+											<select name="shift_user" id="shift_user" data-placeholder="<%=__('admin.admin_permissions.select_user') %>" class="form-control model_select_box chosen"><option value=""><%=__('admin.admin_permissions.select_user') %></option><%-result%></select>
+										</div>
+										<span id="shift_user_error" class="error model_select_error"></span>
+									</div>
+								<%}%>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="assign_and_shift_btn" class="btn bg-brown btn-sm waves-effect btn-submit" <%- ADMIN_LOADING_TEXT %> > <%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		setTimeout(function () {
+			/** here initialize the chosen library */
+			$(".chosen").chosen();
+			$(".chosen").trigger("chosen:updated");
+		}, 200);
+	});
+	$(".btn-submit").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+		ajax_submit("assign_and_shift_form",function(status,response){
+			if(status){
+				$('#form_modal').modal("hide");
+				// $("#reset").trigger("click");
+				if(response.status && response.message) notice(response.status,response.message);
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+</script>

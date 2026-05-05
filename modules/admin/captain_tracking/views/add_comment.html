@@ -1,0 +1,58 @@
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <form id="edit-note" action="<%=WEBSITE_ADMIN_URL%>tickets/add_comment?redirect=captain_tracking" data-submit-btn-id="edit-note-add-btn-id" method="post" class="on_click_submit" role="form">
+            <div class="modal-dialog  modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-seperator p-l-20 p-b-0">
+                        <h2 class="modal-title">
+                            <%= __("admin.captain_tracking.add_comment"); %>
+                            <span class="cursor-pointer edit-note-close modal-close pull-right" data-dismiss="modal"><i class="material-icons">close</i></span>
+                        </h2>
+                    </div>
+                    <div class="modal-body padding-20">
+                        <div class="row clearfix selected">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="comment" class="control-label col-555">
+                                            <%= __("admin.captain_tracking.comment"); %><span class="required"> *</span>
+                                        </label>
+                                        <input type="hidden" id="ticket_id" class="form-control" name="ticket_id" value="<%=ticket_id%>">
+                                        <textarea id="comment" class="form-control resize-none height-100" rows="5" name="comment"></textarea>
+                                    </div>
+                                    <span id="comment_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer modal-footer-seperator">
+                        <button type="button" id="edit-note-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+                            <%= __("admin.system.submit"); %>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    /**
+     * Function to submit form
+     */
+    $('.btn-submit').click(function(){
+        var btnId = $(this).attr('id');
+        startTextLoading(btnId);
+        ajax_submit('edit-note',function(status,response){
+            if(status){
+                $("#datatable-listing-ticket").DataTable().ajax.reload();
+                if(response.status && response.message) notice(response.status,response.message);
+				$('#form_modal_2, #form_modal').modal("hide");
+            }else{
+                stopTextLoading(btnId);
+            }
+        });
+    });
+});
+</script>

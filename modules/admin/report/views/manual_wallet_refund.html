@@ -1,0 +1,129 @@
+<%
+    var fromDate  = newDate(from_date,DATABASE_DATE_FORMAT);
+    var toDate    = newDate(to_date,DATABASE_DATE_FORMAT);
+
+%>
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="header">
+                <h2>
+                    <h2><%= __("admin.report.manual_wallet_refund_report"); %></h2>
+                </h2>
+                <ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['manual_wallet_refund_report','export']); %>">
+                    <li>
+                        <a href="javascript:void(0);" id="dataExportBtn">
+                            <button type="button" class="btn btn-sm bg-green waves-effect">
+                                <%= __("admin.report.export")%>
+                            </button>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="body">
+                <table id="datatable-listing" class="row-border fixed-width-table hover table full-length-header table-bordered" cellspacing="0" width="100%" >
+                    <thead>
+                        <tr>
+                            <th><%= __('admin.report.user_name'); %></th>
+                            <th><%= __('admin.report.user_email'); %></th>
+                            <th><%= __('admin.report.user_mobile_number'); %></th>
+                            <th><%= __('admin.report.refunded_amount'); %></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th class="sales_th"></th>
+                            <th class="sales_th"></th>
+                            <th class="sales_th"></th>
+                            <th class="sales_th"></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data */
+	var dataTable =	"";
+	$(document).ready(function() {
+		dataTable = $('#datatable-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: [],
+			"sDom"		: "ltipr",
+			"serverSide": true,
+			"scrollX"	: true,
+			"lengthMenu": PAGING_LENGTH_MENU,
+			"columns"	: [
+                {   "data"       : "user_name",
+                    "serachable" : false,
+                    "orderable"  : false
+                },
+                {   "data"       : "user_email",
+                    "serachable" : false,
+                    "orderable"  : false
+                },
+                {   "data"       : "user_mobile_number",
+                    "serachable" : false,
+                    "orderable"  : false,
+                },
+                {   "data"       : "refund_amount",
+                    "serachable" : false,
+                    "orderable"  : false,
+                    "render"     : function(refund_amount){
+                        return (refund_amount) ? currencyFormat(refund_amount) : "";
+                    }
+                },
+			],
+			"ajax":{
+				url 	: "<%=admin_list_url%>/append_manual_wallet_refund_report/<%=from_date%>/<%=to_date%>/<%=restaurant_id%>/<%=branch_id%>",
+				type	: "POST",
+				dataSrc	: function(res){
+					adjustPermissionsClass();
+					return res.data;
+				}
+            },
+            "footerCallback": function ( row, data, start, end, display ) {				
+                var api = this.api(), data;
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function ( i ) {
+                    return typeof i === 'string' ?  i*1 : typeof i === 'number' ? i : 0;
+                };
+
+                // Total over this page
+                totalRefundedAmount = 0;
+				if(api.column( 3, { page: "current"} ) && api.column( 3, { page: "current"} ).data()){
+					totalRefundedAmount = api.column( 3, { page: "current"} )
+                    .data()
+                    .reduce( function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0 );
+				}
+                // Update footer
+                $( api.column( 3 ).footer() ).html(
+                    currencyFormat(totalRefundedAmount)
+                );
+            },
+        });
+        
+        /**
+		* Export Details action
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		$(document).on("click","#dataExportBtn",function(){
+		    var exportURL = "<%=admin_list_url%>/manual_wallet_refund_report/export_data/<%=fromDate%>/<%=toDate%>/<%=restaurant_id%>/<%=branch_id%>";
+			window.location.href = exportURL;
+		});
+	});	
+</script>
+

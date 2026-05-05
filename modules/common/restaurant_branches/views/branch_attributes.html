@@ -1,0 +1,134 @@
+<%
+let branchId = branch_id;
+let restaurantId = restaurant_id;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="body">
+			<form action="<%=list_url+'/save_branch_attributes/'+branchId%>" id="attribute" data-submit-btn-id="form-attribute" method="post" class="freezed_event" role="form">
+				<input type="hidden" name="restaurant_id" value="<%=restaurantId%>">
+				<table id="datatable-attribute" class="row-border full-length-header hover table table-bordered dataTable cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="10%"><%= __("branch_attributes.attribute_id");%></th>
+							<th width="45%"><%= __("branch_attributes.attribute_desc");%></th>
+							<th width="45%"><%= __("branch_attributes.value");%></th>
+						</tr>
+					</thead>
+					<tbody>
+						<% if(result.length>0){
+							result.map((records,index)=>{
+								let inputType 		= 	(records.input_type) 		?  	records.input_type		:'';
+								let defaultValue	= 	(records.default_value) 	?	records.default_value	:'';
+
+								let inputValue		= 	(records.value) 			?  	records.value 			:(inputType != "checkbox" ? defaultValue : "");
+								let validateType	= 	(records.validation_type) 	?	records.validation_type	:'';
+								let required		= 	(records.required) 			?	records.required	:'';
+								%>
+								<tr>
+									<td><%= records.attribute_id %></td>
+									<td><%= records.title %></td>
+									<td>
+										<div class="dynamic_inputs">
+											<input type="hidden" name="attributes[<%= index %>][validate_type]" value="<%=validateType%>">
+											<input type="hidden" name="attributes[<%= index %>][attribute_id]" value="<%=records.attribute_id%>">
+											<input type="hidden" name="attributes[<%= index %>][input_type]" value="<%= inputType %>">
+											<input type="hidden" name="attributes[<%= index %>][required]" value="<%=required%>">
+											<input type="hidden" name="attributes[<%= index %>][title]" value="<%=records.title%>">
+											<input type="hidden" name="attributes[<%= index %>][old_value]" value="<%=inputValue%>">
+											<% if(inputType == "checkbox"){ %>
+												<div class="switch">
+													<label>
+														<input id="attribute_<%=index%>" name="attributes[<%= index %>][value]" value="<%=ACTIVE%>" type="checkbox" <%= (inputValue == ACTIVE) ? "checked" :""; %> />
+														<span class="lever switch-col-green"></span>
+													</label>
+												</div>
+											<%	}else if(inputType == "textarea"){ %>
+												<textarea  id="attribute_<%=index%>"  name="attributes[<%= index %>][value]" class="form-control no-resize" placeholder="<%= records.title %>"><%= inputValue; %></textarea>
+											<%	}else if(inputType == "select"){
+													let selectOption = (records.data) ? records.data :[];
+												%>
+												<select id="attribute_<%=index%>" class="form-control" name="attributes[<%= index %>][value]">
+													<option value=""><%=__("branch_attributes.select")+" "+records.title%></option>
+													<% if(selectOption.length >0){
+														selectOption.map(data=>{
+															var selectValue = (data.value) ? data.value :'';
+															%>
+															<option value="<%=selectValue;%>"  <%= (inputValue == selectValue) ? 'selected' :''; %> >
+																<%=(data.title) ? data.title :'';%>
+															</option>
+													<%	});
+													} %>
+												</select>
+											<%	}else{ %>
+												<input type="<%= inputType; %>"  id="attribute_<%=index%>"  class="form-control width-100" name="attributes[<%= index %>][value]" value="<%= inputValue; %>" placeholder="<%= records.title %>" />
+											<%	} %>
+											<span id="value_<%=index%>_error" class="error"></span>
+										</div>
+									</td>
+								</tr>
+							<% });
+						} %>
+					</tbody>
+				</table>
+				<p></p>
+				<% if(slug != BURGER_KING && slug != PIZZA_HUT){ %>
+					<button type="button" class="pull-right attribute-btn-submit btn bg-brown btn-sm waves-effect freezed_event hideMe" id="form-attribute" > <%=__("system.submit")%> </button>
+				<% } %>
+			</form>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function() {
+		/** Call to freezed event **/
+		updateFreezedEvent();
+
+		$('#datatable-attribute').DataTable({
+			"order"		: 	[],
+			"sDom"		:	"ftr",
+			"bFilter"	: 	true,
+			"serverSide": 	false,
+			"scrollX"	: 	true,
+			"paging"	:	false,
+			"columnDefs": [
+				{ orderable: false, "targets": [ 2 ] }
+			]
+		});
+
+		$('.attribute-btn-submit').click(function(){
+			function submitForm(){
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				ajax_submit("attribute",function(status,response){
+					stopTextLoading(btnId);
+					if(status){
+						$("#attribute span.error").html("");
+						$(".submit-for-approval").removeClass("hide");
+						notice("success",response.message);
+					}
+				});
+			}
+
+			<% if(isRestaurant(module_type)){ %>
+				swal({
+					title : "<%= __('system.are_you_sure') %>",
+					text  : "<%= __('branch_attributes.branch_attribute_add_comfirm_message')%>",
+					type  : "warning",
+					showCancelButton   : true,
+					confirmButtonColor : "#DD6B55",
+					confirmButtonText  : "<%=__('system.ok')%>",
+					closeOnConfirm     : false,
+					showLoaderOnConfirm: true,
+				}, function (isConfirm) {
+					if(isConfirm){
+						submitForm();
+						swal.close();
+					}
+				});
+			<% }else{ %>
+				submitForm();
+			<% } %>
+		});
+	});
+</script>

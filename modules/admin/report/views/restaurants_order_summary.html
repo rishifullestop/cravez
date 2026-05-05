@@ -1,0 +1,476 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id"
+								data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+								aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+									<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel"
+						aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by restaurant name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick restaurant_id"
+													name="search_restaurant_id" id="restaurant_ids"
+													data-live-search="true" multiple
+													data-title="<%= __('admin.report.search_by_restaurant_name'); %>">
+
+													<%-restaurant_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by area -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick area_id" id="area_ids"
+													name="search_area_id" data-live-search="true"
+													data-title="<%=__('admin.report.search_by_area')%>" multiple>
+													<%- area_list %>
+												</select>
+											</div>
+										</div>
+									</div>
+
+									<!-- Search by date -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" autocomplete="off"
+													value="">
+											</div>
+										</div>
+									</div>
+
+									<!-- reset button -->
+									<div class="col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.report.restaurants_order_summary"); %>
+					</h2>
+					<ul
+						class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['restaurants_order_summary','export']); %>">
+						<li>
+							<a href="javascript:void(0);" id="dataExportBtn">
+								<button type="button" class="btn btn-sm bg-green waves-effect">
+									<%= __("admin.report.export")%>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing"
+						class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0"
+						width="100%">
+						<thead>
+							<tr>
+								<th width="10%">
+									<%= __("admin.report.restaurant_name"); %>
+								</th>
+								<th width="10%">
+									<%= __("admin.report.no_of_orders"); %>
+								</th>
+								<th width="10%">
+									<%= __("admin.report.order_amount"); %>
+								</th>
+								<th width="10%">
+									<%= __("admin.report.delivery_fees"); %>
+								</th>
+								<th width="10%">
+									<%= __("admin.report.our_commission"); %>
+								</th>
+								<th width="10%">
+									<%= __("admin.report.total_revenues"); %>
+								</th>
+								<th width="10%">
+									<%= __("admin.report.avg_rev_per_order"); %>
+								</th>
+								<th width="10%">
+									<%= __("admin.report.avg_amount_per_order"); %>
+								</th>
+								<th width="10%">
+									<%= __("admin.report.delivery_by"); %>
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<th class="sales_th">
+									<%= __("admin.report.grand_total"); %>
+								</th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+								<th class="sales_th"></th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+			<div class="card">
+				<div class="body">
+					<table id="previous-date"
+						class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0"
+						width="100%">
+
+					</table>
+				</div>
+			</div>
+			<div class="card">
+				<div class="body">
+					<table id="previous-month"
+						class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0"
+						width="100%">
+
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<%- contentFor('script') %>
+		<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+		<script type="text/javascript"
+			src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+		<script type="text/javascript">
+			/** Function to initialize datatable and get server side data*/
+			var dataTable = "";
+			var DELIVERY_BY = 	<%- JSON.stringify(DELIVERY_BY) %>;
+			$(document).ready(function () {
+				dataTable = $("#datatable-listing").DataTable({
+					"bStateSave": true,
+					"fnStateSave": function (oSettings, oData) {
+						localStorage.setItem('DataTables', JSON.stringify(oData));
+					},
+					"fnStateLoad": function (oSettings) {
+						return JSON.parse(localStorage.getItem('DataTables'));
+					},
+					"order": [[1, "desc"]],
+					"dom": 'Blrtip',
+					"serverSide": true,
+					"scrollX": true,
+					"lengthMenu": PAGING_LENGTH_MENU,
+					"columns": [
+
+						{
+							"data": "restaurant_name",
+							"field_type": "<%=OBJECT_ID_FIELD %>",
+							"field_name": "restaurant_id",
+							"orderable": false,
+							"render": function (restaurant_name) {
+								return restaurant_name[DEFAULT_LANGUAGE_CODE];
+							}
+						},
+						{
+							"data": "total_orders",
+							"searchable": false,
+							"render": function (total_orders) {
+								return customRound(total_orders);
+							}
+						},
+						{
+							"data": "total_amount",
+							"searchable": false,
+							"render": function (total_amount) {
+								return currencyFormat(total_amount,true);
+							}
+						},
+						{
+							"data": "delivery_fees",
+							"searchable": false,
+							"render": function (delivery_fees) {
+								return currencyFormat(delivery_fees,true);
+							}
+						},
+						{
+							"data": "cravez_payout",
+							"searchable": false,
+							"render": function (cravez_payout) {
+								return currencyFormat(cravez_payout,true);
+							}
+						},
+						{
+							"data": "total_revenue",
+							"searchable": false,
+							"render": function (total_revenue) {
+								return currencyFormat(total_revenue,true);
+							}
+						},
+						{
+							"data": "avg_rev_per_order",
+							"searchable": false,
+							"render": function (avg_rev_per_order) {
+								return currencyFormat(avg_rev_per_order,true);
+							}
+						},
+						{
+							"data": "avg_chq_value",
+							"searchable": false,
+							"render": function (avg_chq_value) {
+								return currencyFormat(avg_chq_value,true);
+							}
+						},
+						{
+							"data": "delivery_type",
+							"orderable": false,
+							"render": function (delivery_type) {
+								return DELIVERY_BY[delivery_type];
+							}
+						},
+					],
+					"ajax": {
+						url: "<%=admin_list_url%>/restaurants_order_summary",
+						type: "POST",
+						data: function (d) {
+							d.date = $('#date-range-picker').val();
+							d.restaurant_ids = $('#restaurant_ids').val();
+							d.area_ids = $('#area_ids').val();
+						},
+						dataSrc: function (res) {
+							adjustPermissionsClass();
+							return res.data;
+						}
+					},
+					"footerCallback": function (row, data, start, end, display) {
+						var api = this.api(), data;
+
+						// Remove the formatting to get integer data for summation
+						var intVal = function (i) {
+							return typeof i === 'string' ? i * 1 : typeof i === 'number' ? i : 0;
+						};
+
+						// Total over this page
+						totalOrders = api
+							.column("1", { page: 'current' })
+							.data()
+							.reduce(function (a, b) {
+								return intVal(a) + intVal(b);
+							}, 0);
+						// Total over this page
+						totalOrderAmount = api
+							.column("2", { page: 'current' })
+							.data()
+							.reduce(function (a, b) {
+								return intVal(a) + intVal(b);
+							}, 0);
+						// Total over this page
+						totalDeliveryFee = api
+							.column("3", { page: 'current' })
+							.data()
+							.reduce(function (a, b) {
+								return intVal(a) + intVal(b);
+							}, 0);
+						// Total over this page
+						totalCommission = api
+							.column("4", { page: 'current' })
+							.data()
+							.reduce(function (a, b) {
+								return intVal(a) + intVal(b);
+							}, 0);
+						// Total over this page
+						totalRevenue = api
+							.column("5", { page: 'current' })
+							.data()
+							.reduce(function (a, b) {
+								return intVal(a) + intVal(b);
+							}, 0);
+						// Total over this page
+						totalAvgRevenue = api
+							.column("6", { page: 'current' })
+							.data()
+							.reduce(function (a, b) {
+								return intVal(a) + intVal(b);
+							}, 0);
+						// Total over this page
+						totalAvgAmount = api
+							.column("7", { page: 'current' })
+							.data()
+							.reduce(function (a, b) {
+								return intVal(a) + intVal(b);
+							}, 0);
+						// Update footer
+						$(api.column("1").footer()).html(
+							totalOrders
+						);
+						// Update footer
+						$(api.column("2").footer()).html(
+							currencyFormat(totalOrderAmount,true)
+						);
+						// Update footer
+						$(api.column("3").footer()).html(
+							currencyFormat(totalDeliveryFee,true)
+						);
+						// Update footer
+						$(api.column("4").footer()).html(
+							currencyFormat(totalCommission,true)
+						);
+						// Update footer
+						$(api.column("5").footer()).html(
+							currencyFormat(totalRevenue,true)
+						);
+						// Update footer
+						$(api.column("6").footer()).html(
+							currencyFormat(totalAvgRevenue,true)
+						);
+						// Update footer
+						$(api.column("7").footer()).html(
+							currencyFormat(totalAvgAmount,true)
+						);
+					},
+				});
+				previousData();
+				$("#date-range-picker").change(function () {
+					dataTable.draw();
+					previousData();
+				});
+			});
+
+			$("#restaurant_ids,#area_ids").change(function () {
+				dataTable.draw()
+			});
+
+
+
+			/** Javascript function to search datatable */
+			function searchDatatable(columnNumber) {
+				var query = $('#column_filter_' + columnNumber).val();
+				dataTable.column(columnNumber).search(query).draw()
+			}//end searchDatatable()
+
+			/**
+			* Export Details action
+			*
+			* @param  null
+			*
+			* @return void
+			*/
+			$(document).on("click", "#dataExportBtn", function () {
+				var date = $("#date-range-picker").val();
+				var restaurantIds = $("#restaurant_ids").val();
+				var areaIds = $("#area_ids").val();
+				var sortedCol = dataTable.order()[0][0];
+				var sortedDir = dataTable.order()[0][1];
+				var columns = dataTable.settings().init().columns;
+				var sortedColName = columns[sortedCol].data;
+
+				if (date) {
+					var exportURL = "<%=admin_list_url%>/restaurants_order_summary/export_data?date=" + date + "&sort_field=" + sortedColName + "&sort_dir=" + sortedDir;
+					if (restaurantIds) exportURL += "&restaurant_ids=" + restaurantIds;
+					if (areaIds) exportURL += "&area_ids=" + areaIds;
+					window.location.href = exportURL;
+				}
+			});
+
+			/**
+			* Get dropdown value by local storage
+			*/
+			let tempRestaurantId = "";
+			let tempAreaId = "";
+			if (localStorage["search_" + window.location.pathname]) {
+				let searchFormData = JSON.parse(localStorage["search_" + window.location.pathname]);
+				for (index in searchFormData) {
+					if (searchFormData[index].name && searchFormData[index].name == "search_area_id" && searchFormData[index].value) {
+						tempAreaId = searchFormData[index].value;
+					}
+					if (searchFormData[index].name && searchFormData[index].name == "search_restaurant_id" && searchFormData[index].value) {
+						tempRestaurantId = searchFormData[index].value;
+					}
+				}
+			}
+
+			function previousData() {
+				var date = $('#date-range-picker').val();
+				$.ajax({
+					type: "POST",
+					url: "<%=admin_list_url%>/restaurants_order_summary/previous_data",
+					data: { date: date },
+					dataType: 'json',
+					success: function (response) {
+						var trHTML = '';
+						var previousHTML = '';
+						var noDataHtml = "<tr><td class='dataTables_empty'><%= __('admin.report.no_data_available'); %></td></tr>";
+						var data = response.data;
+						var prevData = response.prev_data;
+						if (response.status == '<%=STATUS_SUCCESS%>' && data.length > 1) {
+							trHTML += '<tr><td>' + moment(data[0].date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_FORMAT) + '</td><td>' + data[0].total_orders + '</td><td>' + currencyFormat(data[0].total_amount,true) + '</td><td>' + currencyFormat(data[0].delivery_fees,true) + '</td><td>' + currencyFormat(data[0].cravez_payout,true) + '</td><td>' + currencyFormat(data[0].total_revenue,true) + '</td><td>' + currencyFormat(data[0].avg_rev_per_order,true) + '</td><td>' + currencyFormat(data[0].avg_chq_value,true) + '</td></tr>';
+
+							trHTML += '<tr><td><%= __("admin.report.change_in_value"); %></td><td>' + (data[1].total_orders - data[0].total_orders,true) + '</td><td>' + currencyFormat(data[1].total_amount - data[0].total_amount,true) + '</td><td>' + currencyFormat(data[1].delivery_fees - data[0].delivery_fees,true) + '</td><td>' + currencyFormat(data[1].cravez_payout - data[0].cravez_payout,true) + '</td><td>' + currencyFormat(data[1].total_revenue - data[0].total_revenue,true) + '</td><td>' + currencyFormat(data[1].avg_rev_per_order - data[0].avg_rev_per_order,true) + '</td><td>' + currencyFormat(data[1].avg_chq_value - data[0].avg_chq_value,true) + '</td></tr>';
+
+							trHTML += '<tr><td><%= __("admin.report.change_percent"); %></td><td>' + (isNaN(customRound(((data[1].total_orders - data[0].total_orders) / data[0].total_orders) * 100)) ? 0 : customRound(((data[1].total_orders - data[0].total_orders) / data[0].total_orders) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((data[1].total_amount - data[0].total_amount) / data[0].total_amount) * 100)) ? 0 : customRound(((data[1].total_amount - data[0].total_amount) / data[0].total_amount) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((data[1].delivery_fees - data[0].delivery_fees) / data[0].delivery_fees) * 100)) ? 0 : customRound(((data[1].delivery_fees - data[0].delivery_fees) / data[0].delivery_fees) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((data[1].cravez_payout - data[0].cravez_payout) / data[0].cravez_payout) * 100)) ? 0 : customRound(((data[1].cravez_payout - data[0].cravez_payout) / data[0].cravez_payout) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((data[1].total_revenue - data[0].total_revenue) / data[0].total_revenue) * 100)) ? 0 : customRound(((data[1].total_revenue - data[0].total_revenue) / data[0].total_revenue) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((data[1].avg_rev_per_order - data[0].avg_rev_per_order) / data[0].avg_rev_per_order) * 100)) ? 0 : customRound(((data[1].avg_rev_per_order - data[0].avg_rev_per_order) / data[0].avg_rev_per_order) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((data[1].avg_chq_value - data[0].avg_chq_value) / data[0].avg_chq_value) * 100)) ? 0 : customRound(((data[1].avg_chq_value - data[0].avg_chq_value) / data[0].avg_chq_value) * 100)) + '<%= __("admin.report.percent"); %></td></tr>';
+
+							$("#previous-date tr").remove();
+							$('#previous-date').append(trHTML);
+						} else {
+							$("#previous-date tr").remove();
+							$('#previous-date').append(noDataHtml);
+						}
+						if (response.status == '<%=STATUS_SUCCESS%>' && prevData.length > 1) {
+							previousHTML += '<tr><td>' + moment(prevData[0].date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_FORMAT) + '</td><td>' + prevData[0].total_orders + '</td><td>' + currencyFormat(prevData[0].total_amount,true) + '</td><td>' + currencyFormat(prevData[0].delivery_fees) + '</td><td>' + currencyFormat(prevData[0].cravez_payout,true) + '</td><td>' + currencyFormat(prevData[0].total_revenue,true) + '</td><td>' + currencyFormat(prevData[0].avg_rev_per_order,true) + '</td><td>' + currencyFormat(prevData[0].avg_chq_value,true) + '</td></tr>';
+
+							previousHTML += '<tr><td><%= __("admin.report.change_in_value"); %></td><td>' + (prevData[1].total_orders - prevData[0].total_orders) + '</td><td>' + currencyFormat(prevData[1].total_amount - prevData[0].total_amount,true) + '</td><td>' + currencyFormat(prevData[1].delivery_fees - prevData[0].delivery_fees,true) + '</td><td>' + currencyFormat(prevData[1].cravez_payout - prevData[0].cravez_payout,true) + '</td><td>' + currencyFormat(prevData[1].total_revenue - prevData[0].total_revenue,true) + '</td><td>' + currencyFormat(prevData[1].avg_rev_per_order - prevData[0].avg_rev_per_order,true) + '</td><td>' + currencyFormat(prevData[1].avg_chq_value - prevData[0].avg_chq_value,true) + '</td></tr>';
+
+							previousHTML += '<tr><td><%= __("admin.report.change_percent"); %></td><td>' + (isNaN(customRound(((prevData[1].total_orders - prevData[0].total_orders) / prevData[0].total_orders) * 100)) ? 0 : customRound(((prevData[1].total_orders - prevData[0].total_orders) / prevData[0].total_orders) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((prevData[1].total_amount - prevData[0].total_amount) / prevData[0].total_amount) * 100)) ? 0 : customRound(((prevData[1].total_amount - prevData[0].total_amount) / prevData[0].total_amount) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((prevData[1].delivery_fees - prevData[0].delivery_fees) / prevData[0].delivery_fees) * 100)) ? 0 : customRound(((prevData[1].delivery_fees - prevData[0].delivery_fees) / prevData[0].delivery_fees) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((prevData[1].cravez_payout - prevData[0].cravez_payout) / prevData[0].cravez_payout) * 100)) ? 0 : customRound(((prevData[1].cravez_payout - prevData[0].cravez_payout) / prevData[0].cravez_payout) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((prevData[1].total_revenue - prevData[0].total_revenue) / prevData[0].total_revenue) * 100)) ? 0 : customRound(((prevData[1].total_revenue - prevData[0].total_revenue) / prevData[0].total_revenue) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((prevData[1].avg_rev_per_order - prevData[0].avg_rev_per_order) / prevData[0].avg_rev_per_order) * 100)) ? 0 : customRound(((prevData[1].avg_rev_per_order - prevData[0].avg_rev_per_order) / prevData[0].avg_rev_per_order) * 100)) + '<%= __("admin.report.percent"); %></td><td>' + (isNaN(customRound(((prevData[1].avg_chq_value - prevData[0].avg_chq_value) / prevData[0].avg_chq_value) * 100)) ? 0 : customRound(((prevData[1].avg_chq_value - prevData[0].avg_chq_value) / prevData[0].avg_chq_value) * 100)) + '<%= __("admin.report.percent"); %></td></tr>';
+
+							$("#previous-month tr").remove();
+							$('#previous-month').append(previousHTML);
+						} else {
+							$("#previous-month tr").remove();
+							$('#previous-month').append(noDataHtml);
+						}
+					},
+					error: function (e) {
+						console.log("ERROR: ", e);
+					}
+				});
+			}
+
+			$('#date-range-picker').daterangepicker({
+				singleDatePicker: true,
+				showDropdowns: true,
+				changeMonth: true,
+				numberOfMonths: 1,
+				maxDate: new Date()
+			});
+
+		</script>
+		<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

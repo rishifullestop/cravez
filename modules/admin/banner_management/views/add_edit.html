@@ -1,0 +1,136 @@
+<%
+	var result 		= (banner_result) ? banner_result :{};
+	var isEditable 	= is_editable;
+	var bannerId 	= result._id;
+	var formUrl 	= (result && isEditable) ? admin_list_url+"/edit/"+bannerId : admin_list_url+"/add";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form data-modal-id="form_modal" id="add-banner" data-submit-btn-id="banner-add-btn-id" method="post" action="<%=formUrl%>" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.system.edit") : __("admin.system.add") %>
+						</h2>
+					</div>
+
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="description_in_english" class="control-label">
+											<%= __("admin.banner_management.description_in_english"); %>
+										</label>
+									    <textarea name="description_in_english" id="description_in_english" class="form-control height-100 resize-none"><%=(result.description) ? result.description.en :''%></textarea>
+                                    </div>
+									<span id="description_in_english_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="description_in_arabic" class="control-label">
+											<%= __("admin.banner_management.description_in_arabic"); %>
+										</label>
+									    <textarea name="description_in_arabic" id="description_in_arabic" class="form-control height-100 resize-none"><%=(result.description) ? result.description.ar :''%></textarea>
+                                    </div>
+									<span id="description_in_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="<%= (isEditable) ? 'col-sm-4' : 'col-sm-6';%>">
+								<div class="form-group">
+									<div class="form-lie">
+										<label for="image" class="control-label">
+											<%= __("admin.banner_management.image"); %>
+											<% if(!isEditable) { %>
+												<span class="required"> *</span>
+											<% } %>
+										</label>
+										<input type="file" data-input="false" name="image" class="form-control cfilestyle" id="image" />
+										<span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('system.extension_and_size_suggestion_message',ALLOWED_IMAGE_EXTENSIONS.join(', '),BANNER_IMAGE_RESOLUTION)%>">
+											<i class="material-icons">info</i>
+										</span>
+										<input type="hidden" name="old_image" value="<%=result.image%>">
+									</div>
+									<span id="image_error" class="error"></span>
+								</div>
+							</div>
+							<% if(isEditable) { %>
+								<div class="col-sm-2">
+									<div class="form-group">
+										<a href="<%=result.full_image_path%>" class="item-image set_image_med_dim" data-lightbox="roadtrip">
+											<img class="img-thumbnail float-right" src="<%=result.full_image_path%>" alt="image"></td>
+										</a>
+									</div>
+								</div>
+							<% } %>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="page_name" class="control-label">
+											<%= __("admin.banner_management.page_name"); %>
+										</label>
+										<select class="form-control show-tick" id="page_name" name="page_name" title="<%=__('admin.banner_management.select_page_name')%>"><%
+											if(Object.keys(BANNER_DROPDOWN).length > 0){
+												Object.keys(BANNER_DROPDOWN).map(data=>{
+													let selected = (result && result.page_name && data == result.page_name) ? 'selected' : ''%>
+													<option value="<%= data %>" <%= selected%>><%= BANNER_DROPDOWN[data] %></option><%
+												});
+											} %>
+										</select>
+                                    </div>
+									<span id="page_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="banner-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(".show-tick").selectpicker('refresh');
+	$(document).ready(function(){
+
+		customFileStyle();
+
+		$('.show-tick').selectpicker();
+
+		/**
+		 * Function to submit form
+		*/
+		var isEditable = <%=isEditable%>;
+
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			submit_multipart_form('add-banner',function(status,response){
+				if(status){
+					if(isEditable){
+						if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+						if(response.status && response.message) notice(response.status,response.message);
+						$('#form_modal').modal("hide");
+					}else{
+						$("#reset").trigger("click");
+					}
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	});
+
+</script>
+

@@ -1,0 +1,174 @@
+<%
+var result 		= (result) ? result   : {};
+var freeDelivery= (result.free_delivery) ? result.free_delivery : '';
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-corporate" action="<%=(is_editable) ? admin_list_url+'/edit/'+result._id : admin_list_url+'/add'%>" data-submit-btn-id="corporate-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (is_editable) ?  __("admin.public_composite.edit")  : __("admin.public_composite.add"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix selected materialize_checkbox">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="free_delivery_tier" class="control-label">
+											<%= __('admin.public_composite.free_delivery_tier') %>
+										</label> <br>
+										<input type="checkbox" value="1" name="free_delivery" id="free_delivery" class="filled-in chk-col-indigo delivery_check" <%= (freeDelivery) ? "checked" :'';%>>
+										<label for="free_delivery" class="control-label font-14 font-bold"><%= __('admin.public_composite.free_delivery') %> </label>
+									</div>
+									<span id="free_delivery_tier_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6 hide_class hide">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="min_order_amount" class="control-label"><%= __('admin.public_composite.min_order_amount'); %><span class="required">*</span> </label>
+										<input name="min_order_amount" id="min_order_amount" type="text" value="<%=result.minimum_order_amount ? result.minimum_order_amount : ''%>" class="form-control"/>
+									</div>
+									<span id="min_order_amount_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix selected">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="kfg_offer_id" class="control-label"><%= __('admin.corporate_tie_ups.kfg_offer_id'); %></label>
+										<input name="kfg_offer_id" id="kfg_offer_id" type="text" value="<%=result.kfg_offer_id ? result.kfg_offer_id : ''%>" class="form-control"/>
+									</div>
+									<span id="kfg_offer_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="kfg_offer_name" class="control-label"><%= __('admin.corporate_tie_ups.kfg_offer_name'); %></label>
+										<input name="kfg_offer_name" id="kfg_offer_name" type="text" value="<%=result.kfg_offer_name ? result.kfg_offer_name : ''%>" class="form-control"/>
+									</div>
+									<span id="kfg_offer_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="clearfix">&nbsp;</div>
+						<div class="account-section cstm_account_section">
+							<div class="account-form-section ">
+								<div class="account-section-heading">
+									<h2><%= __('admin.public_composite.discount'); %></h2>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped full-length-header">
+                                            <thead>
+                                                <tr>
+                                                    <th width="25%"> <%= __('admin.public_composite.min_order_amount'); %> </th>
+                                                    <th width="25%"> <%= __('admin.public_composite.max_order_amount'); %> </th>
+                                                    <th width="25%"> <%= __('admin.public_composite.discount_type'); %> </th>
+                                                    <th width="25%"> <%= __('admin.public_composite.discount_value'); %>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>  <%
+												for(index =0;index < CORPORATE_DISCOUNT_LENGTH;index++){ %>
+													<input type="hidden" id="index_<%=index%>" class="form-control" name="discount[<%=index%>][index]" value="<%= index%>"/>
+													<tr class="add_input add_div_<%=index%>">
+														<td>
+															<div class="form-group">
+																<div class="form-line">
+																	<input type="text" id="min_order_amount_<%=index%>" class="form-control" name="discount[<%=index%>][min_order_amount]" value="<%= (result.discounts && result.discounts[index]) ? result.discounts[index].min_order_amount : ''%>"/>
+																</div>
+																<span id="min_order_amount_<%=index%>_error" class="error"></span>
+															</div>
+														</td>
+														<td>
+															<div class="form-group">
+																<div class="form-line">
+																	<input type="text" id="max_order_amount_<%=index%>" class="form-control" name="discount[<%=index%>][max_order_amount]" value="<%= (result.discounts && result.discounts[index] && result.discounts[index].max_order_amount) ? result.discounts[index].max_order_amount : ''%>"/>
+																</div>
+																<span id="max_order_amount_<%=index%>_error" class="error"></span>
+															</div>
+														</td>
+														<td>
+															<div class="form-group">
+																<div class="form-line">
+																	<select name="discount[<%=index%>][discount_type]" id="discount_type_<%=index%>" class="form-control show-tick">
+																		<option value=""><%= __("admin.public_composite.select_discount_type"); %></option>
+																		<% Object.keys(ITEM_DISCOUNT_TYPE).map(key=>{
+																			var discountType	=	(result.discounts && result.discounts[index] && result.discounts[index].discount_type) ? result.discounts[index].discount_type : '' %>
+																			<option value="<%=key%>" <%= (discountType == key) ? 'selected' :''; %>>
+																				<%= ITEM_DISCOUNT_TYPE[key] %>
+																			</option>
+																		<% });%>
+																	</select>
+																</div>
+																<span id="discount_type_<%=index%>_error" class="error"></span>
+															</div>
+														</td>
+														<td>
+															<div class="form-group">
+																<div class="form-line">
+																	<input type="text" id="discount_value_<%=index%>" class="form-control" name="discount[<%=index%>][discount_value]" value="<%= (result.discounts && result.discounts[index] && result.discounts[index].discount_value) ? result.discounts[index].discount_value : ''%>"/>
+																</div>
+																<span id="discount_value_<%=index%>_error" class="error"></span>
+															</div>
+														</td>
+													</tr><%
+												} %>
+											</tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="corporate-add-btn-id" class="btn  bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-corporate',function(status,response){
+			if(status){
+				window.location.href = response.redirect_url;
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	$(".show-tick").selectpicker('refresh');
+
+	/**
+	 * Function to show free delivery input
+	 */
+	<% if(freeDelivery){ %>
+		$('.hide_class').removeClass('hide');
+	<% } %>
+
+	$('.delivery_check').change(function() {
+        if(this.checked) {
+			$('.hide_class').removeClass('hide');
+		}else{
+			$('.hide_class').addClass('hide');
+		}
+	});
+</script>

@@ -1,0 +1,171 @@
+<%
+  var itemList 		= 	item_list;
+  var extraItemId	= 	result._id;
+  var extraUnitList = 	extra_unit_list;
+  var unitList 		= 	unit_list;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-extra-item" action="<%=list_url+'/clone_extra_item/'+extraItemId%>" data-submit-btn-id="extra-item-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("extra_items.clone_extra_item"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="item_unit_id" class="control-label">
+											<%= __("extra_items.item_unit_id"); %>
+										</label>
+										<select id="item_unit_id" class="form-control show-tick" name="item_unit_id" data-live-search="true">
+											<option value=""><%=__("extra_items.select_item_unit")%></option>
+											<%-unitList%>
+										</select>
+									</div>
+									<span id="item_unit_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="extra_unit_id" class="control-label">
+											<%= __("extra_items.extra_unit_id"); %><span class="required"> *</span>
+										</label>
+										<select id="extra_unit_id" class="form-control show-tick" name="extra_unit_id" data-live-search="true">
+											<option value=""><%=__("extra_items.select_extra_unit")%></option>
+											<%-extraUnitList%>
+										</select>
+									</div>
+									<span id="extra_unit_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_english" class="control-label">
+											<%= __("extra_items.name_in_english"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_english" class="form-control" name="name_in_english" value="<%=(result.name) ? result.name.en :''%>"/>
+									</div>
+									<span id="name_in_english_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_arabic" class="control-label">
+											<%= __("extra_items.name_in_arabic"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_arabic" class="form-control" name="name_in_arabic" value="<%=(result.name) ? result.name.ar :''%>"/>
+									</div>
+									<span id="name_in_arabic_error" class="error"></span>
+								</div>
+							</div>
+                        </div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="extra_fees" class="control-label">
+											<%= __("extra_items.extra_fees"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="extra_fees" class="form-control" name="extra_fees" value="<%=result.extra_fees%>"/>
+									</div>
+									<span id="extra_fees_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="item_id" class="control-label">
+											<%= __("extra_items.item_id"); %><span class="required"> *</span>
+										</label>
+										<select id="item_id" class="form-control show-tick" name="item_id" data-live-search="true" title='<%=__("extra_items.select_item")%>' multiple>
+											<%-itemList%>
+										</select>
+										<span class="input-group-addon loading-btn hide">
+											<%= __("admin.system.loading_txt") %> <br/>
+										</span>
+									</div>
+									<span id="item_id_error" class="error"></span>
+								</div>
+							</div>
+                        </div>
+                    </div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="extra-item-add-btn-id" class="btn bg-brown btn-sm waves-effect extra-item-btn-submit" <%- FRONT_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" data-dismiss="modal"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+
+		/** For refresh selectpicker */
+		$("#add-extra-item .show-tick").selectpicker('refresh');
+
+		/**
+		 * Function to submit form
+		*/
+		$('.extra-item-btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			function submitForm(){
+				startTextLoading(btnId);
+				ajax_submit('add-extra-item',function(status,response){
+					if(status){
+						$('#form_modal').modal("hide");
+                        $("#reset").first().trigger("click");
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			}
+			<% if(isRestaurant(module_type)){ %>
+				confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("extra_items.extra_items_clone_comfirm_message"); %>',function(result){
+					if(result){
+						submitForm();
+					}
+					swal.close();
+				});
+			<% }else{ %>
+				submitForm();
+			<% } %>
+		});
+
+		/**
+		 * Function to submit form
+		*/
+		$('#item_unit_id').change(function(e){
+			let itemUnitId = $(this).val();
+
+			$(".loading-btn").removeClass('hide');
+			$("#item_id").html("");
+			$(".show-tick").selectpicker('refresh');
+			/** Get item list */
+			ajaxRequest({
+				url 	: "<%=list_url%>/get_item_list",
+				data	: {item_unit_id: itemUnitId},
+				method	: "post"
+			},function(response){
+				$(".loading-btn").addClass('hide');
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					$("#item_id").html(response.item_list);
+					$(".show-tick").selectpicker('refresh');
+				}else if(response.status && response.message){
+					notice(response.status,response.message);
+				}
+			});
+		});
+	});
+</script>

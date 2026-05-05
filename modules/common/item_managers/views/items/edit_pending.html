@@ -1,0 +1,734 @@
+<%
+	var result 			= (typeof result !== typeof undefined && result)  				  ?	result 			:{};
+	var itemUnitList	= (typeof item_unit_list !== typeof undefined && item_unit_list)  ?	item_unit_list 	:[];
+	var itemId			= (result._id)	?	result._id	:"";
+    var itemUnitDetails = (typeof item_unit_details !== typeof undefined && item_unit_details) ? item_unit_details :[];
+    var itemAvailabilityDetails = (typeof item_availability_details !== typeof undefined && item_availability_details)  ?	item_availability_details :[];
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="edit-pending-item" action="<%=list_url+"/edit/"+itemId%>" data-modal-id="form_modal" data-submit-btn-id="pending-item-edit-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("items.edit_pending_item") %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20 materialize_checkbox">
+						<div class="row clearfix padding-10">
+                            <div class="account-section cstm_account_section">
+                                <div class="account-form-section ">
+                                    <div class="account-section-heading">
+                                        <h2><%= __("items.information"); %></h2>
+                                    </div>
+                                    <div class="row clearfix selected">
+                                        <div class="<%=(result.image) ? 'col-sm-4' :'col-sm-6'; %>">
+                                            <div class="form-group">
+                                                <div class="form-lin no-bottom-border">
+                                                    <label for="image" class="control-label">
+                                                        <%= __("items.image"); %>
+                                                        <% if(!itemId){ %>
+                                                            <span class="required"> *</span>
+                                                        <% }%>
+                                                    </label>
+                                                    <input name="old_image" id="old_image" type="hidden"  value="<%=(result.image) ? result.image :'';%>"/>
+                                                    <input name="image" id="image" type="file" data-text="<%=__('items.select_mage')%>"  data-input="false" class="form-control cfilestyle"/>
+
+                                                    <span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('admin.system.extension_and_size_suggestion_message',ALLOWED_IMAGE_EXTENSIONS.join(', '),ITEMS_FILE_RESOLUTION)%>">
+                                                        <i class="material-icons">info</i>
+                                                    </span>
+                                                </div>
+                                                <span id="image_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                        <% if(result.image){ %>
+                                            <div class="col-sm-2">
+                                                <a href='<%=result.main_image%>'  class='items-image' data-lightbox='roadtrip'>
+                                                    <img src="<%=result.main_image%>" alt="restaurant image" class="set_image_dim img-thumbnail" />
+                                                </a>
+                                            </div>
+                                        <% } %>
+                                        <div class="<%=(result.grid_image) ? 'col-sm-4' :'col-sm-6'; %>">
+                                            <div class="form-group">
+                                                <div class="form-lin no-bottom-border">
+                                                    <label for="image" class="control-label">
+                                                        <%= __("items.grid_image"); %>
+                                                        <% if(!itemId){ %>
+                                                            <span class="required"> *</span>
+                                                        <% }%>
+                                                    </label>
+                                                    <input name="old_grid_image" id="old_grid_image" type="hidden"  value="<%=(result.grid_image) ? result.grid_image :'';%>"/>
+                                                    <input name="grid_image" id="grid_image" type="file" data-text="<%=__('items.select_mage')%>"  data-input="false" class="form-control cfilestyle"/>
+
+                                                    <span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('admin.system.extension_and_size_suggestion_message',ALLOWED_IMAGE_EXTENSIONS.join(', '),ITEMS_FILE_RESOLUTION)%>">
+                                                        <i class="material-icons">info</i>
+                                                    </span>
+                                                </div>
+                                                <span id="grid_image_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                        <% if(result.grid_image){ %>
+                                            <div class="col-sm-2">
+                                                <a href='<%=result.grid_image_path%>'  class='items-image' data-lightbox='roadtrip'>
+                                                    <img src="<%=result.grid_image_path%>" alt="item grid image" class="set_image_dim img-thumbnail" />
+                                                </a>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    <div class="row clearfix selected">
+                                        <div class="<%=(result.detail_image) ? 'col-sm-4' :'col-sm-6'; %>">
+                                            <div class="form-group">
+                                                <div class="form-lin no-bottom-border">
+                                                    <label for="image" class="control-label">
+                                                        <%= __("items.detail_image"); %>
+                                                        <% if(!itemId){ %>
+                                                            <span class="required"> *</span>
+                                                        <% }%>
+                                                    </label>
+                                                    <input name="old_detail_image" id="old_detail_image" type="hidden"  value="<%=(result.detail_image) ? result.detail_image :'';%>"/>
+                                                    <input name="detail_image" id="detail_image" type="file" data-text="<%=__('items.select_mage')%>"  data-input="false" class="form-control cfilestyle"/>
+
+                                                    <span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('admin.system.extension_and_size_suggestion_message',ALLOWED_IMAGE_EXTENSIONS.join(', '),ITEMS_FILE_RESOLUTION)%>">
+                                                        <i class="material-icons">info</i>
+                                                    </span>
+                                                </div>
+                                                <span id="detail_image_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                        <% if(result.detail_image){ %>
+                                            <div class="col-sm-2">
+                                                <a href='<%=result.detail_image_path%>'  class='items-image' data-lightbox='roadtrip'>
+                                                    <img src="<%=result.detail_image_path%>" alt="item detail image" class="set_image_dim img-thumbnail" />
+                                                </a>
+                                            </div>
+                                        <% } %>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="cuisine" class="control-label">
+                                                        <%= __("items.cuisine"); %>
+                                                    </label>
+                                                    <select id="cuisine" class="form-control show-tick" name="cuisine" data-live-search="true">
+                                                        <option value=""><%=__("items.select_cuisine")%></option>
+                                                        <%-cuisine_list%>
+                                                    </select>
+                                                </div>
+                                                <span id="cuisine_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row clearfix">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="menu_ids" class="control-label">
+                                                        <%= __("item.menu"); %>
+                                                    </label>
+                                                    <select id="menu_ids" class="form-control show-tick" name="menu_ids[]" data-live-search="true" multiple>
+                                                       <%-menu_list%>
+                                                    </select>
+                                                    <span class="message demo-image-copyright"> <%=__("items.leave_blank_to_select_all")%> </span>
+                                                </div>
+                                                <span id="menu_ids_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="category_ids" class="control-label">
+                                                        <%= __("items.category"); %>
+                                                    </label>
+                                                    <select id="category_ids" class="form-control show-tick" name="category_ids[]" data-live-search="true" multiple>
+                                                        <%-category_list%>
+                                                    </select>
+                                                    <span class="message demo-image-copyright"> <%=__("items.leave_blank_to_select_all")%> </span>
+                                                </div>
+                                                <span id="category_ids_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row clearfix">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="name_in_english" class="control-label">
+                                                        <%= __("items.name_in_english"); %><span class="required"> *</span>
+                                                    </label>
+                                                    <input type="text" id="name_in_english" class="form-control" name="name_in_english" value="<%=(result.name) ? result.name.en :''%>"/>
+                                                </div>
+                                                <span id="name_in_english_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="name_in_arabic" class="control-label">
+                                                        <%= __("items.name_in_arabic"); %><span class="required"> *</span>
+                                                    </label>
+                                                    <input type="text" id="name_in_arabic" class="form-control" name="name_in_arabic" value="<%=(result.name) ? result.name.ar :''%>"/>
+                                                </div>
+                                                <span id="name_in_arabic_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row clearfix">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="description_in_english" class="control-label">
+                                                        <%= __("items.description_in_english"); %><span class="required"> *</span>
+                                                    </label>
+                                                    <textarea name="description_in_english" id="description_in_english" class="form-control height-100 resize-none"><%=(result.description) ? result.description.en :''%></textarea>
+                                                </div>
+                                                <span id="description_in_english_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="description_in_arabic" class="control-label">
+                                                        <%= __("items.description_in_arabic"); %><span class="required"> *</span>
+                                                    </label>
+                                                    <textarea name="description_in_arabic" id="description_in_arabic" class="form-control height-100 resize-none"><%=(result.description) ? result.description.ar :''%></textarea>
+                                                </div>
+                                                <span id="description_in_arabic_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row clearfix">
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="non_sellable" class="control-label">
+                                                        <%= __("item.non_sellable_items"); %>
+                                                    </label> <br/>
+                                                    <input type="checkbox" name="non_sellable" value="<%=NON_SELLABLE%>" id="non_sellable_item" class="filled-in chk-col-indigo" <%= (result.non_sellable == NON_SELLABLE) ? "checked" :'';%>>
+                                                    <label for="non_sellable_item" class="control-label font-14 font-bold"> </label>
+                                                </div>
+                                                <span id="non_sellable_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <div class="form-group">
+                                                        <div class="form-line">
+                                                            <label for="price_on_selection" class="control-label">
+                                                                <%= __("items.price_on_selection"); %>
+                                                            </label> <br/>
+                                                            <input type="checkbox" value="<%=PRICE_ON_SELECTION%>" name="price_on_selection" id="price_on_selection_item" class="filled-in chk-col-indigo" <%= (result.price_on_selection == PRICE_ON_SELECTION) ? "checked" :'';%>>
+                                                            <label for="price_on_selection_item" class="control-label font-14 font-bold"> </label>
+                                                        </div>
+                                                        <span id="price_on_selection_error" class="error"></span>
+                                                    </div>
+                                                </div>
+                                                <span id="price_on_selection_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="discount_value" class="control-label">
+                                                        <%= __("items.discount_by_value"); %>
+                                                    </label>
+                                                    <input type="text" id="discount_value " value="<%=(result.discount_value) ? result.discount_value :''%>" class="form-control" name="discount_value"/>
+                                                </div>
+                                                <span id="discount_value_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="discount_percentage" class="control-label">
+                                                        <%= __("items.discount_percentage"); %>
+                                                    </label>
+                                                    <input type="text" id="discount_percentage" value="<%=(result.discount_percentage) ? result.discount_percentage :''%>" class="form-control" name="discount_percentage"/>
+                                                </div>
+                                                <span id="discount_percentage_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row clearfix">
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-line">
+                                                    <label for="item_price" class="control-label">
+                                                        <%= __("items.price"); %>
+                                                        <span class="required item-price"> *</span>
+                                                    </label>
+                                                    <input type="text" id="item_price" class="form-control" name="item_price" value="<%=(result.item_price) ? result.item_price :''%>"/>
+                                                </div>
+                                                <span id="item_price_error" class="error"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="account-section cstm_account_section">
+                                <div class="account-form-section ">
+                                    <div class="account-section-heading">
+                                        <h2><%= __("items.availability"); %></h2>
+                                    </div>
+                                    <div class="availability_append_div"> <%
+                                        if(itemAvailabilityDetails.length >0){
+                                            itemAvailabilityDetails.map((records,index)=>{ %>
+                                                <div class="row clearfix availability_input availability_div_<%=index%>">
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <div class="form-line">
+                                                                <label for="from_time_<%=index%>" class="control-label">
+                                                                    <%= __("items.from_time"); %>
+                                                                </label>
+                                                                <input type="text" id="from_time_<%=index%>" class="form-control timepicker" name="availability[<%=index%>][from_time]" value="<%=(typeof records.from_time !== typeof undefined && result.availability_status == ACTIVE) ? set24HourFormat(records.from_time) :''%>" readonly/>
+                                                            </div>
+                                                            <span id="from_<%=index%>_time_error" class="error"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <div class="form-line">
+                                                                <label for="to_time_<%=index%>" class="control-label">
+                                                                    <%= __("items.to_time"); %>
+                                                                </label>
+                                                                <input type="hidden" name="availability[<%=index%>][index]" value="<%=index%>" />
+                                                                <input type="hidden" name="availability[<%=index%>][id]" value="<%=records._id%>" />
+                                                                <input type="text" id="to_time_<%=index%>" class="form-control timepicker" name="availability[<%=index%>][to_time]" value="<%=(typeof records.to_time !== typeof undefined && result.availability_status == ACTIVE) ? set24HourFormat(records.to_time) :''%>" readonly />
+                                                            </div>
+                                                            <span id="to_time_<%=index%>_error" class="error"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <div class="form-line">
+                                                                <label for="comment_<%=index%>" class="control-label">
+                                                                    <%= __("item.comment"); %>
+                                                                </label>
+                                                                <textarea name="availability[<%=index%>][comment]" id="comment_<%=index%>" class="form-control height-50 resize-none" > <%=(records.comment) ? records.comment :''%> </textarea>
+                                                            </div>
+                                                            <span id="comment_<%=index%>_error" class="error"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-1">
+                                                        <% if(index >0){ %>
+                                                             <button type="button" class="btn bg-red delete_availability m-t-25 hoverButton" data-rel="<%=records._id%>" data-id="availability_div_<%=index%>" data-heading="<%=__('system.are_you_sure')%>" data-title="<%=__('items.you_want_to_permanently_delete_this_availability')%>" >x</button>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                        <%  });
+                                        } %>
+
+                                    </div>
+                                    <div class="row clearfix">
+                                        <div class="col-sm-1">
+                                            <button class="availability_add_more btn btn-success" type="button"><%=__("system.add_more")%></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="account-section cstm_account_section">
+                                <div class="account-form-section ">
+                                    <div class="account-section-heading">
+                                        <h2><%= __("item.pricing"); %></h2>
+                                    </div>
+                                    <div >
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th width="5%"> <%= __("item.active"); %> </th>
+                                                    <th width="10%"> <%= __("item.sorting"); %> </th>
+                                                    <th width="10%"> <%= __("items.item_unit"); %> </th>
+                                                    <th width="10%"> <%= __("items.price"); %> </th>
+                                                    <th> <%= __("items.discount_type"); %></th>
+                                                    <th> <%= __("items.discount_value"); %></th>
+                                                    <th width="1%"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="price_append_div">  <%
+                                                if(itemUnitDetails.length >0){
+                                                    itemUnitDetails.map((records,index)=>{ %>
+                                                        <tr class="price_input price_div_<%=index%>">
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <div class="form-line">
+                                                                        <input type="checkbox" name="price[<%=index%>][status]" value="<%=ACTIVE%>" id="status_<%=index%>" class="filled-in chk-col-indigo" <%= (records.status == ACTIVE) ? 'checked' :''; %> >
+                                                                        <label for="status_<%=index%>" class="control-label"> </label>
+                                                                    </div>
+                                                                    <span id="status_<%=index%>_error" class="error"></span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <div class="form-line">
+                                                                        <input type="text" id="sorting_<%=index%>" class="form-control" name="price[<%=index%>][sorting]" value="<%= (records.sorting) ? records.sorting :'';%>"/>
+                                                                    </div>
+                                                                    <span id="sorting_<%=index%>_error" class="error"></span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <div class="form-line">
+                                                                        <select name="price[<%=index%>][item_unit]" id="item_unit_<%=index%>" class="form-control show-tick">
+                                                                            <option value=""><%= __("items.select_item_unit"); %></option>
+                                                                            <%
+                                                                            if(itemUnitList.length >0){
+                                                                                itemUnitList.map(data=>{ %>
+                                                                                    <option value="<%=data._id%>" <%= (String(data._id) == String(records.item_unit_id)) ? 'selected' :''; %> >
+                                                                                        <%=(data.name && data.name[DEFAULT_LANGUAGE_CODE]) ? data.name[DEFAULT_LANGUAGE_CODE] :"";%>
+                                                                                    </option> <%
+                                                                                });
+                                                                            } %>
+                                                                        </select>
+                                                                    </div>
+                                                                    <span id="item_unit_<%=index%>_error" class="error"></span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <div class="form-line">
+                                                                        <input type="text" id="price_<%=index%>" class="form-control" name="price[<%=index%>][price]" value="<%=(records.price) ? records.price :'';%>"/>
+                                                                        <input type="hidden" value="<%=index%>" id="price_index_<%=index%>" class="form-control" name="price[<%=index%>][index]"/>
+                                                                        <input type="hidden" value="<%=records._id%>" class="form-control" name="price[<%=index%>][id]"/>
+                                                                    </div>
+                                                                    <span id="price_<%=index%>_error" class="error"></span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <div class="form-line">
+                                                                        <select name="price[<%=index%>][discount_type]" id="discount_type_<%=index%>" class="form-control show-tick">
+                                                                            <option value=""><%= __("items.select_discount_type"); %></option>
+                                                                            <% Object.keys(ITEM_DISCOUNT_TYPE).map(key=>{ %>
+                                                                                <option value="<%=key%>" <%= (records.discount_type == key) ? 'selected' :''; %> >
+                                                                                    <%= ITEM_DISCOUNT_TYPE[key] %>
+                                                                                </option>
+                                                                            <% });%>
+                                                                        </select>
+                                                                    </div>
+                                                                    <span id="discount_type_<%=index%>_error" class="error"></span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <div class="form-line">
+                                                                        <input type="text" id="discount_value_<%=index%>" class="form-control" name="price[<%=index%>][discount_value]" value="<%=(records.discount_value) ? records.discount_value :'';%>"/>
+                                                                    </div>
+                                                                    <span id="discount_value_<%=index%>_error" class="error"></span>
+                                                                </div>
+                                                            </td>
+                                                            <td> <%
+                                                                if(index >0){ %>
+                                                                    <button type="button" class="btn bg-red delete_price m-t-5 hoverButton" data-rel="<%=records._id%>" data-id="price_div_<%=index%>" data-heading="<%=__('system.are_you_sure')%>" data-title="<%=__('items.you_want_to_permanently_delete_this_price_unit')%>" >x</button>
+                                                                <%}%>
+                                                            </td>
+                                                        </tr>
+                                                <%   });
+                                                } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="row clearfix">
+                                        <div class="col-sm-1">
+                                            <button class="price_add_more btn btn-success" type="button"><%=__("system.add_more")%></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="pending-item-edit-btn-id" class="btn bg-brown btn-sm waves-effect pending-item-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="hide">
+    <table>
+        <tbody class="extra_fields">
+            <tr class="price_input price_div_{index}">
+                <td>
+                    <div class="form-group">
+                        <div class="form-line">
+                            <input type="checkbox" name="price[{index}][status]" value="<%=ACTIVE%>" id="status_{index}" class="filled-in chk-col-indigo" >
+                            <label for="status_{index}" class="control-label"> </label>
+                        </div>
+                        <span id="status_{index}_error" class="error"></span>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <div class="form-line">
+                            <input type="text" id="sorting_{index}" class="form-control" name="price[{index}][sorting]"/>
+                        </div>
+                        <span id="sorting_{index}_error" class="error"></span>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <div class="form-line">
+                            <select name="price[{index}][item_unit]" id="item_unit_{index}" class="form-control show-tick">
+                                <option value=""><%= __("items.select_item_unit"); %></option>
+                                <%
+                                if(itemUnitList.length >0){
+                                    itemUnitList.map(records=>{ %>
+                                        <option value="<%=records._id%>" >
+                                            <%=(records.name && records.name[DEFAULT_LANGUAGE_CODE]) ? records.name[DEFAULT_LANGUAGE_CODE] :"";%>
+                                        </option> <%
+                                    });
+                                } %>
+                            </select>
+                        </div>
+                        <span id="item_unit_{index}_error" class="error"></span>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <div class="form-line">
+                            <input type="text" id="price_{index}" class="form-control" name="price[{index}][price]"/>
+                            <input type="hidden" value="{index}" id="price_index_{index}" class="form-control" name="price[{index}][index]"/>
+                        </div>
+                        <span id="price_{index}_error" class="error"></span>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <div class="form-line">
+                            <select name="price[{index}][discount_type]" id="discount_type_{index}" class="form-control show-tick">
+                                <option value=""><%= __("items.select_discount_type"); %></option>
+                                <% Object.keys(ITEM_DISCOUNT_TYPE).map(key=>{ %>
+                                    <option value="<%=key%>"> <%= ITEM_DISCOUNT_TYPE[key] %> </option>
+                                <% });%>
+                            </select>
+                        </div>
+                        <span id="discount_type_{index}_error" class="error"></span>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <div class="form-line">
+                            <input type="text" id="discount_value_{index}" class="form-control" name="price[{index}][discount_value]"/>
+                        </div>
+                        <span id="discount_value_{index}_error" class="error"></span>
+                    </div>
+                </td>
+                <td>
+                    <button type="button" class="btn bg-red delete_price m-t-5 hoverButton" data-id="price_div_{index}" data-heading="<%=__('system.are_you_sure')%>" data-title="<%=__('items.you_want_to_delete_this_price_unit')%>" >x</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="availability_extra_fields">
+        <div class="row clearfix availability_input availability_div_{index}">
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <div class="form-line">
+                        <label for="from_time_{index}" class="control-label">
+                            <%= __("items.from_time"); %>
+                        </label>
+                        <input type="text" id="from_time_{index}" class="form-control timepicker" name="availability[{index}][from_time]" readonly/>
+                    </div>
+                    <span id="from_{index}_time_error" class="error"></span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <div class="form-line">
+                        <label for="to_time_{index}" class="control-label">
+                            <%= __("items.to_time"); %>
+                        </label>
+                        <input type="hidden" name="availability[{index}][index]" value="{index}" />
+                        <input type="text" id="to_time_{index}" class="form-control timepicker" name="availability[{index}][to_time]" readonly />
+                    </div>
+                    <span id="to_time_{index}_error" class="error"></span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <div class="form-line">
+                        <label for="comment_{index}" class="control-label">
+                            <%= __("item.comment"); %>
+                        </label>
+                        <textarea name="availability[{index}][comment]" id="comment_{index}" class="form-control height-50 resize-none" > </textarea>
+                    </div>
+                    <span id="comment_{index}_error" class="error"></span>
+                </div>
+            </div>
+            <div class="col-sm-1">
+                <button type="button" class="btn bg-red delete_availability m-t-25 hoverButton" data-id="availability_div_{index}" data-heading="<%=__('system.are_you_sure')%>" data-title="<%=__('items.you_want_to_delete_this_availability')%>" >x</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+        customFileStyle();
+
+        /**
+		 * Date time picker
+		 */
+		$('.timepicker').datetimepicker({
+			ignoreReadonly: true,
+			format: '<%=DATEPICKER_TIME_FORMAT%>'
+		});
+
+		$("#edit-pending-item .show-tick").selectpicker('refresh');
+
+         /** Call price append fields function **/
+         if($(".price_append_div .price_input").length <=0){
+            appendPriceInput();
+        }
+
+        /** Call availability append fields function **/
+        if($(".availability_append_div .availability_input").length <=0){
+            appendAvailabilityInput();
+        }
+
+        /** hide show asterick **/
+        <% if(result.price_on_selection == PRICE_ON_SELECTION){ %>
+            $('.item-price').addClass('hide');
+        <% } %>
+
+        /**
+         * Function to submit form
+        */
+        $('.pending-item-btn-submit').click(function(){
+            var btnId = $(this).attr('id');
+
+            function submitForm(){
+                startTextLoading(btnId);
+                submit_multipart_form('edit-pending-item',function(status,response){
+                    if(status){
+						if(response.status && response.message) notice(response.status,response.message);
+                        $("#reset").trigger("click");
+                    }else{
+                        stopTextLoading(btnId);
+                    }
+                });
+            };
+            <% if(isRestaurant(module_type)){ %>
+                // confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("item.item_add_comfirm_message"); %>',function(result){
+                    submitForm();
+                //     swal.close();
+                // });
+            <% }else{ %>
+                submitForm();
+            <% } %>
+
+        });
+
+        /** Delete price input div*/
+        $(document).on('click','.delete_price',function(){
+            var priceItemId			= 	$(this).attr("data-rel");
+            var divId 				= 	$(this).attr("data-id");
+            var deletePopupTitle 	= 	$(this).attr("data-heading");
+            var deletePopupMsg 		= 	$(this).attr("data-title");
+
+            confirmBox("warning",deletePopupTitle,deletePopupMsg,function(result){
+                if(result){
+                    if(priceItemId){
+                        var options = {
+                            url 	: 	"<%=list_url%>/remove_item_unit",
+                            data	: 	{item_unit_id: priceItemId, item_id: "<%=itemId%>"},
+                            method	:	"post"
+                        };
+                        ajaxRequest(options,function(response){
+                            if(response.status == "<%= STATUS_SUCCESS%>"){
+                                $("."+divId).html("");
+                            }else{
+                                notice(response.status,response.message);
+                            }
+                        });
+                    }else{
+                        $("."+divId).html("");
+                    }
+                }
+                swal.close();
+            });
+        });
+
+        /** Delete availability input div*/
+        $(document).on('click','.delete_availability',function(){
+            var availabilityId		= 	$(this).attr("data-rel");
+            var divId 				= 	$(this).attr("data-id");
+            var deletePopupTitle 	= 	$(this).attr("data-heading");
+            var deletePopupMsg 		= 	$(this).attr("data-title");
+
+            confirmBox("warning",deletePopupTitle,deletePopupMsg,function(result){
+                if(result){
+                    if(availabilityId){
+                        var options = {
+                            url 	: 	"<%=list_url%>/remove_item_availability",
+                            data	: 	{item_availability_id: availabilityId, item_id: "<%=itemId%>"},
+                            method	:	"post"
+                        };
+                        ajaxRequest(options,function(response){
+                            if(response.status == "<%= STATUS_SUCCESS%>"){
+                                $("."+divId).html("");
+                            }else{
+                                notice(response.status,response.message);
+                            }
+                        });
+                    }else{
+                        $("."+divId).html("");
+                    }
+                }
+                swal.close();
+            });
+        });
+
+        /** Add price input div*/
+        $(".price_add_more").click(function(){
+            appendPriceInput();
+        });
+
+        /** Add availability input div*/
+        $(".availability_add_more").click(function(){
+            appendAvailabilityInput();
+        });
+
+        /** hide show  asterisk */
+        $('#price_on_selection_item').click(function(){
+            if($(this).prop('checked')){
+                $(".item-price").addClass('hide');
+			}else{
+                $(".item-price").removeClass('hide');
+			}
+        });
+    });
+
+    /** Append price input **/
+    function appendPriceInput(){
+        var index = $(".price_append_div .price_input").length;
+        var html  = $(".extra_fields").html();
+        html 	  =	html.replace(/{index}/g,index);
+
+        $(".price_append_div").append(html);
+        if(index ==0)  $(".price_append_div .delete_price").remove();
+
+        $(".price_append_div .show-tick").selectpicker('refresh');
+    }// end appendPriceInput()
+
+    /** Append availability input **/
+    function appendAvailabilityInput(){
+        var index = $(".availability_append_div .availability_input").length;
+        var html  = $(".availability_extra_fields").html();
+        html 	  =	html.replace(/{index}/g,index);
+
+        $(".availability_append_div").append(html);
+        if(index ==0)  $(".availability_append_div .delete_availability").remove();
+
+        /**
+		 * Date time picker
+		*/
+		$('.timepicker').datetimepicker({
+			ignoreReadonly: true,
+			format: '<%=DATEPICKER_TIME_FORMAT%>'
+		});
+    }// end appendAvailabilityInput()
+</script>

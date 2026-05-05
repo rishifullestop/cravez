@@ -1,0 +1,42 @@
+<div class="sign_box">
+	<div class="form_section">
+		<figure><img src="<%= WEBSITE_ADMIN_IMG_URL %>logo.png" alt="img"></figure>
+		<form id="login-admin" data-submit-btn-id="admin-login-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="form-group">
+				<label for="username"><%= __("admin.login.email_placeholder");%></label>
+				<input type="text" class="form-control" name="username" id="username" placeholder="<%= __("admin.login.email_placeholder");%>">
+				<span id="username_error" class="error"></span>
+			</div>
+			<div class="form-group">
+				<label for="password"><%= __("admin.login.password"); %> *</label>
+				<input type="password" class="form-control" name="password" id="password" placeholder="<%= __("admin.login.password"); %> *">
+				<span id="password_error" class="error"></span>
+			</div>
+			<div class="submit_btn">
+				<a href="<%= WEBSITE_ADMIN_URL%>forgot-password" ><%= __("admin.login.forgot_password"); %></a>
+                <button type="button" id="admin-login-btn-id" class="btn btn-default btn-submit" <%- ADMIN_LOADING_TEXT %> > <%= __("admin.system.submit"); %></button>
+                <div class="clearfix"></div>
+			</div>
+		</form>
+	</div>
+</div>
+	
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		
+		/**
+		 * Function to submit form
+		 */
+		$(".btn-submit").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("login-admin",function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	</script>

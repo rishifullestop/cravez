@@ -1,0 +1,87 @@
+<%
+    var userData         = user_data;
+    var dates            = choose_date;
+    var leaveTypeList    = leave_type_list;
+    var shiftAvailablity = shift_availablity;
+    var fromDate	     = newDate(from_date,DATABASE_DATE_FORMAT);
+    var toDate		     = newDate(to_date,DATABASE_DATE_FORMAT);
+    var sessionDetails   = session_details;
+%>      
+<table id="datatable-listing" class="row-border fixed-width-table hover table full-length-header table-bordered" cellspacing="0" width="100%" >
+    <thead>
+        <tr>
+            <th><%= __('admin.shift_setup.user_name'); %></th>
+            <%  dates.map((dateRecords)=>{ %>
+                    <th><%=dateRecords%></th> <%
+                });
+            %>
+        </tr>
+    </thead>
+    <tbody>
+        <%
+            userData.map((userRecords)=>{
+                let userId   = (userRecords._id)         ?  userRecords._id         :"";
+                let userName = (userRecords.full_name)   ?  userRecords.full_name   :"";
+                %>
+                <tr>
+                    <td><%=userName%></td>
+                    <%
+                        dates.map((dateRecords)=>{
+                            var shiftData = (shiftAvailablity[dateRecords] && shiftAvailablity[dateRecords][userId]) ? shiftAvailablity[dateRecords][userId] : {};
+                            var startTime = (shiftData.start_time) ?    set24HourFormat(shiftData.start_time)   :"";
+                            var endTime   = (shiftData.end_time)   ?    set24HourFormat(shiftData.end_time)     :"";
+                            var shiftId   = (shiftData.shift_id)   ?    shiftData.shift_id         :"";
+                            var id        = (shiftData.id)         ?    shiftData.id               :"";
+                            var time      = (startTime && endTime) ?    startTime+" - "+endTime    :"";
+                            var leaveData = (shiftData.leave_type) ?    shiftData.leave_type       :"";
+                            
+                            var leaveType = "";
+                            if(leaveData){
+                                leaveType  = '<span class="label label-success">'+(leaveTypeList[String(leaveData)] ? leaveTypeList[String(leaveData)] :"")+'</span>';
+                                time = "";
+                            }
+                            %>
+                            <td><%=time%> <%- leaveType%>
+                                <%  
+                                    if(sessionDetails.user_role_id != CRAVEZ){
+                                        if(!leaveType && startTime && endTime){%>
+                                            <a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>shift_setup/assign_shift/<%=shiftId%>/<%=id%>" data-open-modal="true" class="float-right waves-effect waves-block action-btn <%= getPermissionClass(module_type,['shift_setup','assign_shift']); %>">
+                                                <i class="material-icons font-14">mode_edit</i>
+                                            </a><%
+                                        }else if(leaveType &&shiftData.status == PENDING ){
+                                            if(leaveData == WEEKLY_OFF ){ %>
+                                                <a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>leave_management/vacation_request/edit_weekly_off/<%=id%>" data-open-modal="true" class="float-right waves-effect waves-block action-btn <%= getPermissionClass(module_type,['vacation_request','edit_weekly_off']); %>">
+                                                    <i class="material-icons font-14">mode_edit</i>
+                                                </a><%
+                                            }else{ %>
+                                                <a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>leave_management/vacation_request/edit/<%=id%>" data-open-modal="true" class="float-right waves-effect waves-block action-btn <%= getPermissionClass(module_type,['vacation_request','edit']); %>">
+                                                    <i class="material-icons font-14">mode_edit</i>
+                                                </a>
+                                                <%
+                                            }
+                                        }
+                                    }
+                                %>
+                            </td>
+                            <%
+                        });
+                    %>
+                </tr>
+                <%
+            });
+        %>
+    </tbody>
+</table>
+<%
+    if(userData.length > 0 ){%>
+        <div class="export">
+            <a href="<%=WEBSITE_ADMIN_URL%>shift_setup/export_schedule/<%=fromDate%>/<%=toDate%>" class="btn btn-sm waves-effect btn-success <%=getPermissionClass(module_type,['shift_setup','export_schedule']); %>">
+                <%= __("admin.shift_setup.export")%>
+            </a>
+            <a href="<%=WEBSITE_ADMIN_URL%>shift_setup/user_schedule" class="btn bg-deep-orange btn-sm waves-effect <%=getPermissionClass(module_type,['shift_setup','user_schedule']); %>">
+                <%= __("admin.shift_setup.send_team_schedule")%>
+            </a>
+        </div><%
+    }
+%>
+

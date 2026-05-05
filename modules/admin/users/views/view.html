@@ -1,0 +1,111 @@
+<%
+	var result	= (typeof result !== typeof undefined && result)	?	result		:{};
+	var userId	= (typeof result._id !== typeof undefined)			? 	result._id	:"";
+%>
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2><%= __('admin.user.user_details'); %></h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<li>
+							<a href="<%=admin_list_url%>/edit/<%=userId%>" target="_blank" class="m-r-5">
+								<button type="button" class="btn bg-green waves-effect">
+									 <%= __('admin.system.edit'); %>
+								</button>
+							</a>
+						</li>
+						<li>
+							<a href="<%=admin_list_url%>">
+								<button type="button" class="btn bg-indigo waves-effect">
+									<%= __('admin.system.back'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li>
+									<a href="<%=admin_list_url%>/edit/<%=userId%>" target="_blank">
+										<%= __("admin.system.edit"); %>
+									</a>
+								</li>
+								<li>
+									<a href="<%=admin_list_url%>" >
+										<%= __("admin.system.back"); %>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body table-responsive" id="aniimated-thumbnials">
+					<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+						<tr>
+							<th class="text-right" width="25%"><%= __("admin.user.image"); %></th>
+							<td>
+								<% if(typeof result[IMAGE_FIELD_NAME] !== typeof undefined && result[IMAGE_FIELD_NAME] !=""){ %>
+									<a href="<%= result[IMAGE_FIELD_NAME]%>"   class="items-image" data-lightbox="roadtrip">
+										<img src="<%= result[IMAGE_FIELD_NAME]%>?dim=120x120&type=resize" alt="Profile image"  />
+									</a>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-right" width="20%"><%= __('admin.user.full_name'); %></th>
+							<td><%=(typeof result.full_name !== typeof undefined)	? result.full_name	: 'N/A';%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.user.email'); %></th>
+							<td><%-(typeof result.email !== typeof undefined) ? '<a href="mailto:'+result.email+'">'+result.email+'</a>' : 'N/A'%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.user.phone_number'); %></th>
+							<td><%= (typeof result.mobile_number !== typeof undefined) ? result.mobile_number :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.user.gender'); %></th>
+							<td><%= (typeof result.gender !== typeof undefined) ? result.gender :"N/A";%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.user.date_of_birth'); %></th>
+							<td>
+								<% if(typeof result.dateofbirth !== typeof undefined){%>
+									<span class="setDateTimeFormat" data-time-format="<%=DATE_FORMAT_HTML%>" data-date-time="<%= (result.dateofbirth) ? result.dateofbirth :'';%>"></span>
+								<%}else{%>
+									<span>N/A</span>
+								<%}%>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.system.status'); %></th>
+							<%
+								var status 	=	(result.active && result.active == ACTIVE) ? '<span class="label label-success m-r-5">'+__("admin.system.active")+'</span>': '<span class="label label-danger m-r-5">'+__("admin.system.inactive")+'</span>';
+								status 		+= 	(result.is_verified && result.is_verified == VERIFIED ) ? '<span class="label label-info">'+__("admin.user.email_verified")+'</span>': '<span class="label label-warning">'+__("admin.user.email_not_verified")+'</span>';
+							%>
+							<td><%- status%></td>
+						</tr>
+						<tr>
+							<th class="text-right"><%= __('admin.user.registered_date'); %></th>
+							<td>
+								<span class="setDateTimeFormat" data-date-time="<%= (result.created) ? result.created :'';%>"></span>
+							</td>
+						</tr>
+						
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css" rel="stylesheet">
+
+<%- contentFor('script') %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>

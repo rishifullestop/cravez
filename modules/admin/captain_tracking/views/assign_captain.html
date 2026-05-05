@@ -1,0 +1,501 @@
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="modal-dialog  modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+					<h2 class="modal-title">
+						<%= __("admin.captain_tracking.reassign"); %>
+					</h2>
+				</div>
+				<div class="modal-body padding-20">
+					<!--Search Start -->
+					<div class="row clearfix">
+						<input class="total_record" name="total_record" id="total_record" type="hidden" value="<%= total_captains %>">
+
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+								<div class="panel panel-col-pink">
+									<div class="panel-heading " role="tab" id="panel-heading-id">
+										<h4 class="panel-title">
+											<a class=" " role="button" data-toggle="collapse" data-target="#assign-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="true"
+											   aria-controls="assign-collapse-id">
+												<%= __("admin.system.search"); %>
+												<span class="pull-right collapse-toggle-icon"></span>
+											</a>
+										</h4>
+									</div>
+									<div id="assign-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+										<div class="panel-body">
+											<div class="row clearfix dataTables_wrapper">
+												<div class="col-xs-12 col-sm-3">
+													<div class="form-group">
+														<div class="form-line">
+															<select class="form-control" id="assign_area_id" data-live-search="true" data-title='<%=__("admin.order_tracking.search_by_area");%>' multiple>
+																<%- area_list%>
+															</select>
+														</div>
+													</div>
+												</div>
+												<div class="col-xs-12 col-sm-3">
+													<div class="form-group">
+														<div class="form-line">
+															<input class="form-control assign-full-name" name="search_by_captain_name" id="search_by_captain_name" placeholder="<%= __('admin.order_tracking.search_by_captain_name'); %>">
+														</div>
+													</div>
+												</div>
+												<div class="col-xs-12 col-sm-3">
+													<div class="form-group">
+														<div class="form-line">
+															<select class="form-control" name="driver_order_status" id="driver_order_status" data-title='<%=__("admin.order_tracking.search_by_driver_order_status")%>' data-live-search="true" multiple>
+																<% Object.keys(DRIVER_ORDER_STATUS).map(key=>{ %>
+																	<option value="<%=key%>"> <%=DRIVER_ORDER_STATUS[key].title%></option> <%
+																}); %>
+															</select>
+														</div>
+													</div>
+												</div>
+												<div class="col-xs-12 col-sm-3">
+													<button type="button" id="reset_assign_form" class="btn btn-sm waves-effect btn-danger">
+														<%= __("system.reset")%>
+													</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--captain Listing -->
+					<div class="row clearfix">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<div class="card">
+								<div class="header">
+									<h2>
+										<%= __("admin.order_tracking.captain"); %>
+									</h2>
+									<ul class="header-dropdown m-r--5 btn-right-top-margin">
+									    <li>
+											<a href="javascript:void(0)">
+												<button type="button" id="reload-captain-btn" class="btn btn-sm bg-indigo waves-effect" onclick="reloadDatatable('datatable-listing-captain','reload-captain-btn',true)">
+													<%= __("admin.order_tracking.refresh"); %>
+												</button>
+											</a>
+										</li> <%
+										if(branch_area_id){ %>
+											<li>
+												<a href="javascript:void(0)">
+													<button type="button" class="btn btn-sm bg-blue-grey waves-effect search_by_branch_area"  data-area-id="<%-branch_area_id%>">
+														<%= __("admin.order_tracking.search_by_branch_area"); %>
+													</button>
+												</a>
+											</li> <%
+										} %>
+									</ul>
+								</div>
+								<div class="body hideScroll">
+									<table id="datatable-listing-captain" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+										<thead>
+											<tr>
+												<th width="30%"><%= __("admin.order_tracking.captain_name"); %></th>
+												<th width="25%"><%= __("admin.order_tracking.number_of_orders"); %></th>
+												<th width="20%"><%= __("admin.order_tracking.distance"); %></th>
+												<th width="15%"><%= __("admin.system.status"); %></th>
+												<th width="20%"><%= __("admin.system.action"); %></th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!--- Driver Map-->
+					<div class="card hide" id="driver-assign-location-map">
+						<div class="header">
+							<h2>
+								<%= __("admin.order_tracking.map"); %>
+							</h2>
+							<ul class="header-dropdown m-r--5 btn-right-top-margin">
+								<li>
+									<a  class="refresh-location-btn">
+										<button type="button" class="btn btn-sm bg-indigo waves-effect">
+											<%= __("admin.order_tracking.refresh"); %>
+										</button>
+									</a>
+									<a  class="close-map-btn">
+										<button type="button" class="btn btn-sm btn-danger waves-effect">
+											<%= __("admin.system.close"); %>
+										</button>
+									</a>
+								</li>
+							</ul>
+						</div>
+						<div id="legend" class="col-sm-12 m-t-10 text-center">
+							<ul class="order-legends">
+								<li>
+									<img src="<%=STORE_GOOGLE_MAP_ICON%>" />
+									<p class="captain-map-legend"><%= __("admin.order_tracking.pickup_location"); %></p>
+								</li>
+								<li>
+									<img src="<%=DROPOFF_LOCATION_GOOGLE_MAP_ICON%>" class="dropoff-icon"/>
+									<p class="captain-map-legend"><%= __("admin.order_tracking.drop_off_location"); %></p>
+								</li>
+								<li>
+									<img src="<%=CAPTAIN_ICON_IMAGE%>" />
+									<p class="captain-map-legend"><%= __("admin.order_tracking.captain_location"); %></p>
+								</li>
+							</ul>
+						</div>
+						<div class="body table-responsive" id="driver-assign-report">
+							<div id="driver-assign-map" style="height:500px" class="col-sm-12"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$('.modal-body').addClass('assign-modal');
+
+	$('#form_modal').on('hidden.bs.modal', function () {
+		$('.modal-body').removeClass('assign-modal');
+	});
+
+	var historyData;
+	var myMarker 	= [];
+	var infowindow 	= [];
+	/** Function to initialize datatable and get server side data*/
+	var assignedCaptain		=	"";
+	var captainDataTable	=	"";
+	var adjustInterval		=	"";
+	var driverOrderStatus 	=	<%- JSON.stringify(DRIVER_ORDER_STATUS)%>;
+	$(document).ready(function() {
+		var captainBtnId =	'reload-captain-btn';
+		captainDataTable = $('#datatable-listing-captain').DataTable({
+			"order"		: 	[[2,"asc"]],
+			"sDom"		:	"tipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	[[parseInt("<%=total_captains%>")], [parseInt("<%=total_captains%>")]],
+			"columns"	: 	[
+				{
+					"data"		: 'full_name',
+					"orderable" : false,
+				},
+				{
+					"data"		: 'active_orders',
+					"render" 	: function(activeOrders){
+						return (activeOrders) ? activeOrders :0;
+					}
+				},
+				{
+					"data"		: 'distance_in_minutes',
+					"render"    : function(distanceInMinutes){
+						return ((distanceInMinutes) ? distanceInMinutes :0)+" <%=__('admin.order_tracking.minutes')%>";
+					}
+				},
+				{
+					"data"			: 	{},
+					"field_name"	: 	'is_available',
+					"searchable"	: 	false,
+					"orderable"		: 	false,
+					"render" 		: 	function(result){
+						var orderStatus = 	(result.order_status) ? result.order_status :"<%=ORDER_DRIVER_FREE%>";
+
+						var statusHtml	= 	"";
+						var statusClass	=	(driverOrderStatus[orderStatus] && driverOrderStatus[orderStatus]["label_class"]) ? driverOrderStatus[orderStatus]["label_class"] :"";
+						var statusLabel	=	(driverOrderStatus[orderStatus] && driverOrderStatus[orderStatus]["title"]) ? driverOrderStatus[orderStatus]["title"] :"";
+						statusHtml 		=	'<span class="label '+statusClass+'">'+statusLabel+'</span>';
+						if(result.orders && result.orders.length>0){
+							statusHtml +='<br><br><span class="label label-warning"><%=__("admin.order_tracking.assigned")%></span>';
+						}
+						return statusHtml;
+					}
+				},
+				{ 	"data"		: {},
+					"orderable"	: false,
+					"searchable": false,
+					"render"	: function(result){
+						var id = result._id;
+
+						var dropDownButton = '<a href="javascript:void(0);" data-id="'+id+'" class="btn btn-sm bg-blue-grey waves-effect m-t-5 get_driver_location" >'+
+							'<%= __("admin.order_tracking.view_on_map");%>'+
+						'</a>';
+						if(!assignedCaptain || (assignedCaptain && result._id != assignedCaptain)){
+							dropDownButton+='<a href="javascript:void(0);" data-id="'+id+'" data-minutes="'+result.distance_in_minutes+'" class="btn btn-sm bg-indigo waves-effect mt10 assign_captain">'+
+								'<%= __("admin.captain_tracking.reassign");%>'+
+							'</a>';
+						}
+						return dropDownButton;
+					}
+				},
+			],
+			"ajax":{
+				url 	:	"<%=WEBSITE_ADMIN_URL%>order_tracking/get_captain_list",
+				type	: 	"POST",
+				data	: 	function (d) {
+					d.order_id			 =	"<%=order_id%>";
+					d.area_id 			 = 	$('#assign_area_id').val();
+					d.full_name			 = 	$('#search_by_captain_name').val();
+					d.total_record		 = 	$('#total_record').val();
+					d.driver_order_status= 	$('#driver_order_status').val();
+				},
+				dataSrc	: 	function(res){
+					assignedCaptain	= res.assigned_captain;
+					$("#total_record").val(res.recordsTotal);
+
+					adjustPermissionsClass();
+					stopTextLoading(captainBtnId);
+					window.setTimeout(function(){
+						clearInterval(adjustInterval);
+					},1000);
+					return res.data;
+				}
+			}
+		});
+
+		adjustInterval = setInterval(function(){
+			captainDataTable.columns.adjust();
+		},1);
+
+		$('.search_by_branch_area').click(function(){
+			if($(this).attr("data-area-id")){
+				$("#assign_area_id").val("");
+				$("#assign_area_id").val($(this).attr("data-area-id")).trigger("change").selectpicker('refresh');
+			}
+		});
+
+		/** Reload datatable data*/
+		$("#assign_area_id, #driver_order_status").change(function(){
+			captainDataTable.ajax.reload();
+		});
+
+		/** Reload datatable data*/
+		$("#search_by_captain_name").keyup(function(){
+			captainDataTable.ajax.reload();
+		});
+
+		/** assign driver */
+		$(document).off("click",".assign_captain");
+		$(document).on('click','.assign_captain',function(){
+			let headingMsg 		  = "<%=__('admin.system.are_you_sure')%>"
+			let message 		  = "<%=__('admin.order_tracking.you_want_to_assign_order_this_captain')%>"
+			let driverId 		  = $(this).attr("data-id");
+			let distanceInMinutes = $(this).attr("data-minutes");
+
+			if(driverId){
+				confirmBox("warning",headingMsg,message,function(result){
+					if(result){
+						/** Set ajax option **/
+						var options = {
+							url 	: "<%=admin_list_url%>/order_reassign_to_captain",
+							method	: "post",
+							data 	: {order_id:"<%=order_id%>", captain_id:driverId, distance_in_minutes:distanceInMinutes}
+						};
+						ajaxRequest(options,function(response){
+							if(response.status == "<%=STATUS_SUCCESS%>"){
+								window.location.reload(true);
+							}else if(response.status && response.message){
+								notice(response.status,response.message);
+							}
+						});
+					}
+					swal.close();
+				});
+			}
+		});
+
+		$(document).off("click",".get_driver_location");
+		$(document).on('click','.get_driver_location',function(){
+			let driverId = $(this).attr("data-id");
+			let notScroll = $(this).attr("data-not-scroll");
+
+			if(driverId){
+				getDriverLocationData(driverId,notScroll);
+			}
+		});
+
+		$(document).on('click','.close-map-btn',function(){
+			$("#driver-assign-map").html("");
+			$("#driver-assign-location-map").addClass("hide");
+		});
+
+		$("#assign_area_id, #driver_order_status").selectpicker('refresh');
+	});
+
+	// Reset assign form
+	$(document).on('click','#reset_assign_form',function(){
+		$('#search_by_captain_name, #assign_area_id, #driver_order_status').val('');
+		$("#assign_area_id, #driver_order_status").selectpicker('refresh');
+
+		$('#datatable-listing-captain').DataTable().ajax.reload();
+	});
+
+	/** Refresh datatable */
+	function reloadDatatable(tableId,btnId,load){
+		if(load) startTextLoading(btnId);
+		if(tableId) $("#"+tableId).DataTable().ajax.reload();
+	}// end reloadDatatable()
+
+	var map;
+	var bounds;
+	var myMarker = [];
+	var centerPoint = '';
+	function initialize(historyData,parentCallback) {
+		setTimeout(function(){
+			if((historyData.order_detail && historyData.order_detail.restaurant_latitude && historyData.order_detail.restaurant_longitude) || (historyData.captain_detail) || (historyData.order_detail && historyData.order_detail.customer_latitude && historyData.order_detail.customer_longitude)){
+				var orderId			= (historyData.order_detail && historyData.order_detail.unique_order_id) ? historyData.order_detail.unique_order_id : '';
+				var captainMobile	= (historyData.captain_detail && historyData.captain_detail.mobile_number) ? historyData.captain_detail.mobile_number : '';
+				var captainName		= (historyData.captain_detail && historyData.captain_detail.full_name) ? historyData.captain_detail.full_name : '';
+				var captainLat		= (historyData.captain_detail && historyData.captain_detail.latitude) ? historyData.captain_detail.latitude : '';
+				var captainLong		= (historyData.captain_detail && historyData.captain_detail.longitude) ? historyData.captain_detail.longitude : '';
+				var dropLatitude	= (historyData.order_detail && historyData.order_detail.customer_latitude) 	? historyData.order_detail.customer_latitude	:"";
+				var dropLongitude	= (historyData.order_detail && historyData.order_detail.customer_longitude) ? historyData.order_detail.customer_longitude	:"";
+				var pickLatitude	= (historyData.order_detail && historyData.order_detail.restaurant_latitude) ? historyData.order_detail.restaurant_latitude	:"";
+				var pickLongitude	= (historyData.order_detail && historyData.order_detail.restaurant_longitude) ? historyData.order_detail.restaurant_longitude	:"";
+				var pickUpAddress	= (historyData.order_detail && historyData.order_detail.restaurant_address) ? historyData.order_detail.restaurant_address	:"";
+				var dropOffAddress	= (historyData.order_detail && historyData.order_detail.customer_address) ? historyData.order_detail.customer_address	:"";
+
+				/**Set map icons*/
+				var icons = {
+					store: {
+						name: "<%= __('admin.order_tracking.pickup_location')%>",
+						icon: '<%=STORE_GOOGLE_MAP_ICON%>'
+					},
+					user: {
+						name: "<%= __('admin.order_tracking.drop_off_location')%>",
+						icon: '<%=DROPOFF_LOCATION_GOOGLE_MAP_ICON%>'
+					},
+					captain: {
+						name: "<%= __('admin.order_tracking.captain_location')%>",
+						icon: '<%=CAPTAIN_ICON_IMAGE%>'
+					},
+				};
+				var store	=	'';
+				var user	=	'';
+				var captain	=	'';
+				bounds = new google.maps.LatLngBounds();
+				if(pickLatitude && pickLongitude){
+					store	=	[{"id": 0, "location" : {"lat": pickLatitude, "lng" : pickLongitude} , "icon" : icons['store'].icon,"title":pickUpAddress,"order_id": '<%= __("admin.order_tracking.order_id")%>:'+orderId}];
+					var pickLoc	=	new google.maps.LatLng(pickLatitude, pickLongitude);
+					bounds.extend(pickLoc);
+				}
+				if(dropLatitude && dropLongitude){
+					user	=	[{"id": 1,"location" : {"lat": dropLatitude, "lng" :dropLongitude} , "icon" : icons['user'].icon,"title":dropOffAddress,"order_id": '<%= __("admin.order_tracking.order_id")%>:'+orderId}];
+					var dropLoc	=	new google.maps.LatLng(dropLatitude, dropLongitude);
+					bounds.extend(dropLoc);
+				}
+				if(captainLat && captainLong){
+					captain	=	[{"id": 2,"location" : {"lat": captainLat, "lng" :captainLong} , "icon" : icons['captain'].icon,"title":captainName,"mobile_number":captainMobile}];
+					var captainLoc	=	new google.maps.LatLng(captainLat, captainLong);
+					bounds.extend(captainLoc);
+				}
+
+				var directionsService = new google.maps.DirectionsService();
+				var directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true,polylineOptions: { map:map,strokeColor: "red"} });
+				map = new google.maps.Map(document.getElementById("driver-assign-map"), {
+					mapTypeId: google.maps.MapTypeId.ROADMAP
+				});
+				directionsRenderer.setMap(map);
+				directionsService.route({
+					origin		: pickLoc,
+					destination	: dropLoc,
+					optimizeWaypoints: true,
+					travelMode	: 'DRIVING'
+				}, function(response, status) {
+					directionsRenderer.setDirections(response);
+					pushMarker(store, "<%= __('admin.order_tracking.pickup_location')%>");
+					if(captainLat && captainLong){
+						pushMarker(captain, "<%= __('admin.order_tracking.captain_location')%>");
+					}
+					pushMarker(user, "<%= __('admin.order_tracking.drop_off_location')%>");
+					map.fitBounds(bounds);
+					map.panToBounds(bounds);
+					parentCallback(null);
+				});
+			}
+		},100);
+	}
+
+	/** add marker on map*/
+	function pushMarker(data, type) {
+		var marker;
+		$.each( data, function( key, value ) {
+			myMarker[ value.id ] = addMarker(map, value,type);
+		})
+	}
+
+	/**create the markers*/
+	function addMarker(map, data,type) {
+		var marker = new google.maps.Marker({
+			position: new google.maps.LatLng(data.location.lat, data.location.lng),
+			map: map,
+			title: type,
+			icon: data.icon
+		});
+
+		/**create the info windows*/
+		var content = document.createElement("DIV");
+		var title = document.createElement("DIV");
+		var mobile = document.createElement("DIV");
+		var order_id = document.createElement("DIV");
+		title.innerHTML = data.title;
+		if(type == 'Captain Location'){
+			mobile.innerHTML = data.mobile_number;
+		}
+		if(type != 'Captain Location'){
+			order_id.innerHTML = data.order_id;
+		}
+		content.appendChild(title);
+		content.appendChild(mobile);
+		content.appendChild(order_id);
+
+		var infowindow = new google.maps.InfoWindow({
+			content: content
+		});
+
+		// Open the infowindow on marker click
+		google.maps.event.addListener(marker, "click", function() {
+			infowindow.open(map, marker);
+		});
+
+		// Default info box for service provider should be open.Igore if store and customer address
+		if(data.id != 0 && data.id != 1){
+			infowindow.open(map, marker);
+		}
+		return marker;
+	}// end addMarker()
+
+	/**
+	* Function to get Location of captain using ajax submit
+	*/
+	function getDriverLocationData(driverId,notScroll){
+		if(driverId){
+			/** Set ajax option **/
+			var options = {
+				url 	: "<%=WEBSITE_ADMIN_URL%>order_tracking/get_driver_location",
+				data 	: {captain_id: driverId, order_id: "<%=order_id%>"},
+				method	: "post"
+			};
+			ajaxRequest(options,function(response){
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					var historyData = response.result;
+					$(".refresh-location-btn").attr('data-id',driverId).addClass("get_driver_location").attr("data-not-scroll",true);
+					$("#driver-assign-location-map").removeClass("hide");
+
+					initialize(historyData,function(res){
+						map.fitBounds(bounds);
+						map.panToBounds(bounds);
+					});
+
+					if(!notScroll) $("#form_modal").animate({scrollTop: $("#driver-assign-location-map").offset().top+100 }, "slow");
+				}else if(response.status && response.message){
+					notice(response.status,response.message);
+				}
+			});
+		}
+	}//End getDriverLocationData()
+</script>

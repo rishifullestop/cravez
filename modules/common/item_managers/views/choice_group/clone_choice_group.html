@@ -1,0 +1,206 @@
+<%
+  var itemUnitList 	 = item_unit_list;
+  var itemList 	 	 = item_list;
+  var result 	 	 = (result) ? result :{};
+  var choiceGroupId  = (result._id) ? result._id : "";
+  var formUrl 		 = list_url+"/clone/"+choiceGroupId;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="clone-choice-group" action="<%=formUrl%>" data-submit-btn-id="choice-group-clone-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%=__("choice_group.clone"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix selected">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="item_unit_id" class="control-label">
+											<%= __("choice_group.item_unit_id"); %>
+										</label>
+										<select id="item_unit_id" class="form-control show-tick" name="item_unit_id" data-live-search="true">
+											<option value=""><%=__("choice_group.select_item_unit")%></option>
+											<%-itemUnitList%>
+										</select>
+									</div>
+									<span id="item_unit_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="item_id" class="control-label">
+											<%= __("choice_group.item"); %>
+										</label>
+										<select id="item_id" class="form-control show-tick" name="item_id" data-live-search="true" title='<%=__("choice_group.select_item")%>' multiple>
+											<%-itemList%>
+										</select>
+										<span class="input-group-addon loading-btn hide">
+											<%= __("admin.system.loading_txt") %> <br/>
+										</span>
+										<span id="item_id_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="group_name_english" class="control-label">
+											<%= __("choice_group.group_name_in_english"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="group_name_english" class="form-control" name="group_name_english"value="<%=(result.name) ? result.name.en :''%>"/>
+									</div>
+									<span id="group_name_english_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="group_name_arabic" class="control-label">
+											<%= __("choice_group.group_name_in_arabic"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="group_name_arabic" class="form-control" name="group_name_arabic" value="<%=(result.name) ? result.name.ar :''%>"/>
+									</div>
+									<span id="group_name_arabic_error" class="error"></span>
+								</div>
+							</div>
+                        </div>
+                        <div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="group_min_quantity" class="control-label">
+											<%= __("choice_group.group_min_quantity"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="group_min_quantity" class="form-control" name="group_min_quantity" value="<%=result.min_quantity%>"/>
+									</div>
+									<span id="group_min_quantity_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="group_max_quantity" class="control-label">
+											<%= __("choice_group.group_max_quantity"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="group_max_quantity" class="form-control" name="group_max_quantity" value="<%=result.max_quantity%>"/>
+									</div>
+									<span id="group_max_quantity_error" class="error"></span>
+								</div>
+							</div>
+                        </div>
+                        <div class="row clearfix">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="description_in_english" class="control-label">
+                                            <%= __("choice_group.group_description_in_english"); %>
+                                        </label>
+                                        <textarea name="description_in_english" id="description_in_english" class="form-control height-100 resize-none"><%=(result.description) ? result.description.en :''%></textarea>
+                                    </div>
+                                    <span id="description_in_english_error" class="error"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="description_in_arabic" class="control-label">
+                                            <%= __("choice_group.group_description_in_arabic"); %>
+                                        </label>
+                                        <textarea name="description_in_arabic" id="description_in_arabic" class="form-control height-100 resize-none"><%=(result.description) ? result.description.ar :''%></textarea>
+                                    </div>
+                                    <span id="description_in_arabic_error" class="error"></span>
+                                </div>
+                            </div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="order" class="control-label">
+											<%= __("choice_group.order"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="order" class="form-control" name="order" value="<%=(result.order) ? result.order :''%>"/>
+										<span class="message demo-image-copyright"> <%=__("choice_group.order_help_msg")%> </span>
+									</div>
+									<span id="order_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="choice-group-clone-btn-id" class="btn bg-brown btn-sm waves-effect choice-group-btn-submit" <%- FRONT_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){
+
+		/** For refresh selectpicker*/
+		$("#clone-choice-group .show-tick").selectpicker('refresh');
+
+		/**
+		 * Function to submit form
+		*/
+		$('.choice-group-btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			function submitForm(){
+				startTextLoading(btnId);
+				ajax_submit('clone-choice-group',function(status,response){
+					if(status){
+						$("#reset").first().trigger("click");
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			};
+
+			<% if(isRestaurant(module_type)){ %>
+				confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("choice_group.choice_group_clone_comfirm_message"); %>',function(result){
+					if(result){
+						submitForm();
+					}
+					swal.close();
+				});
+			<% }else{ %>
+				submitForm();
+			<% } %>
+		});
+
+		/**
+		 * Function to submit form
+		*/
+		$('#item_unit_id').change(function(e){
+			let itemUnitId = $(this).val();
+
+			$(".loading-btn").removeClass('hide');
+			$("#item_id").html("");
+			$(".show-tick").selectpicker('refresh');
+			/** Get item list */
+			ajaxRequest({
+				url 	: "<%=list_url%>/get_item_list",
+				data	: {item_unit_id: itemUnitId},
+				method	: "post"
+			},function(response){
+				$(".loading-btn").addClass('hide');
+				if(response.status == "<%=STATUS_SUCCESS%>"){
+					$("#item_id").html(response.item_list);
+					$(".show-tick").selectpicker('refresh');
+				}else if(response.status && response.message){
+					notice(response.status,response.message);
+				}
+			});
+		});
+	});
+</script>

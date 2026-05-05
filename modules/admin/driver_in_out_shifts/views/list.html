@@ -1,0 +1,300 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by driver name -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input name="driver_name" class="form-control" id="column_filter_1"  onkeyup="searchDatatable(1)" placeholder="<%= __('admin.driver_in_out_shifts.search_by_name'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Date Range -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="date-range-picker" id="date-range-picker" placeholder="<%= __('admin.driver_in_out_shifts.search_by_date'); %>" autocomplete="off" value="<%=newDate('',DATABASE_DATE_FORMAT)+' - '+newDate('',DATABASE_DATE_FORMAT)%>">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=newDate('',DATABASE_DATE_FORMAT+' '+START_DATE_TIME_FORMAT)%>">
+											<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=newDate('',DATABASE_DATE_FORMAT+' '+END_DATE_TIME_FORMAT)%>">
+										</div>
+									</div>
+
+									<!-- reset button -->
+									<div class="col-sm-1">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.driver_in_out_shifts.driver_in_out_shifts"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.driver_in_out_shifts.driver_id");%></th>
+								<th><%= __("admin.driver_in_out_shifts.driver_name");%></th>
+								<th><%= __("admin.driver_in_out_shifts.type");%></th>
+								<th><%= __("admin.driver_in_shifts.km");%></th>
+								<th><%= __("admin.driver_in_out_shifts.km");%></th>
+								<th ><%= __("admin.system.in_time");%></th>
+								<th ><%= __("admin.system.out_time");%></th>
+								<!-- <th><%= __("admin.driver_in_out_shifts.lat_and_long");%></th> -->
+								<!-- <th><%= __("admin.driver_in_out_shifts.address");%></th> -->
+								<th><%= __("admin.driver_in_out_shifts.in_shifts_lat_and_long");%></th>
+								<th><%= __("admin.driver_in_out_shifts.out_shifts_lat_and_long");%></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal to update kilometer-->
+<div class="modal fade" id="update_km" tabindex="-1" role="dialog" aria-labelledby="update_km" aria-hidden="true">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("admin.driver_in_out_shifts.update_km") %></h4>
+			</div>
+			<form id="kilometer-form" data-submit-btn-id="update_km_btn" method="post" class="on_click_submit" role="form" action="<%=admin_list_url%>/update_kilometer">
+				<input type="hidden" name="shift_id" id="shift_id">
+				<input type="hidden" id="shift_type" name="shift_type">
+				<input type="hidden" id="driver_id" name="driver_id">
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-group">
+								<div class="form-lin no-bottom-border">
+									<label for="kilometer" class="control-label"><%= __('admin.driver_in_out_shifts.kilometer'); %><span class="required"> *</span>  </label>
+									<div class="form-grop margin-0">
+										<div class="form-line">
+											<input type="text" id="kilometer" class="form-control" name="kilometer"></textarea>
+										</div>
+										<span id="kilometer_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="update_km_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-km noHover margin-0"><%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div><!--modal close-->
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable ="";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"  : true,
+				"fnStateSave" : function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad" : function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[5, "desc" ]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ 	"data" 		 : 'captain_id',
+						"searchable" : 	false,
+					},
+					{ 	"data" : 'driver_name'},
+					{
+						"data"		: "type",
+						"orderable"	: false,
+						"render" 	: function(type){
+							return (type == "<%= IN_SHIFT %>")? "<%= DRIVER_SHIFT_TYPE[IN_SHIFT] %>":"<%= DRIVER_SHIFT_TYPE[OUT_SHIFT] %>";
+						}
+					},
+					{
+						"data" : {},
+						"field_name" : "start_km",
+						"orderable"	: false,
+						"render" : function(result){
+							var kilometer 	=	(result.start_km) ? result.start_km : 0;
+							var inShiftTime	= 	moment(result.modified).tz(DEFAULT_TIME_ZONE);
+							var cutOffTime	= 	moment(inShiftTime).add(parseInt("<%-ALLOW_DAY_TO_UPDATE_DRIVER_KM%>"),"hours").tz(DEFAULT_TIME_ZONE);
+							if( cutOffTime >= moment().tz(DEFAULT_TIME_ZONE)){
+								kilometer += '<a href="javascript:void(0);" data-id="'+result._id+'" data-type="<%=IN_SHIFT%>" data-drvierId ="'+result.driver_id+'" data-km="'+kilometer+'" class="ml-5 m-t-5 update-shift-km pull-right <%= getPermissionClass(module_type,["driver_in_out_shifts","list"])%>"> <i class="material-icons font-14">mode_edit</i></a>';
+							}
+							return kilometer;
+						}
+					},
+					{ 	"data" : {},
+						"field_name" : "km",
+						"orderable"	: false,
+						"render" : function(result){
+							var kilometer 		=	(result.out_km) ? result.out_km :((result.km) ? result.km : 0);
+							var outShiftTime	= 	moment(result.modified).tz(DEFAULT_TIME_ZONE);
+							var cutOffTime		= 	moment(outShiftTime).add(parseInt("<%-ALLOW_DAY_TO_UPDATE_DRIVER_KM%>"),"hours").tz(DEFAULT_TIME_ZONE);
+							if(result.type == "<%= OUT_SHIFT %>" && cutOffTime >= moment().tz(DEFAULT_TIME_ZONE)){
+								kilometer += '<a href="javascript:void(0);" data-id="'+result._id+'" data-drvierId ="'+result.driver_id+'" data-type="<%=OUT_SHIFT%>" data-km="'+kilometer+'  "class="ml-5 m-t-5 update-shift-km pull-right <%= getPermissionClass(module_type,["driver_in_out_shifts","list"])%>"> <i class="material-icons font-14">mode_edit</i></a>';
+						 	}
+							return result.type == "<%= OUT_SHIFT %>" ? kilometer : "";
+						}
+					},
+					{
+						"data"			: 	'created',
+						"searchable"	: 	false,
+						"render" 		: 	function(created){
+							return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"		: {},
+						"orderable"	: false,
+						"render" 	: function(result){
+							var type 	 = (result.type)		? result.type   	: "";
+							var modified = (result.modified)	? result.modified   : "";
+
+							return (type == "<%= OUT_SHIFT %>") ? moment(modified).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) :"";
+						}
+					},
+					// {
+					// 	"data"		: {},
+					// 	"orderable"	: false,
+					// 	"searchable": false,
+					// 	"render" 	: function(result){
+					// 		var longitude = (result.longitude)  ? result.longitude  : "";
+					// 		var latitude  = (result.latitude)	? result.latitude   : "";
+
+					// 		return (longitude && latitude) ? latitude+","+longitude :"";
+					// 	}
+					// },
+					// { 	"data" 		 : 'location_address',
+					// 	"searchable" : 	false,
+					// 	"orderable"	 : false,
+					// },					
+					{
+						"data"		: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render" 	: function(result){
+							var longitude = (result.in_longitude)  ? result.in_longitude  : "";
+							var latitude  = (result.in_latitude)   ? result.in_latitude   : "";
+							return (longitude && latitude) ? latitude+","+longitude :"";
+						}
+					},
+					{
+						"data"		: {},
+						"orderable"	: false,
+						"searchable": false,
+						"render" 	: function(result){
+							var latitude = (result.out_latitude)  ? result.out_latitude    : "";
+							var longitude  = (result.out_longitude) ? result.out_longitude  : "";
+							return (longitude && latitude) ? latitude+","+longitude :"";
+						}
+					},
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>",
+					type	: 	"POST",
+					data 	: function(d){
+						d.fromDate 	= $('#from_date').val();
+				        d.toDate 	= $('#to_date').val();
+					},
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/**
+		* Function to show modal
+		*/
+		$(document).on('click','.update-shift-km',function(){
+			var shiftLogId	= $(this).attr("data-id");
+			var tmpKM 		= $(this).attr("data-km");
+			var driverId 	= $(this).attr("data-drvierId");
+			var dataType    = $(this).attr("data-type");
+			$("#shift_id").val(shiftLogId);
+			$("#shift_type").val(dataType);
+			$("#driver_id").val(driverId);
+			$("#kilometer_error").text("");
+			$("#kilometer").val(tmpKM);
+
+			$("#update_km").modal({
+				backdrop: "static",
+				keyboard: false
+			});
+			$("#update_km").modal("show");
+		});
+
+		/**
+		* Function to submit  modal form
+		*/
+		$(".btn-submit-km").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+
+			ajax_submit("kilometer-form",function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

@@ -1,0 +1,81 @@
+<aside id="leftsidebar" class="sidebar">
+	<!-- User Info -->
+	<div class="user-info">
+		<div class="info-container">
+			<div class="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><%= (auth.full_name) ? auth.full_name : "" %></div>
+			<div class="email"><%= (auth.email) ? auth.email : "" %></div>
+			<div class="btn-group user-helper-dropdown">
+				<i class="material-icons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">keyboard_arrow_down</i>
+				<ul class="dropdown-menu pull-right">
+					<li><a href="<%= WEBSITE_ADMIN_URL%>edit_profile"><i class="material-icons">person</i><%= __("admin.system.edit_profile"); %></a></li>
+					<li role="seperator" class="divider"></li>
+					<li><a href="<%= WEBSITE_ADMIN_URL%>logout"><i class="material-icons">input</i><%= __("admin.system.sign_out"); %></a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- #User Info -->
+	<!-- Menu -->
+    <div class="expand_arrow"> <a href="javascript:void(0)" id="expand_arrow"><img src="<%= WEBSITE_ADMIN_IMG_URL %>expand-arrow.png" alt="img"></a> </div>
+	<div class="menu">
+    	<ul class="list">
+			<% if(typeof admin_modules_list !== typeof undefined && admin_modules_list && admin_modules_list.length > 0){
+				admin_modules_list.map(function(module,index){
+					if(!module.only_for_permission && module.title){
+						let moduleGroupPath = (module.group_path) ? module.group_path.split(',') : [];
+						%>
+						<li class="<%= (moduleGroupPath.indexOf(active_path) != -1) ? 'active' : '' %>">
+							<%
+								let extraString = "";
+								let menuLink	= WEBSITE_ADMIN_URL+module.path;
+								if(typeof module.childs !== typeof undefined && module.childs && module.childs.length > 0){
+									let isToggled 	= (moduleGroupPath.indexOf(active_path) != -1) ? 'active toggled' : '';
+									extraString 	= 'class="menu-toggle '+isToggled+'"';
+									menuLink		= module.path;
+								}
+							%>
+							<a href="<%= menuLink%>" <%-extraString%>>
+								<% if(module.icon) { %>
+									<i class="material-icons"><%= module.icon%></i>
+								<% } %>
+								<span><%= module.title %></span>
+							</a>
+							<%if(typeof module.childs !== typeof undefined && module.childs && module.childs.length > 0){%>
+								<ul class="ml-menu">
+									<%
+									module.childs.map(function(child,index){
+										if(!child.only_for_permission && child.title){
+											let activeClass 	= "";
+											let childGroupPath = (child.group_path) ? child.group_path.split(',') : [];
+											childGroupPath.map(function(childPath){
+												if(site_url.indexOf(childPath) > -1){
+													activeClass = "active";
+												}
+											}); %>
+											<li class="<%= activeClass %>">
+												<a href="<%= WEBSITE_ADMIN_URL+child.path%>"><%= child.title %></a>
+											</li><%
+										}
+									})%>
+								</ul>
+							<%}%>
+						</li> <%
+					}
+				});
+			} %>
+		</ul>
+	</div>
+	<!-- #Menu -->
+	<!-- Footer -->
+	<div class="legal">
+		<div class="copyright">
+			<%- settings["Site.copyright_text"] %>
+		</div>
+	</div>
+	<!-- #Footer -->
+</aside>
+<script>
+$("#expand_arrow").click(function(){
+  $("body").toggleClass("menuclose");
+});
+</script>

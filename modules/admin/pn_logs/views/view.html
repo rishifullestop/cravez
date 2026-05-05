@@ -1,0 +1,96 @@
+<%
+	var result 			= (typeof result !== typeof undefined && result) ? result : {};
+	var deviceType 		= (result.device_type)	? 	result.device_type	:'';
+	var deviceToken 	= (result.device_token)	? 	result.device_token	:'';
+	var userName 		= (result.user_name)		? 	result.user_name	:'';
+	var email 			= (result.user_email)		? 	result.user_email	:'';
+	var mobileNumber 	= (result.mobile_number)	? 	result.mobile_number:'';
+	var serverKey 		= (result.server_key)		? 	result.server_key	:'';
+	var body 			= (result.body)			? 	result.body			:'';
+	var request 		= (result.request)		? 	result.request		:'';
+	var response 		= (result.response)		? 	result.response		:'';
+	var created 		= (result.created)		? 	result.created		:'';
+	var parseResponse	= response;
+	if(deviceType.toLowerCase() == "android"){
+		parseResponse 	=	(response) ? JSON.parse(response) : "";
+	}
+%>
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.pn_logs.details');%>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" ><button type="button" class="btn bg-indigo waves-effect"><i class="material-icons font-14">keyboard_backspace</i> <%= __('admin.system.back'); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body table-responsive" id="aniimated-thumbnials">
+					<table  class="row-border hover table table-bordered" cellspacing="0">
+						<tr>
+							<th class="pn_log_view_table_th" width="20%"><%= __('admin.pn_logs.device_type'); %></th>
+							<td class="pn_log_view_table_td"><span><%=deviceType%></span></td>
+						</tr>
+						<tr>
+							<th class="pn_log_view_table_th"><%= __('admin.pn_logs.device_token'); %></th>
+							<td class="pn_log_view_table_td"><%=deviceToken%></td>
+						</tr>
+						<tr>
+							<th class="pn_log_view_table_th"><%= __('admin.pn_logs.user_name'); %></th>
+							<td class="pn_log_view_table_td"><%=userName%></td>
+						</tr>
+						<tr>
+							<th class="pn_log_view_table_th"><%= __('admin.pn_logs.email'); %></th>
+							<td class="pn_log_view_table_td"><%=email%></td>
+						</tr>
+						<tr>
+							<th class="pn_log_view_table_th"><%= __('admin.pn_logs.mobile_number'); %></th>
+							<td class="pn_log_view_table_td"><%=mobileNumber%></td>
+						</tr>
+						<tr>
+							<th class="pn_log_view_table_th"><%= __('admin.pn_logs.status'); %></th>
+							<%if(deviceType.toLowerCase() == "android"){%>
+								<%if(parseResponse.success == SENT){%>
+									<td class="pn_log_view_table_td" ><span class="label label-success m-l-5 m-t-5"><%=__('admin.pn_logs.sent')%></span></td>
+								<%}else{%>
+									<td class="pn_log_view_table_td" ><span class="label label-danger m-l-5 m-t-5"><%=__('admin.pn_logs.failed')%></span></td>
+								<%}%>
+							<%}%>
+							<%if(deviceType.toLowerCase() == "iphone"){%>
+								<%if(response.sent && response.sent.length > 0){%>
+									<td class="pn_log_view_table_td" ><span class="label label-success m-l-5 m-t-5"><%=__('admin.pn_logs.sent')%></span></td>
+								<%}else{%>
+									<td class="pn_log_view_table_td" ><span class="label label-danger m-l-5 m-t-5"><%=__('admin.pn_logs.failed')%></span></td>
+								<%}%>
+							<%}%>
+						</tr>
+						<tr>
+							<th class="pn_log_view_table_th"><%= __('admin.pn_logs.android_server_key'); %></th>
+							<%if(deviceType.toLowerCase() == "android"){%>
+								<td class="pn_log_view_table_td"><%=serverKey%></td>
+							<%}%>
+						</tr>
+						<tr>
+							<th class="pn_log_view_table_th"><%= __('admin.pn_logs.request'); %></th>
+							<td class="pn_log_view_table_td">
+								<span><%=JSON.stringify(request)%></span>
+							</td>
+						</tr>
+						<tr>
+							<th class="pn_log_view_table_th"><%= __('admin.pn_logs.response'); %></th>
+							<td class="pn_log_view_table"><%=JSON.stringify(parseResponse)%></td>
+						</tr>
+						<tr>
+							<th class="pn_log_view_table_th"  ><%= __('admin.system.created'); %></th>
+							<td class="pn_log_view_table_td"><span class="setDateTimeFormat" data-date-time="<%= (typeof result !== typeof undefined &&  result.created) ? result.created : '';%>"></span></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

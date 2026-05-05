@@ -1,0 +1,175 @@
+<%
+   let restaurantDetails = restaurant_details;
+   let orderDetails      = order_details;
+%>
+<div class="row clearfix" id="form_modal">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="proceed-payment" action="<%=admin_list_url%>/unsettled_payment/pay/<%=restaurant_id%>?order_ids=<%=order_ids%>" data-submit-btn-id="proceed-payment-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.unsettled_payments.payment_proceed"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="settlement_method" class="control-label">
+											<%= __("admin.unsettled_payments.settlement_method"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" id="settlement_method" name="settlement_method">
+											<option value=""><%=__("admin.unsettled_payments.select_settlement_method");%></option>
+											<%-settlement_methods%>
+										</select>
+									</div>
+									<span id="settlement_method_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="date_of_payment" class="control-label">
+											<%=  __('admin.unsettled_payments.date'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control date-picker" id="date-picker" name="date_of_payment" readonly>
+									</div>
+									<span id="date_of_payment_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="amount" class="control-label">
+											<%= __("admin.unsettled_payments.pay_amount"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="amount" class="form-control" name="amount" value="<%=(orderDetails.pay_amount) ? orderDetails.pay_amount :0; %>" readonly/>
+									</div>
+									<span id="amount_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="remarks" class="control-label">
+											<%= __("admin.unsettled_payments.remarks"); %>
+										</label>
+										<textarea id="remarks" class="form-control height-100" name="remarks"></textarea>
+									</div>
+									<span id="remarks_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix cheque-payment-class hide">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="beneficiary_name" class="control-label">
+											<%= __("admin.unsettled_payments.beneficiary_name"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="beneficiary_name" class="form-control" name="beneficiary_name" value="<%= (restaurantDetails.beneficiary) ? restaurantDetails.beneficiary : ''%>"/>
+									</div>
+									<span id="beneficiary_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="iban" class="control-label">
+											<%= __("admin.unsettled_payments.iban"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="iban" class="form-control" name="iban" value="<%= (restaurantDetails.iban) ? restaurantDetails.iban : ''%>"/>
+									</div>
+									<span id="iban_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="bank_account_number" class="control-label">
+											<%= __("admin.unsettled_payments.bank_account"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="bank_account_number" class="form-control" name="bank_account_number" value="<%= (restaurantDetails.bank_account) ? restaurantDetails.bank_account : ''%>"/>
+									</div>
+									<span id="bank_account_number_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="cheque_number" class="control-label">
+											<%= __("admin.unsettled_payments.cheque_number"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="cheque_number" class="form-control" name="cheque_number"/>
+									</div>
+									<span id="cheque_number_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="cheque_date" class="control-label">
+											<%=  __('admin.unsettled_payments.cheque_date'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control date-picker" id="date-picker-one" name="cheque_date" readonly>
+									</div>
+									<span id="cheque_date_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="proceed-payment-btn-id" class="btn  bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('proceed-payment',function(status,response){
+			if(status){
+				window.location.href = response.redirect_url;
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	$(".show-tick").selectpicker('refresh');
+
+	/**
+	 * Function for datepicker
+	 */
+	$('.date-picker').datepicker({
+		format: '<%=DATABASE_DATE_FORMAT%>',
+	});
+
+	/**
+	 *  hide/show fields according to the settlement method
+	 */
+	$(document).on('change','#settlement_method',function(){
+		var type = $(this).val();
+		$(".cheque-payment-class").addClass("hide");
+		if(type == "<%=CHEQUE_SETTLEMENT_METHOD%>"){
+			$(".cheque-payment-class").removeClass("hide");
+		}
+	});
+</script>

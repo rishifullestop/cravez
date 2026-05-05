@@ -1,0 +1,379 @@
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by ticket no. -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0" name="ticket_id" onkeyup="searchDatatable(0)" placeholder="<%= __('tickets.search_by_ticket_no'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by created -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('tickets.search_by_created'); %>">
+											</div>
+											<input class="form-control hide" id="from_date" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- Search by status -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="column_filter_6" onchange="searchDatatable(6)" name="search_ticket_status" >
+													<option value=""> <%= __("tickets.search_by_ticket_status"); %> </option>
+													<% Object.keys(TICKET_RESTAURANT_STATUS).map(key=>{ %>
+														<option value="<%=key%>"> <%= TICKET_RESTAURANT_STATUS[key].status_name %> </option>
+													<% });	%>
+												</select>
+											</div>
+										</div>
+									</div> 
+									<!-- Search by category -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="column_filter_1" onchange="searchDatatable(1)" name="search_category_id" data-child-name="search_sub_category_id" data-live-search="true">
+													<option value=""> <%= __("tickets.search_by_category"); %> </option>
+													<%-category_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by sub_category -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick disabled" id="column_filter_2" onchange="searchDatatable(2)" name="search_sub_category_id" data-child-name="search_title" data-placeholder="<%=__('tickets.search_by_sub_category')%>" data-live-search="true" disabled>
+													<option value=""> <%= __("tickets.search_by_sub_category"); %> </option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by title -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick disabled" id="column_filter_3" onchange="searchDatatable(3)" name="search_title" data-placeholder="<%=__('tickets.search_by_title')%>" data-live-search="true" disabled>
+													<option value=""> <%= __("tickets.search_by_title"); %> </option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by department -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="column_filter_5" onchange="searchDatatable(5)"  data-live-search="true" name="search_category_department" >
+													<option value=""> <%= __("tickets.search_by_department"); %> </option>
+													<%-department_list%>
+												</select>
+											</div>
+										</div>
+									</div> 
+									<!-- reset button -->
+									<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('tickets.tickets');%>
+					</h2>
+					
+						<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm">
+							<li class="<%= getPermissionClass(module_type,['tickets','add']); %>">
+								<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/add" data-open-modal="true" class="action-btn">
+									<button type="button" class="btn btn-sm bg-indigo waves-effect">
+										<%= __("tickets.add_tickets"); %>
+									</button>
+								</a>
+							</li>
+						</ul>
+						<!-- Only For Mobile View-->
+						<ul class="header-dropdown m-r--5 visible-xs">
+							<li class="dropdown">
+								<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+									<i class="material-icons">more_vert</i>
+								</a>
+								<ul class="dropdown-menu pull-right m-w-200">
+									<li class="<%= getPermissionClass(module_type,['tickets','add']); %>">">
+										<a href="<%= originalUrl %>" data-action-url="<%=list_url%>/add"  class="action-btn" data-open-modal="true">
+											<%= __("tickets.add_tickets"); %>
+										</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("tickets.ticket_no");%></th>
+								<th><%= __("tickets.category");%></th>
+								<th><%= __("tickets.sub_category");%></th>
+								<th><%= __("tickets.title");%></th>
+								<th><%= __("tickets.description");%></th>
+								<th><%= __("tickets.department");%></th>
+								<th><%= __("tickets.last_activity_type");%></th>
+								<th><%= __("tickets.activity_date");%></th>
+								<th><%= __("tickets.status");%></th>
+								<th><%= __("system.created");%></th>
+								<th><%= __("system.action");%></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable 		=	"";
+		var TICKET_RESTAURANT_STATUS	= 	<%- JSON.stringify(TICKET_RESTAURANT_STATUS)%>;
+		var TICKET_ACTIVITY_TYPE		= 	<%- JSON.stringify(TICKET_ACTIVITY_TYPE)%>;
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: [[7, "desc" ]],
+				"sDom"		: "ltipr",
+				"serverSide": true,
+				"scrollX"	: true,
+				"lengthMenu": PAGING_LENGTH_MENU,
+				"columns"	: [
+					{"data"	: "ticket_id"},
+					{
+						"data" 		: "category_name",
+						"field_name": "category",
+						"field_type": "<%=OBJECT_ID_FIELD%>",
+						"orderable"	: false
+					},
+					{
+						"data" 		: "sub_category_name",
+						"field_name": "sub_category",
+						"field_type": "<%=OBJECT_ID_FIELD%>",
+						"orderable"	: false
+					},
+					{
+						"data" 		: "title_name",
+						"field_name": "title",
+						"field_type": "<%=OBJECT_ID_FIELD%>",
+						"orderable"	: false
+					},
+					{ 	"data"	: 'description',
+						"orderable"	: false,
+						"render": function(description){
+							return (description) ? "<span class='readmore'>"+description+"</span>" :"N/A";
+						}
+					},
+					{
+						"data" 		: "department_name",
+						"field_name": "assigned_to_role_id",
+						"orderable"	: false,
+					},
+					{
+						"data" 		: "last_activity_type",
+						"render" 	 : function(last_activity_type){
+							return (last_activity_type) ? TICKET_ACTIVITY_TYPE[last_activity_type] : '' ;
+						}
+					},
+					{
+						"data" 		: "last_activity_date_time",
+						"render" 	 : function(last_activity_date_time){
+							return moment(last_activity_date_time).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"		: "status",
+						"field_type": "<%=NUMERIC_FIELD%>",
+						"orderable"	: false,
+						"render" : function(status){
+							var statusLabel = (TICKET_RESTAURANT_STATUS[status]) ? '<span class="label '+TICKET_RESTAURANT_STATUS[status].label_class+'">'+TICKET_RESTAURANT_STATUS[status].status_name+'</span>' : '';
+							return statusLabel;
+						} 
+					},
+					{
+						"data"		 : 'created',
+						"render" 	 : function(created){
+							return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{ 	"data"		: {},
+						"orderable"	: false,
+						"render"	: function(result){
+							var id 					= 	(result._id)	?	result._id	:"";
+							var status 				=	(result.status) ? result.status : "";
+							var dropDownButton 		= 	'';
+							if(status != '<%= TICKET_CLOSE %>'){
+								dropDownButton = ''+
+								'<div class="btn-group">'+
+									'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+										'<%= __("system.action"); %> '+
+										'<span class="caret"></span>'+
+									'</button>'+
+									'<ul class="dropdown-menu  width-180">'+
+										'<li>'+
+											'<a href="<%=originalUrl%>" data-action-url="<%=list_url%>/edit/'+id+'" data-open-modal="true" class="waves-effect waves-block action-btn <%= getPermissionClass(module_type,["tickets","edit"]); %>">  <%= __("system.edit"); %>'+
+											'</a>'+
+										'</li>'+
+										/** View Link **/
+										'<li>'+
+											'<a href="<%=list_url%>/view/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["tickets","view"]); %>" target="_blank">  <%= __("system.view"); %>'+
+											'</a>'+
+										'</li>'+
+									'</ul>'+
+								'</div>';
+							}
+
+							return dropDownButton;
+						}
+					},
+				],
+				"ajax":{
+					url 	: "<%=list_url%>",
+					type	: "POST",
+					data	: 	function (d) {
+				        d.fromDate	=	$('#from_date').val();
+				        d.toDate 	= 	$('#to_date').val();
+				    },
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				},
+				"drawCallback": function( settings ) {
+					/** Description read more **/
+					readMore();
+				}
+			});
+
+			/**
+			* Get sub category or title list
+			*/
+			$("select[name='search_category_id'], select[name='search_sub_category_id']").change(function(){
+				getChildSearchDropDownList($(this));
+			});
+		});
+
+		/**
+		* Get dropdown value by local storage
+		*/
+		let tempCategoryId 		= 	"";
+		let tempSubCategoryId 	=	"";
+		let tempTitleId 		=	"";
+		if(localStorage["search_" +window.location.pathname]){
+			let searchFormData = JSON.parse(localStorage["search_" +window.location.pathname]);
+			for(index in searchFormData){
+				if(searchFormData[index].name && searchFormData[index].name == "search_sub_category_id" && searchFormData[index].value){
+					tempSubCategoryId = searchFormData[index].value;
+				}
+				if(searchFormData[index].name && searchFormData[index].name == "search_category_id" && searchFormData[index].value){
+					tempCategoryId = searchFormData[index].value;
+				}
+				if(searchFormData[index].name && searchFormData[index].name == "search_title" && searchFormData[index].value){
+					tempTitleId = searchFormData[index].value;
+				}
+			}
+			if(tempCategoryId) getChildSearchDropDownList($("select[name='search_category_id']"),tempCategoryId,tempSubCategoryId);
+			if(tempSubCategoryId) getChildSearchDropDownList($("select[name='search_sub_category_id']"),tempSubCategoryId,tempTitleId);
+		}
+
+		/**
+		* Get child search dropdown list
+		*/
+		function getChildSearchDropDownList(currentObj,parentCat,catId){
+			if(currentObj){
+				var currentValue	=	currentObj.val();
+				var childInputName	=	currentObj.attr("data-child-name");
+				var childObj		=	(childInputName) ?  $("select[name='"+childInputName+"']") :"";
+				var placeholder		=	childObj.attr("data-placeholder");
+				var childFirstOption=	'<option value="">'+placeholder+'</option>';
+
+				if(!currentValue && parentCat) currentValue = parentCat;
+
+				childObj.attr("disabled",true).removeClass("disabled").html(childFirstOption).val('').trigger("change");
+				if(childObj.attr("data-child-name")){
+					var subChildObj			=	$("select[name='"+childObj.attr("data-child-name")+"']");
+					var subChildPlaceholder = 	subChildObj.attr("data-placeholder");
+					subChildObj.html('<option value="">'+subChildPlaceholder+'</option>').attr("disabled",true).removeClass("disabled");
+				}
+				$(".show-tick").selectpicker('refresh');
+
+				if(currentValue){
+					/** Get dropdown list **/
+					var options =	{
+						url 	: 	"<%=list_url+'/get_category'%>",
+						data	:	{category_id: currentValue},
+						method	:	"post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_SUCCESS%>"){
+							/** Append dropdown list **/
+							childObj.attr("disabled",false).removeClass("disabled").html(childFirstOption+response.result);
+							if(catId) childObj.val(catId);
+							$(".show-tick").selectpicker('refresh');
+						}else if(response.status && response.message){
+							notice(response.status,response.message);
+						}
+					});
+				}
+			}
+		}// end getChildSearchDropDownList()
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_JS_PAGE_PATH %>date_range_picker/config.js"></script>

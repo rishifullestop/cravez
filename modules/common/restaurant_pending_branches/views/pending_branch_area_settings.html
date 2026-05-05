@@ -1,0 +1,65 @@
+<% if(typeof attribute_list !== typeof undefined && attribute_list && attribute_list.length>0){
+	attribute_list.map(records=>{
+		var inputType 		= 	(records._id) 				?  	records._id				:'';
+		var inputType 		= 	(records.input_type) 		?  	records.input_type		:'';
+		var defaultValue	= 	(records.default_value) 	?	records.default_value	:'';
+		var inputValue		= 	(records.value) 			?  	records.value 			:(inputType != "checkbox" ? defaultValue : "");
+		var validateType	= 	(records.validation_type) 	?	records.validation_type	:'';
+		var attributeId		= 	(records.attribute_id) 		?	records.attribute_id	:'';
+		var required		= 	(records.required) 			?	records.required		:'';
+		var title			= 	(records.title) 			?	records.title			:'';
+		var areaName		= 	(records.area_name) 		?	records.area_name		:'';
+		var areaId			= 	(records.area_id) 			?	records.area_id			:'';
+		var index			=	areaId+attributeId;
+		var disabled 		=   (!restaurant_details.pickup_enable && attributeId == ACCEPT_PICKUP_ORDER) ? "disabled" : "";
+		%>
+		<tr class="area_attributes_tr_<%=areaId%>">
+			<td><%= areaName %></td>
+			<td><%= attributeId %></td>
+			<td><%= title %></td>
+			<td>
+				<div class="dynamic_inputs">
+					<input type="hidden" name="area_settings[<%= index %>][area_id]" value="<%=areaId%>">
+					<input type="hidden" name="area_settings[<%= index %>][validate_type]" value="<%=validateType%>">
+					<input type="hidden" name="area_settings[<%= index %>][attribute_id]" value="<%=attributeId%>">
+					<input type="hidden" name="area_settings[<%= index %>][input_type]" value="<%= inputType %>">
+					<input type="hidden" name="area_settings[<%= index %>][required]" value="<%=required%>">
+					<input type="hidden" name="area_settings[<%= index %>][title]" value="<%=title%>">
+					<input type="hidden" name="area_settings[<%= index %>][old_value]" value="<%=inputValue%>">
+					<% if(inputType == "checkbox"){ %>
+						<div class="switch">
+							<label>
+								<input id="area_settings_<%=index%>" name="area_settings[<%= index %>][value]" value="<%=ACTIVE%>" data-attr-id="<%=attributeId%>" class="branch_area_attr_input" type="checkbox" <%= (inputValue == ACTIVE) ? "checked" :""; %> <%=disabled%>/>
+								<span class="lever switch-col-green"></span>
+							</label>
+						</div>
+					<%	}else if(inputType == "textarea"){ %>
+						<textarea  id="area_settings_<%=index%>"  name="area_settings[<%= index %>][value]" class="form-control no-resize branch_area_attr_input" data-attr-id="<%=attributeId%>" placeholder="<%= title %>"><%= inputValue; %></textarea>
+					<%	}else if(inputType == "select"){
+							let selectOption = (records.data) ? records.data :[];
+						%>
+						<select id="area_settings_<%=index%>" class="form-control branch_area_attr_input" name="area_settings[<%= index %>][value]" data-attr-id="<%=attributeId%>">
+							<option value=""><%=__("pending_branches_area.select")+" "+title%></option>
+							<% if(selectOption.length >0){
+								selectOption.map(data=>{
+									var selectValue = (data.value) ? data.value :'';
+									%>
+									<option value="<%=selectValue;%>"  <%= (inputValue == selectValue) ? 'selected' :''; %> >
+										<%=(data.title) ? data.title :'';%>
+									</option>
+							<%	});
+							} %>
+						</select>
+					<%	}else{ %>
+						<input type="<%= inputType; %>"  id="area_settings_<%=index%>"  class="form-control branch_area_attr_input" name="area_settings[<%= index %>][value]" value="<%= inputValue; %>" placeholder="<%= title %>" data-attr-id="<%=attributeId%>" />
+					<%	} %>
+					<span id="value_<%=index%>_error" class="error"></span>
+				</div>
+			</td>
+		</tr>
+	<% });
+}else{ %>
+	<tr>
+		<td colspan="4" class="text-center"> <%=__("pending_branches_area.no_area_attribute_found")%></td>
+	</tr>
+<% } %>

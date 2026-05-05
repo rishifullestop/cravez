@@ -1,0 +1,324 @@
+<%
+var result 				= 	(typeof result !== typeof undefined && result)  ?	result 	:{};
+var openTabs			=	(typeof coutings !== typeof undefined) ? coutings : {};
+var branchDetails		=	(branch_details) ? branch_details : {};
+var restaurantDetails	=	restaurant_details;
+var branchId			=	(branchDetails.branch_id)			?	branchDetails.branch_id	:"";
+var adminId				=	(branchDetails.admin_id)			?	branchDetails.admin_id	:"";
+var forReapproval		=	(branchDetails.for_reapproval)		?	branchDetails.for_reapproval	:"";
+var submitForApproval	=	(branchDetails.submit_for_approval)	?	branchDetails.submit_for_approval	:"";
+var status				=	(branchDetails.status)				?	branchDetails.status	:"";
+var authId				=	(auth._id)							?	auth._id	: "";
+var isFreezed			=	(status == IN_REVIEW && isRestaurant(module_type)) ? true : false;
+%>
+
+<div class="hideMe" id="for_reapproval" data-for-reapproval="<%= forReapproval %>"></div>
+<div class="row m-b-20">
+	<div class="col-sm-12 dashboard_page ">
+		<div class="marchant_file">
+			<div class="restaurant_left">
+				<div class="heading_text">
+					<h3><%= __('pending_branches.restaurants'); %></h3>
+				</div>
+				<div class="all_restaurant">
+					<ul>
+						<li>
+							<label><%= __('pending_branches.restaurants_id'); %></label>
+							<span><%= (restaurantDetails.restaurant_number) ? restaurantDetails.restaurant_number : "" %></span>
+						</li>
+						<li>
+							<label><%= __('pending_branches.en_name'); %></label>
+							<span><%= restaurantDetails.name.en %></span>
+						</li>
+						<li>
+							<label><%= __('pending_branches.ar_name'); %></label>
+							<span><%= restaurantDetails.name.ar %></span>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="restaurant_right">
+				<div class="heading_text clearfix">
+					<h3 class="width-70 float-left"><%= __('pending_branches.restaurants'); %></h3>
+					<% if(!isRestaurant(module_type)){ %>
+						<a href="<%= WEBSITE_ADMIN_URL %>restaurant_enquiries/update-restaurant/<%= restaurantDetails._id %>" class="col-indigo float-right <%= getPermissionClass(module_type,['restaurant_enquiries','update']); %>" target="_blank">
+							<i class="material-icons font-20">mode_edit</i>
+						</a> <%
+					} %>
+				</div>
+				<div class="all_restaurant">
+					<ul>
+						<li>
+							<label><%= __('pending_branches.branch_id'); %></label>
+							<span><%= branchDetails.branch_number%></span>
+						</li>
+						<li>
+							<label><%= __('pending_branches.en_name'); %></label>
+							<span><%= branchDetails.name.en %></span>
+						</li>
+						<li>
+							<label><%= __('pending_branches.ar_name'); %></label>
+							<span><%= branchDetails.name.ar %></span>
+						</li>
+						<% if(submitForApproval || branchDetails.status != PENDING){ %>
+							<li>
+								<label><%= __('pending_branches.status'); %></label>
+								<span><div class="label <%= STATUS_LABELS[branchDetails.status].class %> m-l-5 m-t-5"><%= STATUS_LABELS[branchDetails.status].status_name %></div></span>
+							</li>
+							<%
+							if(branchDetails.rejection_reason){ %>
+								<li>
+									<label><%= __('pending_branches.rejection_reason'); %></label>
+									<span><%= branchDetails.rejection_reason %></span>
+								</li>
+							<%
+							}
+						}%>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<% if(!submitForApproval && isRestaurant(module_type)){ %>
+	<div class="alert bg-grey alert-dismissible submit-for-approval <%= getPermissionClass(module_type,['branches','send_for_approval']); %>" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<%= __("pending_branches.send_for_approval_info_message")%>
+	</div>
+<% } %>
+<div class="row">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%= __('pending_branches.pending_branch_details'); %>
+				</h2>
+
+				<ul class="header-dropdown m-r--5 btn-right-top-margin">
+					<% if(!isRestaurant(module_type) && authId == adminId){ %>
+						<li class="<%= getPermissionClass(module_type,['branches','add']); %>">
+							<a href="javascript:void(0);" data-href="<%=list_url%>/publish/<%= branchId %>" class="confirm_box" data-confirm-message="<%= __('pending_branches.you_want_to_publish_this_branch'); %>" data-confirm-heading="<%= __('system.are_you_sure') %>" >
+								<button type="button" class="btn btn-sm m-t--5 bg-indigo waves-effect" >
+									<%= __("pending_branches.publish_branch"); %>
+								</button>
+							</a>
+						</li>
+					<% }else if(!isRestaurant(module_type)){ %>
+						<% if(branchDetails.status == PENDING){ %>
+							<li class="<%= getPermissionClass(module_type,['branches','update_status']); %>">
+								<a href="javascript:void(0);" data-href="<%=list_url%>/review/<%= branchId %>?redirect=<%=WEBSITE_ADMIN_URL%>restaurants/<%= slug %>/pending_branches/<%= branchId %>" class="confirm_box" data-confirm-message="<%= __('pending_branches.you_want_to_review_this_branch'); %>" data-confirm-heading="<%= __('system.are_you_sure') %>">
+									<button type="button" class="btn btn-sm m-t--5 bg-light-blue waves-effect" >
+										<%= __("pending_branches.review_branch"); %>
+									</button>
+								</a>
+							</li>
+						<% } %>
+						<li class="<%= getPermissionClass(module_type,['branches','update_status']); %>">
+							<a href="javascript:void(0);" data-href="<%=list_url%>/approve/<%= branchId %>" class="confirm_box" data-confirm-message="<%= __('pending_branches.you_want_to_approve_this_branch'); %>" data-confirm-heading="<%= __('system.are_you_sure') %>">
+								<button type="button" class="btn btn-sm m-t--5 bg-indigo waves-effect" >
+									<%= __("pending_branches.approve_branch"); %>
+								</button>
+							</a>
+						</li>
+						<li class="<%= getPermissionClass(module_type,['branches','update_status']); %>">
+							<a href="javascript:void(0);" class="open-modal">
+								<button type="button" class="btn btn-sm m-t--5 btn-danger waves-effect" >
+									<%= __("pending_branches.reject_branch"); %>
+								</button>
+							</a>
+						</li>
+					<% }else if(!submitForApproval){ %>
+						<li class="<%= getPermissionClass(module_type,['branches','send_for_approval']); %>">
+							<a href="javascript:void(0);" class="submit_for_approval" >
+								<button type="button" class="btn btn-sm m-t--5 bg-indigo waves-effect" >
+									<%= __("pending_branches.send_for_approval"); %>
+								</button>
+							</a>
+						</li>
+					<% } %>
+				</ul>
+			</div>
+			<div class="body">
+				<div class="navbar_menu">
+					<nav class="navbar navbar-expand-lg navbar-light">
+						<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+						<div class="collapse navbar-collapse" id="navbarSupportedContent">
+							<!-- Nav tabs -->
+							<ul class="nav nav-tabs tab-nav-right" role="tablist">
+								<li class="active branch-panel-link">
+									<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_detail/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access" data-container="branch-panels">
+										<%= __("pending_branches.branch_details");%>
+									</a>
+								</li>
+								<%
+								if(!forReapproval || openTabs.branch_areas_count){ %>
+									<li class="branch-panel-link">
+										<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_areas/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access"  data-container="branch-panels">
+											<%= __("pending_branches.covered_areas");%>
+										</a>
+									</li>
+								<% }
+								if(!forReapproval || openTabs.branch_attributes_count != 0 ){ %>
+									<li class="branch-panel-link">
+										<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_attributes/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access" data-container="branch-panels">
+											<%= __("pending_branches.branch_attributes");%>
+										</a>
+									</li>
+								<% }
+								if(!forReapproval || openTabs.phone_number_count != 0 ){ %>
+									<li class="branch-panel-link">
+										<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_phones/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access" data-container="branch-panels">
+											<%= __("pending_branches.phones");%>
+										</a>
+									</li>
+								<% }
+								if(!forReapproval || openTabs.payment_method_count != 0 ){ %>
+									<li class="branch-panel-link">
+										<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_payments/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access" data-container="branch-panels">
+											<%= __("pending_branches.payment_methods");%>
+										</a>
+									</li>
+								<% }
+								if(!forReapproval || openTabs.branch_calendars_count != 0 ){ %>
+									<li class="branch-panel-link">
+										<a href="<%= originalUrl %>" data-action-url="<%= list_url %>/branch_calendars/<%= branchId %>" class="action-btn" data-same-tab-html="branch-invalid-access" data-container="branch-panels">
+											<%= __("pending_branches.calendar");%>
+										</a>
+									</li>
+								<% } %>
+							</ul>
+						</div>
+					</nav>
+
+					<!-- Tab panes -->
+					<div class="tab-content">
+						<div role="tabpanel" class="tab-pane fade in active" id="branch-panels">
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="hideMe branch-invalid-access">
+	<div class="row">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="body text-center">
+				<h4><%= __("system.invalid_access");%></h4>
+			</div>
+		</div>
+	</div>
+</div>
+
+<% if(!isRestaurant(module_type)){ %>
+	<!-- Modal for reject restaurant branch request-->
+	<div class="modal fade" id="reject_branch" tabindex="-1" role="dialog" aria-labelledby="reject_branch" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog"  role="document">
+			<div class="modal-content">
+				<div class="modal-header modal-header-seperator">
+					<h4 class="modal-title"><%=__("pending_branches.are_you_sure_you_want_to_reject_restaurant_branch_request") %></h4>
+				</div>
+				<form id="reject-branch" data-submit-btn-id="reject-branch_btn" method="post" class="on_click_submit" role="form" action='<%= list_url%>/reject'>
+					<input type="hidden" name="branch_id" id="branch_id" value="<%= branchId %>">
+					<div class="modal-body">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-grop">
+									<div class="form-lin no-bottom-border">
+										<label for="rejection_reason" class="control-label"><%= __('pending_branches.rejection_reason'); %><span class="required"> *</span>  </label>
+										<div class="form-grop margin-0">
+											<div class="form-line">
+												<textarea id="rejection_reason" rows="6" class="resize-none form-control" name="rejection_reason"></textarea>
+											</div>
+											<span id="rejection_reason_error" class="error"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer border-top">
+						<button type="button"  id="reject-branch_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-reject noHover margin-0"><%= __("system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("system.cancel"); %></button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div><!--modal close-->
+<% } %>
+<script type="text/javascript">
+
+	$(".branch-panel-link.active").find("a").trigger("click");
+
+	/**
+	 * Function to approve branch
+	 */
+	$('.submit_for_approval').click(function(){
+		swal({
+			title : "<%= __('system.are_you_sure') %>",
+			text  : "<%= __('pending_branches.you_want_to_submit_new_changes_for_approval')%>",
+			type  : "warning",
+			showCancelButton   : true,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText  : "Ok",
+			closeOnConfirm     : false,
+			showLoaderOnConfirm: true,
+		}, function (isConfirm) {
+			if(isConfirm){
+				var options = {
+					url 	: "<%= list_url %>/send_for_approval/<%= branchId %>",
+					method	: "POST"
+				};
+				ajaxRequest(options,function(response){
+					if(response.status == "success"){
+						window.location.href = "<%= base_url %>pending_branches";
+					}else{
+						swal.close();
+						notice("error",response.message);
+					}
+				});
+			}
+		});
+	});
+
+	/** Add active class in pannel**/
+	$(document).on("click",".branch-panel-link",function(){
+		$(".branch-panel-link").removeClass("active");
+		$(this).addClass("active");
+		updateFreezedEvent();
+	});
+
+	/**
+	* Function to manage  freezed event
+	*/
+	function updateFreezedEvent(){
+		<% if(!isFreezed){ %>
+			$(".freezed_event").removeClass("hideMe");
+			$("form.freezed_event").addClass("on_click_submit");
+		<% } %>
+	};// end updateFreezedEvent()
+
+	/**
+	* Function to show modal
+	*/
+	$(document).on('click','.open-modal',function(){
+		$("#rejection_reason_error").text('');
+		$('#rejection_reason').val("");
+		$('#reject_branch').modal('show');
+	});
+
+	/**
+	* Function to submit  modal form
+	*/
+	$(".btn-submit-reject").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+		ajax_submit("reject-branch",function(status,response){
+			stopTextLoading(btnId);
+			if(status) window.location.href = response.redirect_url;
+		});
+	});
+</script>

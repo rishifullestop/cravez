@@ -1,0 +1,82 @@
+<%
+	var result 		= 	(typeof result !== typeof undefined && result)  ?	result 	:{};
+	var isEditable 	=	(typeof is_editable !== typeof undefined && is_editable) ? is_editable :false;
+	var cityId		=	(result._id)	?	result._id	:"";
+	var formUrl 	=	(isEditable)	?	admin_list_url+"/edit/"+cityId :admin_list_url+"/add";
+%>
+
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-city" action="<%=formUrl%>" data-submit-btn-id="city-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog  modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.cities.edit_city") : __("admin.cities.add_city"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_english" class="control-label col-555">
+											<%= __("admin.cities.name_in_english"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_english" class="form-control" name="name_english" value="<%=result.name ? result.name.en :''; %>"/>
+									</div>
+									<span id="name_english_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_arabic" class="control-label col-555">
+											<%= __("admin.cities.name_in_arabic"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_arabic" class="form-control" name="name_arabic" value="<%=result.name ? result.name.ar :''; %>"/>
+									</div>
+									<span id="name_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="city-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							 <%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	var isEditable = <%=isEditable%>;
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-city',function(status,response){
+			if(status){
+				if(isEditable){
+					if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+					if(response.status && response.message) notice(response.status,response.message);
+					$('#form_modal').modal("hide");
+				}else{
+					$("#reset").trigger("click");
+				}
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+</script>

@@ -1,0 +1,51 @@
+<%
+	var orderId = order_result._id ? order_result._id : "";
+%>
+<div class="modal-dialog"  role="document">
+	<div class="modal-content">
+		<div class="modal-header modal-header-seperator">
+			<h4 class="modal-title"><%=__("admin.orders.order_revert_status_heading") %></h4>
+		</div>
+		<form id="update-form" data-submit-btn-id="update-order_btn" method="post" class="on_click_submit" role="form" action='<%=admin_list_url%>/order_revert/<%= orderId %>'>
+			<div class="modal-body">
+				<div class="row clearfix">
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="form-line">
+								<label for="cancel_reason" class="control-label"><%= __('admin.orders.cancel_reason'); %><span class="required"> *</span>  </label>
+								<select class="form-control show-tick" id="cancel_reason" name="cancel_reason" data-live-search="true">
+									<option value=""><%=__("admin.orders.select_cancel_reason");%></option>
+									<%-cancel_reason_list%>
+								</select>
+								<span id="cancel_reason_error" class="error"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer border-top">
+				<button type="button"  id="update-order_btn" class="btn bg-brown btn-sm waves-effect btn-submit-update noHover margin-0" <%- ADMIN_LOADING_TEXT %> ><%= __("admin.system.submit"); %>
+				</button>
+				<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	$(".show-tick").selectpicker('refresh');
+
+	/**
+	 * Function to submit  modal form
+	 */
+	$(".btn-submit-update").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+		ajax_submit("update-form",function(status,response){
+			if(status){
+				window.location.reload();
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+</script>

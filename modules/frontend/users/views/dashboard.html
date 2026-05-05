@@ -1,0 +1,332 @@
+<%
+	let ordersData 			=	[];
+	let cancelledOrdersData =	[];
+	if(total_order_chart){
+		for(var i=0; i < total_order_chart.length; i++) {
+			let year = (total_order_chart[i]["_id"])?total_order_chart[i]["_id"]:"";
+			ordersData[i]       = 	{};
+			ordersData[i][year]	=	{};
+
+			ordersData[i][year]["total_orders"]	= (total_order_chart[i]["total_orders"]) ? total_order_chart[i]["total_orders"] :0;
+		}
+	}
+	if(total_cancelled_order_chart){
+		for(var i=0; i < total_cancelled_order_chart.length; i++) {
+			let year = (total_cancelled_order_chart[i]["_id"]) ? total_cancelled_order_chart[i]["_id"] : "";
+			cancelledOrdersData[i]        = {};
+			cancelledOrdersData[i][year]  =	{};
+
+			cancelledOrdersData[i][year]["total_cancelled_orders"]	= (total_cancelled_order_chart[i]["total_cancelled_orders"]) ? total_cancelled_order_chart[i]["total_cancelled_orders"] :0;
+		}
+	}
+%>
+<div class="container-fluid restaurant-dashboard">
+	<div class="row clearfix">
+		<div class="col-md-12">
+			<div class="approved_restaurant">
+				<ul>
+					<li>
+						<div class="content_box">
+							<div class="bg_blue_box content_restaurant">
+								<strong><%= total_orders%></strong>
+							</div>
+							<h4><%= __('dashboard.total_orders');%></h4>
+							<div class="graph_detail"><img src="<%=WEBSITE_IMG_URL%>graph1.png" alt="img"  class="m-b-5"></div>
+						</div>
+					</li>
+					<li>
+						<a href="<%= WEBSITE_URL+'orders/'+ORDER_PENDING;%>" target="_blank" class="stats-anchor">
+						<div class="content_box"><div class="bg_red_box content_restaurant"><strong><%= new_orders %></strong></div><h4><%= __('dashboard.new_orders');%></h4> <div class="graph_detail"><img src="<%=WEBSITE_IMG_URL%>graph2.png" alt="img"  class="m-b-5"></div></a></div>
+					</li>
+					<li>
+						<a href="<%= WEBSITE_URL+'orders/'+ORDER_PREPARING;%>" target="_blank" class="stats-anchor">
+						<div class="content_box"><div class="bg_orange_box content_restaurant"><strong><%= orders_at_restaurant%></strong></div><h4><%= __('dashboard.orders_at_restaurant');%></h4> <div class="graph_detail"><img src="<%=WEBSITE_IMG_URL%>graph3.png" alt="img"  class="m-b-5"></div></a></div>
+					</li>
+					<li>
+						<a href="<%= WEBSITE_URL+'orders/'+ORDER_ON_THE_WAY;%>" target="_blank" class="stats-anchor">
+						<div class="content_box"><div class="bg_skyblue_box content_restaurant"><strong><%= orders_on_way%></strong></div><h4><%= __('dashboard.orders_on_way');%></h4> <div class="graph_detail"><img src="<%=WEBSITE_IMG_URL%>graph4.png" alt="img"  class="m-b-5"></div></a></div>
+					</li>
+					<li>
+						<a href="<%= WEBSITE_URL+'orders/'+ORDER_DELIVERED;%>" target="_blank" class="stats-anchor">
+						<div class="content_box"><div class="bg_violet_box content_restaurant"><strong><%= completed_orders %></strong></div><h4><%= __('dashboard.completed_orders');%></h4> <div class="graph_detail"><img src="<%=WEBSITE_IMG_URL%>graph5.png" alt="img"  class="m-b-5"></div></a></div>
+					</li>
+				</ul>
+			</div>
+			<div class="separate_box">
+				<div class="row">
+					<div class="col-sm-8">
+						<div class="sales_report">
+							<div class="heading_text">
+								<h3><%= __('dashboard.total_order_value');%></h3>
+							</div>
+							<div id="order_chart_div" style="width: 100%; height: 330px;"></div>
+						</div>
+
+						<div class="sales_report">
+							<div class="heading_text">
+								<h3><%= __('dashboard.total_cancelled_order_value');%></h3>
+							</div>
+							<div id="order_cancelled_chart_div" style="width: 100%; height: 330px;"></div>
+						</div>
+					</div>
+					<div class="col-sm-4">
+						<div class="sales_report">
+							<div class="heading_text">
+								<h3><%= __('dashboard.total_delayed_orders');%></h3>
+							</div>
+							<div id="visualization_div"></div>
+						</div>
+						<div class="total-value">
+							<div class="content_box">
+								<div class="bg_red_box content_restaurant">
+									<strong><%= (total_due_payment && total_due_payment.due_amount) ? currencyFormat(total_due_payment.due_amount) : currencyFormat(0)%></strong><span><%= __('dashboard.total_due_from_cravez');%></span>
+								</div>
+							</div>
+							<div class="content_box">
+								<div class="bg_orange_box  content_restaurant">
+									<strong><%= (total_paid_payment && total_paid_payment.paid_amount) ? currencyFormat(total_paid_payment.paid_amount) : currencyFormat(0)%></strong><span><%= __('dashboard.total_paid');%></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="sales_report receive_orders">
+					<div class="heading_text"><h3><%= __('dashboard.receive_orders');%></h3></div>
+					<div class="table-responsive">
+						<table class="table full-length-header">
+							<thead>
+								<tr>
+									<th><%= __('dashboard.customer');%></th>
+									<th><%= __('dashboard.customer_number');%></th>
+									<th><%= __('dashboard.branch');%></th>
+									<th><%= __('dashboard.order_id');%></th>
+									<th><%= __('dashboard.order_date');%></th>
+									<th><%= __('dashboard.net_amount');%></th>
+									<th><%= __('dashboard.status');%></th>
+									<th><%= __('system.action');%></th>
+								</tr>
+							</thead>
+							<tbody><%
+								if(result.length > 0){
+									result.map((records)=>{ %>
+										<tr>
+											<td><%= (records.customer_name) ? records.customer_name : ''; %></td>
+											<td><%= (records.customer_mobile) ? records.customer_mobile : ''; %></td>
+											<td><%= (records.branch_name) ? records.branch_name : ''; %></td>
+											<td><%= (records.unique_order_id) ? records.unique_order_id : ''; %></td>
+											<td><span class="setDateTimeFormat" data-date-time="<%= (records.order_date) ? records.order_date : 'N/A';%>"></span></td>
+											<td><%= (records.net_amount) ? currencyFormat(records.net_amount) : ''; %></td>
+											<td><a href="javascript:void(0)" class="<%= (records.restaurant_status && ORDER_STATUS_TYPES[records.restaurant_status]) ? ORDER_STATUS_TYPES[records.restaurant_status].class_name : '' %>"><%- (records.restaurant_status && ORDER_STATUS_TYPES[records.restaurant_status]) ? '<span class="label '+ORDER_STATUS_TYPES[records.restaurant_status].label_class+'">'+ORDER_STATUS_TYPES[records.restaurant_status].status_name+'</span>' : '' %></a></td>
+											<td>
+												<a href="<%= WEBSITE_URL+'orders/view/'+records._id %>"><button type="button" class="btn bg-blue waves-effect noHover <%= getPermissionClass(module_type,["order_detail","view"]); %>"><%= __('system.view');%></button></a>
+											</td>
+										</tr><%
+									});
+								}else{ %>
+									<tr>
+										<td class="text-center" colspan=7><%= __('system.no_records.found'); %></td>
+									</tr><%
+								} %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript">
+		/** Draw chart */
+		function drawChart(){
+			var totalOrders	  		=	<%= (total_orders) 			? total_orders 			:0%>;
+			var totalDelayedOrders  =	<%= (total_delayed_orders)  ? total_delayed_orders  :0%>;
+
+			var visualization;
+			var data = google.visualization.arrayToDataTable([
+				['<%=__("restaurant.label")%>', '<%=__("restaurant.value")%>'],
+				['<%= __("dashboard.total_orders")%>', totalOrders],
+    			['<%= __("dashboard.total_delay_orders")%>', totalDelayedOrders],
+			]);
+
+			var options = {
+				is3D	: false,
+				colors	: ["#cc66ff","#ff9933"],
+				legend	: { position: 'bottom',maxWidth:100,alignment:'center'},
+				tooltip	: { isHtml:true},
+				pieSliceText: 'value',
+				chartArea: {
+					height: "89%",
+					width : "89%"
+				},
+				pieSliceTextStyle:{bold:true}
+			};
+
+			var container = document.getElementById('visualization_div');
+			visualization = new google.visualization.PieChart(container);
+		    visualization.draw(data,options);
+
+			$('.csv-button').on('click', function () {
+				var browserIsIE;
+				var csvColumns;
+				var csvContent;
+				var downloadLink;
+				var fileName;
+
+				// build column headings
+				csvColumns = '';
+				for (var i = 0; i < data.getNumberOfColumns(); i++) {
+				  csvColumns += data.getColumnLabel(i);
+				  if (i < (data.getNumberOfColumns() - 1)) {
+					csvColumns += ',';
+				  }
+				}
+				csvColumns += '\n';
+
+				// build data rows
+				csvContent = csvColumns + google.visualization.dataTableToCsv(data);
+
+				// download file
+				browserIsIE = false || !!document.documentMode;
+				fileName = 'data.csv';
+				if (browserIsIE) {
+				  window.navigator.msSaveBlob(new Blob([csvContent], {type: 'data:text/csv'}), fileName);
+				} else {
+				  downloadLink = document.createElement('a');
+				  downloadLink.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvContent);
+				  downloadLink.download = fileName;
+				  raiseEvent(downloadLink, 'click');
+				  downloadLink = null;
+				}
+			});
+
+			function raiseEvent(element, eventType) {
+				var eventRaised;
+				if (document.createEvent) {
+					eventRaised = document.createEvent('MouseEvents');
+					eventRaised.initEvent(eventType, true, false);
+					element.dispatchEvent(eventRaised);
+				} else if (document.createEventObject) {
+					eventRaised = document.createEventObject();
+					element.fireEvent('on' + eventType, eventRaised);
+				}
+			}// end raiseEvent()
+
+		}// end drawChart()
+
+		/** Load core chart **/
+		google.charts.load('current', {
+		  packages: ['corechart']
+		}).then(function () {
+			drawChart();
+		});
+
+		/** Google Bar Chart For Total Order & Order Cancelled Value */
+		google.charts.load('current', {'packages':['bar']});
+		google.charts.setOnLoadCallback(drawGraphChart);
+
+		var totalOrderValue 		 =	<%- JSON.stringify(ordersData); %>;
+		var totalCancelledOrderValue =	<%- JSON.stringify(cancelledOrdersData); %>;
+		var yearsArray 			=  getPreviousYears();
+		var yearsArrayForOrders =  getPreviousYears();
+
+		function drawGraphChart() {
+			var data = new google.visualization.DataTable();
+			data.addColumn('string', '<%=__("restaurant.year")%>');
+			data.addColumn('number', '<%=__("restaurant.sales")%>');
+
+			var tmpData = [];
+			$.each(totalOrderValue, function(index,html){
+				for(var i=0; i < yearsArray.length; i++) {
+					if(typeof html[yearsArray[i]['year']] !== typeof undefined){
+						yearsArray[i]['total_orders'] = (html[yearsArray[i]['year']]['total_orders']) ? html[yearsArray[i]['year']]['total_orders'] : 0;
+					}
+				}
+			});
+
+			yearsArray.reverse();
+			for(var i=0; i < yearsArray.length; i++) {
+				let totalOrder = (yearsArray[i].total_orders) ? yearsArray[i].total_orders :0;
+				if(yearsArray[i].year){
+					data.addRows([
+						[String(yearsArray[i].year),totalOrder]
+					]);
+				}
+			}
+
+			var cancelledData = new google.visualization.DataTable();
+			cancelledData.addColumn('string', '<%=__("restaurant.year")%>');
+			cancelledData.addColumn('number', '<%=__("restaurant.sales")%>');
+
+			$.each(totalCancelledOrderValue, function(index,html){
+				for(var i=0; i < yearsArrayForOrders.length; i++) {
+					if(typeof html[yearsArrayForOrders[i]['year']] !== typeof undefined){
+						yearsArrayForOrders[i]['total_cancelled_orders'] = (html[yearsArrayForOrders[i]['year']]['total_cancelled_orders']) ? html[yearsArrayForOrders[i]['year']]['total_cancelled_orders'] : 0;
+					}
+				}
+			});
+
+			yearsArrayForOrders.reverse();
+			for(var i=0; i < yearsArrayForOrders.length; i++) {
+				let totalCancelledOrder = (yearsArrayForOrders[i].total_cancelled_orders) ? yearsArrayForOrders[i].total_cancelled_orders :0;
+				if(yearsArrayForOrders[i].year){
+					cancelledData.addRows([
+						[String(yearsArrayForOrders[i].year),totalCancelledOrder]
+					]);
+				}
+			}
+
+			var options = {
+				colors	: ['#9f5dfe'],
+				legend	: { position: "none" },
+				bars	: 'vertical', // Required for Material Bar Charts.
+				bar		: {groupWidth: "35%"},
+				pieSliceText: 'percentage',
+				chartArea: {
+					height: "100%",
+					width: "100%"
+				}
+			};
+
+			var orderCancelledOptions = {
+				colors	: ['#e96177'],
+				legend	: { position: "none" },
+				bars	: 'vertical', // Required for Material Bar Charts.
+				bar		: {groupWidth: "35%"},
+				pieSliceText: 'percentage',
+				chartArea: {
+					height: "100%",
+					width: "100%"
+				}
+			};
+
+			var orderChart = new google.charts.Bar(document.getElementById('order_chart_div'));
+
+			orderChart.draw(data, google.charts.Bar.convertOptions(options));
+
+			var orderCancelledChart = new google.charts.Bar(document.getElementById('order_cancelled_chart_div'));
+
+			orderCancelledChart.draw(cancelledData,google.charts.Bar.convertOptions(orderCancelledOptions));
+		}// end drawGraphChart()
+
+		var width =  $(document).width();
+		$(window).resize(function(){
+			drawGraphChart();
+			drawChart();
+		});
+
+		/** Get Previous year */
+		function getPreviousYears(){
+			var today 		= 	new Date();
+			var aYear 		= 	today.getFullYear();
+			var yearList 	=	new Array();
+
+			for (var i=0; i<15; i++) {
+				yearList[i] 		=	{};
+				yearList[i]['year']	=  	aYear-i;
+			}
+			return yearList;
+		}// end getPreviousYears()
+	</script>

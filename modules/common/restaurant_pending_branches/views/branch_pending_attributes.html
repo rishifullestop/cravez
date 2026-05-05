@@ -1,0 +1,119 @@
+<%
+let branchId = branch_id;
+let restaurantId = restaurant_id;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="body">
+			<form action="<%=list_url+'/save_branch_attributes/'+branchId%>" id="attribute" data-submit-btn-id="form-attribute" method="post" class="freezed_event" role="form">
+				<input type="hidden" name="restaurant_id" value="<%=restaurantId%>">
+				<table id="datatable-attribute" class="row-border full-length-header hover table table-bordered dataTable cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="20%"><%= __("pending_branches_attributes.attribute_id");%></th>
+							<th width="50%"><%= __("pending_branches_attributes.attribute_desc");%></th>
+							<th><%= __("pending_branches_attributes.value");%></th>
+						</tr>
+					</thead>
+					<tbody>
+						<% if(result.length>0){
+							result.map((records,index)=>{
+								let inputType 		= 	(records.input_type) 		?  	records.input_type		:'';
+								let defaultValue	= 	(records.default_value) 	?	records.default_value	:'';
+
+								let inputValue		= 	(records.value) 			?  	records.value 			:(inputType != "checkbox" ? defaultValue : "");
+								let validateType	= 	(records.validation_type) 	?	records.validation_type	:'';
+								let required		= 	(records.required) 			?	records.required	:'';
+								%>
+								<tr>
+									<td><%= records.attribute_id %></td>
+									<td><%= records.title %></td>
+									<td>
+										<div class="dynamic_inputs">
+											<input type="hidden" name="attributes[<%= index %>][validate_type]" value="<%=validateType%>">
+											<input type="hidden" name="attributes[<%= index %>][attribute_id]" value="<%=records.attribute_id%>">
+											<input type="hidden" name="attributes[<%= index %>][input_type]" value="<%= inputType %>">
+											<input type="hidden" name="attributes[<%= index %>][required]" value="<%=required%>">
+											<input type="hidden" name="attributes[<%= index %>][title]" value="<%=records.title%>">
+											<input type="hidden" name="attributes[<%= index %>][old_value]" value="<%=inputValue%>">
+											<% if(inputType == "checkbox"){ %>
+												<div class="switch">
+													<label>
+														<input id="attribute_<%=index%>" name="attributes[<%= index %>][value]" value="<%=ACTIVE%>" type="checkbox" <%= (inputValue == ACTIVE) ? "checked" :""; %> />
+														<span class="lever switch-col-green"></span>
+													</label>
+												</div>
+											<%	}else if(inputType == "textarea"){ %>
+												<textarea  id="attribute_<%=index%>"  name="attributes[<%= index %>][value]" class="form-control no-resize" placeholder="<%= records.title %>"><%= inputValue; %></textarea>
+											<%	}else if(inputType == "select"){
+												let selectOption = (records.data) ? records.data :[];
+												 %>
+												<select id="attribute_<%=index%>" class="form-control" name="attributes[<%= index %>][value]">
+												<option value=""><%=__("pending_branches_attributes.select "+records.title)%></option>
+												<% if(selectOption.length >0){
+													selectOption.map(data=>{
+														var selectValue = (data.value) ? data.value :'';
+														%>
+														<option value="<%=selectValue;%>"  <%= (inputValue == selectValue) ? 'selected' :''; %> >
+															<%=(data.title) ? data.title :'';%>
+														</option>
+												<%	});
+												} %>
+											</select>
+
+											<%	}else{ %>
+												<input type="<%= inputType; %>"  id="attribute_<%=index%>"  class="form-control width-100" name="attributes[<%= index %>][value]" value="<%= inputValue; %>" placeholder="<%= records.title %>" />
+											<%	} %>
+											<span id="value_<%=index%>_error" class="error"></span>
+										</div>
+									</td>
+								</tr>
+							<% });
+						} %>
+					</tbody>
+				</table>
+				<p></p>
+				<button type="button" class="pull-right attribute-btn-submit btn freezed_event hideMe  bg-brown btn-sm waves-effect" id="form-attribute" >Submit</button>
+			</form>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function() {
+		/**
+		 * call updateFreezedEvent
+		 * Freezed event is when restaurant submit any branch details and admin mark branch as in review, then all add/edit activity is freezed
+		 */
+		updateFreezedEvent();
+
+		/*
+		 *	Initialize Datatable
+		 */
+		$('#datatable-attribute').DataTable({
+			"order"		: 	[],
+			"sDom"		:	"ftr",
+			"bFilter"	:	true,
+			"serverSide": 	false,
+			"scrollX"	: 	true,
+			"paging"	:	false,
+			"columnDefs": [
+				{ orderable: false, "targets": [ 2 ] }
+			]
+		});
+
+		/*
+		 * Function to submit attribute form
+		 */
+		$('.attribute-btn-submit').click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("attribute",function(status,response){
+				stopTextLoading(btnId);
+				if(status){
+					$("#attribute .error").html("");
+					notice("success",response.message);
+				}
+			});
+		});
+	});
+</script>

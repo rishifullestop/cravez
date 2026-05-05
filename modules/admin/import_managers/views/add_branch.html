@@ -1,0 +1,643 @@
+<div class="row clearfix">
+    <form id="add_branch" action="<%=WEBSITE_ADMIN_URL%>merchant_upload/add_branch" data-submit-btn-id="branch-btn-id" method="post" class="on_click_submit" role="form">
+        <input type="hidden" name="restaurant_slug"  id="restaurant_slug"/>
+        <div id="branch_form_html" class="col-sm-12">
+            <div class="table-responsive">
+                <table class="row-border full-length-header hover table table-bordered dataTable fixed_header_table ">
+                    <thead>
+                        <tr>
+                            <th> </th>
+                            <th> <%=__("admin.merchant_upload.branch_id")%> *</th>
+                            <th> <%=__("admin.merchant_upload.branch_english_name")%> *</th>
+                            <th> <%=__("admin.merchant_upload.branch_arabic_name")%> *</th>
+                            <th> <%=__("admin.merchant_upload.branch_english_desc")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_arabic_desc")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_english_slogan")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_arabic_slogan")%> </th>
+                            <th> <%=__("admin.merchant_upload.additional_tax")%> </th>
+                            <th> <%=__("admin.merchant_upload.extra_charge")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_by_value")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_by_percentage")%> </th>
+                            <th> <%=__("admin.merchant_upload.extra_charge_percentage")%> </th>
+                            <th> <%=__("admin.merchant_upload.accept_cashback_from_other_restaurants")%> </th>
+                            <th> <%=__("admin.merchant_upload.discount_by_offer")%> </th>
+                            <th> <%=__("admin.merchant_upload.maximum_duration_in_days_for_scheduled_orders")%> </th>
+                            <th> <%=__("admin.merchant_upload.restaurant_branch_offers_cashback")%> </th>
+                            <th> <%=__("admin.merchant_upload.restaurant_branch_accepts_cashback_payment")%> </th>
+                            <th> <%=__("admin.merchant_upload.restaurant_branch_offers_double_cashback")%> </th>
+                            <th> <%=__("admin.merchant_upload.restaurant_landing_images")%> </th>
+                            <th> <%=__("admin.merchant_upload.hot_line")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_address1")%> *</th>
+                            <th> <%=__("admin.merchant_upload.branch_address1_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_address_area_id")%> *</th>
+                            <th> <%=__("admin.merchant_upload.branch_latitude")%> *</th>
+                            <th> <%=__("admin.merchant_upload.branch_longitude")%> *</th>
+                            <th> <%=__("admin.merchant_upload.branch_address2")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_address2_category")%> </th>
+                            <!-- Branch Phone-->
+                            <th> <%=__("admin.merchant_upload.branch_phone1")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone1_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone1_contact_name")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone2")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone2_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone2_contact_name")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone3")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone3_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone3_contact_name")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone4")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone4_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone4_contact_name")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone5")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone5_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone5_contact_name")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone6")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone6_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone6_contact_name")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone7")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone7_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone7_contact_name")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone8")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone8_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone8_contact_name")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone9")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone9_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone9_contact_name")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone10")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone10_category")%> </th>
+                            <th> <%=__("admin.merchant_upload.branch_phone10_contact_name")%> </th>
+                            <!-- Branch Payment Method-->
+                            <th> <%=__("admin.merchant_upload.payment_method_id1")%> *</th>
+                            <th> <%=__("admin.merchant_upload.payment_method_id2")%> </th>
+                            <th> <%=__("admin.merchant_upload.payment_method_id3")%> </th>
+                            <th> <%=__("admin.merchant_upload.payment_method_id4")%> </th>
+                            <th> <%=__("admin.merchant_upload.payment_method_id5")%> </th>
+                            <th> <%=__("admin.merchant_upload.payment_method_id6")%> </th>
+                            <!-- Branch Calendar-->
+                            <th> <%=__("admin.merchant_upload.calendar_type1")%> *</th>
+                            <th> <%=__("admin.merchant_upload.calendar_type_value1")%> *</th>
+                            <th> <%=__("admin.merchant_upload.from_hour1")%> *</th>
+                            <th> <%=__("admin.merchant_upload.from_minute1")%> *</th>
+                            <th> <%=__("admin.merchant_upload.to_hour1")%> *</th>
+                            <th> <%=__("admin.merchant_upload.to_minute1")%> *</th>
+                            <th> <%=__("admin.merchant_upload.calendar_type2")%> </th>
+                            <th> <%=__("admin.merchant_upload.calendar_type_value2")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_hour2")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_minute2")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_hour2")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_minute2")%> </th>
+                            <th> <%=__("admin.merchant_upload.calendar_type3")%> </th>
+                            <th> <%=__("admin.merchant_upload.calendar_type_value3")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_hour3")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_minute3")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_hour3")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_minute3")%> </th>
+                            <th> <%=__("admin.merchant_upload.calendar_type4")%> </th>
+                            <th> <%=__("admin.merchant_upload.calendar_type_value4")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_hour4")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_minute4")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_hour4")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_minute4")%> </th>
+                            <th> <%=__("admin.merchant_upload.calendar_type5")%> </th>
+                            <th> <%=__("admin.merchant_upload.calendar_type_value5")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_hour5")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_minute5")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_hour5")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_minute5")%> </th>
+                            <th> <%=__("admin.merchant_upload.calendar_type6")%> </th>
+                            <th> <%=__("admin.merchant_upload.calendar_type_value6")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_hour6")%> </th>
+                            <th> <%=__("admin.merchant_upload.from_minute6")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_hour6")%> </th>
+                            <th> <%=__("admin.merchant_upload.to_minute6")%> </th>
+                        </tr>
+                    </thead>
+                    <tbody class="append_branch_tr fixed_body"> </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-sm bg-green branch_addmore" onclick="AppendHTML()"><%=__("admin.merchant_upload.add_more")%></button>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" id="branch-btn-id" class="btn bg-brown btn-sm waves-effect branch-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+            <a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+        </div>
+    </form>
+
+    <div class="appendable_input hide">
+        <table >
+            <tbody class="input_tr">
+                <tr id="branch_row_{index}" class="table_row">
+                    <td>
+                        <button type="button" class="btn bg-red remove_branch hide">x</button>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][branch_id]" class="form-control input-column" id="branch_id_{index}" >
+                        <input type="hidden" name="branch[{index}][index]"  value="{index}" >
+                        <span id="branch_id_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][branch_name_in_english_id]" value="15" >
+                        <input type="text" name="branch[{index}][branch_name_in_english]" class="form-control input-column" id="branch_name_in_english_{index}" >
+                        <span id="branch_name_in_english_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][branch_name_in_arabic_id]" value="17" >
+                        <input type="text" name="branch[{index}][branch_name_in_arabic]" class="form-control input-column" id="branch_name_in_arabic_{index}" >
+                        <span id="branch_name_in_arabic_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][branch_desc_in_english_id]" value="14" >
+                        <input type="text" name="branch[{index}][branch_desc_in_english]" class="form-control input-column" id="branch_desc_in_english_{index}" >
+                        <span id="branch_desc_in_english_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                            <input type="hidden" name="branch[{index}][branch_desc_in_arabic_id]" value="16" >
+                        <input type="text" name="branch[{index}][branch_desc_in_arabic]" class="form-control input-column" id="branch_desc_in_arabic_{index}" >
+                        <span id="branch_desc_in_arabic_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                            <input type="hidden" name="branch[{index}][branch_slogan_in_english_id]" value="10" >
+                        <input type="text" name="branch[{index}][branch_slogan_in_english]" class="form-control input-column" id="branch_slogan_in_english_{index}" >
+                        <span id="branch_slogan_in_english_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][branch_slogan_in_arabic_id]" value="11" >
+                        <input type="text" name="branch[{index}][branch_slogan_in_arabic]" class="form-control input-column" id="branch_slogan_in_arabic_{index}" >
+                        <span id="branch_slogan_in_arabic_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][additional_tax_id]" value="19" >
+                        <input type="text" name="branch[{index}][additional_tax]" class="form-control input-column" id="additional_tax_{index}" >
+                        <span id="additional_tax_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][extra_charge_id]" value="18" >
+                        <input type="text" name="branch[{index}][extra_charge]" class="form-control input-column" id="extra_charge_{index}" >
+                        <span id="extra_charge_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][discount_by_value_id]" value="20" >
+                        <input type="text" name="branch[{index}][discount_by_value]" class="form-control input-column" id="discount_by_value_{index}" >
+                        <span id="discount_by_value_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][discount_by_percentage_id]" value="13" >
+                        <input type="text" name="branch[{index}][discount_by_percentage]" class="form-control input-column" id="discount_by_percentage_{index}" >
+                        <span id="discount_by_percentage_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][extra_charge_percentage_id]" value="23" >
+                        <input type="text" name="branch[{index}][extra_charge_percentage]" class="form-control input-column" id="extra_charge_percentage_{index}" >
+                        <span id="extra_charge_percentage_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][accept_cashback_from_other_restaurants_id]" value="80" >
+                        <input type="text" name="branch[{index}][accept_cashback_from_other_restaurants]" class="form-control input-column" id="accept_cashback_from_other_restaurants_{index}" >
+                        <span id="accept_cashback_from_other_restaurants_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][discount_by_offer_id]" value="24" >
+                        <input type="text" name="branch[{index}][discount_by_offer]" class="form-control input-column" id="discount_by_offer_{index}" >
+                        <span id="discount_by_offer_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][maximum_duration_in_days_for_scheduled_orders_id]" value="25" >
+                        <input type="text" name="branch[{index}][maximum_duration_in_days_for_scheduled_orders]" class="form-control input-column" id="maximum_duration_in_days_for_scheduled_orders_{index}" >
+                        <span id="maximum_duration_in_days_for_scheduled_orders_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][restaurant_branch_offers_cashback_id]" value="22" >
+                        <input type="text" name="branch[{index}][restaurant_branch_offers_cashback]" class="form-control input-column" id="restaurant_branch_offers_cashback_{index}" >
+                        <span id="restaurant_branch_offers_cashback_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][restaurant_branch_accepts_cashback_payment_id]" value="12" >
+                        <input type="text" name="branch[{index}][restaurant_branch_accepts_cashback_payment]" class="form-control input-column" id="restaurant_branch_accepts_cashback_payment_{index}" >
+                        <span id="restaurant_branch_accepts_cashback_payment_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][restaurant_branch_offers_double_cashback_id]" value="30" >
+                        <input type="text" name="branch[{index}][restaurant_branch_offers_double_cashback]" class="form-control input-column" id="restaurant_branch_offers_double_cashback_{index}" >
+                        <span id="restaurant_branch_offers_double_cashback_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="hidden" name="branch[{index}][restaurant_landing_images_id]" value="21" >
+                        <input type="text" name="branch[{index}][restaurant_landing_images]" class="form-control input-column" id="restaurant_landing_images_{index}" >
+                        <span id="restaurant_landing_images_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][hot_line]" class="form-control input-column" id="hot_line_{index}" >
+                        <span id="hot_line_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][address_one]" class="form-control input-column" id="address_one_{index}" >
+                        <span id="address_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][address_one_category]" class="form-control input-column" id="address_one_category_{index}" >
+                        <span id="address_one_category_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][address_area_id]" class="form-control input-column" id="address_area_id_{index}" >
+                        <span id="address_area_id_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][latitude]" class="form-control input-column" id="latitude_{index}" >
+                        <span id="latitude_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][longitude]" class="form-control input-column" id="longitude_{index}" >
+                        <span id="longitude_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][address_two]" class="form-control input-column" id="address_two_{index}" >
+                        <span id="address_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][address_two_category]" class="form-control input-column" id="address_two_category_{index}" >
+                        <span id="address_two_category_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_one]" class="form-control input-column" id="phone_one_{index}" >
+                        <span id="phone_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_one_category]" class="form-control input-column" id="phone_one_category_{index}" >
+                        <span id="phone_one_category_{index}_error" class="error"></span>
+                    </td> 
+					<td>
+                        <input type="text" name="branch[{index}][phone_one_contact_name]" class="form-control input-column" id="phone_one_contact_name_{index}" >
+                        <span id="phone_one_contact_name_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_two]" class="form-control input-column" id="phone_two_{index}" >
+                        <span id="phone_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_two_category]" class="form-control input-column" id="phone_two_category_{index}" >
+                        <span id="phone_two_category_{index}_error" class="error"></span>
+                    </td>
+					<td>
+                        <input type="text" name="branch[{index}][phone_two_contact_name]" class="form-control input-column" id="phone_two_contact_name_{index}" >
+                        <span id="phone_two_contact_name_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_three]" class="form-control input-column" id="phone_three_{index}" >
+                        <span id="phone_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_three_category]" class="form-control input-column" id="phone_three_category_{index}" >
+                        <span id="phone_three_category_{index}_error" class="error"></span>
+                    </td>
+					<td>
+                        <input type="text" name="branch[{index}][phone_three_contact_name]" class="form-control input-column" id="phone_three_contact_name_{index}" >
+                        <span id="phone_three_contact_name_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_four]" class="form-control input-column" id="phone_four_{index}" >
+                        <span id="phone_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_four_category]" class="form-control input-column" id="phone_four_category_{index}" >
+                        <span id="phone_four_category_{index}_error" class="error"></span>
+                    </td>
+					<td>
+                        <input type="text" name="branch[{index}][phone_four_contact_name]" class="form-control input-column" id="phone_four_contact_name_{index}" >
+                        <span id="phone_four_contact_name_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_five]" class="form-control input-column" id="phone_five_{index}" >
+                        <span id="phone_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_five_category]" class="form-control input-column" id="phone_five_category_{index}" >
+                        <span id="phone_five_category_{index}_error" class="error"></span>
+                    </td>
+					<td>
+                        <input type="text" name="branch[{index}][phone_five_contact_name]" class="form-control input-column" id="phone_five_contact_name_{index}" >
+                        <span id="phone_five_contact_name_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_six]" class="form-control input-column" id="phone_six_{index}" >
+                        <span id="phone_six_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_six_category]" class="form-control input-column" id="phone_six_category_{index}" >
+                        <span id="phone_six_category_{index}_error" class="error"></span>
+                    </td>
+					<td>
+                        <input type="text" name="branch[{index}][phone_six_contact_name]" class="form-control input-column" id="phone_six_contact_name_{index}" >
+                        <span id="phone_six_contact_name_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_sevan]" class="form-control input-column" id="phone_sevan_{index}" >
+                        <span id="phone_sevan_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_sevan_category]" class="form-control input-column" id="phone_sevan_category_{index}" >
+                        <span id="phone_sevan_category_{index}_error" class="error"></span>
+                    </td>
+					<td>
+                        <input type="text" name="branch[{index}][phone_seven_contact_name]" class="form-control input-column" id="phone_seven_contact_name_{index}" >
+                        <span id="phone_seven_contact_name_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_eight]" class="form-control input-column" id="phone_eight_{index}" >
+                        <span id="phone_eight_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_eight_category]" class="form-control input-column" id="phone_eight_category_{index}" >
+                        <span id="phone_eight_category_{index}_error" class="error"></span>
+                    </td>
+					<td>
+                        <input type="text" name="branch[{index}][phone_eight_contact_name]" class="form-control input-column" id="phone_eight_contact_name_{index}" >
+                        <span id="phone_eight_contact_name_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_nine]" class="form-control input-column" id="phone_nine_{index}" >
+                        <span id="phone_nine_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_nine_category]" class="form-control input-column" id="phone_nine_category_{index}" >
+                        <span id="phone_nine_category_{index}_error" class="error"></span>
+                    </td>
+					<td>
+                        <input type="text" name="branch[{index}][phone_nine_contact_name]" class="form-control input-column" id="phone_nine_contact_name_{index}" >
+                        <span id="phone_nine_contact_name_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_ten]" class="form-control input-column" id="phone_ten_{index}" >
+                        <span id="phone_ten_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][phone_ten_category]" class="form-control input-column" id="phone_ten_category_{index}" >
+                        <span id="phone_ten_category_{index}_error" class="error"></span>
+                    </td>
+					<td>
+                        <input type="text" name="branch[{index}][phone_ten_contact_name]" class="form-control input-column" id="phone_ten_contact_name_{index}" >
+                        <span id="phone_ten_contact_name_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][payment_method_one]" class="form-control input-column" id="payment_method_one_{index}" >
+                        <span id="payment_method_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][payment_method_two]" class="form-control input-column" id="payment_method_two_{index}" >
+                        <span id="payment_method_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][payment_method_three]" class="form-control input-column" id="payment_method_three_{index}" >
+                        <span id="payment_method_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][payment_method_four]" class="form-control input-column" id="payment_method_four_{index}" >
+                        <span id="payment_method_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][payment_method_five]" class="form-control input-column" id="payment_method_five_{index}" >
+                        <span id="payment_method_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][payment_method_six]" class="form-control input-column" id="payment_method_six_{index}" >
+                        <span id="payment_method_six_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_one]" class="form-control input-column" id="calendar_type_one_{index}" >
+                        <span id="calendar_type_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_value_one]" class="form-control input-column" id="calendar_type_value_one_{index}" >
+                        <span id="calendar_type_value_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_hour_one]" class="form-control input-column" id="calendar_from_hour_one_{index}" >
+                        <span id="calendar_from_hour_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_minute_one]" class="form-control input-column" id="calendar_from_minute_one_{index}" >
+                        <span id="calendar_from_minute_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_hour_one]" class="form-control input-column" id="calendar_to_hour_one_{index}" >
+                        <span id="calendar_to_hour_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_minute_one]" class="form-control input-column" id="calendar_to_minute_one_{index}" >
+                        <span id="calendar_to_minute_one_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_two]" class="form-control input-column" id="calendar_type_two_{index}" >
+                        <span id="calendar_type_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_value_two]" class="form-control input-column" id="calendar_type_value_two_{index}" >
+                        <span id="calendar_type_value_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_hour_two]" class="form-control input-column" id="calendar_from_hour_two_{index}" >
+                        <span id="calendar_from_hour_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_minute_two]" class="form-control input-column" id="calendar_from_minute_two_{index}" >
+                        <span id="calendar_from_minute_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_hour_two]" class="form-control input-column" id="calendar_to_hour_two_{index}" >
+                        <span id="calendar_to_hour_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_minute_two]" class="form-control input-column" id="calendar_to_minute_two_{index}" >
+                        <span id="calendar_to_minute_two_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_three]" class="form-control input-column" id="calendar_type_three_{index}" >
+                        <span id="calendar_type_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_value_three]" class="form-control input-column" id="calendar_type_value_three_{index}" >
+                        <span id="calendar_type_value_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_hour_three]" class="form-control input-column" id="calendar_from_hour_three_{index}" >
+                        <span id="calendar_from_hour_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_minute_three]" class="form-control input-column" id="calendar_from_minute_three_{index}" >
+                        <span id="calendar_from_minute_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_hour_three]" class="form-control input-column" id="calendar_to_hour_three_{index}" >
+                        <span id="calendar_to_hour_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_minute_three]" class="form-control input-column" id="calendar_to_minute_three_{index}" >
+                        <span id="calendar_to_minute_three_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_four]" class="form-control input-column" id="calendar_type_four_{index}" >
+                        <span id="calendar_type_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_value_four]" class="form-control input-column" id="calendar_type_value_four_{index}" >
+                        <span id="calendar_type_value_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_hour_four]" class="form-control input-column" id="calendar_from_hour_four_{index}" >
+                        <span id="calendar_from_hour_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_minute_four]" class="form-control input-column" id="calendar_from_minute_four_{index}" >
+                        <span id="calendar_from_minute_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_hour_four]" class="form-control input-column" id="calendar_to_hour_four_{index}" >
+                        <span id="calendar_to_hour_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_minute_four]" class="form-control input-column" id="calendar_to_minute_four_{index}" >
+                        <span id="calendar_to_minute_four_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_five]" class="form-control input-column" id="calendar_type_five_{index}" >
+                        <span id="calendar_type_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_value_five]" class="form-control input-column" id="calendar_type_value_five_{index}" >
+                        <span id="calendar_type_value_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_hour_five]" class="form-control input-column" id="calendar_from_hour_five_{index}" >
+                        <span id="calendar_from_hour_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_minute_five]" class="form-control input-column" id="calendar_from_minute_five_{index}" >
+                        <span id="calendar_from_minute_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_hour_five]" class="form-control input-column" id="calendar_to_hour_five_{index}" >
+                        <span id="calendar_to_hour_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_minute_five]" class="form-control input-column" id="calendar_to_minute_five_{index}" >
+                        <span id="calendar_to_minute_five_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_six]" class="form-control input-column" id="calendar_type_six_{index}" >
+                        <span id="calendar_type_six_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_type_value_six]" class="form-control input-column" id="calendar_type_value_six_{index}" >
+                        <span id="calendar_type_value_six_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_hour_six]" class="form-control input-column" id="calendar_from_hour_six_{index}" >
+                        <span id="calendar_from_hour_six_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_from_minute_six]" class="form-control input-column" id="calendar_from_minute_six_{index}" >
+                        <span id="calendar_from_minute_six_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_hour_six]" class="form-control input-column" id="calendar_to_hour_six_{index}" >
+                        <span id="calendar_to_hour_six_{index}_error" class="error"></span>
+                    </td>
+                    <td>
+                        <input type="text" name="branch[{index}][calendar_to_minute_six]" class="form-control input-column" id="calendar_to_minute_six_{index}" >
+                        <span id="calendar_to_minute_six_{index}_error" class="error"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    /**
+     *  Append branch input
+    */
+    var rowCount = 0;
+    function AppendHTML(){
+        var defaultHTML     = $(".appendable_input table .input_tr").html();
+        var htmlToAppend    = defaultHTML.replace(RegExp('{index}','g'),rowCount);
+        $(".append_branch_tr").append(htmlToAppend);
+        rowCount++;
+
+        if($("#add_branch .remove_branch").length > 1){
+            $("#add_branch .remove_branch").removeClass("hide");
+        }
+
+        $("#add_branch .branch_addmore").addClass("hide").last().removeClass("hide");
+    }// end AppendHTML()
+
+    $(document).ready(function(){
+        AppendHTML();
+
+        /**
+        * Function to submit form
+        */
+        $(".branch-btn-submit").click(function(){
+            var btnId = $(this).attr("id");
+            $("#restaurant_error").text("");
+			var restaurantSlug = $("#restaurant_slug").val();
+			if(!restaurantSlug || restaurantSlug == ""){
+				display_errors([{param:"restaurant",msg:"<%= __('admin.merchant_upload.please_select_restaurant_first')%>"}],"merchant_file");
+				return false;
+			}
+            startTextLoading(btnId);
+            ajax_submit("add_branch",function(status,response){
+                if(status){
+                    if(response.redirect_url){
+                        notice(response.status,response.message);
+                        $("#upload_action").val('').trigger("change");
+                        resetMerchantForm();
+                        window.location.href = response.redirect_url;
+                    }else{
+                        window.location.reload(true);
+                    }
+                }
+                stopTextLoading(btnId);
+            });
+        });
+    });
+
+    /**
+     *  Remove branch input
+    */
+    $(document).on("click",".remove_branch",function(){
+        var haveValue   =   false;
+        var that        =   this;
+        $(that).parents(".table_row").find("input.input-column").each(function(){
+            if($(this).val() != ""){
+                haveValue = true;
+            }
+        });
+
+        if(!haveValue){
+            $(this).parents(".table_row").remove();
+            if($("#add_branch .remove_branch").length <= 1){
+                $("#add_branch .remove_branch").addClass("hide");
+            }
+
+            $("#add_branch .branch_addmore").addClass("hide").last().removeClass("hide");
+        }else{
+            confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.merchant_upload.branch_remove_comfirm_message"); %>',function(result){
+                if(result){
+                    $(that).parents(".table_row").remove();
+                    if($("#add_branch .remove_branch").length <= 1){
+                        $("#add_branch .remove_branch").addClass("hide");
+                    }
+
+                    $("#add_branch .branch_addmore").addClass("hide").last().removeClass("hide");
+                }
+                swal.close();
+            });
+        }
+    });
+</script>
+
+
+
+
+
+

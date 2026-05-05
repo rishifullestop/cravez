@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <title><%= settings["Site.site_title"] %></title>
+        <!-- Favicon-->
+		<link rel="icon" href="<%=WEBSITE_IMG_URL%>fav_icon.ico" type="image/x-icon">
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+        <!-- Bootstrap Core Css -->
+        <link href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap/css/bootstrap.css" rel="stylesheet">
+        <!-- Waves Effect Css -->
+        <link href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>node-waves/waves.css" rel="stylesheet" />
+        <!-- Animation Css -->
+		<link href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>animate-css/animate.css" rel="stylesheet" />
+		<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery.toast.css">
+        <!-- Custom Css -->
+        <link href="<%=WEBSITE_ADMIN_CSS_PATH%>style.css" rel="stylesheet">
+        <link href="<%=WEBSITE_ADMIN_CSS_PATH%>developer.css" rel="stylesheet">
+		<script src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery/jquery.min.js"></script>
+    </head>
+    <body class="signin_page">
+		<div class="page-loader-wrapper hideMe" id="ajax-loader">
+			<div class="loader">
+				<div class="preloader">
+					<div class="spinner-layer pl-red">
+						<div class="circle-clipper left">
+							<div class="circle"></div>
+						</div>
+						<div class="circle-clipper right">
+							<div class="circle"></div>
+						</div>
+					</div>
+				</div>
+				<p><%= __("admin.system.please_wait"); %></p>
+			</div>
+		</div>
+		<div class="login-box hide-before-load hideMe" id="main-container">
+			<div class="logo msg-boundary">
+				<div id="user-defined-notice"></div>
+				<div id="user-defined-error-notice"></div>
+
+			</div>
+			<%-body%>
+
+		</div>
+		<script type="text/javascript">
+			ROUND_PRECISION 			= '<%= ROUND_PRECISION %>';
+			CURRENCY_ROUND_PRECISION	= '<%= CURRENCY_ROUND_PRECISION %>';
+			DEFAULT_LANGUAGE_CODE 		= '<%= DEFAULT_LANGUAGE_CODE %>';
+			WEBSITE_IMG_URL 			= '<%= WEBSITE_IMG_URL %>';
+			WEBSITE_ADMIN_IMG_URL 		= '<%= WEBSITE_ADMIN_IMG_URL %>';
+			WEBSITE_SOCKET_URL			= "<%= WEBSITE_SOCKET_URL %>";
+			SOCKET_ENABLE				= false;
+			DATATABLE_DATE_TIME_FORMAT 	= '<%= DATATABLE_DATE_TIME_FORMAT; %>';
+			DATATABLE_DATE_FORMAT 		= '<%= DATATABLE_DATE_FORMAT; %>';
+			DEFAULT_TIME_ZONE 			= '<%= DEFAULT_TIME_ZONE; %>';
+			WEBSITE_URL 				= "<%= WEBSITE_URL %>";
+			WEBSITE_ADMIN_URL			= "<%= WEBSITE_ADMIN_URL %>";
+			PAGING_LENGTH_MENU			= "<%- (settings["Site.paging_views"])	?	settings["Site.paging_views"]	:""%>";
+			PAGING_LENGTH_MENU			= JSON.parse(PAGING_LENGTH_MENU);
+			CURRENCY_SYMBOL				= "<%= CURRENCY_SYMBOL %>";
+			START_DATE_TIME_FORMAT		= "<%= START_DATE_TIME_FORMAT %>";
+			END_DATE_TIME_FORMAT		= "<%= END_DATE_TIME_FORMAT %>";
+
+			<% /* User id */ %>
+			var encryptionKey 			= "<%= (auth._id) ? auth._id : ""; %>";
+
+			<% /* User Role */ %>
+			var encryptionType 			= "<%= (auth.user_role_id) ? auth.user_role_id : ""; %>";
+
+			var stopLoader 				= true;
+
+			/** Date Range Picker Configration*/
+			var DATE_RANGE_DATE_FORMAT 						= '<%= DATE_RANGE_DATE_FORMAT; %>';
+			var DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE 	= '<%= DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE; %>';
+			var DATE_RANGE_DISPLAY_FORMAT_FOR_END_DATE 		= '<%= DATE_RANGE_DISPLAY_FORMAT_FOR_END_DATE; %>';
+			var DATE_RANGE_CANCEL_LABEL				 		= "<%= __('admin.date_picker.cancel_label')%>";
+			var DATE_RANGE_OPEN_SIDE				 		= "Right";
+
+			var defaultOrder			= "";
+		</script>
+		<script src="<%=WEBSITE_ADMIN_JS_PATH%>moment.min.js" type="text/javascript" ></script>
+		<script src="<%=WEBSITE_ADMIN_JS_PATH%>moment-timezone-with-data.js" type="text/javascript" ></script>
+		<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>jquery.toast.js"></script>
+		<script src="<%=WEBSITE_ADMIN_JS_PATH%>custom.js" type="text/javascript" ></script>
+        <!-- Bootstrap Core Js -->
+        <script src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap/js/bootstrap.js"></script>
+        <script src="<%=WEBSITE_ADMIN_JS_PATH%>jquery.form.js" type="text/javascript"></script>
+        <!-- Waves Effect Plugin Js -->
+        <script src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>node-waves/waves.js"></script>
+        <!-- Custom Js-->
+        <script src="<%=WEBSITE_ADMIN_JS_PATH%>admin.js"></script>
+        <script type="text/javascript">
+			<% if (success_status) { %>
+				notice('<%= success_status %>','<%= success_flash_message %>');
+			<% } %>
+			<% if (error_status) { %>
+				notice('<%= error_status %>','<%= error_flash_message %>');
+			<% } %>
+		</script>
+		<%- defineContent("script") %>
+    </body>
+</html>

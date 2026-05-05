@@ -1,0 +1,260 @@
+<%
+	var customerList	= (typeof customer_list !== typeof undefined && customer_list)	?	customer_list	: "";
+%>
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by To -->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" id="column_filter_0"  onChange="searchDatatable(0)" name="user_id" > </select>
+										</div>
+									</div>
+								</div>
+								<!-- Search by To -->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick" id="column_filter_1"  onChange="searchDatatable(1)" name="screen_name">
+												<option value=""><%=__("admin.screen_visit_logs.search_by_screen_name");%></option>
+												<%
+												Object.keys(SCREEN_VISITS).map(data=>{
+													Object.keys(SCREEN_VISITS[data]).map(key=>{ %>
+														<option value="<%=key%>">
+															<%= SCREEN_VISITS[data][key]%>
+														</option> <%
+													});
+												}); %>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- Search by Date Range -->
+								<div class="col-xs-12 col-sm-3">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.screen_visit_logs.search_by_date_range'); %>">
+										</div>
+										<input class="form-control hide" id="from_date" type="text" name="from_date">
+										<input class="form-control hide" id="to_date" type="text" name="to_date">
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End-->
+	<!--Start Listing-->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.screen_visit_logs.screen_visit_logs"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __("admin.screen_visit_logs.user_name"); %></th>
+								<th><%= __("admin.screen_visit_logs.screen_name");%></th>
+								<th><%= __("admin.screen_visit_logs.device_type"); %></th>
+								<th><%= __("admin.screen_visit_logs.device_id"); %></th>
+								<th><%= __("admin.screen_visit_logs.ip"); %></th>
+								<th><%= __("admin.screen_visit_logs.os"); %></th>
+								<th><%= __("admin.screen_visit_logs.os_version"); %></th>
+								<th><%= __("admin.screen_visit_logs.date_time"); %></th>
+
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css" rel="stylesheet">
+	<link href='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' rel='stylesheet' type='text/css'>
+
+<%- contentFor("script") %>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js'></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable ="";
+	var SCREEN_VISITS 	= 	<%- JSON.stringify(SCREEN_VISITS)%>;
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-listing').DataTable({
+			"order"		: 	[[7, "desc"]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{
+					"data"  : 'user_name',
+					"orderable"		:   false,
+					"field_name":'user_id',
+					"field_type" : "<%=OBJECT_ID_FIELD %>",
+				},
+				{	"data"  : {},
+					"orderable"		:   false,
+					"searchable"	: 	false,
+					"field_name"	:	"screen_name",
+					"render" 		: function(result){
+						var modal 		=	(result.modal)			? result.modal 		 :'';
+						var screenName 	=	(result.screen_name)	? result.screen_name :'';
+						if(screenName != "" && modal!=""){
+							return SCREEN_VISITS[modal][screenName];
+						}else{
+							return "";
+						}
+					}
+				},
+				{"data"  : 'device_type'},
+				{"data"  : 'device_id'},
+				{"data"  : 'ip'},
+				{"data"  : 'os'},
+				{"data"  : 'os_version'},
+				{
+					"data"	 : 'date_time',
+					"searchable" : false,
+					"render" 	 : function(date_time){
+						return moment(date_time).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+					}
+				},
+
+			],
+			"ajax":{
+				url	 : "<%=admin_list_url%>",
+				type : "POST",
+				data : function (d) {
+			        d.fromDate	= $('#from_date').val();
+			        d.toDate	= $('#to_date').val();
+			    },
+			}
+		});
+
+		/**
+		* Applying date range filter on Email loge details
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		configDemo.on('apply.daterangepicker', function(e,picker){
+			var startDate	= picker.startDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+			var endDate		= picker.endDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_END_DATE%>');
+			$('#from_date').val(startDate);
+			$('#to_date').val(endDate);
+			var displayStartDate	=	picker.startDate.format('<%=DATE_RANGE_DATE_FORMAT%>');
+			var displayEndDate		=	picker.endDate.format('<%=DATE_RANGE_DATE_FORMAT%>');
+			$('#date-range-picker').val(displayStartDate+" - "+displayEndDate);
+			dataTable.draw();
+		});
+
+		/**
+		* Unset date range picker value when click to "clear" button
+		*
+		* @param  null
+		*
+		* @return void
+		*/
+		configDemo.on('cancel.daterangepicker',function(e){
+			configDemo.data('daterangepicker').setStartDate(new Date());
+			configDemo.data('daterangepicker').setEndDate(new Date());
+
+			$('#from_date').val("");
+			$('#to_date').val("");
+			$('#date-range-picker').val("");
+			dataTable.draw();
+		});
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+	/**
+	 * For date range picker in searching
+	 */
+	var DATE_FORMAT = 	"<%=DATE_RANGE_DATE_FORMAT%>";
+	var START_DATE	= 	new Date();
+	var END_DATE	= 	new Date();
+	var OPENS		= 	"right";
+	var options		= 	{};
+
+	/**Options for date range picker*/
+	options.locale = {
+		format		: 	DATE_FORMAT,
+		cancelLabel	:	"<%= __('admin.date_picker.cancel_label')%>"
+	};
+
+	options.startDate		= 	START_DATE;
+	options.endDate			= 	END_DATE;
+	options.opens			= 	OPENS;
+	options.autoUpdateInput	= 	false;
+	options.maxDate			= 	new Date();
+
+	var configDemo = $('#date-range-picker');
+
+	configDemo.daterangepicker(options, function (start, end, label) {
+		var start_date	= start.format('<%=DATE_RANGE_DATE_FORMAT%>');
+		var end_date	= end.format('<%=DATE_RANGE_DATE_FORMAT%>');
+	});
+
+	let pageLimit = parseInt("<%=ADMIN_LISTING_LIMIT%>");
+	$("#column_filter_0").select2({
+		placeholder		: "<%= __('admin.screen_visit_logs.search_by_user_name'); %>",
+		multiple		: false,
+		closeOnSelect	: true,
+		width			: "276px",
+		ajax: {
+			url		: "<%=admin_list_url%>/get_user_list",
+			dataType: "json",
+			type	: "POST",
+			delay	: 500,
+			data	: function (params) {
+				return {
+					q: params.term,
+					page: params.page || 1,
+					limit: pageLimit,
+				};
+			},
+			processResults: function (data, params) {
+				params.page = params.page || 1;
+				return {
+					results: data.result,
+					pagination: {
+						more: (params.page * pageLimit) < data.total_count
+					}
+				};
+			},
+			cache: true
+		},
+	});
+</script>

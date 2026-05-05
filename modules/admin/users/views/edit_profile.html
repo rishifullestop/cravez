@@ -1,0 +1,97 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.user_profile.edit_profile'); %>
+					</h2>
+				</div>
+				<div class="body">
+					<%
+						var fullName	=	(typeof result !== typeof undefined && result && typeof result.full_name !== typeof undefined) 	?	result.full_name 	:"";
+						var email		=	(typeof result !== typeof undefined && result && typeof result.email !== typeof undefined)		? 	result.email		:"";
+					%>
+					<form id="update-profile" data-submit-btn-id="update-profile-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="full_name" class="control-label"><%= __('admin.user_profile.full_name'); %><span class="required"> *</span> </label>
+										<input name="full_name" id="full_name" type="text" class="form-control" value="<%=fullName%>"/>
+									</div>
+									<span id="full_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line  cursor-not-allowed">
+										<label for="email" class="control-label"><%= __('admin.user_profile.email'); %><span class="required"> *</span> </label>
+										<input name="email" id="email" type="text" class="form-control readonly" value="<%=email%>" readonly="true"/>
+									</div>
+									<span id="email_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="alert alert-info">
+									<%= __('admin.user_profile.please_leave_blank_if_you_do_not_want_to_change_password'); %>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="old_password" class="control-label"><%= __('admin.user_profile.old_password'); %> </label>
+										<input name="old_password" id="old_password" type="password" class="form-control" ng-model="data.old_password" />
+									</div>
+									<span id="old_password_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="password" class="control-label"><%= __('admin.user_profile.password'); %> </label>
+										<input name="password" id="password" type="password" class="form-control"/>
+									</div>
+									<span id="password_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="confirm_password" class="control-label"><%= __('admin.user_profile.confirm_password'); %> </label>
+										<input name="confirm_password" id="confirm_password" type="password" class="form-control"/>
+									</div>
+									<span id="confirm_password_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<button type="button"  id="update-profile-btn-id"  <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit"><%= __('admin.system.submit'); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		/**
+		 * Function to submit form
+		 */
+		$(".btn-submit").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("update-profile",function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	</script>

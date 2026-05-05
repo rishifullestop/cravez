@@ -1,0 +1,982 @@
+<%
+	var itemDetails 	= 	(typeof item_detail !== typeof undefined && item_detail)	?	item_detail.item_details :{};
+	var itemUnitList 	= 	(typeof item_detail !== typeof undefined && item_detail)	?	item_detail.item_unit_list 	:{};
+	var doughList		= 	(typeof item_detail !== typeof undefined && item_detail)	?	item_detail.dough_list 	:{};
+	var selectorList 	= 	(typeof item_detail !== typeof undefined && item_detail)	?	item_detail.selector_list:{};
+	var itemChoice		= 	(typeof item_detail !== typeof undefined && item_detail)	?	item_detail.item_choice		:{};
+	var dealItemChoice	= 	(typeof item_detail !== typeof undefined && item_detail)	?	item_detail.deal_item_choice :"";
+	var itemImageUrl	= 	(typeof item_detail !== typeof undefined && item_detail)	? 	item_detail.item_image_url	:'';
+	var itemType	   	= 	(typeof itemDetails !== typeof undefined &&	itemDetails.item_type) ? itemDetails.item_type 	:'';
+	var noOfComponents	= 	(typeof itemDetails !== typeof undefined &&	itemDetails.no_of_components) ? itemDetails.no_of_components :'';
+	var noOfDuplicate	= 	(typeof itemDetails !== typeof undefined &&	itemDetails.no_of_duplicate) ? itemDetails.no_of_duplicate 	:0;
+	var orderId				= 	(order_id)		?	order_id		:"";
+	var itemId				= 	(item_id)		?	item_id			:"";
+	var restaurantId		= 	(restaurant_id)	?	restaurant_id	:"";
+	var branchId			= 	(branch_id)		?	branch_id		:"";
+	var areaId				= 	(area_id)		?	area_id			:"";
+	var customerId			= 	(customer_id)	?	customer_id		:"";
+	var deviceId			= 	(device_id)		?	device_id		:"";
+	if(customerId){
+		deviceUniqueId		=	orderId+customerId;
+	}else{
+		deviceUniqueId		=	orderId+deviceId;
+	}
+	var selectedUnitId		= 	(unit_id)		?	unit_id			:"";
+	var selectedDoughId		= 	(dough_id)		?	dough_id		:"";
+	var selectorId			= 	(selector_id)	?	selector_id		:"";
+	var extraItems			= 	(extra_items)	?	extra_items		:{};
+	var unitLists			= 	(unit_lists)	?	unit_lists		:{};
+	var unitData			= 	(unit_data)		?	unit_data		:[];
+	var doughData			= 	(dough_data)	?	dough_data		:[];
+	var selectorData		= 	(selector_data)	?	selector_data	:[];
+	var extraGroupData		= 	(extra_group_data)	?	extra_group_data	:[];
+	logger("itemChoice");
+	logger(itemChoice);
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<!--  New Popup-->
+		<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+					<h2 class="modal-title">
+						<%= __("admin.order.modify_item"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 order_back_button">
+						<li>
+							<a href="<%= originalUrl %>" data-action-url="<%=list_url+'/add_items/'+orderId %>" data-open-modal="true" class="action-btn">
+								<button type="button" class="btn bg-indigo btn-sm waves-effect noHover"><%= __("admin.order.back"); %></button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- ITEM DETAIL SECTION START-->
+				<form id="add-item" action="" data-submit-btn-id="item-add-btn-id" method="post" class="on_click_submit" role="form">
+					<%
+						var fullName 		= 	(typeof itemDetails !== typeof undefined &&	itemDetails.name)		 ? 	itemDetails.name.en			:'';
+						var fullNameArabic	= 	(typeof itemDetails !== typeof undefined &&	itemDetails.name)		 ? 	itemDetails.name.ar			:'';
+						var itemPrice 		= 	(typeof itemDetails !== typeof undefined &&	itemDetails.item_price)	 ? 	itemDetails.item_price		:0;
+						var cartId 			= 	(typeof itemDetails !== typeof undefined &&	itemDetails.cart_id)	 ? 	itemDetails.cart_id			:"";
+						var cartQty 		= 	(typeof itemDetails !== typeof undefined &&	itemDetails.cart_qty)	 ? 	itemDetails.cart_qty		:1;
+						var image 			= 	(typeof itemDetails !== typeof undefined &&	itemDetails.image)		 ? 	itemDetails.image			:'';
+						var description	    = 	(typeof itemDetails !== typeof undefined &&	itemDetails.description) ? 	itemDetails.description.en 	:'';
+					%>
+					<div class="modal-body">
+						<div class="restaurant_processing">
+							<div class="row">
+								<div class="form-group">
+									<%
+									if(image){
+									%>
+									<div class="col-sm-3">
+										<figure height="200px;">
+											<img src="<%= itemImageUrl+image %>" class="set_image_med_dim"/>
+										</figure>
+									</div>
+									<%
+									}
+									%>
+									<div class="col-sm-3">
+										<input type="hidden" name="item_id" value="<%- itemId %>">
+										<input type="hidden" name="order_id" value="<%- orderId %>">
+										<input type="hidden" name="restaurant_id" value="<%- restaurantId %>">
+										<input type="hidden" name="branch_id" value="<%- branchId %>">
+										<input type="hidden" name="area_id" value="<%- areaId %>">
+										<input type="hidden" name="user_id" value="<%- customerId %>">
+										<input type="hidden" name="device_id" value="<%- deviceId %>">
+										<input type="hidden" name="cart_id" value="<%- cartId %>">
+										<input type="hidden" name="item_type" value="<%- itemType %>">
+										<input type="hidden" name="deal_pizza_select" class="deal_pizza_select" value="">
+										<label><%- (fullName) %></label>
+									</div>
+									<div class="col-sm-6"><%= currencyFormat(itemPrice) %></div>
+								</div>
+							</div>
+							<div class="clearfix"></div>
+							<div class="row">
+								<div class="col-sm-12">
+									<p><%= description %></p>
+								</div>
+							</div>
+							<!--DEAL ITEM CONDITION STRAT-->
+							<%
+							var dealClass	=	"";
+							if(itemType == DEAL_ITEM){
+								if(noOfComponents > 0){
+								%>
+									<div class="row deal_list">
+										<div class="col-sm-12">
+											<hr class="style">
+											<input type="hidden" name="total_deal_components" value="<%= noOfComponents %>">
+											<ul>
+											<%
+											for(j=1; j <= noOfComponents ; j++){
+											%>
+												<li class="list-group-item d-flex justify-content-between align-items-center">
+													<a href="javascript:void(0)" class="show_deal_data" id="<%= j %>">
+														<%= __('admin.order.select_pizza'); %> <%= j %>
+													</a>
+													<div>
+														<span class="show_value_<%= deviceUniqueId %>_<%= orderId%>_<%= j %>">
+													</span>
+													</div>
+													<div><span class="error" id="choose_pizza_error"></span></div>
+												</li>
+											<%
+											}
+											%>
+											</ul>
+										</div>
+									</div>		
+								<%
+								}
+								dealClass = "hidden";
+							} 
+							%>
+							<!---Div Deal Type Condition Show Hide--->
+							<div class="deal_type <%= dealClass %>">
+								<input type="hidden" name="deal_form" class="deal_form" value="">
+								<%
+								if(Object.keys(itemUnitList).length>0){
+								%>
+									
+									<hr class="style">
+									<div class="row">
+										<div class="col-sm-12">
+											<ul class="p15 pizza_selector hidden">
+												<li class="pizza_selection_name">
+													<a href="javascript::void(0);" class="pizza_name">
+														
+													</a>
+												</li>
+												<li class="pizza_selection">
+													<a href="javascript::void(0);">
+														<span class="glyphicon glyphicon-arrow-left"></span>
+														<%= __("admin.order.back_to_pizza_selection"); %>
+													</a>
+												</li>
+											</ul>
+											
+											<ul>
+												<%
+												itemUnitList.map((records,keys)=>{
+													let id		 	=	(records._id) 			? records._id				:"";
+													let unitName 	=	(records.unit_name) 	? records.unit_name.en		:"";
+													let unitId   	=	(records.unit_id)		? records.unit_id			:"";
+													let price    	=	(records.price) 		? records.price				:"";
+													let keyChecked	=	"";
+													if(selectedUnitId){
+														if(String(unitId) == String(selectedUnitId)){
+															keyChecked		=	"checked";
+														}
+													}else{
+														keyChecked			=	(keys==0)	? "checked"	:"";
+													}
+													%>
+													<li class="list-group-item d-flex justify-content-between align-items-center unit_val">
+														<input rel="<%= id %>" type="radio" data-rel="<%=unitName%>" class="comman_unit with-gap unit_id unit_<%=unitId%>" name="unit_id" id="<%=unitId%>" value="<%=unitId%>" <%- keyChecked %> >
+														<label  for="<%=unitId%>"><%=unitName%></label>
+														<span class="badge badge-primary badge-pill">
+															<%= currencyFormat(price) %>
+														</span>
+													</li>
+													<%
+													if(keys==0){
+													%>	
+														<input type="hidden" class="item_unit_id" name="item_unit_id" value="<%= id %>">
+													<%
+													}
+												});
+												%>
+											</ul>
+										</div>
+									</div>
+								<%
+								}
+								if(Object.keys(doughList).length > 0){
+								%>
+									<hr class="style">
+									<div class="row">
+										<div class="col-sm-12">
+											<ul class="dough_data"></ul>
+										</div>
+									</div>
+									<hr class="style">
+									<div class="row">
+										<div class="col-sm-12">
+											<%
+											if(itemType == HALF_AND_HALF_ITEM ){
+												for(i=1 ; i<= noOfDuplicate ; i++){
+												%>
+													<ul class="selector_data_<%= i %>"></ul>
+													<%
+													if(itemChoice){
+													%>
+													<div class="row">
+														<div class="col-sm-12">
+															<div class="panel-group add_choice_data_<%= i %>" id="accordion" role="tablist" aria-multiselectable="true"></div>
+														</div>
+													</div>
+													<hr class="style">
+													<%
+													}		
+												}
+											}else{
+											%>
+												<ul class="selector_data"></ul>
+											<%	
+											}
+											%>
+										</div>	
+									</div>	
+								<%	
+								}
+								%>
+								<%
+								if(itemType != HALF_AND_HALF_ITEM ){
+									if(itemChoice){
+									%>
+										<hr class="style" />
+										<div class="row">
+											<div class="col-sm-12">
+												<a href="javascript:void(0)" onClick = getChoiceValue(); >
+													<img data-toggle="tooltip" data-placement="top" title="" src="<%= WEBSITE_ADMIN_IMG_URL %>/add-plus.png" alt="img" data-original-title="Add Item">
+													<label><%= __('admin.order.choice_off'); %></label>
+												</a>
+											</div>
+										</div>
+										<hr class="style">
+										<div class="row">
+											<div class="col-sm-12">
+												<div class="panel-group add_choice_data" id="accordion" role="tablist" aria-multiselectable="true"></div>
+											</div>
+										</div>
+									<%
+									}
+								}
+								%>
+
+
+
+								<!---Deal Type Button -->
+								<div class="row text-center deal_button hidden">
+									<div class="col-sm-12">
+										<hr class="style"/>
+										<span class="glyphicon glyphicon-cart"></span>
+										<button type="button" id="item-add-btn-id" <%- ADMIN_LOADING_TEXT %> class="btn btn-warning waves-effect deal-cart-submit" >
+											<%= __('admin.system.save'); %>
+										</button>
+									</div>
+								</div>		
+							</div>	
+							<%
+							if(dealItemChoice){
+							%>
+							<hr class="style">
+							<div class="row">
+								<div class="col-sm-12">
+									<div class="panel-group add_deal_choice_data" id="accordion" role="tablist" aria-multiselectable="true"></div>
+								</div>
+							</div>
+							<%
+							}
+							%>
+							<hr class="style"/>
+							<div class="row text-center">
+								<div class="col-sm-3"><strong><label><%= __('admin.order.quantity') %></label></strong></div>
+								<div class="col-sm-3">
+									<div class="form-group">
+										<div class="input-group cart_number">
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-danger btn-number"  data-type="minus" data-field="qty">
+													<span class="glyphicon glyphicon-minus"></span>
+												</button>
+											</span>
+											<input type="text" name="qty" class="form-control input-number" value="<%= cartQty %>" min="1" max="200" readonly>
+											<span class="input-group-btn">
+												<button type="button" class="btn btn-success btn-number" data-type="plus" data-field="qty">
+													<span class="glyphicon glyphicon-plus"></span>
+												</button>
+											</span>
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-6">
+									<span class="glyphicon glyphicon-cart"></span>
+									<button type="button" id="item-add-btn-id" <%- ADMIN_LOADING_TEXT %> class="btn btn-warning waves-effect cart-submit" >
+										<%= __('admin.system.add_to_cart'); %>
+									</button>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+				<!-- ITEM DETAIL SECTION STOP-->
+				<!-- CART SECTION CODE START -->
+				<div class="modal-body padding-20 append_cart"></div>
+				<!-- CART SECTION CODE STOP -->
+			</div>
+		</div>
+		<!--  New Popup-->
+	</div>
+</div>
+<script type="text/javascript">
+	var orderId					= 	"<%= orderId %>";
+	var selectedUnitId			= 	"<%= selectedUnitId %>";
+	var selectedDoughId			= 	"<%= selectedDoughId %>";
+	var selectorSelectedId		= 	"<%= selectorId %>";
+	var itemType				= 	"<%= itemType %>";
+	var noOfDuplicate			= 	"<%= noOfDuplicate %>";
+	var extraItems				= 	<%- JSON.stringify(extraItems) %>;
+	var unitLists				= 	<%- JSON.stringify(unitLists) %>;
+	var doughListUnitWise		=	<%- JSON.stringify(doughList) %>;
+	var selectorListDoughWise	=	<%- JSON.stringify(selectorList) %>;
+
+	var selectorData			=	<%- JSON.stringify(selectorData) %>;
+	var doughData				=	<%- JSON.stringify(doughData) %>;
+	var unitData				=	<%- JSON.stringify(unitData) %>;
+	var extraGroupData			=	<%- JSON.stringify(extraGroupData) %>;
+	myCart();
+	getDealChoiceValue();
+	$(document).ready(function(){
+		/**
+		 * Function to push item into cart
+		*/
+		$(".cart-submit").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			$('#add-item').attr('action','<%= list_url %>/update_new_items');
+			ajax_submit("add-item",function(status,response){
+				if(response.status == "success"){
+					notice('success',response.message);
+					$(".add_new_items").trigger('click');
+				}else{
+					notice('error',response.message);
+				}
+			});
+			stopTextLoading(btnId);
+		});
+		/** 
+		 * fuction for deal type item form submit
+		 * 
+		*/
+		$(".deal-cart-submit").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			$('#add-item').attr('action','<%= list_url %>/update_deal_items');
+			ajax_submit("add-item",function(status,response){
+				if(response.status == "success"){
+					console.log(response.data);
+					if(response.data){
+						$.each(response.data, function(key, value) {
+							$('.show_value_'+key).html(value.deal_pizza_select);
+						});
+					}
+					$('.deal_list').removeClass('hidden');
+					$('.deal_type').addClass('hidden');
+				}
+			});
+			stopTextLoading(btnId);
+		});
+
+		/**
+		 * Function for deal section pizza wise
+		 * 
+		*/
+		$('.pizza_selection').click(function(e){
+			$('.deal_list').removeClass('hidden');
+			$('.deal_button').addClass('hidden');
+			$('.deal_type').addClass('hidden');
+			$('.pizza_selector').addClass('hidden');
+		});
+		$(".show_deal_data").click(function(e){
+			dealFormNumber	=	$(this).attr('id');
+			$('.pizza_selector').removeClass('hidden');
+			$('.pizza_name').html("");
+			$('.pizza_name').html("<%= __('admin.order.select_pizza'); %> "+dealFormNumber);
+			$('.deal_list').addClass('hidden');
+			$('.deal_button').removeClass('hidden');
+			$('.deal_type').removeClass('hidden');
+			$('.deal_form').val(dealFormNumber);
+			/*Put Index values into elements*/
+			$('.unit_val').addClass('unit_val_'+dealFormNumber);
+			$('.dough_data').addClass('dough_data_'+dealFormNumber);
+			$('.selector_data').addClass('selector_data_'+dealFormNumber);
+			$('.checkbox_wrapper').addClass('check_'+dealFormNumber);
+			if(unitData.length >0 ){
+				$.each(unitData, function( uKey, uRecords ){
+					uKey	=	uKey+1;
+					$(".unit_val_"+uKey+" .unit_"+uRecords).prop('checked',true); 
+				});
+			}
+			if(doughData.length >0 ){
+				$.each(doughData, function( dKey, dRecords ){
+					dKey	=	dKey+1;
+					$(".dough_data_"+dKey+" .dough_unit_"+dRecords).prop('checked',true); 
+				});
+			}
+			if(selectorData.length >0 ){
+				$.each(selectorData, function( sKey, sRecords ){
+					sKey	=	sKey+1;
+					$(".selector_data_"+sKey+" .selector_"+sRecords).prop('checked',true); 
+				});
+			}
+			if(extraGroupData.length >0 ){
+				console.log('extraGroupData');
+				console.log(extraGroupData);
+				$.each(extraGroupData, function( eKey, eRecords ){
+					eKey	=	eKey+1;
+					$.each(eRecords, function( childKey, childRecords ){
+						$(".check_"+eKey+" .auto_disable_"+childRecords).prop('disabled',false); 
+						$(".check_"+eKey+" .auto_check_"+childRecords).prop('checked',true); 
+					});
+				});
+			}
+		});
+	
+		/***
+		* Change Quantity value from plus and minus
+		*/
+		$('.btn-number').click(function(e){
+			e.preventDefault();
+			fieldName = $(this).attr('data-field');
+			type      = $(this).attr('data-type');
+			var input = $("input[name='"+fieldName+"']");
+			var currentVal = parseInt(input.val());
+			if (!isNaN(currentVal)) {
+				if(type == 'minus') {
+					if(currentVal > input.attr('min')) {
+						input.val(currentVal - 1).change();
+					}
+					if(parseInt(input.val()) == input.attr('min')) {
+						$(this).attr('disabled', true);
+					}
+				} else if(type == 'plus') {
+					if(currentVal < input.attr('max')) {
+						input.val(currentVal + 1).change();
+					}
+					if(parseInt(input.val()) == input.attr('max')) {
+						$(this).attr('disabled', true);
+					}
+				}
+			} else {
+				input.val(0);
+			}
+		});
+		$('.input-number').focusin(function(){
+			$(this).data('oldValue', $(this).val());
+		});
+		$('.input-number').change(function() {
+			minValue =  parseInt($(this).attr('min'));
+			maxValue =  parseInt($(this).attr('max'));
+			valueCurrent = parseInt($(this).val());
+			name = $(this).attr('name');
+			if(valueCurrent >= minValue) {
+				$(".btn-number[data-type='minus'][data-field='"+name+"']").removeAttr('disabled')
+			} else {
+				$(this).val($(this).data('oldValue'));
+			}
+			if(valueCurrent <= maxValue) {
+				$(".btn-number[data-type='plus'][data-field='"+name+"']").removeAttr('disabled')
+			} else {
+				$(this).val($(this).data('oldValue'));
+			}
+		});
+		/**Change Quantity close*/
+
+		/**
+		 * Function to click on unit wise
+		 * 
+		*/
+		$(".comman_unit").click(function(e){
+			var itemUnitId	=	$(this).attr("rel");
+			var unitId		=	$(this).attr("id");
+			$('.item_unit_id').val(itemUnitId);
+			getDoughAndSelector(unitId);
+		});
+		/**
+		 * Function Hit on Page load on first time
+		 * 
+		*/
+		getDoughAndSelector();
+	});
+	/***
+	* Function to get dough value data from Unit ID
+	*
+	*/
+	function getDoughAndSelector(){
+		unitId 	=	$("input[name='unit_id']:checked").val();
+		if(unitId){
+			if(typeof doughListUnitWise != typeof undefined && Object.keys(doughListUnitWise).length > 0){
+				if(Object.keys(doughListUnitWise[unitId]).length > 0){
+					$('.dough_data').html('');
+					$.each(doughListUnitWise[unitId], function( doughKey, doughRecords ) {
+						var doughHtmlData	=	"";
+						doughId 		=	(doughRecords.id) 			? doughRecords.id				:"";
+						doughName 		=	(doughRecords.unit_name) 	? doughRecords.unit_name.en	:"";
+						doughPrice 		=	(doughRecords.price) 		? doughRecords.price	:"";
+						let checked	=	"";
+						if(selectedDoughId){
+							if(String(doughId) == String(selectedDoughId)){
+								checked	=	"checked";
+							}else{
+								checked			=	(doughKey == 0 )			? 'checked'				:"";
+							}
+						}else{
+							checked			=	(doughKey == 0 )			? 'checked'				:"";
+						}
+						doughHtmlData	+=	'<li class="list-group-item d-flex justify-content-between align-items-center">';
+						doughHtmlData	+=  '<input type="radio" onClick=getSelector(); data-rel="'+doughName+'" class="with-gap dough_unit_'+doughId+'" name="dough_id" id="'+doughId+'" value="'+doughId+'" '+checked+'><label for="'+doughId+'" >'+doughName+'</label><span class="badge badge-primary badge-pill">'+currencyFormat(doughPrice)+'</span>';
+						doughHtmlData	+= '</li>';
+						$('.dough_data').append(doughHtmlData);
+					});
+					getSelector();
+				}
+			}else{
+				getChoiceValue();
+			}
+		}else{
+			getChoiceValue();
+		}	
+	}
+	
+	/***
+	* Function to get selector value data from Dough Id,Unit Id
+	*
+	*/
+	function getSelector(doughId,unitId){
+		unitId 			=	$("input[name='unit_id']:checked").val();
+		doughId		=	$("input[name='dough_id']:checked").val();
+		if(doughId){
+			if(typeof selectorListDoughWise != typeof undefined && Object.keys(selectorListDoughWise).length > 0){
+				if(Object.keys(selectorListDoughWise[doughId]).length > 0){
+					var totalCount	=	1;
+					if(itemType == "<%= HALF_AND_HALF_ITEM %>"){
+						totalCount	=	noOfDuplicate;
+						var selectorHtmlData	=	"";
+						for(i=1 ; i<= totalCount ; i++){
+							$('.selector_data_'+i).html('');
+							var selectorHtmlData	=	"";
+							selectorHtmlData += '<li class="list-group-item"><h4>Choose your '+i+' half</h4></li>';
+							$.each(selectorListDoughWise[doughId], function(selectorKey, selectorRecords){
+								selectorId 		=	(selectorRecords.id) 		? selectorRecords.id			:"";
+								selectorName 	=	(selectorRecords.unit_name) ? selectorRecords.unit_name.en	:"";
+								selectorPrice 	=	(selectorRecords.price) 	? selectorRecords.price			:"";
+								let selectorChecked	=	"";
+								if(selectorSelectedId){
+									if(String(selectorId) == String(selectorSelectedId)){
+										selectorChecked	=	"checked";
+									}else{
+										selectorChecked		=	(selectorKey == 0 )			? 'checked'	:"";
+									}
+								}else{
+									selectorChecked			=	(selectorKey == 0 )			? 'checked'	:"";
+								}
+								selectorHtmlData	+=	'<li class="list-group-item d-flex justify-content-between align-items-center">';
+								selectorHtmlData	+=  '<input type="radio" onchange=getChoiceValue("'+selectorId+'","'+i+'") class="with-gap selector_unit_'+i+' selector_'+selectorId+' selector_unit_'+doughId+'" name="unit_lists['+i+'][selector_id]" id="'+selectorId+'_'+i+'" value="'+selectorId+'" '+selectorChecked+'><label  for="'+selectorId+'_'+i+'" >'+selectorName+'</label><span class="badge badge-primary badge-pill">'+currencyFormat(selectorPrice)+'</span>';
+								selectorHtmlData	+= '</li>';
+							});
+							$('.selector_data_'+i).append(selectorHtmlData);
+							/*For already select value*/
+							if(itemType == "<%= HALF_AND_HALF_ITEM %>"){
+								if(selectorData.length >0 ){
+									$.each(selectorData, function( sKey, sRecords ){
+										sKey	=	sKey+1;
+										$(".selector_data_"+sKey+" .selector_"+sRecords).prop('checked',true); 
+									});
+								}	
+							}
+						}
+					}else{
+						var selectorHtmlData	=	"";
+						$('.selector_data').html('');
+						$.each(selectorListDoughWise[doughId], function(selectorKey, selectorRecords){
+							selectorId 		=	(selectorRecords.id) 	? selectorRecords.id				:"";
+							selectorName 	=	(selectorRecords.unit_name) ? selectorRecords.unit_name.en	:"";
+							selectorPrice 	=	(selectorRecords.price) ? selectorRecords.price	:"";
+							let selectorChecked	=	"";
+							if(selectorSelectedId){
+								if(String(selectorId) == String(selectorSelectedId)){
+									selectorChecked	=	"checked";
+								}else{
+									selectorChecked	=	(selectorKey == 0 )	? 'checked'	:"";
+								}
+							}else{
+								selectorChecked		=	(selectorKey == 0 )	? 'checked'	:"";
+							}
+							selectorHtmlData	+=	'<li class="list-group-item d-flex justify-content-between align-items-center">';
+							selectorHtmlData	+=  '<input type="radio" data-rel="'+selectorName+'" onchange=getChoiceValue() class="with-gap selector_'+selectorId+' selector_unit_'+doughId+'" name="selector_id" id="'+selectorId+'" value="'+selectorId+'" '+selectorChecked+'><label  for="'+selectorId+'" >'+selectorName+'</label><span class="badge badge-primary badge-pill">'+currencyFormat(selectorPrice)+'</span>';
+							selectorHtmlData	+= '</li>';
+						});
+						$('.selector_data').append(selectorHtmlData);
+						if(itemType == "<%= DEAL_ITEM %>"){
+							if(selectorData.length >0 ){
+								$.each(selectorData, function( sKey, sRecords ) {
+									sKey	=	sKey+1;
+									$(".selector_data_"+sKey+" .selector_"+sRecords).prop('checked',true);
+								});
+							}	
+						}
+					}
+					getChoiceValue();
+				}
+			}else{
+				getChoiceValue();
+			}
+		}else{
+			getChoiceValue();
+		}
+	}
+
+	/**
+	* Function to check and put the value of extra item id in case of radio button
+	*	OR max or min qty are equal 
+	*
+	*/	
+	function radioOnCheck(itemId,extraItemId,groupId){
+		$('.radio_uncheck_'+groupId).val("");
+		$('.radio_uncheck_'+groupId).attr("disabled",true);
+		$('.parent_radio_check_'+itemId).val(extraItemId);
+		$('.parent_radio_check_'+itemId).attr("disabled",false);
+	}
+	
+	/**
+	* Function to check and put the value of extra item id in case of radio button
+	*	OR max or min qty are equal 
+	*
+	*/	
+	function radioOnCheckMultiple(itemId,extraItemId,groupId,loopKey){
+		$('.radio_uncheck_'+loopKey+'_'+groupId).val("");
+		$('.radio_uncheck_'+loopKey+'_'+groupId).attr("disabled",true);
+		$('.parent_radio_check_'+loopKey+'_'+itemId).val(extraItemId);
+		$('.parent_radio_check_'+loopKey+'_'+itemId).attr("disabled",false);
+	}
+	
+	/**
+	* Function to get choice of data from unit id,dough id ,selector id 
+	*
+	*/
+	function getChoiceValue(selectId=0,selectorKey=0){
+		unitId 			=	$("input[name='unit_id']:checked").val();
+		doughTypeId		=	$("input[name='dough_id']:checked").val();
+		selectorId		=	$("input[name='selector_id']:checked").val();
+		unitName 		=	$("input[name='unit_id']:checked").attr('data-rel');
+		doughName		=	$("input[name='dough_id']:checked").attr('data-rel');
+		selectorName	=	$("input[name='selector_id']:checked").attr('data-rel');
+		if(unitName && doughName && selectorName){
+			showVal	=	unitName+','+doughName+','+selectorName;
+			$('.deal_pizza_select').val(showVal);
+		}else if(unitName && doughName){
+			showVal	=	unitName+','+doughName;
+			$('.deal_pizza_select').val(showVal);
+		}else{
+			showVal	=	unitName;
+			$('.deal_pizza_select').val(showVal);
+		}
+		if(itemType == "<%= HALF_AND_HALF_ITEM %>"){
+			totalCount	=	noOfDuplicate;
+			if(selectorKey == 0){
+				for(i=1 ; i<= totalCount ; i++){
+					selectorId		=	$("input:radio.selector_unit_"+i+":checked").val();
+					getHalfAndHalfChoicefunction(unitId,doughTypeId,selectorId,i);
+				}
+			}else{
+				selectorId		=	selectId;
+				getHalfAndHalfChoicefunction(unitId,doughTypeId,selectorId,selectorKey);
+			}
+		}else{
+			$.ajax({
+				url 	:	"<%=list_url%>/get_choice_item",
+				type	: 	"POST",
+				data	:	{'item_id':'<%= itemId %>','order_id':'<%= orderId %>','unit_id':unitId,'dough_type_id':doughTypeId,'selector_id':selectorId},
+				success	: 	function(res){
+					if(res.status == 'success'){
+						if(res.data){
+							$('.add_choice_data').html('');
+							htmlData = '<h4>Extra Choice Of</h4>';
+							$.each(res.data, function(key, value) {
+								groupId 	=	(value._id) 				? value._id				:"";
+								name 		=	(value.group_name) 			? value.group_name.en	:"";
+								itemList 	=	(value.extra_item_list) 	? value.extra_item_list	:"";
+								maxQuantity	=	(value.max_quantity) 		? value.max_quantity	:0;
+								minQuantity	=	(value.min_quantity) 		? value.min_quantity	:0;
+								htmlData	+=	'<div class="panel panel-default"><div class="panel-heading" id="heading_'+groupId+'"><h4 class="panel-title"><a role="button" data-toggle="collapse" href="#collapse_'+groupId+'" aria-expanded="false" aria-controls="collapse_'+groupId+'" class="collapsed">'+name+'<span class="pull-right collapse-toggle-icon"></span></a></h4></div>';
+								htmlData   += '<div id="collapse_'+groupId+'" class="panel-collapse collapse collapse_height materialize_checkbox pl15" role="tabpanel" aria-labelledby="heading_'+groupId+'" aria-expanded="false" data-parent="#accordion"><input type="hidden" name="extra_items['+key+'][group_id]" value="'+groupId+'"><input type="hidden" name="extra_items['+key+'][max_quantity]" value="'+maxQuantity+'"><input type="hidden" name="extra_items['+key+'][min_quantity]" value="'+minQuantity+'">';
+								if(itemList){
+									if(maxQuantity > 0){
+										htmlData +=	'<br/>';
+										htmlData +=	'(<%= __("admin.order.select_maximum_of") %> ' + maxQuantity + ' <%= __("admin.order.items") %>)';
+										htmlData +=	'<br/>';
+									}
+									if(minQuantity > 0){
+										htmlData +=	'<br/>';
+										htmlData +=	'(<%= __("admin.order.select_minimum_of") %> ' + minQuantity + ' <%= __("admin.order.items") %>)';
+										htmlData +=	'<br/>';
+									}
+									htmlData	+= '<hr class="style" />';
+									$.each(itemList, function( itemKey, itemRecords ) {
+										let itemId 		=	(itemRecords._id) ? itemRecords._id:"";
+										let extraItemId =	(itemRecords.extra_item_id) 	? itemRecords.extra_item_id			:"";
+										let itemName 	=	(itemRecords.extra_item_name) 	? itemRecords.extra_item_name.en	:"";
+										let itemFee		=	(itemRecords.extra_fees) 	? itemRecords.extra_fees		:"0";
+										let groupChecked	=	"";
+										var selectedExtraGroupId		=	"";
+										var selectedExtraItemId			=	"";
+										var selectedExtraGroupItemId	=	"";
+									
+										if(extraItems.length >0){
+											$.each(extraItems, function(selectedExtrakey, selectedExtravalue) {
+												var selectedExtraGroupId	=	selectedExtravalue.group_id;
+												if(String(selectedExtraGroupId) == String(groupId)){
+													if(selectedExtravalue.extra_item_ids && selectedExtravalue.extra_item_ids.length >0){
+														$.each(selectedExtravalue.extra_item_ids, function( selectChildKey, selectChildRecords){
+															selectedExtraItemId	=	selectChildRecords.extra_item_id;
+															selectedExtraGroupItemId=	selectChildRecords.extra_group_item_id;
+															if(String(selectedExtraItemId) == String(extraItemId)){
+																if(String(selectedExtraGroupItemId) == String(itemId)){
+																	groupChecked ="checked";
+																}else{
+																	groupChecked ="";
+																}
+															}
+														});
+													}
+												}
+											});
+										}
+										htmlData 		+=	'<div class="checkbox_wrapper">';
+										if(maxQuantity == 1){
+											if(groupChecked == "checked"){
+												htmlData += '<input type="hidden" class="radio_uncheck_'+groupId+' parent_radio_check_'+itemId+' auto_disable_'+itemId+'" name="extra_items['+key+'][extra_item_ids][0][extra_item_id]" value="'+extraItemId+'">';	
+											}else{
+												htmlData += '<input type="hidden" class="radio_uncheck_'+groupId+' parent_radio_check_'+itemId+' auto_disable_'+itemId+'" name="extra_items['+key+'][extra_item_ids][0][extra_item_id]" value="" disabled="disabled">';
+											}	
+
+											htmlData +=	'<input type="radio" class="with-gap radio_check_'+itemId+' auto_check_'+itemId+'" onchange=radioOnCheck("'+itemId+'","'+extraItemId+'","'+groupId+'") name="extra_items['+key+'][extra_item_ids][0][extra_group_item_id]" id="'+itemId+'" value="'+itemId+'" '+groupChecked+'><label  for="'+itemId+'">'+itemName+'</label><span class="badge badge-primary badge-pill">'+currencyFormat(itemFee)+'</span>';
+										}else{
+											htmlData += '<input type="hidden" name="extra_items['+key+'][extra_item_ids]['+itemKey+'][extra_item_id]" value="'+extraItemId+'">';
+											
+											htmlData +=	'<input type="checkbox" class="filled-in chk-col-pink comman_check_box auto_check_'+itemId+'" name="extra_items['+key+'][extra_item_ids]['+itemKey+'][extra_group_item_id]" id="'+itemId+'" value="'+itemId+'" '+groupChecked+'><label  for="'+itemId+'">'+itemName+'</label><span class="badge badge-primary badge-pill">'+currencyFormat(itemFee)+'</span>';
+										}
+										htmlData 	+=	'</div>';
+									});
+								};
+								htmlData += '</div></div>';
+								htmlData += '<div><span class="error" id="extra_items_'+groupId+'_error"></span></div>';
+							});
+							$('.add_choice_data').append(htmlData);
+						}   
+					}
+				}
+			});
+		}	
+	}
+
+	/**
+	 * Function to get values of half and half choice of
+	 * 
+	 * 
+	*/
+	function getHalfAndHalfChoicefunction(unitId,doughTypeId,selectorId,loopKey){
+		$.ajax({
+			url 	:	"<%=list_url%>/get_choice_item",
+			type	: 	"POST",
+			data	:	{'item_id':'<%= itemId %>','order_id':'<%= orderId %>','unit_id':unitId,'dough_type_id':doughTypeId,'selector_id':selectorId},
+			success	: 	function(res){
+				if(res.status == 'success'){
+					if(res.data){
+						$('.add_choice_data_'+loopKey).html("");
+						var htmlData	=	"";
+						htmlData += '<h4> '+loopKey+' half extra</h4>';
+						$.each(res.data, function(key, value) {
+							groupId 	=	(value._id) 				? value._id				:"";
+							name 		=	(value.group_name) 			? value.group_name.en	:"";
+							itemList 	=	(value.extra_item_list) 	? value.extra_item_list	:"";
+							maxQuantity	=	(value.max_quantity) 		? value.max_quantity	:0;
+							minQuantity	=	(value.min_quantity) 		? value.min_quantity	:0;
+							htmlData	+=	'<div class="panel panel-default"><div class="panel-heading" id="heading_'+groupId+'_'+loopKey+'"><h4 class="panel-title"><a role="button" data-toggle="collapse" href="#collapse_'+groupId+'_'+loopKey+'" aria-expanded="false" aria-controls="collapse_'+groupId+'_'+loopKey+'" class="collapsed">'+name+'<span class="pull-right collapse-toggle-icon"></span></a></h4></div>';
+							htmlData   += '<div id="collapse_'+groupId+'_'+loopKey+'" class="panel-collapse collapse collapse_height materialize_checkbox pl15" role="tabpanel" aria-labelledby="heading_'+groupId+'_'+loopKey+'" aria-expanded="false" data-parent="#accordion"><input type="hidden" name="unit_lists['+loopKey+'][extra_items]['+key+'][group_id]" value="'+groupId+'"><input type="hidden" name="unit_lists['+loopKey+'][extra_items]['+key+'][max_quantity]" value="'+maxQuantity+'"><input type="hidden" name="unit_lists['+loopKey+'][extra_items]['+key+'][min_quantity]" value="'+minQuantity+'">';
+							if(itemList){
+								if(maxQuantity > 0){
+									htmlData +=	'<br/>';
+									htmlData +=	'(<%= __("admin.order.select_maximum_of") %> ' + maxQuantity + ' <%= __("admin.order.items") %>)';
+									htmlData +=	'<br/>';
+								}
+								if(minQuantity > 0){
+									htmlData +=	'<br/>';
+									htmlData +=	'(<%= __("admin.order.select_minimum_of") %> ' + minQuantity + ' <%= __("admin.order.items") %>)';
+									htmlData +=	'<br/>';
+								}
+								htmlData	+= '<hr class="style" />';
+								$.each(itemList, function( itemKey, itemRecords ) {
+									let itemId 		=	(itemRecords._id) ? itemRecords._id:"";
+									let extraItemId =	(itemRecords.extra_item_id) 	? itemRecords.extra_item_id			:"";
+									let itemName 	=	(itemRecords.extra_item_name) 	? itemRecords.extra_item_name.en	:"";
+									let itemFee		=	(itemRecords.extra_fees) 	? itemRecords.extra_fees		:"0";
+									let groupChecked				=	"";
+									var selectedExtraGroupId		=	"";
+									var selectedExtraItemId			=	"";
+									var selectedExtraGroupItemId	=	"";
+									if(extraItems.length >0){
+											$.each(extraItems, function(selectedExtrakey, selectedExtravalue) {
+												var selectedExtraGroupId	=	selectedExtravalue.group_id;
+												if(String(selectedExtraGroupId) == String(groupId)){
+													if(selectedExtravalue.extra_item_ids && selectedExtravalue.extra_item_ids.length >0){
+														$.each(selectedExtravalue.extra_item_ids, function( selectChildKey, selectChildRecords){
+															selectedExtraItemId	=	selectChildRecords.extra_item_id;
+															selectedExtraGroupItemId=	selectChildRecords.extra_group_item_id;
+															if(String(selectedExtraItemId) == String(extraItemId)){
+																if(String(selectedExtraGroupItemId) == String(itemId)){
+																	groupChecked ="checked";
+																}
+															}
+														});
+													}
+												}
+											});
+										}
+									htmlData 		+=	'<div class="checkbox_wrapper check_'+loopKey+'">';
+									if(maxQuantity == 1){
+										htmlData += '<input type="hidden" class="radio_uncheck_'+loopKey+'_'+groupId+' parent_radio_check_'+loopKey+'_'+itemId+' auto_disable_'+itemId+'" name="unit_lists['+loopKey+'][extra_items]['+key+'][extra_item_ids][0][extra_item_id]" value="'+extraItemId+'" disabled="disabled">';
+									
+										htmlData += '<input type="hidden" name="unit_lists['+loopKey+'][extra_items]['+key+'][extra_item_ids][0][extra_item_name]" value="'+itemName+'">';
+										
+										htmlData +=	'<input type="radio" class="with-gap radio_check_'+itemId+' auto_check_'+itemId+'" onchange=radioOnCheckMultiple("'+itemId+'","'+extraItemId+'","'+groupId+'","'+loopKey+'") name="unit_lists['+loopKey+'][extra_items]['+key+'][extra_item_ids][0][extra_group_item_id]" id="'+itemId+'_'+loopKey+'" value="'+itemId+'" '+groupChecked+'><label  for="'+itemId+'_'+loopKey+'">'+itemName+'</label><span class="badge badge-primary badge-pill">'+currencyFormat(itemFee)+'</span>';
+
+									}else{
+										htmlData += '<input type="hidden" name="unit_lists['+loopKey+'][extra_items]['+key+'][extra_item_ids]['+itemKey+'][extra_item_id]" value="'+extraItemId+'">';
+										
+										htmlData += '<input type="hidden" name="unit_lists['+loopKey+'][extra_items]['+key+'][extra_item_ids]['+itemKey+'][extra_item_name]" value="'+itemName+'">';
+
+										htmlData +=	'<input type="checkbox" class="filled-in chk-col-pink comman_check_box auto_check_'+itemId+'" name="unit_lists['+loopKey+'][extra_items]['+key+'][extra_item_ids]['+itemKey+'][extra_group_item_id]" id="'+itemId+'_'+loopKey+'" value="'+itemId+'" '+groupChecked+'><label  for="'+itemId+'_'+loopKey+'">'+itemName+'</label><span class="badge badge-primary badge-pill">'+currencyFormat(itemFee)+'</span>';
+									}
+									htmlData 	+=	'</div>';
+								});
+							};
+							htmlData += '</div></div>';
+							htmlData += '<div><span class="error" id="unit_lists_'+loopKey+'_extra_items_'+groupId+'_error"></span></div>';
+						});
+						$('.add_choice_data_'+loopKey).append(htmlData);
+						if(extraGroupData.length >0 ){
+							$.each(extraGroupData, function(sKey,sRecords){
+								console.log("sRecords");
+								console.log(sRecords);
+								console.log("sKey");
+								console.log(sKey);
+								sKey	=	sKey+1;
+								$.each(sRecords, function( childKey, childRecords ){
+									$(".check_"+sKey+" .auto_disable_"+childRecords).prop('disabled',false); 
+									$(".check_"+sKey+" .auto_check_"+childRecords).prop('checked',true); 
+								});
+							});
+						}	
+					}
+				}
+			}
+		});
+	}
+
+	/**
+	 * Function show data on deal type extra items.
+	 * 
+	 * 
+	*/
+	function getDealChoiceValue(){
+		$.ajax({
+			url 	:	"<%=list_url%>/get_choice_item",
+			type	: 	"POST",
+			data	:	{'item_id':'<%= itemId %>','order_id':'<%= orderId %>'},
+			success	: 	function(res){
+				if(res.status == 'success'){
+					if(res.data){
+						$('.add_deal_choice_data').html('');
+						htmlData = '<h4>Extra Choice Of</h4>';
+						$.each(res.data, function(key, value) {
+							groupId 	=	(value._id) 				? value._id				:"";
+							name 		=	(value.group_name) 			? value.group_name.en	:"";
+							itemList 	=	(value.extra_item_list) 	? value.extra_item_list	:"";
+							maxQuantity	=	(value.max_quantity) 		? value.max_quantity	:0;
+							minQuantity	=	(value.min_quantity) 		? value.min_quantity	:0;
+							htmlData	+=	'<div class="panel panel-default"><div class="panel-heading" id="heading_'+groupId+'"><h4 class="panel-title"><a role="button" data-toggle="collapse" href="#collapse_'+groupId+'" aria-expanded="false" aria-controls="collapse_'+groupId+'" class="collapsed">'+name+'<span class="pull-right collapse-toggle-icon"></span></a></h4></div>';
+							htmlData   += '<div id="collapse_'+groupId+'" class="panel-collapse collapse collapse_height materialize_checkbox pl15" role="tabpanel" aria-labelledby="heading_'+groupId+'" aria-expanded="false" data-parent="#accordion"><input type="hidden" name="deal_extra_items['+key+'][group_id]" value="'+groupId+'"><input type="hidden" name="deal_extra_items['+key+'][max_quantity]" value="'+maxQuantity+'"><input type="hidden" name="deal_extra_items['+key+'][min_quantity]" value="'+minQuantity+'">';
+							if(itemList){
+								if(maxQuantity > 0){
+									htmlData +=	'<br/>';
+									htmlData +=	'(<%= __("admin.order.select_maximum_of") %> ' + maxQuantity + ' <%= __("admin.order.items") %>)';
+									htmlData +=	'<br/>';
+								}
+								if(minQuantity > 0){
+									htmlData +=	'<br/>';
+									htmlData +=	'(<%= __("admin.order.select_minimum_of") %> ' + minQuantity + ' <%= __("admin.order.items") %>)';
+									htmlData +=	'<br/>';
+								}
+								htmlData	+= '<hr class="style" />';
+								$.each(itemList, function( itemKey, itemRecords ) {
+									let itemId 		=	(itemRecords._id) ? itemRecords._id:"";
+									let extraItemId =	(itemRecords.extra_item_id) 	? itemRecords.extra_item_id			:"";
+									let itemName 	=	(itemRecords.extra_item_name) 	? itemRecords.extra_item_name.en	:"";
+									let itemFee		=	(itemRecords.extra_fees) 	? itemRecords.extra_fees		:"0";
+									let groupChecked	=	"";
+									var selectedExtraGroupId		=	"";
+									var selectedExtraItemId			=	"";
+									var selectedExtraGroupItemId	=	"";
+								
+									if(extraItems.length >0){
+										$.each(extraItems, function(selectedExtrakey, selectedExtravalue) {
+											var selectedExtraGroupId	=	selectedExtravalue.group_id;
+											if(String(selectedExtraGroupId) == String(groupId)){
+												if(selectedExtravalue.extra_item_ids && selectedExtravalue.extra_item_ids.length >0){
+													$.each(selectedExtravalue.extra_item_ids, function( selectChildKey, selectChildRecords){
+														selectedExtraItemId	=	selectChildRecords.extra_item_id;
+														selectedExtraGroupItemId=	selectChildRecords.extra_group_item_id;
+														if(String(selectedExtraItemId) == String(extraItemId)){
+															if(String(selectedExtraGroupItemId) == String(itemId)){
+																groupChecked ="checked";
+															}
+														}
+													});
+												}
+											}
+										});
+									}
+									htmlData 		+=	'<div class="checkbox_wrapper">';
+									if(maxQuantity == 1){
+										if(groupChecked == "checked"){
+											htmlData += '<input type="hidden" class="radio_uncheck_'+groupId+' parent_radio_check_'+itemId+'" name="deal_extra_items['+key+'][extra_item_ids][0][extra_item_id]" value="'+extraItemId+'">';	
+										}else{
+											htmlData += '<input type="hidden" class="radio_uncheck_'+groupId+' parent_radio_check_'+itemId+'" name="deal_extra_items['+key+'][extra_item_ids][0][extra_item_id]" value="" disabled="disabled">';
+										}	
+
+										htmlData +=	'<input type="radio" class="with-gap radio_check_'+itemId+'" onchange=radioOnCheck("'+itemId+'","'+extraItemId+'","'+groupId+'") name="deal_extra_items['+key+'][extra_item_ids][0][extra_group_item_id]" id="'+itemId+'" value="'+itemId+'" '+groupChecked+'><label  for="'+itemId+'">'+itemName+'</label><span class="badge badge-primary badge-pill">'+currencyFormat(itemFee)+'</span>';
+									}else{
+										htmlData += '<input type="hidden" name="deal_extra_items['+key+'][extra_item_ids]['+itemKey+'][extra_item_id]" value="'+extraItemId+'">';
+										
+										htmlData +=	'<input type="checkbox" class="filled-in chk-col-pink comman_check_box" name="deal_extra_items['+key+'][extra_item_ids]['+itemKey+'][extra_group_item_id]" id="'+itemId+'" value="'+itemId+'" '+groupChecked+'><label  for="'+itemId+'">'+itemName+'</label><span class="badge badge-primary badge-pill">'+currencyFormat(itemFee)+'</span>';
+									}
+									htmlData 	+=	'</div>';
+								});
+							};
+							htmlData += '</div></div>';
+							htmlData += '<div><span class="error" id="deal_extra_items_'+groupId+'_error"></span></div>';
+						});
+						$('.add_deal_choice_data').append(htmlData);
+					}   
+				}
+			}
+		});
+	}
+
+	/**
+	* Function to add cart detail   
+	*/
+	function myCart(){
+		$.ajax({
+			url 	:	"<%=list_url%>/my_cart/"+orderId,
+			type	: 	"POST",
+			success	: 	function(res){
+				$('.append_cart').html(res);
+			}
+		});
+	}
+</script>

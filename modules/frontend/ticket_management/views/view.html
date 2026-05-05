@@ -1,0 +1,283 @@
+<% result = (typeof result !== typeof undefined) ? result : {};%>
+<div class="equal_spacing p-t-0" id="main-container">
+    <div class="dashboard_page home_page">
+		<div class="separate_box m-b-25">
+			<div class="heading_box">
+				<div class="left_heading">
+					<h1><%= __("tickets.ticket_details");%></h1>
+				</div>
+			</div>
+			<div class="row">
+				<div class="<%= (result.ticket_type == EXTERNAL_TICKET) ? 'col-sm-4' : 'col-sm-6';%>">
+					<div class="all_restaurant">
+						<ul>
+							<li>
+								<label><%= __("tickets.ticket_id");%></label>
+								<span>
+									<%= (result.ticket_id) ? result.ticket_id : ""; %>
+								</span>
+							</li>
+							<li>
+								<label><%= __("tickets.ticket_title");%></label>
+								<span><%= (result.title) ? categories[result.title] : ""; %></span>
+							</li>
+							<li>
+								<label><%= __("tickets.category");%></label>
+								<span><%= (result.category) ? categories[result.category] : ""; %></span>
+							</li>
+							<li>
+								<label><%= __("tickets.sub_category");%></label>
+								<span><%= (result.sub_category) ? categories[result.sub_category] : ""; %></span>
+							</li>
+							<li>
+								<label><%= __("tickets.from");%></label>
+								<span><%= (result.created_by_name) ? result.created_by_name : ""; %></span>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="<%= (result.ticket_type == EXTERNAL_TICKET) ? 'col-sm-4' : 'col-sm-6';%>">
+					<div class="all_restaurant">
+						<ul>
+							<li>
+								<label><%= __("tickets.assigned_to_department");%></label>
+								<span><%= (result.department) ? result.department : ""; %></span>
+							</li>
+							<li>
+								<label><%= __("tickets.assigned_to_user");%></label>
+								<span><%= (result.assigned_to_name) ? result.assigned_to_name : ""; %></span>
+							</li>
+							<li>
+								<label><%= __("tickets.record_date");%></label>
+								<span class="setDateTimeFormat" data-time-format="<%=FRONT_DATE_FORMAT%>" data-date-time="<%= (result.created) ? result.created :'';%>"></span>
+							</li>
+							<li>
+								<label><%= __("tickets.activity_date");%></label>
+								<span class="setDateTimeFormat" data-time-format="<%=FRONT_DATE_FORMAT%>" data-date-time="<%= (result.last_activity_date_time) ? result.last_activity_date_time :'';%>"></span>
+							</li>
+							<li>
+								<label><%= __("tickets.last_activity_type");%></label>
+								<span><%= (result.last_activity_type) ? TICKET_ACTIVITY_TYPE[result.last_activity_type] : ""; %></span>
+							</li>
+							<li>
+								<label><%= __("system.status");%></label>
+								<span class="green_text"><%= (typeof result.status !== typeof undefined) ? TICKET_STATUS[result.status] : ""; %></span>
+							</li>
+						</ul>
+					</div>
+				</div>
+            </div>
+		</div>
+		<!--- Show Description -->
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="card no-shadow">
+					<div class="body table-responsive p-b-0">
+						<table class="table table-border-0"  width="100%">
+							<tr>
+								<th class="col-black font-15 p-l-0  border-none" width="12%">
+									<%= __('tickets.description'); %> <span class="float-right">:</span>
+								</th>
+								<td class=" border-none">
+									<span class='font-15'><%-(result.description) ? nl2br(result.description) : '';%></span>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<% if(result.qa_comment){ %>
+			<!--- Qa rating and review -->
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="card no-shadow">
+						<div class="body table-responsive p-b-0">
+							<table class="table table-border-0"  width="100%">
+								<tr>
+									<th width="15%">
+										<%= __("tickets.qa_rating");%> <span class="float-right">:</span>
+									</th>
+									<td>
+										<span class="qa_rating_listed" data-rel="<%=result.qa_rating%>"> </span>
+									</td>
+								</tr>
+								<tr>
+									<th>
+										<%= __("tickets.qa_comment");%> <span class="float-right">:</span>
+									</th>
+									<td>
+										<span class="readmore nl2br" data-content-length="250"> <%-result.qa_comment;%> </span>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		<% } %>
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="card no-shadow">
+					<div class="body">
+						<div class="navbar_menu">
+							<nav class="navbar navbar-expand-lg navbar-light">
+								<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+								<div class="collapse navbar-collapse" id="navbarSupportedContent">
+									<!-- Nav tabs -->
+									<ul class="nav nav-tabs tab-nav-right" role="tablist">
+										<li class="active branch-panel-link">
+											<a href="" class="action-btn" data-container="comment-panels">
+												<%= __("tickets.comments");%>
+											</a>
+										</li>
+										<li class="branch-panel-link">
+											<a href="" class="action-btn" data-same-tab-html="ticket-invalid-access" data-container="history-panels">
+												<%= __("tickets.history");%>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</nav>
+							<div class="tab-content p-t-20">
+								<div role="tabpanel" class="tab-pane fade in active " id="comment-panels">
+									<% if(comments.length > 0){
+										comments.map(thread=>{ %>
+											<div class="thread">
+												<div class="chat-title">
+													<h4><%= (thread.user_name) ? thread.user_name : "";%></h4>
+													<span class="setDateTimeFormat" data-time-format="<%=FRONT_DATE_FORMAT%>" data-date-time="<%= (thread.created) ? thread.created :'';%>"></span>
+													<div class="clearfix"></div>
+												</div>
+												<div class="category_table">
+													<div class="chat-reply">
+														<p><%- (thread.response) ? nl2br(thread.response) : "";%></p>
+													</div>
+												</div>
+											</div>
+									<%  });
+									}else{ %>
+										<div class="thread text-center">
+											<div class="category_table">
+												<div class="chat-reply">
+													<h4> <%=__("system.no_record_found")%> </h4>
+												</div>
+											</div>
+										</div>
+									<% }
+									if(result.status != TICKET_CLOSE) { %>
+										<div class="category_table comment_section">
+											<h4><%= __("tickets.add_a_comment");%><span class="required"> *</span></h4>
+											<form id="add-comment" action="<%=list_url%>/add_comment" data-submit-btn-id="comment-add-btn-id" method="post" class="on_click_submit" role="form">
+												<input type="hidden" name="ticket_id" value="<%= result._id %>"/>
+												<input type="hidden" name="order_id" value="<%= (result.order_id) ? result.order_id : '';%>"/>
+												<textarea class="form-control" name="comment" id="comment"></textarea>
+												<span id="comment_error" class="error"></span>
+												<div class="text-right">
+													<button type="button" id="comment-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white comment-btn-submit" <%- FRONT_LOADING_TEXT %> >
+														<%= __("tickets.post_comment");%>
+													</button>
+												</div>
+											</form>
+										</div>
+									<% } %>
+								</div>
+								<div role="tabpanel" class="tab-pane fade in" id="history-panels">
+									<%
+									if(history.length > 0){
+										history.map(log=>{ %>
+											<div class="thread">
+												<div class="chat-title">
+													<h4><%= (log.user_name) ? log.user_name : "";%></h4>
+													<span class="setDateTimeFormat" data-time-format="<%=FRONT_DATE_FORMAT%>" data-date-time="<%= (log.created) ? log.created :'';%>"></span>
+													<div class="clearfix"></div>
+												</div>
+												<div class="category_table">
+													<div class="chat-reply">
+														<p><%- (log.description) ? nl2br(log.description) : __("tickets.ticket_has_been_reassigned_to_qa");%></p>
+													</div>
+												</div>
+											</div>
+										<% });
+									}else{ %>
+										<div class="thread text-center">
+											<div class="category_table">
+												<div class="chat-reply">
+													<h4> <%=__("system.no_record_found")%> </h4>
+												</div>
+											</div>
+										</div>
+									<% } %>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery.raty/js/jquery.raty.js"></script>
+	<script type="text/javascript">
+		$("#ticket-action .show-tick").selectpicker('refresh');
+		$(".branch-panel-link.active").find("a").trigger("click");
+
+		/**
+		 * For add active class in  branch panel
+		 */
+		$(document).on("click",".branch-panel-link",function(){
+			$(".branch-panel-link").removeClass("active");
+			$(this).addClass("active");
+			var containerId = $(this).find("a").data("container");
+			$(".tab-pane").removeClass("active");
+			$("#"+containerId).addClass("active");
+		});
+
+		/**
+		 * Submit post comment form
+		 */
+		$('.comment-btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('add-comment',function(status,response){
+				if(status){
+					window.location.reload();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+
+		/**
+		 *  For Qa rating form
+		 *
+		*/
+		$('.review_rate').raty({
+            start: 0,
+            space: true,
+            path : '<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery.raty/img',
+            score: function () {
+                return $("#review_rating").val();
+            },
+            click: function(score, evt) {
+                $("#review_rating").val(score);
+            }
+		});
+
+		/**
+		*  For Qa listed rating
+		*/
+		$('.qa_rating_listed').raty({
+			readOnly :	true,
+			path	 :	'<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery.raty/img',
+			score	 :	function() {
+				return $(this).attr('data-rel');
+			}
+        });
+	</script>

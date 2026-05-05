@@ -1,0 +1,268 @@
+<%
+	var result		= (typeof result !== typeof undefined && result)	?	result	: "";
+	let isTeamLead	= (auth && auth.team_head) ? true : false;
+	let authRoleId	= (auth && auth.user_role_id) ? auth.user_role_id :"";
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by Name -->
+									<div class="col-xs-12 col-sm-3 col-md-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0" onkeyup="searchDatatable(0)" placeholder="<%= __('admin.admin_permissions.search_by_first_name'); %>" name="name">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Email -->
+									<div class="col-xs-12 col-sm-3 col-md-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_2" onkeyup="searchDatatable(2)" placeholder="<%= __('admin.admin_permissions.search_by_email'); %>" name="email">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Team leader -->
+									<div class="col-xs-12 col-md-2 col-sm-2">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control" id="searchTeamLeader" data-live-search="true" placeholder="<%= __('admin.admin_permissions.search_by_teams'); %>" name="teams" <%= (isTeamLead || authRoleId != CRAVEZ) ? 'disabled' : '';%>>
+													<% if(authRoleId == CRAVEZ || !result){ %>
+														<option value=""><%= __('admin.admin_permissions.select_team_leader'); %></option>
+													<%}%>
+													<%-result%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by Status -->
+									<div class="col-xs-12 col-md-2 col-sm-2">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" name="status" id="filter_status" >
+													<option value=""><%=__("admin.master.search_by_status");%></option>
+													<%
+													if(GLOBAL_STATUS_SEARCH_DROPDOWN && Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).length > 0){
+														Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).map(searchStatus=>{ %>
+															<% let selectedValue = (searchStatus==query_status) ? "selected" : "";  %>
+															<option value="<%= searchStatus %>" <%= selectedValue %>><%=(GLOBAL_STATUS_SEARCH_DROPDOWN[searchStatus]["status_name"]) ? GLOBAL_STATUS_SEARCH_DROPDOWN[searchStatus]["status_name"] :"";%></option>
+														<% 	});
+													} %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- datatable reset -->
+									<div class="col-xs-12 col-md-1 col-sm-1">
+										<div class="form-group">
+											<a href="<%= WEBSITE_ADMIN_URL %>admin_permissions" id="reset" class="btn btn-danger btn-sm waves-effect"><%= __("admin.system.reset")%></a>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.admin_permissions.admin_permissions"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>/add" class="<%= getPermissionClass(module_type,['admin_permissions','add']); %>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									 <%= __('admin.admin_permissions.add_admin_permissions'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="20%"><%= __("admin.admin_permissions.full_name"); %></th>
+								<th width="20%"><%= __("admin.admin_permissions.user_role"); %></th>
+								<th width="20%"><%= __("admin.admin_permissions.email"); %></th>
+								<th width="10%"><%= __("admin.admin_permissions.code"); %></th>
+								<th width="10%"><%= __("admin.system.status"); %></th>
+								<th width="20%"><%= __("admin.system.modified"); %></th>
+								<th width="10%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>chosen/chosen.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>chosen/chosen.jquery.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable ="";
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem('DataTables', JSON.stringify(oData));
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse(localStorage.getItem('DataTables'));
+				},
+				"order"		: 	[[5, "desc"]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":   PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{"data": 'full_name' },
+					{
+						"data"		: 	'role_name',
+						"orderable"	:	false,
+					},
+					{
+						"data"		: 'email',
+						"render" 	: function(email){
+							return 	(email)	? '<a href="mailto:'+email+'">'+email+'</a>' :email;
+						}
+					},
+					{
+						"data"		: 'code',
+						"render" 	: function(code){
+							return 	(code)	? code :"";
+						}
+					},
+					{
+						"data"			: {},
+						"orderable"		: false,
+						"field_type"	: "<%= NUMERIC_FIELD %>",
+						"field_name"	: "active",
+						"render": function(data){
+							let html = (data.active && data.active == "<%=ACTIVE%>")	? '<span class="label label-success m-l-5 m-t-5"><%=__("admin.system.active")%></span>': '<span class="label label-danger m-l-5 m-t-5"><%=__("admin.system.inactive")%></span>';
+							html += (data.team_head && data.team_head == true) ? '<span class="label label-success m-l-5 m-t-5"><%=__("admin.admin_permissions.team_head")%></span>' : '';
+							return html;
+						}
+					},
+					{
+						"data"			: 'modified',
+						"searchable"	: false,
+						"render" 		: function(modified){
+							return moment(modified).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+						}
+					},
+					{
+						"data"			: {},
+						"orderable"		: false,
+						"searchable"	: false,
+						"render" 		: function(result){
+							var id 					= (result._id) ? result._id : "";
+							var roleId 				= (result.user_role_id)	? result.user_role_id : "";
+							var status				= (result.active)	? result.active : "<%=DEACTIVE%>";
+							var teamHeadStatus		= (typeof result.team_head !== typeof undefined && result.team_head === true) ? 	1	: 0;
+							var teamHeadButtonTitle = (teamHeadStatus) 	? "<%= __('admin.admin_permissions.assign_teams'); %>"	: "<%= __('admin.admin_permissions.assign_team'); %>" ;
+
+							/** Status Link  **/
+							var statusLinkText  = (status == "<%= DEACTIVE %>") ? "<%= __('admin.system.activate'); %>"				: "<%= __('admin.system.deactive'); %>" ;
+							var statusLinkTitle = (status == "<%= DEACTIVE %>") ? "<%= __('admin.system.click_to_activate'); %>"  	: "<%= __('admin.system.click_to_deactivate'); %>" ;
+							var statusLinkIcon  = (status == "<%= DEACTIVE %>") ? "done"	: "block";
+
+							var dropDownButton 		=	''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %> '+
+									'<span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/edit/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["admin_permissions","edit"]); %>">'+
+											' <%= __("admin.system.edit"); %>'+
+										'</a>'+
+									'</li>'+
+									/** View Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/view/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["admin_permissions","view"]); %>">'+
+											' <%= __("admin.system.view"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Status Link  **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/update-status/'+id+'/'+status+'" class=" waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["admin_permissions","active_deactive"]); %>" data-confirm-message="<%= __("admin.admin_permissions.you_want_to_change_status"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+statusLinkTitle+'">'+
+											''+
+											statusLinkText+
+										'</a>'+
+									'</li>'+
+									/** Assign Users **/
+									'<li>'+
+										'<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/get_role_users_and_update/'+teamHeadStatus+'/'+roleId+'/'+id+'" data-open-modal="true" class="waves-effect waves-block action-btn <%= getPermissionClass(module_type,["admin_permissions","assign_shift"]); %>">'+
+											''+teamHeadButtonTitle+
+										'</a>'+
+									'</li>'+
+									/** Delete Link */
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["admin_permissions","delete"]); %>" data-confirm-message="<%= __("admin.admin_permissions.you_want_to_delete_this_admin_permissions"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+											'<%= __("admin.system.delete"); %>'+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+						}
+					}
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>",
+					type	: "POST",
+					data: function (d) {
+						d.teamLeader     = $('#searchTeamLeader').val();
+						d.filterStatus   = $('#filter_status').val();
+					},
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		$("#searchTeamLeader").selectpicker('refresh');
+
+		/** Javascript function to search team members in datatable */
+		$(document).on('change', '#searchTeamLeader,#filter_status', function(e){
+			dataTable.draw();
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

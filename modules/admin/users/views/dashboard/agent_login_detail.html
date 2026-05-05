@@ -1,0 +1,29 @@
+<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+	<thead>
+		<tr>
+			<th><%=  __("admin.dashboard.date"); %></th>
+			<th><%=  __("admin.dashboard.login_time"); %></th>
+			<th><%=  __("admin.dashboard.logout_time"); %></th>
+		</tr>
+	</thead>
+	<tbody>
+		<%
+			dateRange.map((dateRecords)=>{ %>
+				<tr>
+					<td><%=newDate(dateRecords,DATABASE_DATE_FORMAT+' ('+DAY_FORMAT+')')%></td><%
+					if(result[dateRecords]){ %>
+						<td>
+							<%= (result[dateRecords].login_time && newDate(dateRecords,DATABASE_DATE_FORMAT) == newDate(result[dateRecords].login_time,DATABASE_DATE_FORMAT)) ? newDate(result[dateRecords].login_time,TIME_FORMAT) : '-';%>
+						</td>
+						<td>
+							<%= (result[dateRecords].logout_time && newDate(dateRecords,DATABASE_DATE_FORMAT) == newDate(result[dateRecords].logout_time,DATABASE_DATE_FORMAT)) ? newDate(result[dateRecords].logout_time,TIME_FORMAT) :'-';%>
+						</td><%
+					}else{ %>
+						<td>-</td>
+						<td>-</td><%
+					} %>
+				</tr><%
+			});
+		%>
+	</tbody>
+</table>

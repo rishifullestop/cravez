@@ -1,0 +1,952 @@
+<%
+	var fromDate = newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),DATABASE_DATE_FORMAT);
+	var toDate	 = newDate(subtractDate(HOURS_IN_A_DAY),DATABASE_DATE_FORMAT);
+	var tempFromDate = newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),CURRENTDATE_START_DATE_FORMAT);
+	var tempToDate	 = newDate("",CURRENTDATE_END_DATE_FORMAT);
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="order_growth_div">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("reports.order_growth_graph"); %>
+					</h2>
+				</div>
+				<div class="header p-b-0 p-t-15 p-r-15 p-l-15">
+					<div class="row clearfix dataTables_wrapper">
+						<!-- Search by year -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick graph_year" id="growth_graph_year" name="growth_graph_year" data-title="<%=__("reports.search_by_year")%>">
+
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Search by branch -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick branch_id" id="growth_branch_ids" name="growth_branch_id" data-live-search="true" data-title="<%=__('reports.search_by_branch')%>" multiple>
+										<%- branch_list%>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div id="order_growth_graph" class="p-b-20">
+						<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="revenue_growth_div">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("reports.revenue_growth_graph"); %>
+					</h2>
+				</div>
+				<div class="header p-b-0 p-t-15 p-r-15 p-l-15">
+					<div class="row clearfix dataTables_wrapper">
+						<!-- Search by year -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick graph_year" id="revenue_graph_year" name="revenue_graph_year" data-title="<%=__("reports.search_by_year")%>" multiple>
+
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Search by branch -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick branch_id" id="revenue_branch_ids" name="revenue_branch_id" data-live-search="true" data-title="<%=__('reports.search_by_branch')%>" multiple>
+										<%- branch_list%>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div id="revenue_growth_graph" class="p-b-20">
+						<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="item_unit_div">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("reports.average_unit_sold_report"); %>
+					</h2>
+				</div>
+				<div class="header p-b-0 p-t-15 p-r-15 p-l-15">
+					<div class="row clearfix dataTables_wrapper">
+						<!-- Search by year -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick graph_year" id="item_unit_graph_year" name="item_unit_graph_year" data-title="<%=__("reports.search_by_year")%>" multiple>
+
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Search by branch -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick branch_id" id="item_unit_branch_ids" name="item_unit_branch_id" data-live-search="true" data-title="<%=__('reports.search_by_branch')%>" multiple>
+										<%- branch_list%>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div id="avg_item_unit_sold_mom" class="p-b-20">
+						<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="basket_size_div">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("reports.average_basket_size_report"); %>
+					</h2>
+				</div>
+				<div class="header p-b-0 p-t-15 p-r-15 p-l-15">
+					<div class="row clearfix dataTables_wrapper">
+						<!-- Search by year -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick graph_year" id="basket_size_graph_year" name="basket_size_graph_year" data-title="<%=__("reports.search_by_year")%>" multiple>
+
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Search by branch -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick branch_id" id="basket_size_branch_ids" name="basket_size_branch_id" data-live-search="true" data-title="<%=__('reports.search_by_branch')%>" multiple>
+										<%- branch_list%>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div id="average_basket_size_mom" class="p-b-20">
+						<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="row clearfix">
+		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="fail_rate_div">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("reports.fail_rate_graph"); %>
+					</h2>
+				</div>
+				<div class="header p-b-0 p-t-15 p-r-15 p-l-15">
+					<div class="row clearfix dataTables_wrapper">
+						<!-- Search by year -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick graph_year" id="fail_rate_graph_year"
+										name="fail_rate_graph_year" data-title="<%=__(" reports.search_by_year")%>">
+
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Search by branch -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick branch_id" id="fail_rate_branch_ids"
+										name="fail_rate_branch_id" data-live-search="true"
+										data-title="<%=__('reports.search_by_branch')%>" multiple>
+										<%- branch_list%>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div id="fail_rate_graph" class="p-b-20">
+						<h4 class='text-center'>
+							<%= __('reports.no_data_available')%>
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="order_frequency_div">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("reports.customer_order_frequency_report"); %>
+					</h2>
+				</div>
+				<div class="header p-b-0 p-t-15 p-r-15 p-l-15">
+					<div class="row clearfix dataTables_wrapper">
+						<!-- Search by year -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick graph_year" id="order_frequency_graph_year"
+										name="order_frequency_graph_year" data-title="<%=__(" reports.search_by_year")%>">
+
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Search by branch -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick branch_id" id="order_frequency_branch_ids"
+										name="order_frequency_branch_id" data-live-search="true"
+										data-title="<%=__('reports.search_by_branch')%>" multiple>
+										<%- branch_list%>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div id="order_frequency_graph" class="p-b-20">
+						<h4 class='text-center'>
+							<%= __('reports.no_data_available')%>
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="lost_revenue_div">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("reports.lost_revenue_graph"); %>
+					</h2>
+				</div>
+				<div class="header p-b-0 p-t-15 p-r-15 p-l-15">
+					<div class="row clearfix dataTables_wrapper">
+						<!-- Search by year -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick graph_year" id="lost_revenue_graph_year"
+										name="lost_revenue_graph_year" data-title="<%=__(" reports.search_by_year")%>"
+										multiple>
+
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Search by branch -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick branch_id" id="lost_revenue_branch_ids"
+										name="lost_revenue_branch_id" data-live-search="true"
+										data-title="<%=__('reports.search_by_branch')%>" multiple>
+										<%- branch_list%>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div id="lost_revenue_graph" class="p-b-20">
+						<h4 class='text-center'>
+							<%= __('reports.no_data_available')%>
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="top_contribution_div">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("reports.top_contribution_to_lost_revenue"); %>
+					</h2>
+				</div>
+				<div class="header p-b-0 p-t-15 p-r-15 p-l-15">
+					<div class="row clearfix dataTables_wrapper">
+						<!-- Search by year -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick graph_year" id="top_contribution_graph_year"
+										name="top_contribution_graph_year" data-title="<%=__(" reports.search_by_year")%>">
+
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Search by branch -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick branch_id" id="top_contribution_branch_ids"
+										name="top_contribution_branch_id" data-live-search="true"
+										data-title="<%=__('reports.search_by_branch')%>" multiple>
+										<%- branch_list%>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div id="top_contribution_graph" class="p-b-20">
+						<h4 class='text-center'>
+							<%= __('reports.no_data_available')%>
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row clearfix">
+		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="cancelled_breakdown_div">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("reports.cancelled_reason_breakdown_report"); %>
+					</h2>
+				</div>
+				<div class="header p-b-0 p-t-15 p-r-15 p-l-15">
+					<div class="row clearfix dataTables_wrapper">
+						<!-- Search by year -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick graph_year" id="cancelled_breakdown_graph_year"
+										name="cancelled_breakdown_graph_year" data-title="<%=__(" reports.search_by_year")%>">
+
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Search by branch -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick branch_id" id="cancelled_breakdown_branch_ids"
+										name="cancelled_breakdown_branch_id" data-live-search="true"
+										data-title="<%=__('reports.search_by_branch')%>" multiple>
+										<%- branch_list%>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div id="cancelled_breakdown_graph" class="p-b-20">
+						<h4 class='text-center'>
+							<%= __('reports.no_data_available')%>
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="revenue_generated_div">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("reports.revenue_generated_graph"); %>
+					</h2>
+				</div>
+				<div class="header p-b-0 p-t-15 p-r-15 p-l-15">
+					<div class="row clearfix dataTables_wrapper">
+						<!-- Search by year -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick graph_year" id="revenue_generated_graph_year"
+										name="revenue_generated_graph_year" data-title="<%=__(" reports.search_by_year")%>">
+
+									</select>
+								</div>
+							</div>
+						</div>
+						<!-- Search by branch -->
+						<div class="col-xs-12 col-sm-6">
+							<div class="form-group m-b-15">
+								<div class="form-line">
+									<select class="form-control show-tick branch_id" id="revenue_generated_branch_ids"
+										name="revenue_generated_branch_id" data-live-search="true"
+										data-title="<%=__('reports.search_by_branch')%>" multiple>
+										<%- branch_list%>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div id="revenue_generated_graph" class="p-b-20">
+						<h4 class='text-center'>
+							<%= __('reports.no_data_available')%>
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.min.js"></script>
+	<script type="text/javascript">
+		google.charts.load("current", {"packages":["bar","line", 'controls', 'corechart', 'table']});
+
+		$(document).ready(function(){
+			google.charts.setOnLoadCallback(drawCharts);
+		});
+
+		$("#growth_graph_year, #growth_branch_ids").change(function(){
+			drawOrderGrowthChart();
+		});
+
+		$("#revenue_graph_year, #revenue_branch_ids").change(function(){
+			drawRevenueGrowthChart();
+		});
+
+		$("#item_unit_graph_year, #item_unit_branch_ids").change(function(){
+			drawItemUnitChart();
+		});
+
+		$("#basket_size_graph_year, #basket_size_branch_ids").change(function(){
+			drawBasketSizeChart();
+		});
+
+		$("#fail_rate_graph_year, #fail_rate_branch_ids").change(function(){
+			drawFailRateChart();
+		});
+
+		$("#order_frequency_graph_year, #order_frequency_branch_ids").change(function () {
+			drawOrderFrequencyChart();
+		});
+
+		$("#lost_revenue_graph_year, #lost_revenue_branch_ids").change(function () {
+			drawLostRevenueChart();
+		});
+
+		$("#revenue_generated_graph_year, #revenue_generated_branch_ids").change(function () {
+			drawRevenueGeneratedChart();
+		});
+
+		$("#top_contribution_graph_year, #top_contribution_branch_ids").change(function () {
+			drawTopContributionChart();
+		});
+
+		$("#cancelled_breakdown_graph_year, #cancelled_breakdown_branch_ids").change(function () {
+			drawCancelledBreakdownChart();
+		});
+
+		function drawCharts(){
+			drawOrderGrowthChart();
+			drawRevenueGrowthChart();
+			drawItemUnitChart();
+			drawBasketSizeChart();
+			drawFailRateChart();
+			drawOrderFrequencyChart();
+			drawLostRevenueChart();
+			drawRevenueGeneratedChart();
+			drawTopContributionChart();
+			drawCancelledBreakdownChart();
+		}
+
+		function drawOrderGrowthChart() {
+			var orderGrowthWidth = $("#order_growth_div").width();
+			if($("#growth_graph_year").val()){
+				var branchId		= $("#growth_branch_ids").val();
+				var requestOptions = {
+					url 	: "<%= list_url%>/order_growth",
+					method	: "post",
+					data	: {years : $("#growth_graph_year").val(),branch_ids : branchId}
+				};
+				$("#order_growth_graph").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_IMG_URL%>pagination_loader.gif" /></div>');
+				ajaxRequest(requestOptions,function(response){
+					if(response.years.length  > 0){
+						var data = new google.visualization.DataTable();
+						data.addColumn("string", "Month");
+						response.years.map(rec=>{
+							data.addColumn("number", rec);
+						});
+
+						data.addRows(response.result);
+
+						var options = {
+							width: (orderGrowthWidth-50),
+							height: 350,
+							axes: {
+								x: {
+									0: {side: "bottom"}
+								}
+							},
+							legend: {position: 'none'},
+							bars	: "vertical",
+						};
+						var chart = new google.charts.Bar(document.getElementById("order_growth_graph"));
+						chart.draw(data, google.charts.Bar.convertOptions(options));
+					}else{
+						$("#order_growth_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+					}
+				});
+			}else{
+				$("#order_growth_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+			}
+		} //End drawOrderGrowthChart
+
+		function drawRevenueGrowthChart() {
+			var revenueGrowthWidth = $("#revenue_growth_div").width();
+			if($("#revenue_graph_year").val()){
+				var branchId		= $("#revenue_branch_ids").val();
+				var requestOptions = {
+					url 	: "<%= list_url%>/revenue_growth",
+					method	: "post",
+					data	: {years : $("#revenue_graph_year").val(),branch_ids : branchId}
+				};
+				$("#revenue_growth_graph").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_IMG_URL%>pagination_loader.gif" /></div>');
+				ajaxRequest(requestOptions,function(response){
+					if(response.years.length  > 0){
+						var data = new google.visualization.DataTable();
+						data.addColumn("string", "Month");
+						response.years.map(rec=>{
+							data.addColumn("number", rec);
+						});
+
+						data.addRows(response.result);
+
+						var options = {
+							width: (revenueGrowthWidth-50),
+							height: 350,
+							axes: {
+								x: {
+									0: {side: "bottom"}
+								}
+							},
+							legend : {position : "none"},
+							vAxis: { format: '# KD' },
+						};
+						var chart = new google.charts.Line(document.getElementById("revenue_growth_graph"));
+						chart.draw(data, google.charts.Line.convertOptions(options));
+					}else{
+						$("#revenue_growth_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+					}
+				});
+			}else{
+				$("#revenue_growth_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+			}
+		} //End drawRevenueGrowthChart
+
+		function drawItemUnitChart() {
+			var itemUnitWidth = $("#item_unit_div").width();
+			if($("#item_unit_graph_year").val()){
+				var branchId		= $("#item_unit_branch_ids").val();
+				var requestOptions = {
+					url 	: "<%= list_url%>/average_unit_sold_report",
+					method	: "post",
+					data	: {years : $("#item_unit_graph_year").val(),branch_ids : branchId}
+				};
+				$("#avg_item_unit_sold_mom").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_IMG_URL%>pagination_loader.gif" /></div>');
+				ajaxRequest(requestOptions,function(response){
+					if(response.years.length  > 0){
+						var data = new google.visualization.DataTable();
+						data.addColumn("string", "Month");
+						response.years.map(rec=>{
+							data.addColumn("number", rec);
+						});
+
+						data.addRows(response.result);
+						var options = {
+							width: (itemUnitWidth-50),
+							height: 350,
+							axes: {
+								x: {
+									0: {side: "bottom"}
+								}
+							},
+							legend : {position : "none"},
+						};
+						var chart = new google.charts.Line(document.getElementById("avg_item_unit_sold_mom"));
+						chart.draw(data, google.charts.Line.convertOptions(options));
+					}else{
+						$("#avg_item_unit_sold_mom").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+					}
+				});
+			}else{
+				$("#avg_item_unit_sold_mom").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+			}
+		}//End drawItemUnitChart()
+
+		function drawBasketSizeChart() {
+			var basketSizeWidth = $("#basket_size_div").width();
+			if($("#basket_size_graph_year").val()){
+				var branchId	  = $("#basket_size_branch_ids").val();
+				var requestOptions = {
+					url 	: "<%= list_url%>/average_basket_size_report",
+					method	: "post",
+					data	: {years : $("#basket_size_graph_year").val(),branch_ids : branchId}
+				};
+				$("#average_basket_size_mom").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_IMG_URL%>pagination_loader.gif" /></div>');
+				ajaxRequest(requestOptions,function(response){
+					if(response.years.length  > 0){
+						var data = new google.visualization.DataTable();
+						data.addColumn("string", "Month");
+						response.years.map(rec=>{
+							data.addColumn("number", rec);
+						});
+
+						data.addRows(response.result);
+
+						var options = {
+							width: (basketSizeWidth - 50),
+							height: 350,
+							axes: {
+								x: {
+									0: {side: "bottom"}
+								}
+							},
+							legend : {position : "none"},
+						};
+						var chart = new google.charts.Line(document.getElementById("average_basket_size_mom"));
+						chart.draw(data, google.charts.Line.convertOptions(options));
+					}else{
+						$("#average_basket_size_mom").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+					}
+				});
+			}else{
+				$("#average_basket_size_mom").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+			}
+		}//End drawBasketSizeChart()
+
+		function drawFailRateChart() {
+			var failRateWidth = $("#fail_rate_div").width();
+			if($("#fail_rate_graph_year").val()){
+				var branchId		= $("#fail_rate_branch_ids").val();
+				var requestOptions = {
+					url 	: "<%= list_url%>/fail_rate_graph",
+					method	: "post",
+					data	: {years : $("#fail_rate_graph_year").val(),branch_ids : branchId}
+				};
+				$("#fail_rate_graph").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_IMG_URL%>pagination_loader.gif" /></div>');
+				ajaxRequest(requestOptions,function(response){
+					if(response.years.length  > 0){
+						var data = new google.visualization.DataTable();
+						data.addColumn("string", "Month");
+						data.addColumn("number", '<%= __("reports.total_acceptable_rate"); %>');
+						response.years.map(rec=>{
+							data.addColumn("number", rec);
+						});
+
+						data.addRows(response.result);
+
+						var options = {
+							width : (failRateWidth-50),
+							height: 350,
+							axes  : {
+								x: {
+									0: {side: "bottom"}
+								}
+							},
+							legend: {position: 'none'},
+							vAxis: { format: '#\'%\'' },
+
+						};
+						var chart = new google.charts.Line(document.getElementById("fail_rate_graph"));
+						chart.draw(data, google.charts.Line.convertOptions(options));
+					}else{
+						$("#fail_rate_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+					}
+				});
+			}else{
+				$("#fail_rate_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+			}
+		} //End drawFailRateChart
+
+		function drawOrderFrequencyChart() {
+			var orderFrequencyWidth = $("#order_frequency_div").width();
+			if($("#order_frequency_graph_year").val()){
+				var branchId		= $("#order_frequency_branch_ids").val();
+				var requestOptions = {
+					url 	: "<%= list_url%>/customer_order_frequency_report",
+					method	: "post",
+					data	: {years : $("#order_frequency_graph_year").val(),branch_ids : branchId}
+				};
+				$("#order_frequency_graph").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_IMG_URL%>pagination_loader.gif" /></div>');
+				ajaxRequest(requestOptions,function(response){
+					if(response.years.length  > 0){
+						var data = new google.visualization.DataTable();
+						data.addColumn("string", "Frequency");
+
+						response.years.map(rec => {
+							data.addColumn("number", rec);
+						});
+						data.addRows(response.result);
+
+						var options = {
+							width : (orderFrequencyWidth-50),
+							height: 350,
+							axes  : {
+								x: {
+									0: {side: "bottom"}
+								}
+							},
+							legend: {position: 'none'},
+							vAxis: {
+								title: "Customers",
+								format: '0'
+							},
+							hAxis: {
+								title: "Frequency",
+							},
+
+						};
+						var chart = new google.visualization.ColumnChart(document.getElementById("order_frequency_graph"));
+						chart.draw(data, (options));
+					}else{
+						$("#order_frequency_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+					}
+				});
+			}else{
+				$("#order_frequency_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+			}
+		} //End drawOrderFrequencyChart
+
+		function drawLostRevenueChart() {
+			var lostRevenueWidth = $("#lost_revenue_div").width();
+			if($("#lost_revenue_graph_year").val()){
+				var branchId		= $("#lost_revenue_branch_ids").val();
+				var requestOptions = {
+					url 	: "<%= list_url%>/lost_revenue_graph",
+					method	: "post",
+					data	: {years : $("#lost_revenue_graph_year").val(),branch_ids : branchId}
+				};
+				$("#lost_revenue_graph").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_IMG_URL%>pagination_loader.gif" /></div>');
+				ajaxRequest(requestOptions,function(response){
+					if(response.years.length  > 0){
+						var data = new google.visualization.DataTable();
+						data.addColumn("string", "Month");
+						response.years.map(rec => {
+							data.addColumn("number", rec);
+						});
+						data.addRows(response.result);
+
+						var options = {
+							width : (lostRevenueWidth-50),
+							height: 350,
+							axes  : {
+								x: {
+									0: {side: "bottom"}
+								}
+							},
+							legend: {position: 'none'},
+							vAxis: { format: '# KD' },
+						};
+						var chart = new google.charts.Line(document.getElementById("lost_revenue_graph"));
+						chart.draw(data, google.charts.Line.convertOptions(options));
+					}else{
+						$("#lost_revenue_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+					}
+				});
+			}else{
+				$("#lost_revenue_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+			}
+		} //End drawLostRevenueChart
+
+		function drawRevenueGeneratedChart() {
+			var revenueGeneratedWidth = $("#revenue_generated_div").width();
+			if ($("#revenue_generated_graph_year").val()) {
+				var branchId = $("#revenue_generated_branch_ids").val();
+				var requestOptions = {
+					url		: "<%= list_url%>/revenue_generated",
+					method	: "post",
+					data	: { years: $("#revenue_generated_graph_year").val(), branch_ids: branchId }
+				};
+				$("#revenue_generated_graph").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_IMG_URL%>pagination_loader.gif" /></div>');
+				ajaxRequest(requestOptions, function (response) {
+					if (response.years.length > 0) {
+						var data = new google.visualization.DataTable();
+						data.addColumn("string", "Month");
+						response.years.map(rec => {
+							data.addColumn("number", rec);
+						});
+						data.addRows(response.result);
+
+						var options = {
+							width: (revenueGeneratedWidth - 50),
+							height: 350,
+							axes: {
+								x: {
+									0: { side: "bottom" }
+								}
+							},
+							legend: { position: 'none' },
+						};
+						var chart = new google.charts.Bar(document.getElementById("revenue_generated_graph"));
+						chart.draw(data, google.charts.Bar.convertOptions(options));
+					} else {
+						$("#revenue_generated_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+					}
+				});
+			} else {
+				$("#revenue_generated_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+			}
+		} //End drawRevenueGeneratedChart
+
+		function drawTopContributionChart() {
+			var topContributionWidth = $("#top_contribution_div").width();
+			if ($("#top_contribution_graph_year").val()) {
+				var branchId = $("#top_contribution_branch_ids").val();
+				var requestOptions = {
+					url		: "<%= list_url%>/top_contribution_lost_revenue",
+					method	: "post",
+					data	: { years: $("#top_contribution_graph_year").val(), branch_ids: branchId }
+				};
+				$("#top_contribution_graph").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_IMG_URL%>pagination_loader.gif" /></div>');
+				ajaxRequest(requestOptions, function (response) {
+					if (response.years.length > 0) {
+						var data = new google.visualization.DataTable();
+						data.addColumn("string", "Month");
+						data.addColumn("number", '<%= __("reports.unavailable_items"); %>');
+						data.addColumn("number", '<%= __("reports.shortage_of_delivery_driver"); %>');
+						data.addColumn("number", '<%= __("reports.no_response_from_restaurant"); %>');
+						data.addColumn("number", '<%= __("reports.wrong_order"); %>');
+
+						data.addRows(response.result);
+
+						var options = {
+							width: (topContributionWidth - 50),
+							height: 350,
+							axes: {
+								x: {
+									0: { side: "bottom" }
+								}
+							},
+							legend: { position: 'none' },
+							vAxis: {
+								format: '#',
+								viewWindow: { min: 0 }
+							},
+							bars: 'vertical',
+							isStacked: true
+						};
+						var chart = new google.charts.Bar(document.getElementById("top_contribution_graph"));
+						chart.draw(data, google.charts.Bar.convertOptions(options));
+					} else {
+						$("#top_contribution_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+					}
+				});
+			} else {
+				$("#top_contribution_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+			}
+		} //End drawTopContributionChart
+
+		function drawCancelledBreakdownChart() {
+			var cancelledBreakdownWidth = $("#cancelled_breakdown_div").width();
+			if ($("#cancelled_breakdown_graph_year").val()) {
+				var branchId = $("#cancelled_breakdown_branch_ids").val();
+				var requestOptions = {
+					url		: "<%= list_url%>/cancelled_reason_breakdown_report",
+					method	: "post",
+					data	: { years: $("#cancelled_breakdown_graph_year").val(), branch_ids: branchId }
+				};
+				$("#cancelled_breakdown_graph").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_IMG_URL%>pagination_loader.gif" /></div>');
+				ajaxRequest(requestOptions, function (response) {
+					if (response.years.length > 0) {
+						var data = new google.visualization.DataTable();
+						data.addColumn("string", "Reason");
+
+						response.years.map(rec => {
+							data.addColumn("number", rec);
+						});
+						data.addRows(response.result);
+
+						var options = {
+							width: (cancelledBreakdownWidth - 50),
+							height: 350,
+							axes: {
+								x: {
+									0: { side: "bottom" }
+								}
+							},
+							hAxis: {
+								format: '#',
+								viewWindow: { min: 0 }
+							},
+							legend: { position: 'none' },
+							bars: 'horizontal',
+						};
+						var chart = new google.charts.Bar(document.getElementById("cancelled_breakdown_graph"));
+						chart.draw(data, google.charts.Bar.convertOptions(options));
+					} else {
+						$("#cancelled_breakdown_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+					}
+				});
+			} else {
+				$("#cancelled_breakdown_graph").html("<h4 class='text-center'> <%= __('reports.no_data_available')%></h4>");
+			}
+		} //End drawCancelledBreakdownChart
+
+		var MIN_YEAR_FOR_REPORT = parseInt("<%=MIN_YEAR_FOR_REPORT%>");
+		function getYearDropdown(){
+			$(".graph_year").each(function(){
+				var boxId = this.id;
+				var currentYear = new Date().getFullYear();
+				var yearsOption = "";
+				for(yearValue=currentYear; yearValue >= MIN_YEAR_FOR_REPORT; yearValue--){
+					var selectText = (yearValue == currentYear) ? "selected" : "";
+					yearsOption = '<option value="'+yearValue+'" '+selectText+'>'+yearValue+'</option>';
+					$("#"+boxId).append(yearsOption);
+					$("#"+boxId).selectpicker("refresh");
+
+				}
+			});
+		};
+		getYearDropdown();
+	</script>
+

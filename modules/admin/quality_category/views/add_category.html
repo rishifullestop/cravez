@@ -1,0 +1,125 @@
+<%
+  var result            =   (typeof result !== typeof undefined && result)      ? result    :{};
+  var isEditable        =   (typeof is_editable !== typeof undefined && is_editable) ?  is_editable :"";
+  let parentCategorysId =   (parent_category_id) ? parent_category_id :0;
+  let categorysId       =   (result._id) ? result._id :'';
+  let actionUrl         =   admin_list_url+"/add/"+parentCategorysId;
+  if(isEditable) actionUrl = admin_list_url+"/edit/"+categorysId+"/"+parentCategorysId;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-category" action="<%=actionUrl%>" data-submit-btn-id="category-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog  modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.category.edit_category") : __("admin.category.add_category"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+                        <div class="row clearfix">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="category_name" class="control-label">
+                                            <%= __("admin.quality_category.category"); %><span class="required"> *</span>
+                                        </label>
+                                        <input type="hidden" name="parent_category_id" id="parent_category_id" value="<%=(result.parent_category_id) ? result.parent_category_id :0%>" />
+                                        <input type="text" id="category_name" class="form-control" name="category_name" value="<%=(result.category_name) ? result.category_name :''%>"/>
+                                    </div>
+                                    <span id="category_name_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <%  if(breadcrumbData && breadcrumbData.length > 1 ){  %>
+                            <div class="row clearfix">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="form-line">
+                                            <label for="category_percentage" class="control-label">
+                                                <%= __("admin.quality_category.category_percentage"); %><span class="required"> *</span>
+                                            </label>
+                                            <input type="text" id="category_percentage" class="form-control" name="category_percentage" value="<%=(result.category_percentage) ? result.category_percentage :''%>"/>
+                                        </div>
+                                        <span id="category_percentage_error" class="error"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                        <% if(CATEGORY_ADD_ORDER) { %>
+                            <div class="row clearfix">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="form-line">
+                                            <label for="order" class="control-label">
+                                            <%= __("admin.category.order"); %><span class="required"> *</span>
+                                            </label>
+                                            <input type="text" id="order" class="form-control" name="order" value="<%=(result.order) ? result.order :''%>"/>
+                                        </div>
+                                        <span id="order_error" class="error"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                        <% if(CATEGORY_ADD_IMAGE) { %>
+                            <div class="row clearfix">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="">
+                                        <label for="category_image" class="control-label">
+                                            <%= __("admin.category.image"); %><span class="required"> *</span>
+                                        </label>
+                                        <% var oldImage = (result.category_image) ? result.category_image :''; %>
+                                        <input name="old_image" id="old_image" type="hidden" class="form-control"  value="<%=oldImage %>"/>
+                                        <input type="file" id="category_image" class="form-control" name="category_image" />
+                                        <% if(typeof result.category_image !== typeof undefined && result.category_image != ""){ %>
+                                            <a href="<%= CATEGORY_URL %><%= result.category_image %>" class="items-image img-thumbnail" data-lightbox="roadtrip">
+                                            <img src="<%= CATEGORY_URL %><%= result.category_image%>" alt="Category image" class="set_image_big_dim" />
+                                            </a>
+                                        <% } %>
+                                        </div>
+                                        <span id="category_image_error" class="error"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="category-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink  btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							 <%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+    $(()=>{
+        $(".show-tick").selectpicker('refresh');
+    });
+    /**
+     * Function to submit form
+     */
+    var isEditable = '<%=isEditable%>'
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-category',function(status,response){
+			if(status){
+				$('#form_modal').modal("hide");
+				if(isEditable){
+					if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+					if(response.status && response.message) notice(response.status,response.message);
+				}else{
+					$("#reset").trigger("click");
+				}
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+</script>

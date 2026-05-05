@@ -1,0 +1,147 @@
+<%
+	var result 		     = 	result;
+	var selectedCuisines = 	selected_cuisines;
+	var cuisineCount	 =  cuisine_count;
+%>
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <form action="<%=admin_list_url+'/'+restaurant_id+'/'+branch_id+'/select_cuisine_priority'%>" data-modal-id="form_modal" id="select_cuisine_priority_form" data-submit-btn-id="select_cuisine_priority_btn"
+            method="post" class="on_click_submit" role="form">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-seperator p-l-20 p-b-0">
+                        <h2 class="modal-title">
+                            <%= __("admin.cuisine_priorities.select_cuisine_priority"); %>
+                        </h2>
+                    </div>
+                    <div class="modal-body padding-20 scroll-body">
+                        <div class="row clearfix">
+                            <div class="col-sm-12 body">
+                                <table id="datatable-add-cuisine-priority" class="row-border full-length-header hover table table-bordered cb-data-table datatable"
+                                    cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%">
+                                                <div class="materialize_checkbox list-checkbox">
+                                                    <div class="checkbox_wrapper">
+                                                        <input class="filled-in chk-col-pink " id="list-checkbox-head" type="checkbox">
+                                                        <label for="list-checkbox-head" class="checkbox list-checkbox p-l-20"></label>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <th><%= __("admin.cuisine_priorities.cuisine_name");%></th>
+                                            <th><%= __("admin.cuisine_priorities.order");%></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+										<% result.map((record, index)=>{ %>
+											<tr>
+												<td>
+													<div class="materialize_checkbox list-checkbox m-t-15">
+														<div class="checkbox_wrapper">
+															<%
+																let cuisineId   = (record._id) ? record._id : "";
+																let found       = selectedCuisines.find(element => element.cuisine_id == cuisineId.toString());
+															%>
+															<input class="filled-in chk-col-pink list-checkbox-input" <%=(found) ? 'checked' : '';%> id="list-checkbox-<%=index%>" name="data[<%=index%>][cuisine_id]" type="checkbox" value="<%=cuisineId%>" tabIndex="-1">
+															<label for="list-checkbox-<%=index%>" class="checkbox list-checkbox p-l-20"></label>
+														</div>
+													</div>
+												</td>
+												<td><%=(record.name[DEFAULT_LANGUAGE_CODE]) ? record.name[DEFAULT_LANGUAGE_CODE] : ""%></td>
+												<td>
+													<input type="text" id="order" class="form-control" name="data[<%=index%>][order]" value="<%=(record.order) ? record.order : ''%>"/>
+													<span id="order_<%=index%>_error" class="error model_select_error"></span>
+												</td>
+											</tr>
+										<% }); %>
+                                    </tbody>
+                                </table>
+                                <span id="cuisine_id_error" class="error model_select_error"></span>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="select_cuisine_priority_btn" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %>>
+                            <%= __("admin.system.submit"); %>
+                        </button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		/** For initialization of modal datatable */
+		var dataTable = $('#datatable-add-cuisine-priority').DataTable({
+			"order"     :   false,
+			"sDom"      :   "ftr",
+			"serverSide":   false,
+			"scrollX"   :   false,
+			"paging"	:	false,
+			"columnDefs": [
+				{ orderable: false, "targets": [ 0 ] }
+			]
+		});
+
+		/** For check all checkboxes functionality */
+		$('#list-checkbox-head').on('click', function(){
+			if($(this).is(':checked')){
+				$('.checkbox_wrapper').find('input:checkbox').prop('checked', true);
+			}else{
+				$('.checkbox_wrapper').find('input:checkbox').prop('checked', false);
+			}
+		});
+
+		/** On page ready all checkboxes checked then top header checkbox automatically check */
+		if ($('.list-checkbox-input').length == $('.list-checkbox-input:checked').length) {
+			$('#list-checkbox-head').prop('checked', true);
+		}
+
+		/** When all list checkboxes checked then head checkbox automatically check */
+		$(document).on('click', '.list-checkbox-input', function(e){
+			let totalCheckbox   =   $('.list-checkbox-input').length;
+			let checkedChekboxes=   $('.list-checkbox-input:checked').length;
+			let selectAll       =   (totalCheckbox == checkedChekboxes) ? true : false;
+			$("#list-checkbox-head").prop("checked",selectAll);
+		});
+	});
+
+	/** For submit form  */
+	$(".btn-submit").click(function () {
+		var btnId = $(this).attr("id");
+		<% if(cuisineCount > 0) { %>
+			confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.cuisine_priorities.you_want_to_submit_form"); %>',function(result){
+				startTextLoading(btnId);
+				swal.close();
+				submitForm();
+			});
+		<% }else { %>
+			startTextLoading(btnId);
+			submitForm();
+		<% } %>
+		
+		/** Function for ajax call  */
+		function submitForm(){
+			ajax_submit("select_cuisine_priority_form", function (status, response) {
+				if (status) {
+					$("#reset").trigger("click");
+				} else {
+					stopTextLoading(btnId);
+				}
+			});
+		}
+	});
+
+	/** For scroll model body  **/
+	$(".scroll-body").mCustomScrollbar({
+		theme			:"dark-3",
+		mouseWheelPixels: 400
+	});
+
+</script>

@@ -1,0 +1,388 @@
+<%
+	var statusType = (typeof status_type !== typeof undefined && status_type)	?	status_type :"";
+%>
+<div class="container-fluid">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<div class="row clearfix dataTables_wrapper">
+								<!-- Search by Name -->
+								<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.user.search_by_name'); %>" name="name">
+										</div>
+									</div>
+								</div>
+								<!-- Search by Email -->
+								<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_1" onkeyup="searchDatatable(1)" placeholder="<%= __('admin.user.search_by_email'); %>" name="email">
+										</div>
+									</div>
+								</div>
+								<!-- Search by Mobile Number -->
+								<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_2" onkeyup="searchDatatable(2)" placeholder="<%= __('admin.user.search_by_phone_number'); %>" name="mobile_number">
+											<input class="form-control hide" type="text" name="export_type" id="export_type">
+										</div>
+									</div>
+								</div>
+								<!-- Search by Status -->
+								<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick search_by_status" id="status_search" name="status">
+												<option value=""><%=__("admin.user.search_by_status");%></option>
+												<%
+												if(typeof USER_STATUS_SEARCH_DROPDOWN!== typeof undefined && USER_STATUS_SEARCH_DROPDOWN.length > 0){
+													USER_STATUS_SEARCH_DROPDOWN.map(searchStatus=>{
+														var selectedFlag	= (typeof searchStatus.status_type !== typeof undefined && searchStatus.status_type  && searchStatus.status_type == statusType)	? "selected" : "";
+														%>
+														<option value="<%=searchStatus.status_id%>"  <%=selectedFlag%>><%=searchStatus.status_name%></option>
+												<% 	});
+												} %>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- Search by Date Range -->
+								<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.user.search_by_registration_date'); %>">
+										</div>
+										<input class="form-control hide" id="from_date" type="text" name="from_date">
+										<input class="form-control hide" id="to_date" type="text" name="to_date">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.user.user_management") %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin visible-md visible-lg visible-sm">
+						<li>
+							<select class="export-details form-control border-bottom">
+								<option value=""><%= __("admin.system.select_export_type"); %></option>
+								<option value="<%=EXPORT_ALL%>"><%= __("admin.system.export_all"); %></option>
+								<option value="<%=EXPORT_FILTERED%>"><%= __("admin.system.export_filtered"); %></option>
+							</select>
+						</li>
+						<li>
+							<a href="<%=admin_list_url%>/add" class="m-l-10">
+								<button type="button" class="btn bg-indigo waves-effect">
+									<%= __("admin.user.add_user"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+					<!-- Only For Mobile View-->
+					<ul class="header-dropdown m-r--5 visible-xs">
+						<li class="dropdown">
+							<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							</a>
+							<ul class="dropdown-menu pull-right m-w-200">
+								<li>
+									<a href="<%=admin_list_url+'/competitions/export_data/'+export_count+'/'+EXPORT_ALL%>" data-test="<%=admin_list_url+'/competitions/export_data/'+export_count+'/'+EXPORT_ALL%>">
+										<%= __('admin.system.export_all'); %>
+									</a>
+								</li>
+								<li>
+									<a href="<%=admin_list_url+'/competitions/export_data/'+export_count+'/'+EXPORT_FILTERED%>">
+										<%= __('admin.system.export_filtered'); %>
+									</a>
+								</li>
+								<li>
+									<a href="<%=admin_list_url+"/add/"%>">
+										<%= __("admin.user.add_user"); %>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __('admin.user.name'); %></th>
+								<th><%= __('admin.user.email'); %></th>
+								<th><%= __('admin.user.phone_number'); %></th>
+								<th><%= __('admin.system.status'); %></th>
+								<th><%= __('admin.user.registered_date'); %></th>
+								<th> <%= __('admin.system.action'); %>	</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+		/**
+		* Function to initialize datatable and get server side data
+		*/
+		var dataTable = "";
+		$(document).ready(function() {
+			dataTable = $('#datatable-listing').DataTable({
+				"order"		: [[4, "desc" ]],
+				"sDom"		: "ltipr",
+				"lengthMenu": PAGING_LENGTH_MENU,
+				"serverSide": true,
+				"scrollX"	: true,
+				"columns"	: [
+					{
+						"data": 'full_name'
+					},
+					{
+						"data" 		: "email",
+						"orderable"	: false,
+						"render" 	: function(email){
+							return 	(email)	?	'<a href="mailto:'+email+'">'+email+'</a>'	:email;
+						}
+					},
+					{
+						"data"		: "mobile_number",
+						"orderable"	: false,
+						"render" 	: function(mobileNumber){
+							return "<span class='white-space-nowrap'>"+mobileNumber+"</span>";
+						}
+					},
+					{
+						"data"			: {},
+						"orderable"		: false,
+						"searchable"	: false,
+						"render": function(result){
+							var active 		= (result && result.active)		 ?	result.active		: "";
+							var isVerified 	= (result && result.is_verified) ?	result.is_verified	: "";
+
+							/** Active Status **/
+							var statusTab	= (active == '<%=ACTIVE%>')	? '<span class="label label-success m-l-5 m-t-5"><%=__("admin.system.active")%></span>': '<span class="label label-danger m-l-5 m-t-5"><%=__("admin.system.inactive")%></span>';
+							statusTab		+=	'<br/>';
+
+							/** Verified Status **/
+							statusTab	+=	(isVerified == '<%=VERIFIED%>') ?	'<span class="label label-info m-l-5 m-t-5"><%=__("admin.user.email_verified")%></span>': '<span class="label label-warning m-l-5 m-t-5"><%=__("admin.user.email_not_verified")%></span>';
+							return statusTab;
+						}
+					},
+					{
+						"data"			: 'created',
+						"render" 		: function(created){
+							return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"			: {},
+						"orderable"		: false,
+						"searchable"	: false,
+						"render" 		: function(result){
+							var id 			= (result._id)			? result._id			: "";
+							var status		= (result.active)		? result.active			: "<%=DEACTIVE%>";
+							var verified 	= (result.is_verified)	? result.is_verified	: "<%=NOT_VERIFIED%>";
+
+							/** Status Link Label And Class **/
+							var statusLinkText  =	(status == '<%= DEACTIVE %>') ?	"<%= __('admin.system.activate'); %>"			: "<%= __('admin.system.deactive'); %>" ;
+							var statusLinkTitle =	(status == '<%= DEACTIVE %>') ? "<%= __('admin.system.click_to_activate'); %>"  : "<%= __('admin.system.click_to_deactivate'); %>" ;
+							var statusLinkIcon  =	(status == '<%= DEACTIVE %>') ?	"done"	: "block";
+
+							/** Verify Link Class **/
+							var verifyClass	= (verified == "<%= VERIFIED%>")	?	"hide"	:"";
+
+							var dropDownButton 	=	''+
+							'<div class="btn-group m-l-5 m-t-5">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %>'+
+									' <span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu min-width-190">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/edit/'+id+'" class="waves-effect waves-block">'+
+											'<%= __("admin.system.edit"); %>'+
+										'</a>'+
+									'</li>'+
+									/** View Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/view/'+id+'" class="waves-effect waves-block">'+
+											'<%= __("admin.system.view"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Status Link  **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/update_user_status/'+id+'/'+status+'/<%=ACTIVE_INACTIVE_STATUS%>" class=" waves-effect waves-block confirm_box" data-confirm-message="<%= __("admin.user.do_you_want_to_change_status"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+statusLinkTitle+'">'+
+											''+
+											statusLinkText+
+										'</a>'+
+									'</li>'+
+									/** Delete Link */
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete/'+id+'" class="waves-effect waves-block confirm_box" data-confirm-message="<%= __("admin.user.do_you_want_to_delete"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+											'<%= __("admin.system.delete"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Verify Link **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/update_verified_user_status/'+id+'"  class="waves-effect waves-block confirm_box '+verifyClass+'" data-confirm-message="<%= __("admin.user.do_you_want_to_verify"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+											'<%= __("admin.user.verify"); %>'+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+						}
+					},
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url+"/"+statusType%>",
+					type	: 	"POST",
+					data	: 	function (d) {
+				        d.fromDate 			= $('#from_date').val();
+				        d.toDate 			= $('#to_date').val();
+				        d.status_search		= $('#status_search').val();
+						d.kyc_status_search	= $('#kyc_status_search').val();
+						d.export_count		= <%= export_count %>;
+					},
+					dataSrc	: function(res){
+						return res.data;
+					}
+				}
+			});
+
+			/**
+			 * For date range picker in searching
+			 */
+			var DATE_FORMAT = "<%=DATE_RANGE_DATE_FORMAT%>";
+			var START_DATE	= (typeof dateFrom !== typeof undefined && dateFrom!="") ?	new Date(dateFrom) 	: new Date();
+			var END_DATE	= (typeof dateTo !==typeof  undefined && dateTo!="" ) ?	new Date(dateTo) : new Date();
+			var OPENS		= "right";
+			var options		= {};
+
+			/**Options for date range picker*/
+			options.locale = {
+				format		: 	DATE_FORMAT,
+				cancelLabel	:	"<%= __('admin.date_picker.cancel_label')%>"
+			};
+
+			options.startDate		= 	START_DATE;
+			options.endDate			= 	END_DATE;
+			options.opens			= 	OPENS;
+			options.autoUpdateInput	= 	false;
+			options.maxDate			= 	new Date();
+
+			var configDemo = $('#date-range-picker');
+			configDemo.daterangepicker(options, function (start, end, label) {
+				var start_date	= start.format('<%=DATE_RANGE_DATE_FORMAT%>');
+				var end_date	= end.format('<%=DATE_RANGE_DATE_FORMAT%>');
+			});
+
+			/**
+			* Applying date range filter on user details
+			*
+			* @param  null
+			*
+			* @return void
+			*/
+			configDemo.on('apply.daterangepicker', function(e,picker){
+				var startDate	= picker.startDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+				var endDate		= picker.endDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_END_DATE%>');
+
+				$('#from_date').val(startDate);
+				$('#to_date').val(endDate);
+
+				var displayStartDate 	=	picker.startDate.format('<%=DATEPICKER_DATE_FORMAT%>');
+				var displayEndDate 		= 	picker.endDate.format('<%=DATEPICKER_DATE_FORMAT%>');
+				$('#date-range-picker').val(displayStartDate+" - "+displayEndDate);
+				dataTable.draw();
+			});
+
+			/**
+			* Unset date range picker value when click to "clear" button
+			*
+			* @param  null
+			*
+			* @return void
+			*/
+			configDemo.on('cancel.daterangepicker',function(e){
+				configDemo.data('daterangepicker').setStartDate(new Date());
+				configDemo.data('daterangepicker').setEndDate(new Date());
+
+				$('#from_date').val("");
+				$('#to_date').val("");
+				$('#date-range-picker').val("");
+				dataTable.draw();
+			});
+
+			/**
+			* Search by status
+			*
+			* @param  null
+			*
+			* @return void
+			*/
+			$(".search_by_status").change(function(){
+				dataTable.draw();
+			});
+
+			/**
+			* Export Details action
+			*
+			* @param  null
+			*
+			* @return void
+			*/
+			$(document).on("change",".export-details",function(){
+				var type = $(this).val();
+				if(type && type!=""){
+					$(this).val("");
+					window.location.href="<%=admin_list_url%>/export_data/<%= export_count %>/"+type;
+				}
+			});
+		});
+
+		/**
+		* Javascript function to search datatable
+		*
+		* @param  columnNumber as data table column number
+		*
+		* @return void
+		*/
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>

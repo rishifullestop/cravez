@@ -1,0 +1,201 @@
+<%
+	var result 		= (result) ? result   : {};
+	var isEditable  = (typeof is_editable !== typeof undefined && is_editable) ? is_editable : "";
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= (isEditable) ? __("admin.user_management.edit_driver") : __("admin.user_management.add_driver"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>/list_driver" ><button type="button" class="btn btn-sm bg-indigo waves-effect"> <%= __("admin.system.back"); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="add-driver" data-submit-btn-id="driver-add-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="<%=(isEditable) ? 'col-sm-4' :'col-sm-6'; %>">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="image" class="control-label">
+											<%= __("admin.user_management.photo"); %>
+											<% if(!isEditable) { %>
+												<span class="required"> *</span> :
+											<% } %>
+										</label>
+										<input type="file" data-input="false" name="image" class="form-control cfilestyle" id="image" />
+										<span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('admin.user_management.extension_and_size_suggestion_message',ALLOWED_IMAGE_EXTENSIONS.join(', '))%>">
+											<i class="material-icons">info</i>
+										</span>
+										<input type="hidden" name="old_image" value="<%=result.image%>">
+									</div>
+									<span id="image_error" class="error"></span>
+								</div>
+							</div>
+							<% if(isEditable) { %>
+								<div class="col-sm-2">
+									<a href="<%=result.full_image_path%>" class="item-image" data-lightbox="roadtrip">
+										<img class="img-thumbnail pull-right set_image_dim" src="<%=result.full_image_path%>" alt="Driver Image"></td>
+									</a>
+								</div>
+							<% } %>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="driver_id" class="control-label"><%= __('admin.user_management.driver_id'); %><span class="required">*</span> :</label>
+										<input name="driver_id" id="driver_id" type="text" class="form-control" value="<%=(driver_id) ? driver_id : result.driver_id%>" />
+									</div>
+									<span id="driver_id_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="first_name" class="control-label"><%= __('admin.user_management.first_name'); %><span class="required">*</span> :</label>
+										<input name="first_name" id="first_name" type="text" value="<%=result.first_name%>" class="form-control"/>
+									</div>
+									<span id="first_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="last_name" class="control-label"><%= __('admin.user_management.last_name'); %><span class="required">*</span> :</label>
+										<input name="last_name" id="last_name" type="text" class="form-control" value="<%=result.last_name%>"/>
+									</div>
+									<span id="last_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="email" class="control-label"><%= __('admin.user_management.user_name'); %><span class="required">*</span> :</label>
+										<input name="email" id="email" type="text" class="form-control" value="<%=result.email%>"/>
+									</div>
+									<span id="email_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="mobile_number" class="control-label"><%= __('admin.user_management.phone_number'); %><span class="required">* </span> :</label>
+										<input name="mobile_number" id="mobile_number" type="text" class="form-control" value="<%=result.mobile_number%>" />
+									</div>
+									<span id="mobile_number_error" class="error"></span>
+								</div>
+							</div>
+						</div><%
+						if(isEditable){ %>
+							<div class="row clearfix">
+								<div class="col-sm-12">
+									<div class="alert alert-info">
+										 <%= __('admin.user_management.please_leave_blank_if_you_do_not_want_to_change_password'); %>
+									</div>
+								</div>
+							</div><%
+						} %>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="password" class="control-label"><%= __('admin.user_management.password'); %>
+										<%
+										if(!isEditable){ %>
+											<span class="required"> * </span><%
+										}%>
+										 :</label>
+										<input name="password" id="password" type="password" class="form-control"/>
+									</div>
+									<span id="password_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="confirm_password" class="control-label"><%= __('admin.user_management.confirm_password'); %>
+										<%
+										if(!isEditable){ %>
+											<span class="required"> * </span><%
+										}%> :</label>
+										<input name="confirm_password" id="confirm_password" type="password" class="form-control"/>
+									</div>
+									<span id="confirm_password_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<button type="button" id="driver-add-btn-id" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit" >
+							<%= __('admin.system.submit'); %>
+						</button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css" rel="stylesheet">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		/** file browser **/
+		customFileStyle();
+
+		/**
+		 * Function to submit form
+		 */
+		$(".btn-submit").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			ajax_submit("add-driver",function(status,response){
+				if(response.exists){
+					var existId	=	response.exist_id;
+					swal({
+						title: '<%= __("admin.user_management.user_name_or_mobile_number_already_exists")%>',
+						text: "<%- __("admin.user_management.want_to_reclaim")%>",
+						type: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: "#DD6B55",
+						confirmButtonText: "<%= __("admin.user_management.reclaim")%>",
+						closeOnConfirm: false,
+						showLoaderOnConfirm: true,
+					}, function (isConfirm) {
+						if (isConfirm) {
+							var options		= {
+								url 	: "<%=admin_list_url%>/reclaim/"+existId,
+								method	: "POST"
+							}
+							ajaxRequest(options,function(response){
+								if(response){
+									window.location.href = '<%= admin_list_url%>/list_driver'
+								}
+							});
+						}else{
+							stopTextLoading(btnId);
+						}
+					});
+				}else{
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						stopTextLoading(btnId);
+					}
+				}
+			});
+		});
+	});
+</script>

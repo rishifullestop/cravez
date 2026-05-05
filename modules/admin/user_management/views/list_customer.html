@@ -1,0 +1,273 @@
+<%
+	var result			= (typeof result !== typeof undefined && result)	?	result	: "";
+	var status			= (typeof status !== typeof undefined && status)	?	status	: "";
+	var blacklisted		= (typeof blacklisted !== typeof undefined && blacklisted)	?	blacklisted	: "";
+	var newUsers		= (typeof new_users !== typeof undefined && new_users)	?	new_users	: "";
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __('admin.system.search'); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm">
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by Name -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0" onkeyup="searchDatatable(0)" placeholder="<%= __('admin.user_management.search_by_first_name'); %>" name="name">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Email -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_1" onkeyup="searchDatatable(1)" placeholder="<%= __('admin.user_management.search_by_email'); %>" name="email">
+											</div>
+										</div>
+									</div>
+									<!-- Search by Mobile number -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_2" onkeyup="searchDatatable(2)" placeholder="<%= __('admin.user_management.search_by_mobile_number'); %>" name="search_mobile">
+											</div>
+										</div>
+									</div>
+									<!-- Search by status -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="column_filter_3"  onChange="searchDatatable(3)" name="branch_status_search">
+													<option value=""><%=__("categories.search_by_status");%></option>
+														<%
+														Object.keys(GLOBAL_STATUS_SEARCH_DROPDOWN).map(key=>{
+															var selected	=	(key == status) ? 'selected' : '';%>
+															<option value="<%=key%>" <%= selected%>>
+																<%= GLOBAL_STATUS_SEARCH_DROPDOWN[key].status_name%>
+															</option> <%
+														}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- datatable reset -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<button type="button" data-href="<%= admin_list_url+'/list_customer'%>" id="reset" class="btn btn-danger btn-sm waves-effect"><%= __("admin.system.reset")%></button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.user_management.customer_management"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>/add_customer" class="<%= getPermissionClass(module_type,['customer_management','add']); %>">
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __('admin.user_management.add_customer'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<tr>
+									<th width="20%"><%= __("admin.user_management.full_name"); %></th>
+									<th width="20%"><%= __("admin.user_management.email"); %></th>
+									<th width="20%"><%= __("admin.user_management.phone_number"); %></th>
+									<th width="10%"><%= __("admin.system.status"); %></th>
+									<th width="15%"><%= __("admin.system.modified"); %></th>
+									<th width="15%"><%= __("admin.system.action"); %></th>
+								</tr>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable ="";
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem('DataTables', JSON.stringify(oData));
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse(localStorage.getItem('DataTables'));
+				},
+				"order"		: 	[[4, "desc"]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":   PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{"data": 'full_name' },
+					{
+						"data"		: 'email',
+						"render" 	: function(email){
+							return 	(email)	? '<a href="mailto:'+email+'">'+email+'</a>' :email;
+						}
+					},
+					{
+						"data" : "mobile_number",
+						"orderable"		: false,
+					},
+					{
+						"data"			: {},
+						"orderable"		: false,
+						"field_name"	: "active",
+						"field_type"	: "<%= NUMERIC_FIELD %>",
+						"render"		: function(result){
+							let isGuest 	= (result.is_guest) 	 ? result.is_guest 			: "";
+							let isBlackList = (result.is_black_list) ? result.is_black_list 	: "";
+							let html 		= (result.active && result.active == "<%=ACTIVE%>")	? '<span class="label label-success m-l-5 m-t-5"><%=__("admin.system.active")%></span>': '<span class="label label-danger m-l-5 m-t-5"><%=__("admin.system.inactive")%></span>';
+							let guestStatus 	= (isGuest == true)		? '<span class="label label-warning m-l-5 m-t-5"><%=__("admin.user_management.guest_user")%></span>': '';
+							let blacklistStatus = (isBlackList == true)	? '<span class="label label-warning m-l-5 m-t-5"><%=__("admin.user_management.black_listed")%></span>': '';
+
+							return html+guestStatus+blacklistStatus;
+						}
+					},
+					{
+						"data"			: 'modified',
+						"searchable"	: false,
+						"render" 		: function(modified){
+							return moment(modified).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+						}
+					},
+					{
+						"data"			: {},
+						"orderable"		: false,
+						"searchable"	: false,
+						"render" 		: function(result){
+							var id 			= (result._id) 			? result._id 				: "";
+							var status		= (result.active)		? result.active				: "<%=DEACTIVE%>";
+							var clientType 	= (result.client_type) 	? result.client_type 		: "";
+							var isBlackList	= (result.is_black_list == true ) ? "<%=BLACKLISTED%>"	: "<%=NOT_BLACKLISTED%>";
+
+							/** Status Link  **/
+							var statusLinkText  = (status == "<%= DEACTIVE %>") ? "<%= __('admin.system.activate'); %>"				: "<%= __('admin.system.deactive'); %>" ;
+							var statusLinkTitle = (status == "<%= DEACTIVE %>") ? "<%= __('admin.system.click_to_activate'); %>"  	: "<%= __('admin.system.click_to_deactivate'); %>" ;
+							var statusLinkIcon  = (status == "<%= DEACTIVE %>") ? "done"	: "block";
+
+							/** Black list Status link text, title and  link icon **/
+							var blackListStatusLinkText  =	(isBlackList == '<%=NOT_BLACKLISTED%>') ? "<%= __('admin.user_management.mark_user_as_blacklist'); %>" 		 : "<%= __('admin.user_management.remove_user_from_blacklist'); %>";
+							var blackListStatusLinkTitle =  (isBlackList == '<%=NOT_BLACKLISTED%>') ? "<%= __('admin.user_management.click_to_mark_user_as_blacklist'); %>" : "<%= __('admin.user_management.click_to_remove_user_from_blacklist'); %>";
+
+							var dropDownButton 		=	''+
+							'<div class="btn-group">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %> '+
+									'<span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/edit_customer/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["customer_management","edit"]); %>">'+
+											' <%= __("admin.system.edit"); %>'+
+										'</a>'+
+									'</li>'+
+									/** View Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/view_customer/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["user_detail","customer_detail"]); %>">'+
+											' <%= __("admin.system.view"); %>'+
+										'</a>'+
+									'</li>'+
+									/** Status Link  **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/update-customer-status/'+id+'/'+status+'" class=" waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["customer_management","active_deactive"]); %>" data-confirm-message="<%= __("admin.user_management.you_want_to_change_customer_status"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+statusLinkTitle+'">'+
+											''+
+											statusLinkText+
+										'</a>'+
+									'</li>'+
+									/** Assign category link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/assign_category/'+id+'" data-open-modal="true" class="action-btn waves-effect waves-block <%= getPermissionClass(module_type,["customer_management","assign_category"]); %>">'+
+										' <%= __("admin.user_management.assign_category"); %>'+
+									'</li>'+
+									/** black list Status Link  **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/update-customer-black-list/'+id+'/'+isBlackList+'" class=" waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["customer_management","blacklist"]); %>" data-confirm-message="<%= __("admin.user_management.you_want_to_change_customer_black_list"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" title="'+blackListStatusLinkTitle+'">'+
+											''+
+											blackListStatusLinkText+
+										'</a>'+
+									'</li>';
+									/** Delete Link */
+									dropDownButton +='<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete_customer/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["customer_management","delete"]); %>" data-confirm-message="<%= __("admin.user_management.you_want_to_delete_this_customer"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+											'<%= __("admin.system.delete"); %>'+
+										'</a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+						}
+					},
+				],
+				"ajax":{
+					url 	: "<%=admin_list_url%>/list_customer?active=<%= status%>&blacklisted=<%= blacklisted%>&corporate_id=<%= corporate_id%>&new_users=<%= newUsers%>",
+					type	: "POST",
+					data: function (d) {
+
+					},
+					dataSrc	: function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			if(columnNumber == 2 ){
+				var mobileNumberLength = $('#column_filter_'+columnNumber).val().length;
+				if(mobileNumberLength >= 3 || mobileNumberLength == 0){
+					var query= $('#column_filter_'+columnNumber).val();
+					dataTable.column(columnNumber).search(query).draw()
+				}
+			}else{
+				var query= $('#column_filter_'+columnNumber).val();
+				dataTable.column(columnNumber).search(query).draw()
+			}
+		}//end searchDatatable()
+
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

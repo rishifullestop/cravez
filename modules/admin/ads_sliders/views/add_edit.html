@@ -1,0 +1,329 @@
+<%
+var result 		= (result) ? result   : {};
+var isEditable  = (typeof is_editable !== typeof undefined && is_editable) ? is_editable : "";
+var pos 		= (result.position) ? result.position : 0;
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix" >
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= (isEditable) ? __("admin.ads_sliders.edit") : __("admin.ads_sliders.add"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>">
+								<button type="button" class="btn bg-indigo btn-sm waves-effect">
+									 <%= __("admin.system.back"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="add-ads"  data-submit-btn-id="ads-add-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="ad_position" class="control-label">
+											<%= __("admin.ads_sliders.ad_position"); %>
+											<span class="required"> *</span> :
+										</label>
+										<select id="ad_position" name="ad_position" class="form-control"
+											data-blank-error="<%=__('admin.ads_sliders.please_select_ad_position')%>" <%=(isEditable) ? 'disabled' :""%> >
+											<option value=""><%= __("admin.ads_sliders.select_ad_position") %></option>
+											<% Object.keys(ADS_POSITION).map(positionVal=>{
+												var selected = (pos == positionVal) ? 'selected':""%>
+											<option value="<%=positionVal%>" <%=selected%>><%= ADS_POSITION[positionVal] %></option>
+											<% }); %>
+										</select>
+										<%if(isEditable){%>
+										<input type="hidden" name="ad_position" value="<%=pos%>">
+										<%}%>
+									</div>
+									<span id="ad_position_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="image-add"> <!--  edit add more html -->
+								<% var i = 0; %>
+								<%if(isEditable && result.image && result.image.length > 0) {%>
+									<%result.image.map((records,index)=>{  %>
+										<% let imgNumbers = index+1;  %>
+											<div id="add_image_<%= imgNumbers %>" class="image-pointer" data-val="<%= imgNumbers %>">
+												<div class="col-sm-4">
+													<hr/>
+													<div class="form-group m-t-40">
+														<div class="form-lie">
+															<label for="image" class="control-label label_index_image">
+																<%= __("admin.ads_sliders.image"); %>
+																<span class="required"> *</span>
+															</label>
+															<input type="file" name="image_<%= imgNumbers %>" class="form-control filestyle" id="image_<%= imgNumbers %>" />
+															<span class='tooltipShow tooltipHelp brand-tooltip m-t-60' title="" id="img_<%= imgNumbers %>" data-html="true" data-toggle="tooltip"
+																data-original-title='<%= __("system.extension_and_size_suggestion_message", ALLOWED_IMAGE_EXTENSIONS.join(", "), POSITION_1_IMAGE_RESOLUTION) %>'>
+																<i class="material-icons">info</i>
+															</span>
+															<input type="hidden" name="data[image][<%= imgNumbers %>][_id]" value="<%= records._id %>" />
+
+															<input type="hidden" name="data[image][<%= imgNumbers %>][image_val_index]" value="<%= imgNumbers %>" />
+														</div>
+														<span id="image_<%= imgNumbers %>_error" class="error"></span>
+													</div>
+												</div>
+												<div class="col-sm-2 m-t-60">
+													<input type="hidden" name="data[old_image][<%= imgNumbers %>][image_val]" id="old_image" value="<%= records.image%>" />
+													<a href="<%=ADS_SLIDER_FILE_URL%><%= records.image%>" class="items-image" data-lightbox="<%=ADS_SLIDER_FILE_URL%><%= records.image%>">
+														<img src="<%=ADS_SLIDER_FILE_URL%><%= records.image%>" alt=" image" height="50" width="50" class="titleImage img-thumbnail set_image_big_dim" />
+													</a>
+												</div>
+												<div class="col-sm-6">
+													<hr />
+													<div class="form-group">
+														<div class="form-line">
+															<label for="url" class="control-label label_index_url">
+																<%= __("admin.ads_sliders.url"); %>
+																<span class="required"> *</span>
+															</label>
+															<input id="url" class="form-control" type="text" name="data[url][<%= imgNumbers %>][url_val]"
+															value="<%=records.url ? records.url : '';%>">
+														</div>
+														<span id="url_<%= imgNumbers %>_error" class="error"></span>
+													</div>
+												</div>
+												<%if (pos == 1){%>
+													<div class="row clearfix">
+														<div class="col-sm-7">
+														</div>
+														<div class="col-sm-5">
+															<div class="col-sm-12">
+																<%if (imgNumbers > 1)  {%>
+																<a href="javascript:void(0);" data-record-id="<%= result._id%>" data-image-id="<%= records._id %>"
+																	class="remove_image right m-r-10" data-confirm-message="<%= __("admin.ads_sliders.you_want_to_delete_this_image"); %>"
+																	data-confirm-heading="<%= __("admin.system.are_you_sure") %>" data-id="add_image_<%= imgNumbers %>"><button
+																		type="button" class="btn bg-red btn-sm waves-effect"><%= __("admin.ads_sliders.remove"); %></button></a>
+																<% } %>
+																<%if (i == parseInt(result.image.length) - 1)  {%>
+																<a href="javascript:void(0);" class="add_more_image m-r-10 right"><button type="button" id="img-add-more"
+																		class="btn bg-green btn-sm waves-effect"
+																		<%- ADMIN_LOADING_TEXT %>><%= __("admin.ads_sliders.add_more"); %></button></a>
+																<% }else{ %>
+																<a href="javascript:void(0);" class="add_more_image hide m-r-10 right"><button type="button" id="img-add-more"
+																		class=" btn bg-green btn-sm waves-effect" <%- ADMIN_LOADING_TEXT %>>
+																		<%= __("admin.ads_sliders.add_more"); %></button></a>
+																<% } %>
+															</div>
+														</div>
+													</div>
+												<%}%>
+											</div>
+									<% i++; }); %>
+								<%}%>
+							</div> <!-- End edit add more html -->
+						</div>
+						<!--  submit btn html -->
+						<button type="button" id="ads-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> > <%= __("admin.system.submit"); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+						<!--  edit  submit btn html -->
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Add more html for image -->
+<div class="add-more-image hide">
+	<div id="add_image_{imageindex}" class="image-pointer" data-val="{imageindex}">
+		<hr/>
+		<div class="col-sm-6">
+			<div class="form-group ">
+				<div class="form-line">
+					<label for="image_[{imageindex}]" class="control-label label_index_image">
+						<%= __("admin.ads_sliders.image"); %>
+						<span class="required"> *</span>
+					</label>
+					<input type="file" name="image_{imageindex}" class="form-control filestyle" id="image_[{imageindex}]" />
+					<input type="hidden" name="data[image][{imageindex}][image_val_index]" value="{imageindex}" />
+					<span class='tooltipShow tooltipHelp brand-tooltip' title="" id="img" data-html="true" data-toggle="tooltip"
+						data-original-title='<%= __("system.extension_and_size_suggestion_message", ALLOWED_IMAGE_EXTENSIONS.join(", "), POSITION_1_IMAGE_RESOLUTION) %>'>
+						<i class="material-icons">info</i>
+					</span>
+				</div>
+				<span id="image_{imageindex}_error" class="error"></span>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="form-group">
+				<div class="form-line">
+					<label for="url_[{imageindex}]" class="control-label">
+						<%= __("admin.ads_sliders.url"); %>
+						<span class="required"> *</span>
+					</label>
+					<input id="url_[{imageindex}]" class="form-control"
+						name="data[url][{imageindex}][url_val]">
+				</div>
+				<span id="url_{imageindex}_error" class="error"></span>
+			</div>
+		</div>
+		<div class="row clearfix">
+			<div class="col-sm-12">
+				<a href="javascript:void(0);" class="remove_image hide right m-r-10" data-confirm-message="<%= __('admin.ads_sliders.you_want_to_delete_this_image'); %>" data-confirm-heading="<%= __('admin.system.are_you_sure') %>" data-id="add_image_{imageindex}"><button type="button" class="btn bg-red btn-sm waves-effect"><%= __("admin.ads_sliders.remove"); %></button></a>
+				<a href="javascript:void(0);" class="add_more_image hide m-r-10 right"><button type="button" id="img-add-more" class="btn bg-green btn-sm waves-effect" <%- ADMIN_LOADING_TEXT %>><%= __("admin.ads_sliders.add_more"); %> </button></a>
+			</div>
+	    </div>
+    </div>
+</div>
+<!-- Add more html for option-->
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css" rel="stylesheet">
+	<link href="<%=WEBSITE_ADMIN_CSS_PATH%>lightbox.css" rel="stylesheet">
+<%- contentFor("script") %>
+	<script src="<%=WEBSITE_ADMIN_JS_PATH%>jquery-filestyle.min.js" type="text/javascript"></script>
+	<script src="<%=WEBSITE_ADMIN_JS_PATH%>lightbox.js" type="text/javascript"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+<script type="text/javascript">
+	/*
+	 *	Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		submit_multipart_form('add-ads',function(status,response){
+			if(status){
+				window.location.href = response.redirect_url;
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	var count = <%= (isEditable && result.image)? result.image.length :1%>;
+	var editable = '<%=isEditable%>';
+	var imageNumber = <%= (isEditable && result.image)? result.image.length:1 %>;
+	/** Function to add more image */
+	function appendImageHtml(){
+		var index 		= parseInt($(".image-add .image-pointer").length)+1;
+		var indexoption = imageNumber;
+		var labelIndex 	= ($('#add-ads .image-add .label_index_image').length)+1;
+		var html 	 	= $(".add-more-image").html();
+		/**  Image index Replace */
+		html = html.replace(/{imageindex}/g,index);
+
+		/** Appened html **/
+		$(".image-add").append(html);
+		$(".image-add").find(".add_more_image").addClass("hide");
+		if(editable) position = <%=pos %>;
+		if(position == <%=POSITION_1%>){
+			$(".image-add .add_more_image:last").removeClass("hide");
+			if(count >1)
+				$(".image-add:last").find(".remove_image").removeClass("hide");
+
+			/** show delete button when image more than one */
+			if(index == 1){
+				$(".image-add:first").find(".remove_image").remove();
+			}
+		}
+		$('#image_['+indexoption+']').jfilestyle({
+			'input': false,
+		});
+		$('.tooltipShow').tooltip();
+		var finalInput = '<span class="count-jfilestyle hide"></span>';
+		$('[for="image_[' + indexoption +']"]').append(finalInput);
+	}
+
+	$(document).ready(function(){
+		if(editable){
+			if (<%=pos%> == <%= POSITION_1 %>) {
+				$('.tooltipShow').attr('data-original-title', '<%= __("system.extension_and_size_suggestion_message", ALLOWED_IMAGE_EXTENSIONS.join(', '), POSITION_1_IMAGE_RESOLUTION) %>');
+			} else if((<%= pos %> == <%= POSITION_4 %>)){
+				$('.tooltipShow').attr('data-original-title', '<%= __("system.extension_and_size_suggestion_message", ALLOWED_IMAGE_EXTENSIONS.join(', '), POSITION_4_IMAGE_RESOLUTION) %>');
+			}else{
+				$('.tooltipShow').attr('data-original-title', '<%= __("system.extension_and_size_suggestion_message", ALLOWED_IMAGE_EXTENSIONS.join(', '), POSITION_2_3_IMAGE_RESOLUTION) %>');
+			}
+		}
+		$('.filestyle').jfilestyle({
+			'input': false,
+		});
+		$(".tooltipShow").tooltip();
+
+		if(!editable){
+			position= 0;
+			/** add more image append*/
+			appendImageHtml();
+			/** End add more image append*/
+		}
+
+		/** add more question on click*/
+		$(document).on('click','.add_more_image',function(){
+			count++;
+			imageNumber++;
+			appendImageHtml();
+			$(".tooltipShow").tooltip();
+		});
+
+
+		/** Delete Image on Click **/
+		$(document).on('click','.remove_image',function(){
+			var divId    	     = $(this).attr("data-id");
+			var confirmMessage   = $(this).attr('data-confirm-message');
+			var confirmHeading   = $(this).attr('data-confirm-heading');
+
+			confirmBox("warning",confirmHeading,confirmMessage,function(result){
+				if(result){
+					$('#'+divId).empty();
+					if($('.image-add').find(".image-pointer").length != 0){
+						$(".image-add .add_more_image:last").removeClass("hide");
+					}
+					count--;
+					if (count == 1) {
+						$(".remove_image").addClass('hide');
+					}
+				}
+				swal.close();
+			});
+		});
+		/** End Delete image on Click **/
+	});
+
+	$(document).on("change", "#ad_position", function () {
+		position = $('#ad_position :selected').val();
+		if (position == <%= POSITION_1 %>) {
+			$(".image-add .add_more_image:last").removeClass("hide");
+			$('.tooltipShow').attr('data-original-title', '<%= __("system.extension_and_size_suggestion_message", ALLOWED_IMAGE_EXTENSIONS.join(', '), POSITION_1_IMAGE_RESOLUTION) %>');
+		} else {
+			var len = count;
+			for(i=2; i<= len; i++){
+				$('#add_image_'+i).remove();
+				count--;
+			}
+			$(".image-add").find(".add_more_image").addClass("hide");
+			$(".image-add").find(".remove_image").addClass("hide");
+			if (position == <%= POSITION_4 %>) {
+				$('.tooltipShow').attr('data-original-title', '<%= __("system.extension_and_size_suggestion_message", ALLOWED_IMAGE_EXTENSIONS.join(', '), POSITION_4_IMAGE_RESOLUTION) %>');
+			} else {
+				$('.tooltipShow').attr('data-original-title', '<%= __("system.extension_and_size_suggestion_message", ALLOWED_IMAGE_EXTENSIONS.join(', '), POSITION_2_3_IMAGE_RESOLUTION) %>');
+			}
+		}
+		$(".tooltipShow").tooltip();
+	});
+
+	$(document).on("change", "input.filestyle", function () {
+		var files = $(this)[0].files;
+		var inputId = $(this).parent().find("input.filestyle").attr("id");
+		var selectedItems = files.length;
+		if (selectedItems > 0) {
+			$(this).parent().find("div.jfilestyle").find(".count-jfilestyle").text(selectedItems);
+			$(this).parent().find("div.jfilestyle").find(".count-jfilestyle").removeClass("hide");
+		} else {
+			$(this).parent().find("div.jfilestyle").find(".count-jfilestyle").addClass("hide");
+		}
+	});
+
+</script>
+

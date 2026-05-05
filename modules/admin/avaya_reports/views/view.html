@@ -1,0 +1,122 @@
+<%
+	var categoryDetails		= (typeof category_details !== typeof undefined && category_details)	?	category_details	: {};
+	var fromDate			= newDate(subtractDate(HOURS_IN_A_DAY*DAYS_IN_A_WEEK-1),DATABASE_DATE_FORMAT);
+	var toDate				= newDate("",DATABASE_DATE_FORMAT);
+%>
+<div class="container-fluid" id="main-container">
+	<!-- Start Listing -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.quality_monitor.view_quality_monitor_form"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<div class="row clearfix">
+						<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+							<div class="form-group">
+								<div class="form-line">
+									<label for="team_leader_id" class="control-label"><%= __('admin.quality_monitor.team_leader'); %><span class="required"> * </span> </label>
+									<select id="team_leader_id" class="form-control" data-live-search="true" name="team_leader_id" data-child-name="search_team_leader">
+										<option value=""><%= __('admin.quality_monitor.select_team_leader'); %></option>
+										<%- team_list %>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+							<div class="form-group">
+								<div class="form-line">
+									<label for="date-range-picker" class="control-label"><%= __('admin.quality_monitor.date'); %><span class="required"> * </span> </label>
+									<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.quality_monitor.search_by_date'); %>" name="date-range-picker" value="<%=fromDate+' - '+toDate%>">
+								</div>
+								<input class="form-control hide" id="from_date" type="text" name="from_date" value="<%=fromDate%>">
+								<input class="form-control hide" id="to_date" type="text" name="to_date" value="<%=toDate%>">
+							</div>
+						</div>
+					</div>
+					<div id="team_schedule_table">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript">
+	var dataTable 		= "";
+	var configDemo 		= $('#date-range-picker');
+	var stopTableDraw   = true;
+
+	/**  function for daterange picker*/
+	configDemo.on('apply.daterangepicker', function(e,picker){
+		var startDate	= picker.startDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+		var endDate		= picker.endDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+
+		$("#from_date").val(startDate);
+		$("#to_date").val(endDate);
+		getListing();
+	});
+	
+	$('#team_leader_id').change(function(){
+		getListing();
+	});
+	
+	configDemo.on('cancel.daterangepicker', function(ev, picker) {
+		$("#from_date").val('');
+		$("#to_date").val('');
+		getListing();
+	});
+	
+	
+	var dateRanges = null;
+	
+	/*
+	 *	Function to get team schedule list
+	*/
+	function getListing(){
+		var startDate 	= $("#from_date").val();
+		var endDate 	= $("#to_date").val();
+		var teamLeadId 	= $("#team_leader_id").val();
+		$("#team_schedule_table").html('');
+		if(teamLeadId){
+			var options		= {
+				url 	: "<%=admin_list_url%>/view_monitor_form",
+				data    : {from_date : startDate,to_date : endDate,team_leader_id:teamLeadId},
+				method	: "POST"
+			};
+			ajaxRequest(options,function(response){
+				if(response){
+					if(dataTable != ''){
+						$("#datatable-category-listing").DataTable().destroy();
+					}
+					$("#team_schedule_table").html(response);
+					dataTable = $('#datatable-category-listing').DataTable({
+						"order"		: 	[],
+						"sDom"		:	"ftr",
+						"bFilter"	:   true,
+						"serverSide": 	false,
+						"scrollX"	: 	true,
+						"autoWidth" :   false,
+						fixedHeader: true,
+						"columnDefs": [
+							{ "width": "120px", "orderable" : false, "targets": "_all" }
+						]
+					});
+				}
+			});
+		}
+	}
+</script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>

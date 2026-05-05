@@ -1,0 +1,113 @@
+<%
+	let userType = (user_type) ? user_type : "";
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.admin_role.edit_role'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url+'/'+userType%>" >
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.system.back"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="edit-role" data-submit-btn-id="role-edit-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="role" class="control-label"><%= __('admin.admin_role.role'); %><span class="required"> *</span> :</label>
+										<input name="role" id="role" type="text" class="form-control" value="<%=(typeof result !== typeof undefined && result.role_name) ? result.role_name : '';%>"/>
+									</div>
+									<span id="role_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div id="check_unckeck_row" class="row clearfix">
+							<div class="col-sm-4">
+								<button type="button" id="expandAllBtn" class="btn bg-green btn-sm waves-effect">
+									<%= __('admin.admin_role.expand_all'); %>
+								</button>
+								<button type="button" id="collapseAllBtn" class="btn bg-red btn-sm waves-effect">
+									<%= __('admin.admin_role.collapse_all'); %>
+								</button>
+							</div>
+							<div class="col-sm-4"></div>
+							<div class="col-sm-4">
+								<button type="button" id="checkAllBtn" class="btn bg-green btn-sm waves-effect">
+									<%= __('admin.admin_role.check_all'); %>
+								</button>
+								<button type="button" id="unCheckAllBtn" class="btn bg-red btn-sm waves-effect">
+									<%= __('admin.admin_role.un_check_all'); %>
+								</button>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div id="role-menu" class="tree"></div>
+									<span id="module_ids_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<button type="button"  id="role-edit-btn-id"  <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit"> <%= __('admin.system.submit'); %></button>
+								<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PAGE_PATH%>admin_roles/module_tree.js"></script>
+<script type="text/javascript">
+	var permissions	= <%- (userType == USER_TYPE_ADMIN) ? JSON.stringify(ADMIN_PERMISSIONS) : JSON.stringify(PERMISSIONS); %>;
+	$(document).ready(function(){
+		var treeArray 		= 	<%- (typeof admin_modules !== typeof undefined ) ? JSON.stringify(admin_modules) : {} %>;
+		var selectedModules =  	<%- (typeof result !== typeof undefined && result.module_ids) ? JSON.stringify(result.module_ids)	: '[]' %>;
+
+		var moduleIdsArray  = 	[];
+
+		if(selectedModules){
+			selectedModules.map(function(item){
+				moduleIdsArray.push({
+					id: item._id,
+					sub_modules : item.sub_modules
+				});
+			});
+		}
+
+		var level 		=	0;
+		var parentTag 	= 	"#role-menu";
+		printTree(treeArray,level,parentTag,moduleIdsArray);
+
+		/**
+		 * Function to submit form
+		 */
+		$(".btn-submit").click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			submit_multipart_form("edit-role",function(status,response){
+				if(status){
+					window.location.href = response.redirect_url;
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	});
+</script>

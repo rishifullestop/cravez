@@ -1,0 +1,181 @@
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __('admin.restaurant_enquiry.add_restaurant_enquiry'); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" >
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __("admin.system.back"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="add-restaurant_onboarding" data-submit-btn-id="restaurant_onboarding-add-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_english_name" class="control-label"><%= __('admin.restaurant_enquiry.restaurant_english_name'); %> <span class="required"> *</span> </label>
+										<input name="restaurant_english_name" id="restaurant_english_name" type="text" class="form-control"/>
+									</div>
+									<span id="restaurant_english_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_arabic_name" class="control-label"><%= __('admin.restaurant_enquiry.restaurant_arabic_name'); %> <span class="required"> *</span> </label>
+										<input name="restaurant_arabic_name" id="restaurant_arabic_name" type="text" class="form-control"/>
+									</div>
+									<span id="restaurant_arabic_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="email_address" class="control-label"><%= __('admin.restaurant_enquiry.email_address'); %> <span class="required"> *</span> </label>
+										<input name="email_address" id="email_address" type="text" class="form-control"/>
+									</div>
+									<span id="email_address_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="contact_number" class="control-label"><%= __('admin.restaurant_enquiry.contact_number'); %> <span class="required"> *</span> </label>
+										<input name="contact_number" id="contact_number" type="text" class="form-control"/>
+									</div>
+									<span id="contact_number_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="contact_person_name" class="control-label"><%= __('admin.restaurant_enquiry.contact_person_name'); %> <span class="required"> *</span> </label>
+										<input name="contact_person_name" id="contact_person_name" type="text" class="form-control"/>
+									</div>
+									<span id="contact_person_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="account_manager_name" class="control-label"><%= __('admin.restaurant_enquiry.account_manager_name'); %> <span class="required"> *</span> </label>
+										<input name="account_manager_name" id="account_manager_name" type="text" class="form-control"/>
+									</div>
+									<span id="account_manager_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_address" class="control-label"><%= __('admin.restaurant_enquiry.restaurant_address'); %> <span class="required"> *</span> </label>
+										<input name="restaurant_address" id="restaurant_address" type="text" class="form-control"/>
+									</div>
+									<span id="restaurant_address_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_description" class="control-label"><%= __('admin.restaurant_enquiry.restaurant_description'); %>  </label>
+										<textarea name="restaurant_description" id="restaurant_description" type="text" class="form-control"></textarea>
+									</div>
+									<span id="restaurant_description_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="file_upload" class="control-label col-555">
+											<%= __("admin.restaurant_enquiry.file_upload"); %><span class="required"> *</span>
+										</label>
+										<input name="file" id="file" class="form-control cfilestyle" type="file" data-text="<%= __("admin.system.select_file"); %>"/>
+									</div>
+									<span class="demo-image-copyright"><%= __('admin.restaurant_enquiry.extension_and_size_suggestion_message',ALLOWED_RESTAURANT_ONBOARDING_EXTENSIONS.join(', '))%></span>
+									<span id="file_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_logo" class="control-label">
+											<%= __("admin.restaurant_enquiry.logo"); %><span class="required"> *</span>
+										</label>
+										<input type="file" data-input="false" name="restaurant_logo" class="form-control cfilestyle" id="restaurant_logo" />
+									</div>
+									<span id="restaurant_logo_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="landing_image" class="control-label">
+											<%= __("admin.restaurant_enquiry.landing_image"); %><span class="required"> *</span>
+										</label>
+										<input type="file" data-input="false" name="landing_image" class="form-control cfilestyle" id="landing_image" />
+									</div>
+									<span id="landing_image_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="detail_image" class="control-label">
+											<%= __("admin.restaurant_enquiry.detail_image"); %><span class="required"> *</span>
+										</label>
+										<input type="file" data-input="false" name="detail_image" class="form-control cfilestyle" id="detail_image" />
+									</div>
+									<span id="detail_image_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<button type="button"  id="restaurant_onboarding-add-btn-id"  <%- ADMIN_LOADING_TEXT %> class="btn bg-pink btn-sm waves-effect btn-submit"><%= __('admin.system.submit'); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+						<a href="<%= admin_list_url %>"><button type="button" class="btn bg-brown btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css">
+<%- contentFor("script") %>
+
+	<script type="text/javascript">
+		customFileStyle();
+		/**
+		 * Function to submit form
+		*/
+		$(".btn-submit").click(function(){
+			if(client_side_validation("add-restaurant_onboarding")){
+				var btnId = $(this).attr("id");
+				startTextLoading(btnId);
+				ajax_submit("add-restaurant_onboarding",function(status,response){
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						stopTextLoading(btnId);
+					}
+				});
+			}
+		});
+	</script>

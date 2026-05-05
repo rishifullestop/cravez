@@ -1,0 +1,118 @@
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.corporate_tie_ups.import_user"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>" ><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __('admin.system.back'); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="import_file" action="" data-submit-btn-id="import-file-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="image" class="control-label m-r-5"><%= __("admin.corporate_tie_ups.file"); %>
+											<span class="required"> *</span>
+										</label>
+										<input type="file" name="file"  class="form-control cfilestyle" id="file" data-text="Select File" />
+									</div>
+									<span class="demo-image-copyright"><%= __('admin.corporate_tie_ups.extension_and_size_suggestion_message',ALLOWED_IMPORT_USER_EXTENSIONS.join(', '))%></span>
+									<span id="file_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<a href="<%= WEBSITE_PUBLIC_UPLOADS_PATH+"sample_files/import_user_sample.csv"%>" class="text-decoration-none pull-right" id="sample_file_btn" download><button type="button" class="btn btn-default btn-sm waves-effect no-shadow"><i class="material-icons font-14">file_download</i><%= __("admin.corporate_tie_ups.download_sample_file")%></button></a>
+							</div>
+						</div>
+						<button type="button" id="user-file-btn-id" class="btn bg-brown btn-sm waves-effect btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+			<!-- Dynamic content card-->
+			<div class="card form-card hide" >
+				<div class="body">
+					<div class="row clearfix">
+						<div class="col-sm-12" id="dynamic_content"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			customFileStyle();
+			load_content();
+		});
+		
+		/*** Manage restaurant to show hide*/
+		function load_content(){
+					
+			var options = {	method	: "GET"};
+			options.url = "<%= WEBSITE_ADMIN_URL %>corporate_tie_ups/add_user/<%= corporate_id%>";
+			
+			ajaxRequest(options,function(response){ 
+				$("#dynamic_content").html(response);
+			});
+		};
+
+		/**
+		* Function to submit form
+		*/
+		$(".btn-submit").click(function(){
+			var confirmModal = false;
+			var btnId = $(this).attr("id");
+
+			$("#dynamic_content form").find("input.input-column").each(function(){
+				if($(this).val() != "" && $("#file")[0].files.length > 0){
+					confirmModal = true;
+				}
+			});
+
+			if(!confirmModal) return submitForm(btnId);
+			/** Confirm before submit*/
+			confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.corporate_tie_ups.you_want_submit_if_yes_all_form_data_lost"); %>',function(result){
+				swal.close();
+				submitForm(btnId);
+			});
+		});
+
+		/** Function to submit form*/
+		function submitForm(btnId){
+			startTextLoading(btnId);
+			ajax_submit("import_file",function(status,response){
+				stopTextLoading(btnId);
+				if(status){ 
+					$(".form-card").removeClass("hide");
+					if(response.result.length > 0){
+						$("#dynamic_content form table tbody").html("");
+						response.result.map(function(rowdata,parentIndex){ 
+							AppendHTML();
+							$("#dynamic_content form .table_row").eq(parentIndex).find("input[type=text].input-column").eq(0).val(rowdata.first_name);
+							$("#dynamic_content form .table_row").eq(parentIndex).find("input[type=text].input-column").eq(1).val(rowdata.last_name);
+							$("#dynamic_content form .table_row").eq(parentIndex).find("input[type=text].input-column").eq(2).val(rowdata.email);
+							$("#dynamic_content form .table_row").eq(parentIndex).find("input[type=text].input-column").eq(3).val(rowdata.mobile_number);
+							$("#dynamic_content form .table_row").eq(parentIndex).find("input[type=text].input-column").eq(4).val(rowdata.date_of_birth);
+							$("#dynamic_content form .table_row").eq(parentIndex).find("select option[value="+rowdata.gender+"]").attr('selected', 'selected');
+						});
+					}
+					if(response.status && response.message) notice(response.status,response.message);
+				}
+			});
+		}
+	</script>

@@ -1,0 +1,190 @@
+<div class="container-fluid">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="search_by_page_name" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.cms.search_by_page_name'); %>">
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.cms.cms_management"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>/add" class="<%= getPermissionClass(module_type,['cms','add']); %>" >
+								<button type="button" class="btn btn-sm bg-indigo waves-effect">
+									<%= __('admin.cms.add_cms'); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body hideScroll">
+					<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="20%"><%= __("admin.cms.page_name_in_english"); %></th>
+								<th width="40%"><%= __("admin.cms.page_description_in_english"); %></th>
+								<th width="20%"><%= __("admin.system.modified"); %> </th>
+								<th width="20%"><%= __("admin.system.action"); %></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data */
+		var dataTable ="";
+		$(document).ready(function() {
+			dataTable 	= 	$('#datatable-listing').DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[[ 2, "desc" ]],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	: 	[
+					{ "data": 'name' },
+					{
+						"data"			:	'body',
+						"searchable"	: 	false,
+						"orderable"  	:   false,
+						"render" 	 	: 	function(body){
+							var maxLimit = parseInt('<%=STRING_MAX_LIMIT_IN_DATATABLE%>');
+							var bodyData	 = body.replace(new RegExp('WEBSITE_URL/','g'),'<%=WEBSITE_URL%>');
+							bodyData 		 = bodyData.replace(/(<([^>]+)>)/ig," ").substring(0,maxLimit)+((body.length>maxLimit) ? "..." :"");
+
+							return bodyData;
+						}
+					},
+					{
+						"data"		 : 'modified',
+						"searchable" : 	false,
+						"render" 	 : 	function(modified){
+							return moment(modified).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) ;
+						}
+					},
+					{
+						"data"		 : 	{},
+						"orderable"	 :   false,
+						"searchable" : 	false,
+						"render" 	 : 	function(result){
+							var id		=	(result._id)	?	result._id 	:"";
+							var slug	=	(result.slug)	?	result.slug	:"";
+
+							var dropDownButton 	=	''+
+							'<div class="btn-group m-l-5 m-t-5">'+
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+									'<%= __("admin.system.action"); %>'+
+									' <span class="caret"></span>'+
+								'</button>'+
+								'<ul class="dropdown-menu min-width-190">'+
+									/** Edit Link **/
+									'<li>'+
+										'<a href="<%=admin_list_url%>/edit/'+id+'" class="waves-effect waves-block <%= getPermissionClass(module_type,["cms","edit"]); %>"><%= __("admin.system.edit"); %></a>'+
+									'</li>'+
+									/** Delete Link **/
+									'<li>'+
+										'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete/'+id+'" class="waves-effect waves-block confirm_box <%= getPermissionClass(module_type,["cms","delete"]); %>" data-confirm-message="<%= __("admin.cms.do_you_want_to_delete"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>"><%= __("admin.system.delete"); %></a>'+
+									'</li>'+
+									/** Cpy url Link **/
+									'<li>'+
+										'<a href="javascript:void(0);" data-href="<%= WEBSITE_URL%>home/'+slug+'" class="waves-effect copy_text waves-block"><%= __("admin.cms.copy_url"); %></a>'+
+									'</li>'+
+								'</ul>'+
+							'</div>';
+							return dropDownButton;
+						}
+					}
+				],
+				"ajax":{
+					url 	:	"<%=admin_list_url%>",
+					type	: 	"POST",
+					dataSrc	: 	function(res){
+						adjustPermissionsClass();
+						return res.data;
+					}
+				}
+			});
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+
+		/** To copy url of cms */
+		$(document).on('click','.copy_text',function(e){
+			e.preventDefault();
+			var copyText = $(this).attr('data-href');
+			document.addEventListener('copy', function(e) {
+				e.clipboardData.setData('text/plain', copyText);
+				e.preventDefault();
+			}, true);
+			document.execCommand('copy');
+
+			swal({
+				title: '',
+				text: '<%= __("admin.cms.url_copied");%>',
+				type : "success",
+				timer: 1200,
+				showCancelButton: false,
+				showConfirmButton: true
+			}).then(function (dismiss) {
+					if (dismiss === 'timer') {
+
+					}
+				}
+			)
+		});
+	</script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

@@ -1,0 +1,169 @@
+<%
+	var result 		 = 	result;
+	var isEditable 	 =	is_editable;
+	var dropdownList =  dropdown_list;
+	var attributeId	 =  (result._id) ? result._id :"";
+	var formUrl 	 =  (isEditable) ? admin_list_url+"/edit/"+attributeId : admin_list_url+"/add";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-attribute" action="<%=formUrl%>" data-submit-btn-id="attribute-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog  modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.attributes.edit_attribute") : __("admin.attributes.add_attribute"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="attribute_id" class="control-label col-555">
+											<%= __("admin.attributes.attribute_id"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="attribute_id" class="form-control" name="attribute_id" value="<%=result.attribute_id%>" <%=(isEditable) ? "readonly" : "";%> />
+									</div>
+									<span id="attribute_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="title" class="control-label col-555">
+											<%= __("admin.attributes.title"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="title" class="form-control" name="title" value="<%=result.title%>" />
+									</div>
+									<span id="title_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="type" class="control-label col-555">
+											<%= __("admin.attributes.attribute_type"); %><span class="required"> *</span>
+										</label>
+										<select name="type" id="type" class="form-control show-tick">
+											<option value=""><%= __('admin.attributes.select_attribute_type');%></option>
+											<%-dropdownList%>
+										</select>
+									</div>
+									<span id="type_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="input_type" class="control-label col-555">
+											<%= __("admin.attributes.input_type"); %>
+										</label>
+										<select name="input_type" id="input_type" class="form-control show-tick">
+											<option value=""><%= __('admin.attributes.select_input_type');%></option>
+											<% ATTRIBUTE_INPUT_TYPES.map(record=>{ %>
+												<option value="<%=record.value%>" <%=(result.input_type == record.value) ? "selected" :''%>>
+												<%= record.title%></option>
+											<% 	});%>
+										</select>
+									</div>
+									<span id="input_type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group materialize_checkbox">
+									<div class="form-lin checkbox_wrapper">
+										<input type="checkbox" class="filled-in chk-col-pink" <%=(result.required) ? "checked" :''%> value="true" name="required" id="required">
+										<label for="required" class="checkbox data material-checkbox-label col-555">
+											<%= __("admin.attributes.required"); %>
+										</label>
+									</div>
+									<span id="required_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="validation_type" class="control-label col-555">
+											<%= __("admin.attributes.validation_type"); %>
+										</label>
+										<select name="validation_type" id="validation_type" class="form-control show-tick">
+											<option value=""><%= __('admin.attributes.select_validation_type');%></option>
+											<% ATTRIBUTE_VALIDATION_TYPE.map(record=>{ %>
+												<option value="<%=record.value%>" <%=(result.validation_type == record.value) ? "selected" :''%>>
+												<%= record.title %></option>
+											<% 	});%>
+										</select>
+									</div>
+									<span id="validation_type_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="order" class="control-label col-555">
+											<%= __("admin.attributes.order"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="order" class="form-control" name="order" value="<%=result.order%>" />
+									</div>
+									<span id="order_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="default_value" class="control-label col-555">
+											<%= __("admin.attributes.default_value"); %>
+										</label>
+										<input type="text" id="default_value" class="form-control" name="default_value" value="<%=result.default_value%>" />
+									</div>
+									<span id="default_value_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer modal-footer-seperator">
+							<button type="button" id="attribute-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+								<%= __("admin.system.submit"); %>
+							</button>
+							<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+								<%= __("admin.system.cancel"); %>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	* Function to submit form
+	*/
+	var isEditable = <%=isEditable%>;
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-attribute',function(status,response){
+			if(status){
+				if(isEditable){
+					if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+					if(response.status && response.message) notice(response.status,response.message);
+					$('#form_modal').modal("hide");
+				}else{
+					$("#reset").trigger("click");
+				}
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+</script>

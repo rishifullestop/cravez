@@ -1,0 +1,162 @@
+<%
+	var result				= 	(typeof result !== typeof undefined && result)			?	result			: "";
+	var latestLocation		= 	(typeof result !== typeof undefined && latest_location)	?	latest_location	: "";
+	var driverLatitude		=	(latestLocation.latitude) ? latestLocation.latitude :	"";
+	var driverLongitude		=	(latestLocation.longitude) ? latestLocation.longitude :	"";
+	var driverDateTime		=	(latestLocation.created) ? latestLocation.created :	"";
+	var address				=	(latestLocation.address) ? latestLocation.address :	"";
+	
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<table id="datatable-listing" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+			<tr>
+				<th width="25%"><%= __("admin.user_management.date_and_time"); %><span>: <%= (driverDateTime) ? newDate(driverDateTime,AM_PM_FORMAT_WITH_DATE) :'N/A';%></span></th>
+				<th width="25%"><%= __("admin.user_management.lan_lat"); %><span>: <%= (driverLatitude && driverLongitude) ? driverLatitude+' / '+driverLongitude : 'N/A'; %></span></th>
+				<th width="25%"><%= __("admin.user_management.current_location"); %><span>: <%= (address) ? address : 'N/A'; %> </span></th>
+			</tr>
+		</table>	
+	</div>
+</div>		
+<div class="row clearfix">
+	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+		<div class="card map-table-scroll">
+			<div class="body">
+				<table id="driver-location-listing" style="width:100%" cellspacing="0" cellpadding="10" border="1" class="location_list">
+					<thead>
+						<tr>
+							<th width="30%"><%= __("admin.user_management.latitude_longitude"); %></th>
+							<th width="40%"><%= __("admin.user_management.address"); %></th>
+							<th width="30%"><%= __("admin.system.created"); %></th>
+						</tr>
+					</thead>
+					<tbody>
+						<%
+						if(result.length >0){
+							result.map((records,keys)=>{
+							%>
+							<tr>
+								<td width="25%"><%= records.latitude %> / <%= records.longitude %></td>
+								<td width="25%"><%= records.address %></td>
+								<td width="25%"><span class="setDateTimeFormat"><%= (records && records.created) ? newDate(records.created,AM_PM_FORMAT_WITH_DATE) :'';%></span></td>
+							</tr>
+							<%
+							});	
+						}else{
+						%>
+						<tr>
+							<td class="align-center" colspan="4"><%= __("admin.system.no_record_found"); %></td>
+						</tr>
+						<%		
+						}	
+						%>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+		<div class="card map-table-scroll">
+			<div class="body">
+				<div class="body table-responsive" id="pick-location-report">
+					<%
+					if(result.length >0){
+					%>
+					<div id="pick-up-map" style="height:500px" class="col-sm-12"></div>
+					<%
+					}else{
+					%>
+					<div id="pick-up-map" class="col-sm-12"><p class="align-center"><%= __("admin.system.no_record_found"); %></p></div>	
+					<%
+					}
+					%>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var result				=	<%- JSON.stringify(result) %>;
+	var driverLatitude		=	"<%= driverLatitude %>";
+	var driverLongitude		=	"<%= driverLongitude %>";
+	var map = null;
+	$(document).ready(function() {
+		initMap();	
+	});	
+	var bounds = new google.maps.LatLngBounds();
+	function initMap() {
+		if(result.length >0 ){
+			var directionsService = new google.maps.DirectionsService;
+			var directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true});
+			map = new google.maps.Map(document.getElementById("pick-up-map"), {
+				zoom: 6,
+				center: new google.maps.LatLng(driverLatitude, driverLongitude),
+			});
+			directionsRenderer.setMap(map);
+			calculateAndDisplayRoute(directionsService, directionsRenderer);
+		}	
+	}
+    function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+		var waypts = [];
+		let icons = {
+			start: new google.maps.MarkerImage(
+				'<%=CAPTAIN_ICON_IMAGE%>',
+				 // (width,height)
+					new google.maps.Size( 44, 32 ),
+					// The origin point (x,y)
+					new google.maps.Point( 0, 0 ),
+					// The anchor point (x,y)
+					new google.maps.Point( 22, 32 )
+			),
+			end: new google.maps.MarkerImage(
+				'<%=CAPTAIN_ICON_IMAGE%>',
+				new google.maps.Size( 44, 32 ),
+			   // The origin point (x,y)
+			   new google.maps.Point( 0, 0 ),
+			   // The anchor point (x,y)
+			   new google.maps.Point( 22, 32 )
+			)
+		};
+		if(result.length >0 ){
+			$.each(result, function( eKey, eRecords ){
+				eKey	=	eKey+1;
+				waypts.push({
+					location: new google.maps.LatLng(eRecords.latitude,eRecords.longitude),
+					stopover: true,
+				});
+			});
+		}
+		var wayptsCount	=	waypts.length;
+		directionsService.route({
+			origin: waypts[0]['location'],
+			destination: waypts[wayptsCount-1]['location'],
+			waypoints: waypts,
+			optimizeWaypoints: true,
+			travelMode: 'DRIVING'
+        }, function(response, status) {
+			if (status === 'OK') {
+				directionsRenderer.setDirections(response);
+				var leg = response.routes[0].legs;
+				$.each(leg, function( legKey, legRecords ){
+					bounds.extend(legRecords.start_location);
+					makeMarker( legRecords.start_location, icons.start,legRecords.start_address );
+					bounds.extend(legRecords.end_location);
+					makeMarker( legRecords.end_location, icons.end,legRecords.end_address );
+				});	
+				map.fitBounds(bounds);
+			}else{
+				window.alert('Directions request failed due to ' + status);
+			}
+        });
+	}
+	function makeMarker( position, icon, title ) {
+		new google.maps.Marker({
+			position: position,
+			map: map,
+			icon: icon,
+			title: title
+		});
+	}
+</script>
+

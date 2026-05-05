@@ -1,0 +1,195 @@
+<%
+	var userId  = (typeof user_id !== typeof undefined)   ? user_id   : "";
+	var vocType = (typeof voc_type !== typeof undefined)  ? voc_type  : "";
+	var orderId = (typeof order_id !== typeof undefined)  ? order_id  : "";
+	var url 	= (userId) ? admin_list_url+"/customer_voc_list/"+userId : admin_list_url+"/order_voc_list/"+orderId+"/"+vocType;
+%>
+<!--Search Start -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-col-pink">
+				<div class="panel-heading" role="tab" id="panel-heading-id">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+						   aria-controls="panel-collapse-id">
+							<%= __("admin.system.search"); %>
+							<span class="pull-right collapse-toggle-icon"></span>
+						</a>
+					</h4>
+				</div>
+				<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+					<div class="panel-body">
+						<form id="searchForm" name="searchForm" >
+							<div class="row clearfix dataTables_wrapper">
+								<%  var filterColumn = (userId) ? 0 : 1;%>
+								<!-- Search by type -->
+								<div class="col-xs-12 col-sm-5">
+									<div class="form-group">
+										<div class="form-line">
+											<select class="form-control show-tick"  id="column_filter_<%=filterColumn%>"   onchange="searchDatatable('<%=filterColumn%>')" name="type">
+												<option value=""><%=__("admin.voc_management.search_by_type");%></option>
+												<% if(orderId && vocType == VOC_FOR_CLIENT){ %>
+													<%  Object.keys(VOC_TYPE_FOR_CLIENT).map(key=>{ %>
+														<option value="<%=key%>"><%= VOC_TYPE_FOR_CLIENT[key]%></option>
+													<% }); %>
+												<% } else if(orderId && vocType == VOC_FOR_CAPTAIN) {%>
+													<%  Object.keys(VOC_TYPE_FOR_CAPTAIN).map(key=>{ %>
+														<option value="<%=key%>"><%= VOC_TYPE_FOR_CAPTAIN[key]%></option>
+													<% }); %>
+												<% }else {%>
+													<%  Object.keys(VOC_TYPE_FOR_CLIENT).map(key=>{ %>
+														<option value="<%=key%>"><%= VOC_TYPE_FOR_CLIENT[key]%></option>
+													<% });
+												} %>
+											</select>
+										</div>
+									</div>
+								</div>
+								<%  var questionColumn = (userId) ? 1 : 2;%>
+								<!-- Search by question -->
+								<div class="col-xs-12 col-sm-5">
+									<div class="form-group">
+										<div class="form-line">
+											<input class="form-control" id="column_filter_<%=questionColumn%>"  onkeyup="searchDatatable('<%=questionColumn%>')" placeholder="<%= __('admin.voc_management.search_by_question'); %>" name="question">
+										</div>
+									</div>
+								</div>
+								<!-- Search by reset -->
+								<div class="col-md-2">
+									<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+										<%= __("admin.system.reset")%>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Search End -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%= __("admin.voc_management.voc"); %>
+				</h2>
+				<% if(orderId && vocType) {
+					let permissionType = (vocType == VOC_FOR_CLIENT) ? "add_voc_client" :"add_voc_captain";
+					%>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>/order_voc_list/<%=orderId%>/<%=vocType%>" data-action-url="<%=admin_list_url+'/add_order_voc/'+orderId+'/'+vocType%>" data-open-modal="true" class="action-btn <%= getPermissionClass(module_type,['order_detail',permissionType]); %>">
+								<button type="button" class="btn bg-indigo waves-effect btn-sm">
+									<%= __("admin.voc_management.add_voc"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				<% } %>
+			</div>
+			<div class="body">
+				<table id="datatable-listingg" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<% if (orderId && vocType){ %>
+								<th><%= __("admin.voc_management.role"); %></th>
+							<% } %>
+							<th><%= __("admin.voc_management.type"); %></th>
+							<th><%= __("admin.voc_management.question"); %></th>
+							<th><%= __("admin.voc_management.answer"); %></th>
+							<th><%= __("admin.system.created"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable ="";
+	var VOC_TYPE_FOR_CLIENT  = <%-JSON.stringify(VOC_TYPE_FOR_CLIENT)%>;
+	var VOC_TYPE_FOR_CAPTAIN = <%-JSON.stringify(VOC_TYPE_FOR_CAPTAIN)%>;
+	var VOC_FOR 	= <%-JSON.stringify(VOC_FOR)%>;
+	var orderField  = parseInt("<%=(orderId) ? 4 :3%>");
+
+	$(document).ready(function() {
+		adjustPermissionsClass();
+		dataTable 	= 	$('#datatable-listingg').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem('DataTables', JSON.stringify(oData));
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse(localStorage.getItem('DataTables'));
+			},
+			"order"		: 	[[orderField,"desc"]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":   PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				<% if (orderId && vocType){ %>
+					{
+						"data"	  	 : 'user_type',
+						"orderable"	 :  false,
+						"searchable" : 	false,
+						"render"  	 : function(user_type){
+							return VOC_FOR[user_type];
+						}
+					},
+				<% } %>
+				{
+					"data"		 :  {},
+					"orderable"	 :  false,
+					"field_name" :  "type",
+					"render"  	 :  function(result){
+						var type 	=	(result.type) 	   ? result.type 	  :'';
+						var vocFor 	=	(result.user_type) ? result.user_type :'';
+						return (vocFor == '<%=VOC_FOR_CAPTAIN%>') ? VOC_TYPE_FOR_CAPTAIN[type] : VOC_TYPE_FOR_CLIENT[type];
+					}
+				},
+				{
+					"data"		 : "question",
+					"orderable"	 :  false,
+				},
+				{
+					"data"		 : "answer",
+					"searchable" : 	false,
+					"orderable"	 :  false,
+				},
+				{
+					"data"			: 'created',
+					"searchable"	: false,
+					"render" 		: function(created){
+						return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+					}
+				},
+			],
+			"ajax":{
+				url 	: "<%=url%>",
+				type	: "POST",
+				dataSrc	: function(res){
+					return res.data;
+				}
+			}
+		});
+
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+</script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+
+

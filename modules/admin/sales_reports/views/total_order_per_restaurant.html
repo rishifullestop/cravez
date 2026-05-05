@@ -1,0 +1,316 @@
+<%
+    let daysArray = [];
+    let dates  	  = getDateRange(new Date(from_date),new Date(to_date));
+    let deliveredGraphData  =   delivered_orders_chart;
+    let netAmountGraphData  =   total_net_amount_chart;
+    let deliveredOrdersData =   [];
+    let totalNetAmountData  =   [];
+    let deliveredGraphObj   =   {};
+    let netAmountGraphObj   =   {};
+
+    if(deliveredGraphData.length >0){
+        deliveredGraphData.map(records=>{
+            deliveredGraphObj[records._id] = records;
+        });
+    }
+
+    if(netAmountGraphData.length >0){
+        netAmountGraphData.map(records=>{
+            netAmountGraphObj[records._id] = records;
+        });
+    }
+
+    dates.map(tmpDate=>{
+        let dateToCheck         = 	newDate(tmpDate,DATABASE_DATE_FORMAT);
+        let orderAmount         = (netAmountGraphObj[dateToCheck]) ? netAmountGraphObj[dateToCheck].total_net_amount :0;
+        let cravezDelivery      = (deliveredGraphObj[dateToCheck]) ? deliveredGraphObj[dateToCheck].total_cravez_delivery :0;
+        let pickupDelivery      = (deliveredGraphObj[dateToCheck]) ? deliveredGraphObj[dateToCheck].total_pickup_delivery :0;
+        let restaurantDelivery  = (deliveredGraphObj[dateToCheck]) ? deliveredGraphObj[dateToCheck].total_restaurant_delivery :0;
+
+        deliveredOrdersData.push({
+            date                  : newDate(tmpDate,DELIVERED_GRAPH_DATE_FORMAT),
+            cravez_delivery       : cravezDelivery,
+            pickup_delivery       : pickupDelivery,
+            restaurant_delivery   : restaurantDelivery,
+        });
+
+        totalNetAmountData.push({
+            date                : newDate(tmpDate,DELIVERED_GRAPH_DATE_FORMAT),
+            total_net_amount    : orderAmount,
+        });
+    });
+%>
+<div class="excel_charts">
+    <a class="excel_btn excel_format" id="excel_btn" href="javascript:void(0)">
+        <i><img src="<%= WEBSITE_ADMIN_IMG_URL %>new_dashboard/excel.png" alt="img"></i><%= __("admin.sales_report.excel"); %>
+    </a>
+    <a class="chart_format_btn" id="charts_btn" href="javascript:void(0)"><i><img src="<%= WEBSITE_ADMIN_IMG_URL %>new_dashboard/pie-chart.png" alt="img"></i><%= __("admin.sales_report.charts"); %></a>
+</div>
+<div class="row clearfix excel_class">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="header">
+                <h2>
+                    <%= __("admin.sales_report.total_order_per_amount"); %>
+                </h2>
+            </div>
+            <div class="body">
+                <table id="total-order-per-restaurant-datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th width="50%"><%= __("admin.sales_report.restaurant_name");%></th>
+                            <th width="25%"><%= __("admin.sales_report.number_of_orders");%></th>
+                            <th width="25%"><%= __("admin.sales_report.order_amount");%></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th class="sales_th text-right"><%= __("admin.sales_report.restaurant_order"); %></th>
+                            <th class="sales_th"></th>
+                            <th class="sales_th"></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="separate_box chart_class hide">
+    <div class="delivered_order_section">
+        <div class="sales_report">
+            <div class="heading_text display-block-ruby">
+                <h3><%= __("admin.sales_report.delivered_order")%></h3>
+				<ul class="supervisor__sales_legends pull-right">
+					<li><small class="sales-report-cravez"></small><span class="m-l-5 m-r-10"><%= __("admin.sales_report.cravez")%></span></li>
+
+					<li><small class="sales-report-restaurant"></small><span class="m-l-5 m-r-10"><%= __("admin.sales_report.restaurant")%></span></li>
+
+					<li><small class="sales-report-pickup"></small><span class="m-l-5"><%= __("admin.sales_report.pickup")%></span></li>
+				</ul>
+            </div>
+            <div id="delivered_order_chart_div" style="width: 100%; height: 500px;"></div>
+        </div>
+    </div>
+    <div class="delivered_order_section">
+        <div class="sales_report">
+            <div class="heading_text">
+                <h3><%= __('admin.sales_report.total_net_amount')%></h3>
+            </div>
+            <div id="net_amount_chart_div" style="width: 100%; height: 500px;"></div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/buttons.dataTables.min.css">
+
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/jszip.min.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/pdfmake.min.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/vfs_fonts.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/buttons.html5.min.js "></script>
+<script type="text/javascript">
+    /** Function to initialize datatable and get server side data*/
+    var dataTable		=	"";
+    $(document).ready(function() {
+
+        dataTable = $('#total-order-per-restaurant-datatable-listing').DataTable({
+            "bStateSave"	: true,
+            "fnStateSave"	: function (oSettings, oData) {
+                localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+            },
+            "fnStateLoad"	: function (oSettings) {
+                return JSON.parse( localStorage.getItem('DataTables') );
+            },
+            "order"		: 	[],
+            "dom"		: 	'Blrtip',
+            "serverSide": 	true,
+            "scrollX"	: 	true,
+			"lengthMenu":   PAGING_LENGTH_MENU,
+            "columns"	: 	[
+                {   "data"       : 'restaurant_name.en',
+                    "searchable" : false
+                },
+                {
+                    "data"       : 'total_orders',
+                    "searchable" : false,
+                    "render"     : function(total_orders){
+                        return (total_orders) ? total_orders : 0;
+                    }
+                },
+                {
+                    "data"      : 'total_amount',
+                    "searchable":  false,
+                    "render"    : function(total_amount){
+                        return (total_amount) ? currencyFormat(total_amount) : currencyFormat(0);
+                    }
+                },
+            ],
+            buttons: [
+                {
+                    text: 'Export Excel',
+                    extend: 'excelHtml5',
+                    className: 'btn btn-sm bg-indigo waves-effect',
+                    exportOptions: {
+                        orthogonal: 'export',
+                        columns: [ 0, 1, 2]
+                    }
+                },
+                {
+                    text: 'Export PDF',
+                    extend: 'pdfHtml5',
+                    className: 'btn btn-sm bg-indigo waves-effect',
+                    exportOptions: {
+                        orthogonal: 'export',
+                        columns: [ 0, 1, 2]
+                    }
+                }
+            ],
+            "ajax":{
+                url 	: "<%=admin_list_url%>/total_order_per_restaurant?date_from=<%=from_date%>&date_to=<%=to_date%>&restaurant_id=<%=restaurant_id%>&branch_id=<%=branch_id%>",
+                type	: "POST",
+                dataSrc	: function(res){
+                    return res.data;
+                }
+            },
+            "footerCallback": function ( row, data, start, end, display ) {
+                var api = this.api(), data;
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function ( i ) {
+                    return typeof i === 'string' ?  i*1 : typeof i === 'number' ? i : 0;
+                };
+
+                // Total over this page
+                totalNumberOfOrders = api
+                    .column( 1, { page: 'current'} )
+                    .data()
+                    .reduce( function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0 );
+                totalOrderAmount = api
+                    .column( 2, { page: 'current'} )
+                    .data()
+                    .reduce( function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0 );
+                // Update footer
+                $( api.column( 1 ).footer() ).html(
+                   totalNumberOfOrders
+                );
+                $( api.column( 2 ).footer() ).html(
+                    currencyFormat(totalOrderAmount)
+                );
+
+            },
+        });
+    });
+
+    /* show excel table */
+    $('#excel_btn').on('click',function(e){
+        $('.chart_class').addClass("hide");
+        $('.excel_class').removeClass("hide");
+        $('#excel_btn').addClass('excel_format');
+        $('#charts_btn').removeClass('chart_format');
+    });
+
+    /* show chart*/
+    $('#charts_btn').on('click',function(e){
+        $('.excel_class').addClass("hide");
+        $('.chart_class').removeClass("hide");
+        $('#excel_btn').removeClass('excel_format');
+        $('#charts_btn').addClass('chart_format');
+        drawChart();
+    });
+
+    google.charts.load('current', {'packages':['bar']});
+    google.charts.setOnLoadCallback(drawChart);
+    var totalDeliveredOrder =	<%- JSON.stringify(deliveredOrdersData); %>;
+    var totalNetAmountKD    =	<%- JSON.stringify(totalNetAmountData); %>;
+
+    function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Day');
+        data.addColumn('number', 'Cravez');
+        data.addColumn('number', 'Restaurant');
+        data.addColumn('number', 'Pickup');
+
+        $.each(totalDeliveredOrder, function(index,html){
+            if(typeof html['date'] !== typeof undefined){
+                cravez_delivery     = (html['cravez_delivery'])     ? html['cravez_delivery']       : 0;
+                restaurant_delivery = (html['restaurant_delivery']) ? html['restaurant_delivery']   : 0;
+                pickup_delivery     = (html['pickup_delivery'])     ? html['pickup_delivery']       : 0;
+            }
+        });
+
+        for(var i=0; i < totalDeliveredOrder.length; i++) {
+            let totalCravezDelivery     = (totalDeliveredOrder[i].cravez_delivery)      ? totalDeliveredOrder[i].cravez_delivery     :0;
+            let totalRestaurantDelivery = (totalDeliveredOrder[i].restaurant_delivery)  ? totalDeliveredOrder[i].restaurant_delivery :0;
+            let totalPickupDelivery     = (totalDeliveredOrder[i].pickup_delivery)      ? totalDeliveredOrder[i].pickup_delivery     :0;
+
+            if(totalDeliveredOrder[i].date){
+                data.addRows([
+                    [String(totalDeliveredOrder[i].date),totalCravezDelivery,totalRestaurantDelivery,totalPickupDelivery],
+                ]);
+            }
+        }
+
+        var options = {
+            colors: ['#7E7EEE', '#FAB80E','#C9CBCF'],
+            legend: { position: 'none'},
+            bars: 'vertical', // Required for Material Bar Charts.
+            pieSliceText: 'percentage',
+            chartArea: {
+                height: "100%",
+                width: "100%"
+            },
+            bar: {groupWidth: "95%"},
+			vAxis: {viewWindowMode: "explicit", viewWindow:{ min: 0 },format: '0'}
+        };
+
+        var totalAmountData = new google.visualization.DataTable();
+        totalAmountData.addColumn('string', 'Day');
+        totalAmountData.addColumn('number', 'Net Amount');
+
+        $.each(totalNetAmountKD, function(index,html){
+            if(typeof html['date'] !== typeof undefined){
+                total_net_amount = (html['total_net_amount']) ? html['total_net_amount'] : 0;
+            }
+        });
+
+        let totalAmount = 0;
+        for(var i=0; i < totalNetAmountKD.length; i++) {
+            let totalNetAmount = (totalNetAmountKD[i].total_net_amount) ? totalNetAmountKD[i].total_net_amount :0;
+            totalAmount += totalNetAmount;
+
+            if(totalNetAmountKD[i].date){
+                totalAmountData.addRows([
+                    [String(totalNetAmountKD[i].date),totalNetAmount],
+                ]);
+            }
+        }
+        totalAmountData.addRows([["Total",totalAmount]]);
+
+        var netAmountOptions = {
+            colors: ['#7E7EEE'],
+            legend: { position: 'none'},
+            bars: 'vertical', // Required for Material Bar Charts.
+            pieSliceText: 'percentage',
+            chartArea: {
+                height: "100%",
+                width: "100%"
+            },
+            bar: {groupWidth: "95%"},
+			vAxis: {viewWindowMode: "explicit", viewWindow:{ min: 0 },format: '0'}
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('delivered_order_chart_div'));
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+        var netAmountChart = new google.charts.Bar(document.getElementById('net_amount_chart_div'));
+        netAmountChart.draw(totalAmountData, google.charts.Bar.convertOptions(netAmountOptions));
+    }
+
+    var width =  $(document).width();
+    $(window).resize(function(){
+        drawChart();
+    });
+
+</script>

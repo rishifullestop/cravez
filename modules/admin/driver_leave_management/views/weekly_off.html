@@ -1,0 +1,88 @@
+<%
+var date			= (result && result.date) ? newDate(result.date,DATABASE_DATE_FORMAT) : newDate(addDate(HOURS_IN_A_DAY),DATABASE_DATE_FORMAT);
+var weeklyRequestId	= (result && result._id) ?  result._id : "";
+var action			= (is_editable) ? admin_list_url+'/driver_vacation_request/edit_weekly_off/'+weeklyRequestId : admin_list_url+'/driver_vacation_request/add_weekly_off';
+if(is_driver_shift && is_editable) action +="?is_driver_shift=1";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-weekly-off" action="<%= action %>" data-submit-btn-id="vacation-request-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (is_editable) ?  __("admin.driver_leave_management.edit_weekly_off")  : __("admin.driver_leave_management.add_weekly_off"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix selected">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="driver" class="control-label">
+											<%=  __('admin.driver_leave_management.driver'); %><span class="required"> *</span>
+										</label>
+										<select id="driver" class="form-control show-tick" name="driver"  data-live-search="true">
+											<option value=""><%- __('admin.driver_leave_management.select_driver')%></option>
+											<%-users_list%>
+										</select>
+									</div>
+									<span id="driver_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="dates" class="control-label">
+											<%=  __('admin.driver_leave_management.date'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control" id="date-picker" name="dates" readonly value="<%= date%>" placeholder="<%= __('admin.driver_leave_management.select_date');%>">
+										<span id="info-message" class="message demo-image-copyright"><%= __("admin.driver_leave_management.select_date_note") %></span>
+									</div>
+									<span id="dates_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="vacation-request-add-btn-id" class="btn  bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-weekly-off',function(status,response){
+			if(status){
+				window.location.href = response.redirect_url;
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/**
+	 * Function for datepicker
+	 */
+	$('#date-picker').datepicker({
+		format		:	'<%=CLIENT_DATE_PICKER_FORMAT%>',
+		multidate	: 	true,
+		startDate 	: 	new Date('<%-newDate(addDate(HOURS_IN_A_DAY),DATABASE_DATE_FORMAT)%>')
+	});
+
+	$(".show-tick").selectpicker('refresh');
+</script>

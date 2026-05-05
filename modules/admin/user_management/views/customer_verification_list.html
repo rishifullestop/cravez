@@ -1,0 +1,243 @@
+
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%= __("admin.user_management.verifications"); %>
+				</h2>
+			</div>
+			<div class="body">
+				<table id="datatable-customer-verification" class="row-border hover table table-bordered cb-data-table full-length-header" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="15%"><%= __("admin.user_management.creation_date"); %></th>
+							<th width="15%"><%= __("admin.user_management.expiration_date"); %></th>
+							<th width="10%"><%= __("admin.user_management.channel"); %></th>
+							<th width="5%"><%= __("admin.user_management.no_of_tries"); %></th>
+							<th width="5%"><%= __("admin.user_management.reset_tries"); %></th>
+							<th width="20%"><%= __("admin.user_management.status"); %></th>
+							<th width="10%"><%= __("admin.user_management.function"); %></th>
+							<th width="10%"><%= __("admin.user_management.text"); %></th>
+							<th width="10%"><%= __("admin.system.action"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal to verify user-->
+<div class="modal fade" id="verify_customer" tabindex="-1" role="dialog" aria-labelledby="verify_customer" aria-hidden="true">
+	<div class="modal-dialog"  role="document">
+		<div class="modal-content">
+			<div class="modal-header modal-header-seperator">
+				<h4 class="modal-title"><%=__("admin.user_management.select_verification_type") %></h4>
+			</div>
+			<form id="verify-customer-form" data-submit-btn-id="verify_customer_btn" method="post" class="on_click_submit" role="form" action="<%=admin_list_url%>/customer_verification_process/<%= user_id %>">
+				<input type="hidden" name="log_id" id="log_id">
+				<div class="modal-body">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<div class="form-grop">
+								<div class="form-lin no-bottom-border">
+								<% if(typeof CUSTOMER_VERIFICATION_TYPES !== undefined){
+									Object.keys(CUSTOMER_VERIFICATION_TYPES).map((type,index)=>{
+									let isSelected = (index == 0) ? "checked" : "";
+								%>
+									<input name="verification_type" type="radio" id="<%=type%>" class="with-gap radio-col-indigo" <%= isSelected%> value="<%=type%>">
+									<label for="<%=type%>"><%= CUSTOMER_VERIFICATION_TYPES[type] %></label><br />
+								<% });
+								} %>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row clearfix otp_code_row">
+						<div class="col-sm-12">
+							<div class="form-grop">
+								<div class="form-lin no-bottom-border">
+									<label for="otp" class="control-label"><%= __('admin.user_management.otp'); %><span class="required"> *</span>  </label>
+									<div class="form-grop margin-0">
+										<div class="form-line">
+											<input id="otp" class="form-control" name="otp"/>
+										</div>
+										<span id="otp_error" class="error"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-top">
+					<button type="button"  id="verify_customer_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit-verify noHover margin-0"><%= __("admin.system.submit"); %>
+					</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div><!--modal close-->
+<script type="text/javascript">
+	/** Function to initialize datatable and get server side data*/
+	var dataTable =	"";
+	var RECLAIM_LOGS_ACTION_TYPE 	= <%-JSON.stringify(RECLAIM_LOGS_ACTION_TYPE)%>;
+	var SYSTEM_CHANNEL  		 	= <%-JSON.stringify(SYSTEM_CHANNEL)%>;
+	var CUSTOMER_VERIFICATION_TYPES = <%-JSON.stringify(CUSTOMER_VERIFICATION_TYPES)%>;
+
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-customer-verification').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem('DataTables', JSON.stringify(oData));
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse(localStorage.getItem('DataTables'));
+			},
+			"order"		: 	[[0,"desc"]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":   PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{
+					"data"			: 'created',
+					"searchable"	: false,
+					"render" 		: function(created){
+						return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+					}
+				},
+				{
+					"data"			: 'expiry_date',
+					"searchable"	: false,
+					"render" 		: function(expiry_date){
+						var dateStr = (expiry_date) ? moment(expiry_date).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT) : "";
+						return dateStr;
+					}
+				},
+				{
+					"data"		 : "channel",
+					"searchable" :  false,
+					"orderable"  :  false,
+					"render" 	 : 	function(channel){
+						return SYSTEM_CHANNEL[channel];
+					}
+				},
+				{
+					"data"		 : "retry_count",
+					"orderable"  : false,
+					"searchable" : false,
+					"render" 	 : 	function(retry_count){
+						return (retry_count) ? retry_count : 0;
+					}
+				},
+				{
+					"data"		 : "reset_tries",
+					"orderable"  : false,
+					"searchable" : false,
+					"render" 	 : function(reset_tries){
+						return (reset_tries) ? reset_tries : 0;
+					}
+				},
+				{
+					"data"		 : {},
+					"orderable"  : false,
+					"searchable" : false,
+					"render"	 : function(result){
+						let verifiedBy = (result.verified_by_name) ? result.verified_by_name : "Customer";
+						let tooltipTxt = 'Verified by : '+verifiedBy;
+						if(result.verification_type) tooltipTxt+= '<br />Verification Type : '+CUSTOMER_VERIFICATION_TYPES[result.verification_type];
+						var tooltip = (result.status == "<%=VERIFIED%>") ? '<span data-placement="bottom" class="tooltipShow tooltipHelp brand-tooltip" title="'+tooltipTxt+'" data-html="true" data-toggle="tooltip"  data-original-title=""><i class="material-icons">info</i></span>' : "";
+
+						let html = "";
+						if(typeof result.status !== typeof undefined && result.status !== ""){
+							html += (result.status == "<%=VERIFIED%>")	? '<span class="label label-success m-t-5"><%=__("admin.system.verified")%></span>'+tooltip : '<span class="label label-warning m-l-5 m-t-5"><%=__("admin.system.pending")%></span>';
+						}
+						return html;
+					}
+				},
+				{
+					"data"		 : "function",
+					"orderable"  : false,
+					"searchable" : false,
+				},
+				{
+					"data"		 : "otp",
+					"orderable"  : false,
+					"searchable" : false,
+				},
+
+				{
+					"data"			: {},
+					"orderable"		: false,
+					"searchable"	: false,
+					"render" 		: function(result){
+						var id 	= (result._id) 	? result._id 	: "";
+						var status 	= (result.status) 	? result.status 	: "<%= PENDING%>";
+
+						var dropDownButton 		=	(status == "<%= PENDING%>") ? ''+
+						'<button type="button" class="btn btn-sm bg-indigo waves-effect verification-options" data-id="'+id+'">'+
+							'<%= __("admin.user_management.options"); %>'+
+						'</button>' : "";
+						return dropDownButton;
+					}
+				},
+
+			],
+			"ajax":{
+				url 	: "<%=admin_list_url%>/customer_verification_list/"+'<%= user_id %>',
+				type	: "POST",
+				dataSrc	: function(res){
+					return res.data;
+				}
+			},
+			"drawCallback": function() {
+				$('[data-toggle="tooltip"]').tooltip();
+			}
+		});
+
+		/** Refresh bootstrap select box  **/
+		$(".show-tick").selectpicker('refresh');
+
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+	$(document).on("click",".verification-options",function(){
+		var customerId = $(this).data("id");
+		$("#otp").val("");
+		$("#log_id").val(customerId);
+		$("#verify_customer").modal("show");
+	});
+
+	$(document).on("change","input[type='radio']",function(){
+		var selectedOption = $(this).val();
+		$(".otp_code_row").removeClass("hide");
+		if(selectedOption == "<%= CUSTOMER_VERIFY_WITHOUT_CODE %>" || selectedOption == "<%= CUSTOMER_REGENERATE_VERIFY_CODE %>"){
+			$("#otp").val("");
+			$(".otp_code_row").addClass("hide");
+		}
+	});
+
+
+	/**
+	* Function to submit  modal form
+	*/
+	$(".btn-submit-verify").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+
+		ajax_submit("verify-customer-form",function(status,response){
+			if(status){
+				window.location.reload();
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+</script>
+

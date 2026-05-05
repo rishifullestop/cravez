@@ -1,0 +1,358 @@
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= __("admin.merchant_upload.merchant_files"); %>
+					</h2>
+				</div>
+				<div class="body">
+					<form id="merchant_file" action="" data-submit-btn-id="merchant-file-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="upload_action" class="control-label col-555">
+											<%= __("admin.merchant_upload.upload_action"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" id="upload_action" name="upload_action">
+											<option value=""><%=__("admin.merchant_upload.select_action");%></option>
+											<% Object.keys(MERCHANT_UPLOAD_ACTION).map(key=>{%>
+												<option value="<%=key%>">
+													<%=(MERCHANT_UPLOAD_ACTION[key]) ? MERCHANT_UPLOAD_ACTION[key].title :"";%>
+												</option>
+											<%
+											}); %>
+										</select>
+									</div>
+									<span id="upload_action_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6 restaurant-field hide">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant" class="control-label col-555">
+											<%= __("admin.merchant_upload.restaurant"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" id="restaurant" name="restaurant" data-live-search="true>
+											<option value=""><%=__("admin.merchant_upload.select_restaurant");%></option>
+											<%- restaurant_list%>
+										</select>
+									</div>
+									<span id="restaurant_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-3">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="image" class="control-label m-r-5"><%= __("admin.merchant_upload.file"); %>
+											<span class="required"> *</span>
+										</label>
+										<input type="file" name="file"  class="form-control cfilestyle" id="file" data-text="Select File" />
+									</div>
+									<span class="demo-image-copyright"><%= __('admin.merchant_upload.extension_and_size_suggestion_message',ALLOWED_MERCHANT_FILE_EXTENSIONS.join(', '))%></span>
+									<span id="file_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="btn-group file-download hide">
+									<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										<%= __("admin.merchant_upload.download_sample_file")%> <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										<li>
+											<a href="javascript:void(0)" class="waves-effect waves-block" download id="sample_file_btn">
+												<%= __("admin.merchant_upload.download_txt_file")%>
+											</a>
+										</li>
+										<li>
+											<a href="javascript:void(0)" class="waves-effect waves-block" download id="csv_sample_file_btn">
+												<%= __("admin.merchant_upload.download_csv_file")%>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<button type="button" id="merchant-file-btn-id" class="btn bg-brown btn-sm waves-effect merchant-file-btn-submit" <%- ADMIN_LOADING_TEXT %> ><%= __("system.submit"); %></button>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+			<div class="card help-msg hide">
+				<%
+				Object.keys(MERCHANT_UPLOAD_ACTION).map((key,index)=>{
+					var helpMsg = settings["Merchant_upload_help_message."+key];
+					helpMsg 	= (helpMsg) ? helpMsg.trim() :helpMsg;
+					if(helpMsg){ %>
+						<div class="help-msg-<%=key%> content hide padding-20">
+							<%-helpMsg.replace(/\\"/g,'"')%>
+						</div><%
+					}
+				});%>
+			</div>
+			<div class="card text-left padding-20">
+				<a href="<%= WEBSITE_ADMIN_URL %>areas" class="waves-effect <%= getPermissionClass(module_type,['areas','list']); %>" target="_blank">
+					<button type="button" class="btn btn-sm bg-indigo waves-effect">
+						<%= __("admin.merchant_upload.get_area_ids"); %>
+					</button>
+				</a>
+				<a href="<%= WEBSITE_ADMIN_URL %>cuisines" class="waves-effect <%= getPermissionClass(module_type,['cuisines','list']); %>" target="_blank">
+					<button type="button" class="btn btn-sm bg-orange waves-effect">
+						<%= __("admin.merchant_upload.get_cuisine_ids"); %>
+					</button>
+				</a>
+				<span class="after-restaurant-btn hide">
+					<a href="<%= originalUrl %>" data-href="<%= WEBSITE_ADMIN_URL %>restaurants/{restaurant-slug}/branches" target="_blank" class="waves-effect get_ids_button <%= getPermissionClass(module_type,['branches','list']); %>">
+						<button type="button" class="btn btn-sm bg-indigo waves-effect">
+							<%= __("admin.merchant_upload.get_branch_ids"); %>
+						</button>
+					</a>
+					<a  href="<%= originalUrl %>" data-href="<%= WEBSITE_ADMIN_URL %>restaurants/{restaurant-slug}/menu" target="_blank" class="waves-effect get_ids_button <%= getPermissionClass(module_type,['menu','list']); %>">
+						<button type="button" class="btn btn-sm bg-orange waves-effect">
+							<%= __("admin.merchant_upload.get_menu_ids"); %>
+						</button>
+					</a>
+					<a  href="<%= originalUrl %>" data-href="<%= WEBSITE_ADMIN_URL %>restaurants/{restaurant-slug}/category" class="waves-effect get_ids_button <%= getPermissionClass(module_type,['category','list']); %>" target="_blank">
+						<button type="button" class="btn btn-sm bg-indigo waves-effect">
+							<%= __("admin.merchant_upload.get_category_ids"); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-href="<%= WEBSITE_ADMIN_URL %>restaurants/{restaurant-slug}/size_category" class="waves-effect get_ids_button <%= getPermissionClass(module_type,['size_category','list']); %>" target="_blank">
+						<button type="button" class="btn btn-sm bg-orange waves-effect">
+							<%= __("admin.merchant_upload.get_item_unit_ids"); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-href="<%= WEBSITE_ADMIN_URL %>restaurants/{restaurant-slug}/item" target="_blank" class="waves-effect get_ids_button <%= getPermissionClass(module_type,['item','list']); %>">
+						<button type="button" class="btn btn-sm bg-indigo waves-effect">
+							<%= __("admin.merchant_upload.get_item_ids"); %>
+						</button>
+					</a>
+				</span>
+			</div>
+			<div class="alert bg-grey alert-dismissible menu-alert hide" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+				<%= __("admin.merchant_upload.leave_start_date_end_date_blank_to_make_as_default"); %>
+			</div>
+			<!-- Dynamic content card-->
+			<div class="card form-card hide" >
+				<div class="body">
+					<div class="row clearfix">
+						<div class="col-sm-12" id="dynamic_content"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css">
+	<!-- <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.6/css/fixedHeader.dataTables.min.css"> -->
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<!-- <script type="text/javascript" src="https://cdn.datatables.net/fixedheader/3.1.6/js/dataTables.fixedHeader.min.js"></script> -->
+
+	<script type="text/javascript">
+
+		$(function() {
+		  var $window = $(window);
+		  var $table = $('.fixed_header_table');
+		  var header = $(".fixed_header_table thead");
+
+		   $window.scroll(toFixTableHeader);
+
+
+		  function toFixTableHeader() {
+			if($('.table-responsive').length>0){
+				var scroll = $(window).scrollTop();
+				header.css("visibility", "hidden");
+				if (scroll >= $('.table-responsive').offset().top - 63) {
+				  $(".fixed_header_table thead tr th").css({
+					top: scroll - $('.table-responsive').offset().top + 63,
+				  });
+				} else {
+				  $(".fixed_header_table thead tr th").css({
+					top: 0,
+				  });
+				}
+				header.css("visibility", "visible");
+			}
+		  }
+		});
+
+		var dataTable =  "";
+		function resetDataTable(){
+			if(dataTable != ''){
+				$("#datatable-listing").DataTable().destroy();
+			}
+			dataTable = $('#datatable-listing').DataTable({
+				"order"			: 	[],
+				"sDom"			:	"ftr",
+				"bFilter"		:   false,
+				"serverSide"	: 	false,
+				//"scrollX"		: 	true,
+				"autoWidth" 	:   false,
+				"fixedHeader" 	: 	{
+					header: true,
+					headerOffset: 65,
+				},
+				"columnDefs": [
+					{ "width": "190px", "orderable" : false, "targets": "_all" }
+				]
+			});
+			if(dataTable) dataTable.columns.adjust();
+		}
+
+		var MERCHANT_UPLOAD_ACTION = <%- JSON.stringify(MERCHANT_UPLOAD_ACTION)%>;
+		$(document).ready(function() {
+			customFileStyle();
+		});
+
+		/*** Manage restaurant to show hide*/
+		$("#upload_action").change(function(){
+			$(".menu-alert").addClass("hide");
+			$(".help-msg, .help-msg .content").addClass("hide");
+			var uploadAction = $(this).val();
+			if(MERCHANT_UPLOAD_ACTION[uploadAction] && MERCHANT_UPLOAD_ACTION[uploadAction].select_restaurant){
+
+				$("#restaurant").val("");
+				$("#restaurant").selectpicker("refresh");
+				$(".restaurant-field").removeClass("hide");
+			}else{
+				$(".restaurant-field").addClass("hide");
+			}
+			if(MERCHANT_UPLOAD_ACTION[uploadAction] && MERCHANT_UPLOAD_ACTION[uploadAction].sample_file && MERCHANT_UPLOAD_ACTION[uploadAction].csv_sample_file){
+				$("#sample_file_btn").attr("href",MERCHANT_UPLOAD_ACTION[uploadAction].sample_file);
+				$("#csv_sample_file_btn").attr("href",MERCHANT_UPLOAD_ACTION[uploadAction].csv_sample_file);
+				$(".file-download").removeClass("hide");
+			}else{
+				$(".file-download").addClass("hide");
+			}
+
+			if($(".help-msg-"+uploadAction).length >0){
+				$(".help-msg, .help-msg .help-msg-"+uploadAction).removeClass("hide");
+			}
+
+			/** manage url by action*/
+			if(uploadAction){
+				var options = {	method	: "GET"};
+				if(uploadAction == '<%= MERCHANT_UPLOAD_CATEGORY %>'){
+					options.url = "<%= WEBSITE_ADMIN_URL %>merchant_upload/add_category";
+				}else if(uploadAction == '<%= MERCHANT_UPLOAD_BRANCHES %>' ){
+					options.url = "<%= WEBSITE_ADMIN_URL %>merchant_upload/add_branch";
+				}else if(uploadAction == '<%= MERCHANT_UPLOAD_MAIN_CATEGORY %>' ){
+					options.url = "<%= WEBSITE_ADMIN_URL %>merchant_upload/add_main_category";
+				}else if(uploadAction == '<%= MERCHANT_UPLOAD_BRANCH_AREAS %>'){
+					options.url = "<%= WEBSITE_ADMIN_URL %>merchant_upload/add_branch_areas";
+				}else if(uploadAction == '<%= MERCHANT_UPLOAD_ITEM_CHOICE_GROUP %>' ){
+					options.url = "<%= WEBSITE_ADMIN_URL %>merchant_upload/add_item_choice_group";
+				}else if(uploadAction == '<%= MERCHANT_UPLOAD_ITEM_EXTRA_ITEMS %>'){
+					options.url = "<%= WEBSITE_ADMIN_URL %>merchant_upload/add_item_extra_items";
+				}else if(uploadAction == '<%= MERCHANT_UPLOAD_ITEM %>'){
+					options.url = "<%= WEBSITE_ADMIN_URL %>merchant_upload/add_item";
+				} else if(uploadAction == '<%= MERCHANT_UPLOAD_MENU %>' ){
+					options.url = "<%= WEBSITE_ADMIN_URL %>merchant_upload/add_menu";
+					$(".menu-alert").removeClass("hide");
+				} else if(uploadAction == '<%= MERCHANT_UPLOAD_RESTAURANT %>'){
+					options.url = "<%= WEBSITE_ADMIN_URL %>merchant_upload/add_restaurant";
+				}
+
+				ajaxRequest(options,function(response){
+					$("#dynamic_content").html(response);
+					//resetDataTable();
+					$(".form-card").removeClass("hide");
+				});
+
+			}else{
+				$(".form-card").addClass("hide");
+				$("#dynamic_content").html("");
+			}
+		});
+
+		/**
+		* Function to submit form
+		*/
+		$(".merchant-file-btn-submit").click(function(){
+			var confirmModal = false;
+			var btnId = $(this).attr("id");
+
+			$("#dynamic_content form").find("input.input-column").each(function(){
+				if($(this).val() != "" && $("#file")[0].files.length > 0){
+					confirmModal = true;
+				}
+			});
+
+			if(!confirmModal) return submitForm(btnId);
+			/** Confirm before submit*/
+			confirmBox("warning",'<%= __("system.are_you_sure") %>','<%= __("admin.merchant_upload.you_want_submit_if_yes_all_form_data_lost"); %>',function(result){
+				swal.close();
+				submitForm(btnId);
+			});
+		});
+
+		/** Function to submit form*/
+		function submitForm(btnId){
+			startTextLoading(btnId);
+			$("#merchant_file span.error").text("");
+			ajax_submit("merchant_file",function(status,response){
+				stopTextLoading(btnId);
+				if(status){
+					if(response.result.length > 0){
+						$("#dynamic_content form table tbody").html("");
+						rowCount = 0;
+						response.result.map(function(rowdata,parentIndex){
+							AppendHTML();
+
+							rowdata.map(function(column,index){
+								if($("#upload_action").val() == '<%= MERCHANT_UPLOAD_MAIN_CATEGORY %>'){
+									if(index == 0){
+										$("#dynamic_content form .table_row").eq(parentIndex).find("input[type=text].input-column").eq(0).val(column);
+									}
+									if(index == 1){
+										$("#dynamic_content form .table_row").eq(parentIndex).find("select option:contains("+column+")").attr('selected', 'selected');
+									}
+									if(index == 2 && column == '<%= AVAILABLE %>'){
+										$("#dynamic_content form .table_row").eq(parentIndex).find("input[type=checkbox]").prop("checked",true);
+									}
+								}else{
+									$("#dynamic_content form .table_row").eq(parentIndex).find("input[type=text].input-column").eq(index).val(column);
+								}
+							});
+						});
+					}
+					if(response.status && response.message) notice(response.status,response.message);
+				}
+			});
+		}
+
+		/** Set restaurant slug*/
+		$("#restaurant").change(function(){
+			var slug = $(this).val();
+			$("#restaurant_slug").val(slug);
+			$(".after-restaurant-btn").addClass("hide");
+
+			/** append restaurant slug */
+			if(slug){
+				$(".get_ids_button").each(function(){
+					let href = $(this).data("href").replace("{restaurant-slug}",slug);
+					$(this).attr("href",href);
+				});
+				$(".after-restaurant-btn").removeClass("hide");
+			}
+
+		});
+
+		/** Reset merchant form*/
+		function resetMerchantForm(){
+			$("#merchant_file .error").html('');
+			$("#merchant_file input,#merchant_file select").val('');
+			$("#merchant_file select").selectpicker("refresh");
+			$(".count-jfilestyle").addClass("hide");
+		};
+	</script>

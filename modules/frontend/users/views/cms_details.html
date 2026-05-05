@@ -1,0 +1,30 @@
+<%
+	if(typeof result !== typeof undefined && result.constructor == Array && result.length>0){
+		result.map(records=>{
+			if(records.body){
+				var body = (records.body) ?  records.body :"";
+				var title = (records.name) ?  records.name :"";
+				body =		body.replace(/{WEBSITE_IMG_URL}/g,WEBSITE_IMG_URL);
+				%>
+				<div class="container-fluid" id="main-container">
+					<div class="row clearfix">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<div class="card">
+								<div class="header">
+									<h2>
+										<%- title %>
+									</h2>
+								</div>
+								<div class="body">
+									<%- body; %>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div><%
+			}
+		});
+	}
+	%>
+
+

@@ -1,0 +1,242 @@
+<%
+  var dateStart		=	newDate(subtractMinute(MINUTES_IN_A_HOUR),DATE_TIME_RANGE_FORMAT);
+  var dateEnd		=	newDate("",DATE_TIME_RANGE_FORMAT);
+  var dateForm		=	newDate(subtractMinute(MINUTES_IN_A_HOUR),DATABASE_DATE_TIME_FORMAT);
+  var dateTo		=	newDate("",DATABASE_DATE_TIME_FORMAT);
+  let selectedButton = type ? type : TOTAL_ORDER_PER_RESTAURANT;
+%>
+<div class="container-fluid">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							aria-controls="panel-collapse-id">
+								<%= __("admin.sales_report.sales_report"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix">
+									<!-- Search by order Date -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="date-range-picker" placeholder="<%= __('admin.orders.search_by_order_date'); %>" value="<%= dateStart %> - <%= dateEnd%>" readonly>
+											</div>
+											<input class="form-control hide" id="from_date" value="<%= dateForm%>" type="text" name="from_date">
+											<input class="form-control hide" id="to_date" value="<%= dateTo%>" type="text" name="to_date">
+										</div>
+									</div>
+									<!-- Search by status -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="sales_report_type" name="sales_report_type" data-live-search="true" data-selected-type="<%= selectedButton %>">
+													<%
+													Object.keys(SALES_REPORT_DROPDOWN).map(key=>{
+														var selected = (selectedButton == key) ? 'selected' : '';%>
+														<option value="<%=key%>" <%= selected%>>
+															<%= SALES_REPORT_DROPDOWN[key].status_name%>
+														</option> <%
+													}); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by restaurant name -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick restaurant_id" id="search_restaurant_id"   name="search_restaurant_id" data-child-name="search_branch_id" data-live-search="true" multiple title='<%=__("admin.sales_report.search_by_restaurant");%>'>
+													<%- restaurant_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by branch -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick branch_id disabled" id="search_branch_id"   name="search_branch_id" data-live-search="true"  title='<%=__("admin.sales_report.search_by_branch");%>' data-live-search="true" disabled multiple>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- Search by payment method -->
+									<div class="col-xs-12 col-sm-4 payment-class hide">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick" id="payment_method" name="payment_method">
+													<option value=""><%=__("admin.sales_report.search_by_payment_method");%></option>
+														<% Object.keys(PAYMENT_METHODS).map(key=>{ %>
+															<option value="<%=key%>"><%= PAYMENT_METHODS[key]%></option>
+														<% }); %>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="main-container"></div>
+</div>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/buttons.dataTables.min.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/dataTables.buttons.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/jszip.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/pdfmake.min.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/vfs_fonts.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>jquery-datatable/extensions/export_new/buttons.html5.min.js "></script>
+
+	<script type="text/javascript">
+		show_report();
+
+		/* Event triggered when restaurant change */
+		$(document).on('change','#sales_report_type',function(e){
+			show_report();
+		});
+
+		/**
+		* Function to change current order
+		*/
+		function show_report(){
+			var dateFrom 	= 	$('#from_date').val();
+			var dateTo 		= 	$('#to_date').val();
+			var reportType	= 	$('#sales_report_type').val();
+			var paymentMethod= 	$('#payment_method').val();
+			var restaurantId = 	$('#search_restaurant_id').val();
+			var branchId 	 = 	$('#search_branch_id').val();
+			if(reportType != '<%=TOTAL_ORDERS_PER_REST_WITH_PAYMENT_METHOD%>'){
+				$('.payment-class').addClass("hide");
+			}else{
+				$('.payment-class').removeClass("hide");
+			}
+			
+			$("#main-container").data("url","<%= WEBSITE_ADMIN_URL+'sales_reports' %>/"+reportType+'?date_from='+dateFrom+'&date_to='+dateTo+'&payment_method='+paymentMethod+'&restaurant_id='+restaurantId+'&branch_id='+branchId+'&type='+'<%= SALES_REPORT_EXCEL %>');
+			$("#main-container").data("open-modal",false);
+			if(reportType){
+				fetchData();
+			}
+
+		}
+
+		/**
+		* Get branch list
+		*/
+		$("select[name='search_restaurant_id']").change(function(){
+			getBranchDropDownList($(this));
+		});
+
+		/**
+		* Get dropdown value by local storage
+		*/
+		let tempRestaurantId = 	"";
+		let tempBranchId 	 =	"";
+		if(localStorage["search_" +window.location.pathname]){
+
+			let searchFormData = JSON.parse(localStorage["search_" +window.location.pathname]);
+			for(index in searchFormData){
+				if(searchFormData[index].name && searchFormData[index].name == "search_branch_id" && searchFormData[index].value){
+					tempBranchId = searchFormData[index].value;
+				}
+				if(searchFormData[index].name && searchFormData[index].name == "search_restaurant_id" && searchFormData[index].value){
+					tempRestaurantId = searchFormData[index].value;
+				}
+			}
+
+			if(tempRestaurantId) getBranchDropDownList($("select[name='search_restaurant_id']"),tempRestaurantId,tempBranchId);
+		}
+
+		/**
+		* Get branch search dropdown list
+		*/
+		function getBranchDropDownList(currentObj,restaurantId,branchId){
+			if(currentObj){
+
+				var currentValue	=	currentObj.val();
+				var childInputName	=	currentObj.attr("data-child-name");
+				var childObj		=	(childInputName) ?  $("select[name='"+childInputName+"']") :"";
+				var placeholder		=	childObj.attr("title");
+				var childFirstOption=	'<option value="">'+placeholder+'</option>';
+
+				if(!currentValue && restaurantId) currentValue = restaurantId;
+
+				childObj.attr("disabled",true).removeClass("disabled").html(childFirstOption);
+				if(!branchId) childObj.val("").trigger("change");
+				$(".show-tick").selectpicker('refresh');
+
+				if(currentValue){
+					/** Get dropdown list **/
+					var options = {
+						url 	: "<%=WEBSITE_ADMIN_URL%>sales_reports/branch_list",
+						data	: {restaurant_id : currentValue},
+						method	: "post"
+					}
+					ajaxRequest(options,function(response){
+						if(response.status == "<%=STATUS_SUCCESS%>"){
+							/** Append dropdown list **/
+							childObj.attr("disabled",false).removeClass("disabled").html(response.branch_list);
+							if(branchId) childObj.val(branchId);
+							$(".show-tick").selectpicker('refresh');
+						}else if(response.status && response.message){
+							notice(response.status,response.message);
+						}
+					});
+				}
+			}
+		}// end getBranchDropDownList()
+
+		/* Date range picker configuration */
+		var displayDateTimeFormat = "<%=DATE_PICKER_DATE_TIME_FORMAT%>";
+		var maxDate    		= new Date();
+		var dateRanges 		= null;
+		var startDate 		= new Date();
+		var endDate 		= new Date();
+		var timePicker 		= true;
+		var autoUpdateInput = false;
+		var opens 			= "right";
+		var removeClearBtn  = true;
+		var startDateTimeFormat = "<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>";
+		var endDateTimeFormat   = "<%=DATE_RANGE_DISPLAY_FORMAT_FOR_END_DATE%>";
+
+		var configDemo = $('#date-range-picker');
+
+		configDemo.on('apply.daterangepicker', function(e,picker){
+			var startDate	= picker.startDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>');
+			var endDate		= picker.endDate.format('<%=DATE_RANGE_DISPLAY_FORMAT_FOR_END_DATE%>');
+
+			$('#from_date').val(startDate);
+			$('#to_date').val(endDate);
+		    show_report(startDate,endDate);
+		});
+
+		/* Payment method on change call show report function */
+		$("#payment_method,#search_restaurant_id,#search_branch_id").change(function(){
+			show_report();
+		});
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+	<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
